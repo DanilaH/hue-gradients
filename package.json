@@ -21,7 +21,8 @@
     "build:yandex": "npm run typecheck && vite build --config vite.yandex.config.ts --mode yandex",
     "build:yandex:debug": "npm run typecheck && vite build --config vite.yandex.config.ts --mode yandex-debug",
     "yandex:check": "npm run build:yandex && node tools/yandex-audit.mjs",
-    "spec:check": "node tools/check-spec.mjs"
+    "spec:check": "node tools/check-spec.mjs",
+    "test:browser": "node tools/m1-browser-check.mjs"
   },
   "dependencies": {
     "@capacitor/android": "8.6.0",

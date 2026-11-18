@@ -26,10 +26,19 @@ export interface OperationReceipt {
   readonly appliedRevision: number;
 }
 
+export type StoredFact = PreparedCommit['facts'][number];
+
+export class StoreError extends Error {
+  constructor(public readonly code: 'CONFLICT' | 'OPERATION_MISMATCH' | 'CORRUPT' | 'UNAVAILABLE', message: string) {
+    super(message);
+  }
+}
+
 export interface TransactionalLocalStore {
   load(vaultId: string): Promise<CommittedWorkspace | null>;
   /** Snapshot + facts/outbox + operation receipt in ONE native/IndexedDB transaction. */
   commit(command: PreparedCommit): Promise<OperationReceipt>;
   readOperation(vaultId: string, operationId: string): Promise<OperationReceipt | null>;
+  listFacts(vaultId: string): Promise<readonly StoredFact[]>;
   close(): void;
 }

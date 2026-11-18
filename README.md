@@ -1,23 +1,35 @@
-# ХУЕ / «Полусон»
+# Полусон / hue-gradients
+
 Цветовая головоломка для Android/RuStore и Яндекс Игр. «Полусон» — рабочее название.
-Реализация по [ТЗ 1.0](docs/spec/PRODUCT_SPEC_1_0.md) и [роудмапе M0–M8](docs/spec/ROADMAP_1_0.md). [Статус](docs/STATUS.md), [handoff](docs/SESSION_HANDOFF.md).
 
-Сейчас подготовлены два технических host-scaffold и чистое ядро первых15 задач. Экран с тестовым счётчиком проверяет host; это ещё не игровая сборка. Полный релиз включает кампанию, мету, daily/архив, редактор, экспорт и облако.
+Сейчас доступен внутренний игровой срез M1: 15 неизменяемых уровней, tap–tap/drag/клавиатура, помощь, повторы, результаты и локальное транзакционное сохранение. Android использует SQLite, браузер — IndexedDB. Полный первый релиз по ТЗ ещё не готов; художественная приёмка M2 не проводилась.
 
-## Подготовка
-Node24, JDK21, Android SDK36/build-tools36.0.0. Runtime/guidance закреплены отдельно в [kit-pins.json](kit-pins.json). Kit приватный; нужен авторизованный доступ к закреплённому SHA.
+Перед продолжением читать [AGENTS.md](AGENTS.md), [состояние](docs/STATUS.md) и [точку продолжения](docs/SESSION_HANDOFF.md). Исходное ТЗ сохранено в [docs/spec](docs/spec/START_HERE.md), план — [ROADMAP_1_0.md](docs/spec/ROADMAP_1_0.md).
+
+## Разработка
+
+Node 24+. Приватный mini-games-kit закреплён в package.json/kit-pins.json; доступ к нему нужен для установки. Не обновлять pin незаметно.
 
 ```sh
 npm install
+npm run dev
+npm run dev:yandex
 npm run check
 npm run yandex:check
-npm run android:sync:release
-cd native/android
-./gradlew --no-daemon assembleDebug assembleReleaseCheck
+npm run spec:check
 ```
 
-Локально разрешён проверенный npm pack точного kit checkout, установленный через `npm install --no-save --package-lock=false <tgz>`; committed pin не меняется. CI использует KIT_READ_TOKEN с доступом только к чтению mini-games-kit; token не сохраняется в git/npm config.
+Браузерные сценарии требуют Playwright и Chromium:
 
-Android preview: `npm run dev`; Yandex local mock: `npm run dev:yandex`. Native output:dist/; Yandex upload-root:dist-yandex/. releaseCheck имеет тестовую подпись; production требует настроенной сохранённой подписи и публичного certificate pin.
+```sh
+npm run test:browser
+node tools/yandex-browser-check.mjs
+```
 
-Все71 строки production-приёмки пока NOT RUN. Компиляция не заменяет телефон, hosted SDK, облако, реальную авторизацию/рекламу и художественную приёмку.
+Оба скрипта запускают собственный Vite. `CHROMIUM_PATH` задаёт путь к Chromium; в Codex можно использовать headless shell. Тесты SDK локальные, не заменяют загрузку на Яндекс Игры.
+
+Android: [BOOTSTRAP.md](BOOTSTRAP.md), `npm run android:sync:release`, затем Gradle debug/releaseCheck и проверка точного APK. releaseCheck подписывается тестовым ключом. Production signer и публикация не настроены.
+
+## Проверки и ограничения
+
+30 unit-тестов, 20 браузерных сценариев с настоящим IndexedDB, 6 локальных SDK-сценариев, платформенные сборки и проверка R8/APK. Физический Android, native SQLite runtime, hosted SDK, cloud и live ads ещё не приняты. [Внешние условия](docs/M0_GATES.md).

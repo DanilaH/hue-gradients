@@ -32,3 +32,13 @@ Owner reference docs/spec/reference/owner-art-reference.png: fullscreen luminous
 ## Deliberate template changes
 Yandex files moved under web/ with independent config/env/output/audit. Its sample readiness moved from create() to first POST_RENDER, matching native first-frame contract. Product spec overrides template prompts to invent art/economy. Other host sample behavior remains until M1 integration.
 KIT IMPACT: REUSE. No common runtime APIs or other game repositories changed.
+
+## M1 local slice — 18 November 2026
+
+Shared entry is now src/game/mountGame.ts/PuzzleScene.ts; the old counter/sample-scene files are not game entrypoints. The 15 delivered definitions remain byte-identical. Rendering and hit tests share rounded CSS-space geometry. Pointerup checks current geometry directly, without waiting for a resize observer. Normal capture release preserves tap selection; canceled/foreign pointers cannot commit a stale gesture.
+
+Native HueSQLitePlugin uses a process-wide writer and SQLite FULL synchronous transactions. Its corruption callback throws without Android's default database deletion. Browser IndexedDB uses strict durability when supported, a transaction-local revision CAS and an immutable operation ledger. Browser eviction is still possible and does not constitute a cloud backup. Snapshot progress, separate fingerprint/rules bests, earned rights, guest facts/outbox skeleton and operation receipt commit together. Help is committed before reveal; receipt ambiguity blocks mutation until resolved with the same operation. One corrupt attempt is archived within the next explicitly confirmed recovery write; whole-profile corruption never becomes empty defaults.
+
+Yandex SDK is optional for local startup. The host reuses kit script loading/activity and attaches LoadingAPI/GameplayAPI/pause/resume after init, without awaiting SDK metadata storage or identity. Native code never imports that host. Current visuals are an M1 functional surface using system typography; dreamy/PSX art, expressive settling and the font decision remain subject to M2/acceptance.
+
+Evidence: 30 unit, 20 Chromium/IndexedDB/input and 6 local SDK host scenarios; debug/R8 releaseCheck and exact-APK checks. Native SQLite runtime/process death, physical phone and actual hosted SDK remain NOT RUN. KIT IMPACT: REUSE, two local CANDIDATE seams in KIT_CANDIDATES.md; no common runtime was changed.

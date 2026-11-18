@@ -38,7 +38,7 @@ test('allows swapping correct movable tiles; pins, same tile and outside are no-
   for (const [from, to] of [[0, 1], [1, 1], [-1, 2], [1, 99], [NaN, 1]]) {
     expect(proposeSwap(level, attempt, from!, to!)).toBe(attempt);
   }
-  const solution = { ...attempt, board: attempt.board.map((_, i) => i), completed: true };
+  const solution = { ...attempt, moves: level.minimumSwaps, board: attempt.board.map((_, i) => i), completed: true };
   expect(proposeSwap(level, solution, 1, 2)).toBe(solution);
   const partlyCorrect = proposeSwap(level, attempt, 1, 2);
   const correctPosition = partlyCorrect.board.findIndex((id, i) => id === i && !level.pinnedPositions.includes(i));

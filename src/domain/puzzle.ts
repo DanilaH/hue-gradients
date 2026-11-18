@@ -88,7 +88,8 @@ export function validateAttempt(level: LevelDefinition, attempt: Attempt): void 
       !integer(attempt.moves, 0, Number.MAX_SAFE_INTEGER) || !integer(attempt.assistsUsed, 0, Number.MAX_SAFE_INTEGER) ||
       typeof attempt.assisted !== 'boolean' || typeof attempt.completed !== 'boolean' ||
       attempt.assisted !== (attempt.assistsUsed > 0) ||
-      attempt.completed !== attempt.board.every((id, position) => id === position)) {
+      attempt.completed !== attempt.board.every((id, position) => id === position) ||
+      (attempt.completed && attempt.moves < level.minimumSwaps)) {
     throw new Error('Invalid saved attempt');
   }
   validatePermutation(attempt.board, level.pinnedPositions);

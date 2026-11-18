@@ -40,6 +40,9 @@ with zipfile.ZipFile(a.apk) as z:
     blocks=re.split(r'(?=Class #\d+)','\n'.join(output));descriptor='L'+cfg['appId'].replace('.','/')+'/GameStoragePlugin;'
     plugin=[b for b in blocks if re.search(r"Class descriptor\s*:\s*'"+re.escape(descriptor)+"'",b)];assert plugin,'Storage bridge removed by R8'
     for method in ['get','set','remove','list']:assert any(re.search(r"name\s*:\s*'"+method+"'",b) for b in plugin),method
+    descriptor='L'+cfg['appId'].replace('.','/')+'/HueSQLitePlugin;'
+    sqlite=[b for b in blocks if re.search(r"Class descriptor\s*:\s*'"+re.escape(descriptor)+"'",b)];assert sqlite,'Transactional SQLite bridge removed by R8'
+    for method in ['load','commit','readOperation','listFacts']:assert any(re.search(r"name\s*:\s*'"+method+"'",b) for b in sqlite),method
 mapping=Path('native/android/app/build/outputs/mapping')/('release' if a.kind=='release' else 'releaseCheck')/'mapping.txt';assert mapping.is_file() and mapping.stat().st_size>1000
 report={'kind':a.kind,'package':package,'versionName':cfg['versionName'],'versionCode':cfg['versionCode'],'kitRef':stamp['kitRef'],'source':os.environ.get('GITHUB_SHA','local'),'apkSha256':hashlib.sha256(a.apk.read_bytes()).hexdigest(),'bytes':a.apk.stat().st_size,'certificateSha256':cert,'productionSigner':a.kind=='release','v2':True,'zipalign16k':True,'debuggable':False,'webViewDebuggingConfigured':False,'nativeInsetOwner':'content-root','webPayload':web,'nativeRuntime':'NOT RUN','liveServices':'NOT INSTALLED BY THIS HOST TEMPLATE'}
 for name,text in [('signing.txt',sign),('badging.txt',badging),('manifest.txt',manifest),('alignment.txt',alignment)]: (a.out/name).write_text(text)
