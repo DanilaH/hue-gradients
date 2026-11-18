@@ -10,7 +10,7 @@ import com.getcapacitor.BridgeActivity;
 /** The native content root is the single system/cutout-inset owner. */
 public class MainActivity extends BridgeActivity {
   @Override public void onCreate(Bundle savedInstanceState){
-    SplashScreen.installSplashScreen(this);registerPlugin(GameStoragePlugin.class);registerPlugin(HueSQLitePlugin.class);super.onCreate(savedInstanceState);
+    SplashScreen.installSplashScreen(this);registerPlugin(GameStoragePlugin.class);registerPlugin(HueSQLitePlugin.class);registerPlugin(HueFeedbackPlugin.class);super.onCreate(savedInstanceState);
     WindowCompat.setDecorFitsSystemWindows(getWindow(),false);
     WindowCompat.getInsetsController(getWindow(),getWindow().getDecorView()).setAppearanceLightStatusBars(false);
     WindowCompat.getInsetsController(getWindow(),getWindow().getDecorView()).setAppearanceLightNavigationBars(false);

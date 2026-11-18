@@ -49,3 +49,16 @@ test('render bounds and rounded hit testing share cell geometry, including seams
   expect(hitTest(board, -1, 20)).toBeNull(); expect(hitTest(board, 320, 20)).toBeNull();
   expect(hitTest(board, 320 / 6, 40)).toBeNull();
 });
+
+test('preferences extend old saves without resetting attempts, progress or assistance', () => {
+  const state = finish(newWorkspace('old'));
+  const old = JSON.parse(JSON.stringify(state)); delete old.preferences;
+  const loaded = decodeWorkspace(JSON.stringify(old), fingerprints);
+  expect(loaded.preferences).toEqual({ motion: true, sound: true, haptics: true });
+  expect(loaded.attempts).toEqual(state.attempts); expect(loaded.completed).toEqual(state.completed);
+  const changed = applyAction(loaded, { kind: 'preferences', key: 'sound', value: false }, fingerprints);
+  expect(changed.attempts).toBe(loaded.attempts); expect(changed.bests).toBe(loaded.bests);
+  expect(decodeWorkspace(JSON.stringify(changed), fingerprints).preferences.sound).toBe(false);
+  expect(applyAction(changed, { kind: 'preferences', key: 'sound', value: false }, fingerprints)).toBe(changed);
+  expect(() => decodeWorkspace(JSON.stringify({ ...state, preferences: { ...state.preferences, sound: 'yes' } }), fingerprints)).toThrow();
+});

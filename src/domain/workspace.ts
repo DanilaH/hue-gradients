@@ -2,6 +2,8 @@ import { createAttempt, proposeHelp, proposeSwap, RULES_VERSION, validateAttempt
 import { getLevel, levels } from './levels';
 
 export interface Best { fingerprint: string; rulesVersion: typeof RULES_VERSION; clean: number | null; assisted: number | null }
+export interface Preferences { sound: boolean; haptics: boolean; motion: boolean }
+export const DEFAULT_PREFERENCES: Readonly<Preferences> = { sound: true, haptics: true, motion: true };
 export interface Workspace {
   schemaVersion: 1;
   contentVersion: 'gradient-prototype-0.1';
@@ -13,16 +15,18 @@ export interface Workspace {
   rights: string[];
   onboarding: { version: 1; firstSwapDone: boolean; pinExplained: boolean };
   quarantine: { levelId: string; rawAttempt: string }[];
+  preferences: Preferences;
 }
 export type Action = { kind: 'swap'; from: number; to: number; attemptId: string } |
   { kind: 'help'; attemptId: string } | { kind: 'pin' } |
+  { kind: 'preferences'; key: keyof Preferences; value: boolean } |
   { kind: 'open'; levelId: string; attemptId: string } | { kind: 'restart'; levelId: string; attemptId: string };
 
 export function newWorkspace(attemptId: string): Workspace {
   const level = levels[0]!;
   return { schemaVersion: 1, contentVersion: 'gradient-prototype-0.1', policyVersion: 'm1-local-1', activeLevelId: level.id,
     attempts: { [level.id]: createAttempt(level, attemptId) }, completed: [], bests: {}, rights: [],
-    onboarding: { version: 1, firstSwapDone: false, pinExplained: false }, quarantine: [] };
+    onboarding: { version: 1, firstSwapDone: false, pinExplained: false }, quarantine: [], preferences: { ...DEFAULT_PREFERENCES } };
 }
 export function canonicalJson(value: unknown): string {
   if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
@@ -46,6 +50,9 @@ export function decodeWorkspace(json: string, fingerprints: ReadonlyMap<string, 
       !state.onboarding || state.onboarding.version !== 1 || typeof state.onboarding.firstSwapDone !== 'boolean' || typeof state.onboarding.pinExplained !== 'boolean' ||
       !Array.isArray(state.completed) || !Array.isArray(state.rights) || !Array.isArray(state.quarantine)) throw new Error('Unsupported or damaged profile');
   getLevel(state.activeLevelId);
+  // Additive schema-1 extension: old snapshots remain valid; existing fields are never reset.
+  if (!Object.hasOwn(state, 'preferences')) state.preferences = { ...DEFAULT_PREFERENCES };
+  if (!state.preferences || Object.keys(DEFAULT_PREFERENCES).some(key => typeof state.preferences[key as keyof Preferences] !== 'boolean')) throw new Error('Invalid saved preferences');
   for (const list of [state.completed, state.rights]) {
     if (new Set(list).size !== list.length || list.some(id => typeof id !== 'string')) throw new Error('Invalid saved progress');
   }
@@ -77,6 +84,10 @@ export function decodeWorkspace(json: string, fingerprints: ReadonlyMap<string, 
 }
 
 export function applyAction(state: Workspace, action: Action, fingerprints: ReadonlyMap<string, string>): Workspace {
+  if (action.kind === 'preferences') {
+    if (!Object.hasOwn(DEFAULT_PREFERENCES, action.key) || typeof action.value !== 'boolean' || state.preferences[action.key] === action.value) return state;
+    return { ...state, preferences: { ...state.preferences, [action.key]: action.value } };
+  }
   const level = getLevel(state.activeLevelId), attempt = state.attempts[level.id];
   if (action.kind === 'open' || action.kind === 'restart') {
     const target = getLevel(action.levelId);

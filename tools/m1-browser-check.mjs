@@ -140,7 +140,7 @@ try {
   assert.equal((await readState()).revision, unchanged); reports.push('resize cancels captured drag');
   p1 = await center(1); p2 = await center(2);
   await page.mouse.move(p1.x, p1.y); await page.mouse.down(); await page.mouse.move(p2.x, p2.y);
-  await page.evaluate(() => document.querySelector('canvas').dispatchEvent(new PointerEvent('pointercancel', { pointerId: 1 })));
+  await page.evaluate(() => document.querySelector('#board-region canvas').dispatchEvent(new PointerEvent('pointercancel', { pointerId: 1 })));
   await page.mouse.up(); await idle(); assert.equal((await readState()).revision, unchanged); reports.push('pointercancel rejects late release');
   await page.mouse.move(p1.x, p1.y); await page.mouse.down(); await page.mouse.move(p2.x, p2.y);
   await page.evaluate(() => window.dispatchEvent(new Event('blur'))); await page.mouse.up();
@@ -150,11 +150,11 @@ try {
   p1 = await center(1); p2 = await center(2);
   await page.mouse.move(p1.x, p1.y); await page.mouse.down();
   await page.evaluate(() => {
-    const canvas = document.querySelector('canvas');
+    const canvas = document.querySelector('#board-region canvas');
     canvas.dispatchEvent(new PointerEvent('pointerdown', { pointerId: 2, button: 0, clientX: 10, clientY: 10 }));
     canvas.dispatchEvent(new PointerEvent('pointercancel', { pointerId: 2 }));
   });
-  await page.evaluate(p => document.querySelector('canvas').dispatchEvent(new PointerEvent('pointerup', { pointerId: 1, clientX: p.x, clientY: p.y })), p2);
+  await page.evaluate(p => document.querySelector('#board-region canvas').dispatchEvent(new PointerEvent('pointerup', { pointerId: 1, clientX: p.x, clientY: p.y })), p2);
   await page.mouse.up(); await idle();
   assert.equal((await readState()).attempts['gradient-002'].moves, 1); reports.push('final pointerup coordinates and ignored second pointer');
   const restart = async () => {

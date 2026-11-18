@@ -1,0 +1,76 @@
+import assert from 'node:assert/strict';
+import { spawn, execFileSync } from 'node:child_process';
+import { createRequire } from 'node:module';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+let playwright;
+try { playwright = await import('playwright'); } catch { playwright = createRequire(`${process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES}/package.json`)('playwright'); }
+await mkdir('.test-output/m2', { recursive: true });
+const dev = spawn(process.execPath, ['node_modules/vite/bin/vite.js', '--host','127.0.0.1','--port','4175','--strictPort'], { stdio: 'ignore' });
+let browser;
+const reports = [];
+try {
+  for (let i=0;i<100;i++) { try { if ((await fetch('http://127.0.0.1:4175')).ok) break; } catch {} if (i===99) throw Error('Vite not ready'); await new Promise(r=>setTimeout(r,100)); }
+  browser = await playwright.chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', headless: true, args: ['--no-sandbox','--enable-unsafe-swiftshader'] });
+  const context = await browser.newContext({ viewport: { width:390,height:844 } });
+  await context.addInitScript(() => {
+    window.__feedback = { audio:0, haptic:[], busy:[] };
+    const original = AudioBufferSourceNode.prototype.start;
+    AudioBufferSourceNode.prototype.start = function(...args) { window.__feedback.audio++; window.__feedback.busy.push(document.querySelector('#hue-app')?.dataset.busy); return original.apply(this,args); };
+    Object.defineProperty(navigator,'vibrate',{ writable:true,configurable:true,value: value => { window.__feedback.haptic.push(value); return true; } });
+  });
+  const page = await context.newPage(); const errors=[]; page.on('pageerror',e=>errors.push(e.message));
+  await page.goto('http://127.0.0.1:4175');
+  try { await page.waitForSelector('html[data-state=ready]'); } catch(error) { console.log(JSON.stringify({errors,text:(await page.locator('body').innerText()).slice(0,1200)})); await page.screenshot({path:'.test-output/m2/startup-failure.png'}); throw error; }
+  const state = () => page.evaluate(async()=>{ const {openIndexedDb}=await import('/src/local-store/indexed-db.ts'); const s=await openIndexedDb(); const r=await s.load('guest-local-v1'); s.close(); return JSON.parse(r.snapshotJson); });
+  const defs=JSON.parse(await readFile('docs/spec/prototype/levels-0.1.json','utf8')).levels;
+  const idle=()=>page.waitForFunction(()=>document.querySelector('#hue-app').dataset.busy==='false');
+  const tap=async index=>{ const model=await state(),l=defs.find(x=>x.id===model.activeLevelId),r=await page.locator('#board-region canvas').boundingBox(); await page.mouse.click(r.x+(index%l.width+.5)*r.width/l.width,r.y+4+(Math.floor(index/l.width)+.5)*(r.height-8)/l.height); };
+  await tap(0); await idle(); assert.equal(await page.evaluate(()=>window.__feedback.audio),0); assert.equal(await page.evaluate(()=>window.__feedback.haptic.length),0);
+  await tap(1); await tap(1); assert.equal(await page.evaluate(()=>window.__feedback.audio),0); reports.push('pin/deselect have no success audio or haptic');
+  await tap(1); await tap(2); await idle(); await page.waitForSelector('#hue-app[data-layer=result]');
+  assert.equal(await page.getByRole('button',{name:'Дальше',exact:true}).isEnabled(),true);
+  await page.waitForFunction(()=>window.__feedback.haptic.length===1); await page.waitForTimeout(200);
+  const accepted=await page.evaluate(()=>window.__feedback); assert.equal(accepted.audio,1); assert.deepEqual(accepted.busy,['false']); reports.push('one victory cue after commit; CTA immediately enabled');
+  await page.waitForTimeout(650); await page.screenshot({path:'.test-output/m2/win.png'});
+  await page.reload(); await page.waitForSelector('#hue-app[data-layer=result]'); assert.equal(await page.evaluate(()=>window.__feedback.audio+window.__feedback.haptic.length),0); reports.push('restored victory never replays sound/haptic');
+  await page.getByRole('button',{name:'Дальше',exact:true}).click(); await idle();
+  await page.waitForSelector('#game-dialog',{state:'hidden'});
+  await tap(1); await tap(2); await idle();
+  const started=Date.now(); await tap(1); await tap(2); await idle();
+  assert.equal((await state()).attempts['gradient-002'].moves,2); reports.push('new gesture interrupts settling without dropping the next move');
+  await page.locator('#settings').click();
+  await page.getByRole('checkbox',{name:'Звуки',exact:true}).uncheck(); await idle();
+  await page.getByRole('checkbox',{name:'Вибрация',exact:true}).uncheck(); await idle();
+  await page.getByRole('checkbox',{name:'Движение фона',exact:true}).uncheck(); await idle();
+  await page.getByRole('button',{name:'Вернуться к игре'}).click();
+  const muted=await page.evaluate(()=>window.__feedback.audio+window.__feedback.haptic.length);
+  await tap(1); await tap(2); await idle(); assert.equal(await page.evaluate(()=>window.__feedback.audio+window.__feedback.haptic.length),muted);
+  assert.equal(await page.locator('#hue-app').getAttribute('data-motion'),'false');
+  const frame=await page.locator('.atmosphere').getAttribute('data-frames'); await page.waitForTimeout(200); assert.equal(await page.locator('.atmosphere').getAttribute('data-frames'),frame);
+  await page.reload(); await page.waitForSelector('html[data-state=ready]'); assert.deepEqual((await state()).preferences,{sound:false,haptics:false,motion:false}); reports.push('sound/haptic/motion settings persist; muted actions stay silent');
+  await page.locator('#settings').click(); await page.getByRole('checkbox',{name:'Движение фона',exact:true}).check(); await idle(); await page.getByRole('button',{name:'Вернуться к игре'}).click();
+  await page.emulateMedia({reducedMotion:'reduce'}); await page.waitForSelector('#hue-app[data-motion=false]'); assert.equal(await page.locator('#hue-app').getAttribute('data-motion'),'false');
+  const reduced=await page.locator('.atmosphere').getAttribute('data-frames'); await page.waitForTimeout(200); assert.equal(await page.locator('.atmosphere').getAttribute('data-frames'),reduced); reports.push('system reduced motion overrides the animation preference');
+  // Sample actual compositor pixels, away from pin/selection markers, against authored RGB.
+  await page.screenshot({path:'.test-output/m2/gameplay.png'});
+  const model=await state(),level=defs.find(l=>l.id===model.activeLevelId),box=await page.locator('#board-region canvas').boundingBox();
+  const pixels=model.attempts[model.activeLevelId].board.map((tile,i)=>({x:Math.round(box.x+(i%level.width+.23)*box.width/level.width),y:Math.round(box.y+4+(Math.floor(i/level.width)+.23)*(box.height-8)/level.height),rgb:level.solvedTileColors[tile]}));
+  await writeFile('.test-output/m2/pixels.json',JSON.stringify(pixels));
+  execFileSync('python3',['-c',`from PIL import Image\nimport json\nim=Image.open('.test-output/m2/gameplay.png').convert('RGB')\nfor p in json.load(open('.test-output/m2/pixels.json')):\n e=tuple(bytes.fromhex(p['rgb'][1:])); a=im.getpixel((p['x'],p['y'])); assert a==e,(a,e)\nprint('Exact RGB:',${pixels.length})`]); reports.push('actual displayed tile RGB unchanged by atmosphere');
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  await page.evaluate(()=>window.dispatchEvent(new Event('blur'))); const paused=await page.locator('.atmosphere').getAttribute('data-frames');
+  await page.waitForTimeout(200); assert.equal(await page.locator('.atmosphere').getAttribute('data-frames'),paused); await page.evaluate(()=>window.dispatchEvent(new Event('focus'))); await idle(); reports.push('background stops ambient frames and feedback');
+  assert.deepEqual(errors,[]); await context.close();
+  // An aborted physical IndexedDB transaction must not produce successful feedback.
+  const failed=await browser.newContext({viewport:{width:390,height:844}}); const p=await failed.newPage();
+  await p.addInitScript(()=>{window.__haptic=0;Object.defineProperty(navigator,'vibrate',{writable:true,configurable:true,value:()=>{window.__haptic++;return true;}});});
+  await p.goto('http://127.0.0.1:4175'); await p.waitForSelector('html[data-state=ready]');
+  await p.evaluate(()=>{const original=IDBObjectStore.prototype.add; window.__restore=()=>{IDBObjectStore.prototype.add=original;}; IDBObjectStore.prototype.add=function(...args){if(this.name==='operations')throw new DOMException('Full','QuotaExceededError');return original.apply(this,args);};});
+  const b=await p.locator('#board-region canvas').boundingBox();
+  for(const index of [1,2])await p.mouse.click(b.x+(index+.5)*b.width/4,b.y+b.height/2);
+  await p.waitForSelector('#hue-app[data-layer=recovery]'); assert.equal(await p.evaluate(()=>window.__haptic),0);
+  await p.evaluate(()=>window.__restore()); await p.getByRole('button',{name:'Повторить проверку'}).click(); await p.waitForSelector('#hue-app[data-layer=result]'); assert.equal(await p.evaluate(()=>window.__haptic),0);
+  reports.push('failed transaction and explicit receipt recovery do not replay feedback'); await failed.close();
+  await writeFile('.test-output/m2/browser.json',JSON.stringify({passed:reports,pageErrors:errors,limits:['Desktop Chromium, not a physical Android feel test','Font selection and owner art approval pending']},null,2));
+  console.log(`PASS: ${reports.length} M2 presentation scenarios.`);
+} finally { await browser?.close(); dev.kill(); }
