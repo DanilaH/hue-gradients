@@ -1,0 +1,230 @@
+{
+  "status": "PASS",
+  "cases": 54,
+  "sqliteVersion": "3.53.1",
+  "actualSubprocessTerminations": 2,
+  "concurrentDatabaseConnections": 2,
+  "scope": "Host SQLite transaction/retry model, pure calendar/cache and ad policy; not production auth/cloud/mobile/SDK/retention.",
+  "postgresExecuted": false,
+  "mobileExecuted": false,
+  "authProviderExecuted": false,
+  "liveAdsExecuted": false,
+  "rows": [
+    {
+      "case": "first completion applied",
+      "passed": true
+    },
+    {
+      "case": "lost-ack retry is idempotent",
+      "passed": true
+    },
+    {
+      "case": "single completion after retry",
+      "passed": true
+    },
+    {
+      "case": "same operation id cannot change payload",
+      "passed": true
+    },
+    {
+      "case": "session A cannot address B",
+      "passed": true
+    },
+    {
+      "case": "other profile untouched",
+      "passed": true
+    },
+    {
+      "case": "replay cannot farm unique completion",
+      "passed": true
+    },
+    {
+      "case": "assisted best separate",
+      "passed": true
+    },
+    {
+      "case": "revision does not create another base reward",
+      "passed": true
+    },
+    {
+      "case": "archive slot counts once",
+      "passed": true
+    },
+    {
+      "case": "invalid second operation rolls back whole batch",
+      "passed": true
+    },
+    {
+      "case": "batch rollback retained previous state",
+      "passed": true
+    },
+    {
+      "case": "boolean moves rejected",
+      "passed": true
+    },
+    {
+      "case": "empty batch rejected",
+      "passed": true
+    },
+    {
+      "case": "both concurrent draft branches survive",
+      "passed": true
+    },
+    {
+      "case": "descendant advances only its own branch",
+      "passed": true
+    },
+    {
+      "case": "missing parent remains recoverable",
+      "passed": true
+    },
+    {
+      "case": "parents cannot cross works",
+      "passed": true
+    },
+    {
+      "case": "immutable revision id",
+      "passed": true
+    },
+    {
+      "case": "explicit resolution joins heads without deleting history",
+      "passed": true
+    },
+    {
+      "case": "two database connections do not duplicate a logical win",
+      "passed": true
+    },
+    {
+      "case": "reset advances epoch",
+      "passed": true
+    },
+    {
+      "case": "reset retry returns same epoch",
+      "passed": true
+    },
+    {
+      "case": "old offline completion cannot resurrect reset progress",
+      "passed": true
+    },
+    {
+      "case": "progress empty and own works retained after reset",
+      "passed": true
+    },
+    {
+      "case": "new epoch may earn fresh progression",
+      "passed": true
+    },
+    {
+      "case": "process terminated at after_effect",
+      "passed": true
+    },
+    {
+      "case": "atomic recovery after_effect",
+      "passed": true
+    },
+    {
+      "case": "retry after process death after_effect",
+      "passed": true
+    },
+    {
+      "case": "process terminated at after_commit",
+      "passed": true
+    },
+    {
+      "case": "atomic recovery after_commit",
+      "passed": true
+    },
+    {
+      "case": "retry after process death after_commit",
+      "passed": true
+    },
+    {
+      "case": "future and withdrawn slots excluded",
+      "passed": true
+    },
+    {
+      "case": "UTC boundary admits next slot",
+      "passed": true
+    },
+    {
+      "case": "timezone does not redefine slot",
+      "passed": true
+    },
+    {
+      "case": "leap day accepted",
+      "passed": true
+    },
+    {
+      "case": "partial download rejected",
+      "passed": true
+    },
+    {
+      "case": "old cache preserved after hash failure",
+      "passed": true
+    },
+    {
+      "case": "valid hash cannot disguise wrong content id",
+      "passed": true
+    },
+    {
+      "case": "old cache preserved after identity failure",
+      "passed": true
+    },
+    {
+      "case": "ad rejects missing userNext",
+      "passed": true
+    },
+    {
+      "case": "ad rejects missing saved",
+      "passed": true
+    },
+    {
+      "case": "ad rejects missing newOfficialClear",
+      "passed": true
+    },
+    {
+      "case": "ad respects protected",
+      "passed": true
+    },
+    {
+      "case": "ad respects fullscreen",
+      "passed": true
+    },
+    {
+      "case": "ad respects foreground",
+      "passed": true
+    },
+    {
+      "case": "no popup from a load callback",
+      "passed": true
+    },
+    {
+      "case": "first four official wins protected",
+      "passed": true
+    },
+    {
+      "case": "initial active grace protected",
+      "passed": true
+    },
+    {
+      "case": "SDK not ready does not block route",
+      "passed": true
+    },
+    {
+      "case": "eligible transition requests once",
+      "passed": true
+    },
+    {
+      "case": "no-fill does not immediately retry",
+      "passed": true
+    },
+    {
+      "case": "next interval with three new wins eligible",
+      "passed": true
+    },
+    {
+      "case": "time alone cannot create new-progress opportunity",
+      "passed": true
+    }
+  ]
+}

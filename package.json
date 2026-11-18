@@ -1,0 +1,40 @@
+{
+  "name": "hue-gradients",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "dev": "vite --mode development",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "build": "npm run typecheck && vite build && node tools/verify-web.mjs",
+    "build:release": "npm run typecheck && vite build --mode release && node tools/verify-web.mjs --release",
+    "check": "npm run typecheck && npm test && npm run build",
+    "android:sync": "npm run build && cap sync android",
+    "android:sync:release": "npm run build:release && cap sync android",
+    "release:config": "node tools/release-config.mjs --check",
+    "preview": "vite preview",
+    "dev:yandex": "vite --config vite.yandex.config.ts --mode development",
+    "build:yandex": "npm run typecheck && vite build --config vite.yandex.config.ts --mode yandex",
+    "build:yandex:debug": "npm run typecheck && vite build --config vite.yandex.config.ts --mode yandex-debug",
+    "yandex:check": "npm run build:yandex && node tools/yandex-audit.mjs",
+    "spec:check": "node tools/check-spec.mjs"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.6.0",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.6.0",
+    "@danilah/mini-games-kit": "github:DanilaH/mini-games-kit#469928d03f4bae5053e23db26e82187bedbc252e",
+    "phaser": "4.2.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.6.0",
+    "@types/node": "26.4.1",
+    "typescript": "7.0.2",
+    "vite": "8.2.2",
+    "vitest": "4.1.11"
+  }
+}

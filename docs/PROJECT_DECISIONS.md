@@ -1,0 +1,34 @@
+# Project decisions — 18 November 2026
+Guidance snapshot SHA: 469928d03f4bae5053e23db26e82187bedbc252e
+Runtime snapshot SHA: 469928d03f4bae5053e23db26e82187bedbc252e
+
+## Source of truth
+Owner authorized roadmap implementation. Product baseline: docs/spec/PRODUCT_SPEC_1_0.md from kit research commit812b926ebfc82c6b0e5f3c6506145de2331028a0 (PR47 open at adoption). Export preserved byte-for-byte;40 manifest hashes match. Full scope:60 campaign, chapters/album/mastery, daily/archive, editor/versioning, export/cloud, Android/RuStore and Yandex. No energy. First15 frozen. Research evidence is not consumer acceptance.
+
+## Hosts and identity
+Generated Android and Yandex templates from the exact runtime pin; installed, typechecked, tested and built unchanged before combination. One package.json; native root entry + web/ entry and independent dist-yandex upload root. Android payload is dist/ only. Web imports no native SDK.
+Capacitor8.6.0/App8.1.2/Phaser4.2.1/TS7.0.2/Vite8.2.2; Gradle8.14.3/AGP8.13.0/JDK21/min24/target36. Pins, not evergreen rules.
+Working appId com.danilah.huegradients, native responsive orientation, versionCode1/versionName0.1.0; selected for a new consumer and not registered with a store. .playtest/.releasecheck/production packages are isolated. Poluson is a working title. Production certificate=null; no production key created. Local releaseCheck used a test key.
+Native root owns insets once; SystemBars auto-insets disabled; browser CSS handles its own safe areas. Native/document blockers additive. Ready follows first POST_RENDER. Actual hosted SDK/offline behavior remains pending; optional services must not gate the future local core.
+
+## Game/storage boundary
+src/domain is pure rules/proposed attempt state, without renderer, SDK or clock. src/local-store/contracts.ts defines the M1 transaction seam; concrete SQLite/IndexedDB adapters are NOT IMPLEMENTED. Host AtomicFile KV/counter is smoke data only. Snapshot, completion/best, rights, ledger and outbox commit together; operation ID exists before write. Unknown result is resolved by readOperation. Game content/schema/policy and planned single HTTPS API/PostgreSQL remain consumer-owned.
+
+## UI and reference
+Owner reference docs/spec/reference/owner-art-reference.png: fullscreen luminous clouds, grain/haze, spatial response, victory prism. Active RGB stays exact. Font pending M2; current system fonts/sample scenes are not approved art. No mass art created. Read routed UX_AND_ART_SYSTEM, UI_MOTION_RECIPES, STABLE_PROGRESS_UI, GAMEPLAY_ACTIVITY and Android BOOTSTRAP.
+
+## Kit adoption
+| Capability | Decision | Boundary / evidence |
+| --- | --- | --- |
+| Native host/lifecycle/insets/signing | REUSE | Generated source, debug/R8 builds and exact-APK inspection |
+| Yandex runtime/startup/viewport/audit | REUSE | Build/upload audit; hosted SDK NOT RUN |
+| Activity coordinator, DPR, teardown | REUSE | Real template imports and lifecycle tests |
+| Atomic KV counter | HOST SMOKE ONLY | Not a transactional game store |
+| SQLite/IndexedDB/ledger/outbox | LOCAL POLICY | Typed seam now, implementation in M1 |
+| Identity/cloud/conflicts | LOCAL POLICY | Exact spec; production API/proof exchange pending |
+| Ads/banner placement | REUSE LATER | Policy selected; native SDK/IDs pending M7 |
+| Energy/IAP/rewarded economy | NOT APPLICABLE | Not in selected policy |
+
+## Deliberate template changes
+Yandex files moved under web/ with independent config/env/output/audit. Its sample readiness moved from create() to first POST_RENDER, matching native first-frame contract. Product spec overrides template prompts to invent art/economy. Other host sample behavior remains until M1 integration.
+KIT IMPACT: REUSE. No common runtime APIs or other game repositories changed.

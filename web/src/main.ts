@@ -1,0 +1,91 @@
+import Phaser from 'phaser';
+import { destroyRenderer } from '@danilah/mini-games-kit/phaser';
+
+import { createStartupPreloadDomView, StartupPreloadController } from '@danilah/mini-games-kit/startup';
+
+import './style.css';
+import { installDebugPanel } from './app/debug';
+import { createPlatformRuntime } from './app/platform';
+import {
+  afterPaintFrames,
+  detectRuntimeImageFormat,
+  getStartupSnapshot,
+  startupTimeline,
+} from './app/startup';
+import { getInitialGameSize, installViewportRuntime } from './app/viewport';
+import { BootstrapScene, GAME_PRESENTABLE_EVENT } from './game/BootstrapScene';
+
+const preload = new StartupPreloadController(createStartupPreloadDomView());
+preload.begin();
+
+const platformTask = createPlatformRuntime().then((platform) => {
+  startupTimeline.mark('platformReady');
+  return platform;
+});
+const artFormatTask = detectRuntimeImageFormat();
+
+try {
+  const [platform, runtimeImageFormat] = await Promise.all([platformTask, artFormatTask]);
+  const initialSize = getInitialGameSize();
+  let resolvePresentable!: () => void;
+  const presentable = new Promise<void>((resolve) => {
+    resolvePresentable = resolve;
+  });
+
+  const game = new Phaser.Game({
+    type: Phaser.AUTO,
+    parent: 'game-root',
+    width: Math.round(initialSize.width),
+    height: Math.round(initialSize.height),
+    backgroundColor: '#0b0d10',
+    scene: [BootstrapScene],
+    scale: { mode: Phaser.Scale.NONE },
+    callbacks: {
+      preBoot: (bootingGame) => {
+        bootingGame.events.once(GAME_PRESENTABLE_EVENT, resolvePresentable);
+      },
+    },
+  });
+
+  const viewport = installViewportRuntime(game, platform.activity);
+  let alive = true;
+  const applyBlocked = (blocked: boolean): void => {
+    game.sound.mute = blocked;
+    game.input.enabled = !blocked;
+    if (blocked) game.loop.sleep();
+    else game.loop.wake();
+  };
+  const removeBlockedListener = platform.activity.onBlockedChange(applyBlocked);
+  const debug = installDebugPanel(() => getStartupSnapshot(runtimeImageFormat));
+
+  void presentable.then(async () => {
+    startupTimeline.mark('gamePresentable');
+    await afterPaintFrames(2);
+    if (!alive) return;
+    applyBlocked(platform.activity.isBlocked());
+    startupTimeline.mark('ready');
+    platform.markReady();
+    platform.activity.setGameplayDesired(true);
+    preload.complete();
+  }).catch((error: unknown) => { preload.fail(String(error)); });
+
+  const handlePageHide = (event: PageTransitionEvent): void => {
+    // A persisted pagehide enters the back-forward cache. Destroying Phaser and
+    // platform listeners there leaves the restored document alive but unusable.
+    if (event.persisted) return;
+    alive = false;
+    window.removeEventListener('pagehide', handlePageHide);
+    platform.activity.setGameplayDesired(false);
+    removeBlockedListener();
+    debug.destroy();
+    viewport.destroy();
+    preload.destroy();
+    platform.destroy();
+    destroyRenderer(game);
+  };
+  window.addEventListener('pagehide', handlePageHide);
+} catch (error: unknown) {
+  const message = error instanceof Error ? error.message : String(error);
+  preload.fail(message);
+  console.error('Fatal bootstrap failure', error);
+}

@@ -1,0 +1,241 @@
+{
+  "version": "1.0",
+  "date": "2026-11-18",
+  "canonicalCommit": "812b926ebfc82c6b0e5f3c6506145de2331028a0",
+  "historicalSourceCommit": "a8c819da32f64001cfba570f02c1d75fac2215f3",
+  "purpose": "Detailed product specification and developer roadmap; not a game release",
+  "requirementCount": 71,
+  "acceptanceStatus": "NOT RUN in production consumer",
+  "markdownLinksNormalizedToPinnedGitHub": 45,
+  "repair": {
+    "date": "2026-11-18",
+    "kind": "provenance metadata repair; no level definition changes",
+    "oldSourceCommit": "a8c819da32f64001cfba570f02c1d75fac2215f3",
+    "observedFailure": "validate_release_candidates.py failed baselineSha256 assertion against pinned repository prototype/levels-0.1.json",
+    "cause": "earlier working copy had a second trailing LF; parsed JSON is identical",
+    "changedJsonPaths": [
+      "baselineSha256"
+    ],
+    "oldRecordedBaselineSha256": "a31363761141e9c78ad85d0f459262c2eb7895fbe25e3d0d1ccb89463775d820",
+    "repositoryBaselineSha256": "55efdbd17d6e77c23753ea5f6b494de25e02c3c8a05459a92fbbcee8eb34ae51",
+    "oldCandidateSha256": "8a294f23073b6c58b6fa042fe9e8ae59394c57171afb9d7f68fb7c46a5961bd4",
+    "newCandidateSha256": "6c283226eecc9b92846c182328d9491880588ab420d67e62bcb0ecf36d67aa2a",
+    "definitionsEqual": true,
+    "dailyScheduleUnchanged": true,
+    "recheck": {
+      "legalOptimalReplays": 90,
+      "exhaustiveBfs": 26,
+      "editorCases": 33,
+      "colorWarnings": [
+        "gradient-027",
+        "gradient-037",
+        "gradient-053",
+        "gradient-060"
+      ],
+      "humanPlaytest": false,
+      "phoneValidation": false
+    }
+  },
+  "files": [
+    {
+      "path": "ACCEPTANCE_MATRIX_1_0.md",
+      "bytes": 21629,
+      "sha256": "9e5fba7d2a5523145d0ccd1266fa25da061dac1d2874b401a6752eafe6f1cb5b"
+    },
+    {
+      "path": "CONTENT_EDITOR_SPEC_0_1.md",
+      "bytes": 28532,
+      "sha256": "ed36aac5dcc8e91faf859fe45667305575578779b447460844ee68ba6553b034"
+    },
+    {
+      "path": "DEVELOPMENT_HANDOFF.md",
+      "bytes": 4666,
+      "sha256": "d193ef15215e134d0aec809acbc9d0aa2adce65a55ae7139c0f8be7f22c214c6"
+    },
+    {
+      "path": "META_SPEC_0_2.md",
+      "bytes": 41121,
+      "sha256": "09636c242434b4bf8fa8511bcaedceb9badeedb88c67d1ec363e0bfda64d45c8"
+    },
+    {
+      "path": "MONETIZATION_SPEC_0_1.md",
+      "bytes": 18753,
+      "sha256": "031fae7838fa8d6434992a506159bfae009b0f5f97f1f43faa49eb34e7196c9b"
+    },
+    {
+      "path": "PRODUCT_SPEC_1_0.md",
+      "bytes": 67754,
+      "sha256": "1ec8b80245ce6a948b5248ed0dde5c051c7e6f1eee118aa646f0b0357a77b4f7"
+    },
+    {
+      "path": "PROTOTYPE_BRIEF.md",
+      "bytes": 33423,
+      "sha256": "86bae3a43bc8503fb51ee1653b4536bfd61d0a80a5ce10d1f23557c5aabebaaa"
+    },
+    {
+      "path": "REACTIVE_BACKGROUND_0_1.md",
+      "bytes": 9602,
+      "sha256": "ce10e6166fc382dc89bdc52464b1c986a340191439c32fa576a762ba09740785"
+    },
+    {
+      "path": "README.md",
+      "bytes": 31386,
+      "sha256": "abbbe1e08aaf2e657d524cdf22dafbab59bb16ba3e92d6a4c06311c11e807a4b"
+    },
+    {
+      "path": "RELEASE_SCOPE.md",
+      "bytes": 10737,
+      "sha256": "05d4d13253aa4d9e969ddf67a54f67638af58a779cfeee8b48f4f4c755f82286"
+    },
+    {
+      "path": "ROADMAP_1_0.md",
+      "bytes": 30152,
+      "sha256": "4eaa7265a4d173994526c013d7a9341c3bcf60541b8e41f3875169ea3a3af917"
+    },
+    {
+      "path": "SCREEN_STATE_SPEC_0_1.md",
+      "bytes": 30387,
+      "sha256": "b09d85293c5631af32c632b5dc1356037f6eca1e7a3a79e9035b0bb34af7816d"
+    },
+    {
+      "path": "START_HERE.md",
+      "bytes": 4605,
+      "sha256": "4145a3c373bcb576a9d4d195f91eb9ecdf4b1cd28cdd5581d8be5b562a11e7e7"
+    },
+    {
+      "path": "TECHNICAL_SPEC_0_1.md",
+      "bytes": 40052,
+      "sha256": "441b642fd94a37b364ac22e703d9ae4a621dd5be445393cecde2046c51e88387"
+    },
+    {
+      "path": "VISUAL_DIRECTION_0_2.md",
+      "bytes": 16568,
+      "sha256": "01e8b3197a72b211eb3384aa8958c7b096d5cf49876aafcb24f153c123ac8d7b"
+    },
+    {
+      "path": "acceptance-register.csv",
+      "bytes": 18346,
+      "sha256": "4b931293f10ddb24bc47d9cd0ba20e59553a7357dab10e72b615b4dabca47af0"
+    },
+    {
+      "path": "candidates/README.md",
+      "bytes": 6607,
+      "sha256": "99b18a1221d9700fc7bdd4e1b04dfd7714d7e6108a4be386e38c5c64560e8e3c"
+    },
+    {
+      "path": "candidates/editor-boundaries-0.1.json",
+      "bytes": 7159,
+      "sha256": "74b427153e72b533cee68b14c3562b93918f9cfa1bafe843197c575777133155"
+    },
+    {
+      "path": "candidates/levels-0.1.json",
+      "bytes": 122226,
+      "sha256": "6c283226eecc9b92846c182328d9491880588ab420d67e62bcb0ecf36d67aa2a"
+    },
+    {
+      "path": "candidates/previews/sheet-01.svg",
+      "bytes": 57525,
+      "sha256": "8199b056e43365677117d65cc44ea95c27917c8917774ad3b27c012912839780"
+    },
+    {
+      "path": "candidates/previews/sheet-02.svg",
+      "bytes": 73593,
+      "sha256": "b3a7a0a451722e9f659d9982c708c636f5043b1cdb508e4a43ab6d52cdc7026e"
+    },
+    {
+      "path": "candidates/previews/sheet-03.svg",
+      "bytes": 81622,
+      "sha256": "30ed38d04ee9f49d8391c47454c2176b9b01d0566c69d05dbd20a4dfe3f57143"
+    },
+    {
+      "path": "candidates/previews/sheet-04.svg",
+      "bytes": 82924,
+      "sha256": "3ad09aab1edcf6ccdb052210660c462660a5e39cea49870b217e861837c984a8"
+    },
+    {
+      "path": "candidates/previews/sheet-05.svg",
+      "bytes": 68899,
+      "sha256": "927371aa9067fa573f91871a0b282e0a3f0abddf8693ae0827603f0ae6c22f3d"
+    },
+    {
+      "path": "candidates/previews/sheet-06.svg",
+      "bytes": 73102,
+      "sha256": "2088b05f3a29bf02a9c35c404bed5bebb94ee5141d697f1d23861743a5a54b5a"
+    },
+    {
+      "path": "candidates/validation-0.1.json",
+      "bytes": 86325,
+      "sha256": "47c2706d62ee15f31a6f49fc31229522596e6ae0d206495ddf5a2d51c94d2da7"
+    },
+    {
+      "path": "evidence/package-integrity-repair-2026-11-18.json",
+      "bytes": 1152,
+      "sha256": "9e906689ee4ad1a300a27ee2bf161963b0a49497bc632bf705ebd02f0a91a4a5"
+    },
+    {
+      "path": "evidence/technical-contract-checks-2026-11-18.json",
+      "bytes": 4993,
+      "sha256": "0bd28351384d26ebdadbaa1cf0dcb18093f7d5162592abf6e2d8168417c9493b"
+    },
+    {
+      "path": "evidence/technical-sources-2026-11-18.json",
+      "bytes": 5247,
+      "sha256": "0a1c4d840ef1f784aa31fd222657f09ae8c764e8c5b8993090d50f610530f3b3"
+    },
+    {
+      "path": "prototype/first15.svg",
+      "bytes": 58757,
+      "sha256": "b7037c360af421844d1125a3f838915d122228c8883063bcd336423d4cf4fed2"
+    },
+    {
+      "path": "prototype/levels-0.1.json",
+      "bytes": 18331,
+      "sha256": "55efdbd17d6e77c23753ea5f6b494de25e02c3c8a05459a92fbbcee8eb34ae51"
+    },
+    {
+      "path": "prototype/validation-0.1.json",
+      "bytes": 10695,
+      "sha256": "3d956c0ffe0a773308bb045b928e93314c7f3ffdc8e85a4a591f1058312b9e5a"
+    },
+    {
+      "path": "reference/owner-art-reference.png",
+      "bytes": 2866546,
+      "sha256": "872fd9800184a2e4cc52716cd258cbcb194841782745415ae6dd710aedc586ec"
+    },
+    {
+      "path": "tools/build_prototype_pack.py",
+      "bytes": 7422,
+      "sha256": "f6fe33e05f5e3fdfc49c21945fd8b406d414bf8c046a45cc82f9158b5ce634f3"
+    },
+    {
+      "path": "tools/build_release_candidates.py",
+      "bytes": 5451,
+      "sha256": "124974d941eea683e364739f2943f288e15c15f35769d4ba5a3a52d15ffe3cf4"
+    },
+    {
+      "path": "tools/check_editor_boundaries.py",
+      "bytes": 6076,
+      "sha256": "c5e22ef72206c1409f38f254674f7452e3b0fba26c54c743ffb9782587c31770"
+    },
+    {
+      "path": "tools/check_technical_contracts.py",
+      "bytes": 15340,
+      "sha256": "84bd91aa61e65534c1de782138e3274f97af26d3a660767020123d5a902ad958"
+    },
+    {
+      "path": "tools/validate_prototype_pack.py",
+      "bytes": 6461,
+      "sha256": "641066fe67a4de4bd233ff04e493b3404a055f64365a2b50360a8a3d2ee23728"
+    },
+    {
+      "path": "tools/validate_release_candidates.py",
+      "bytes": 8691,
+      "sha256": "14cc0ddb54c4a18807185ffa855aa53c9010bb974105d973b18a3fc1e05f7aef"
+    },
+    {
+      "path": "visual/owner-reference-2026-11-18.json",
+      "bytes": 1414,
+      "sha256": "973307fe886d72c9fc4715680932720c3800abf4f09e4fca659298a59e9bf23f"
+    }
+  ]
+}

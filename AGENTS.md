@@ -1,0 +1,12 @@
+# hue-gradients — agent contract
+**mini-games-kit pinned commit:** 469928d03f4bae5053e23db26e82187bedbc252e
+
+Read docs/PROJECT_DECISIONS.md, docs/STATUS.md and docs/SESSION_HANDOFF.md, then relevant requirements in docs/spec/PRODUCT_SPEC_1_0.md and ROADMAP_1_0.md. Select 1–2 routes in docs/kit-guidance/TASK_ROUTER.md before material work. Reference work follows docs/kit-guidance/REFERENCE_PROTOCOL.md. Reusable work follows docs/kit-guidance/KIT_FEEDBACK_LOOP.md; report KIT IMPACT. Inspect the pinned kit docs/API.md before adding infrastructure. Runtime and guidance pins are separate; no silent upgrades.
+
+Full first release includes campaign, meta, daily/archive, editor, export and cloud. No energy. First15 definitions are immutable. Visual direction is the owner's dreamy/PSX reference in docs/spec/reference; font pending M2. Accept one actual gameplay/win episode before broad styling. Do not restart the A/B/C visual contest. UI changes use routed UX/motion/layout guidance and the game's accepted tokens.
+
+Android: root src/main.ts, BOOTSTRAP.md and native/android. Yandex: web/src/main.ts and web/BOOTSTRAP.md, dist-yandex output. Keep SDKs and outputs separate; never import the Yandex web SDK into Android. Native content root owns system/cutout insets once. Lifecycle blockers are additive; stale listeners/getState must not resume or leak. Ready follows the authored first POST_RENDER. Optional SDK/auth/ads must not gate local gameplay.
+
+M0 entrypoints are HOST samples, not the game. M1 pure rules exist in src/domain; integrate them rather than writing another reducer. Game storage must be native SQLite/web IndexedDB with snapshot+effects+ledger+outbox in ONE transaction. Bootstrap KV/localStorage counter is not that store. Unknown commit results use readOperation; no new ID or empty defaults.
+
+Run npm run check, npm run yandex:check and strict pinned guidance doctor. Native changes additionally require android:sync:release, real Gradle debug/releaseCheck, exact-APK inspection and actual runtime checks. Preserve SHA/certificate/device/evidence and limits. Production acceptance starts NOT RUN; unit/build/model success does not prove phone feel, identity/cloud or live ads. Keep appId/signing identity stable after publication and versionCode monotonic. No implicit production key generation, secrets in source/logs, automatic store publication or production-signer claim for releaseCheck. Release strips QA/debug UI; WebView inspection=false; native logs are debug-only.

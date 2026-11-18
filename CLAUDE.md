@@ -1,0 +1,1 @@
+Read AGENTS.md first, then docs/PROJECT_DECISIONS.md and docs/kit-guidance/TASK_ROUTER.md. mini-games-kit pinned commit: 469928d03f4bae5053e23db26e82187bedbc252e. Runtime and guidance pins are separate contracts; do not silently upgrade either.

@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "appId": "com.danilah.huegradients",
+  "versionName": "0.1.0",
+  "versionCode": 1,
+  "orientation": "responsive",
+  "certificateSha256": null,
+  "releaseExcludedPaths": [
+    "target-lab.html",
+    "content-pilot.html"
+  ],
+  "releaseExcludedMarkers": [
+    "Copy startup JSON",
+    "Startup diagnostics JSON",
+    "data-debug-panel"
+  ],
+  "appName": "Полусон"
+}
