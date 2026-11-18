@@ -18,12 +18,18 @@ A normal lostpointercapture following pointerup must NOT clear a completed tap s
 
 Yandex local play does not await SDK init, metadata storage, login or ads. Optional Loading/Gameplay/pause callbacks attach later. Both entrypoints mark ready only after an authored POST_RENDER. Activity blockers remain additive.
 
+## Latest presentation checkpoint
+
+M2 executable candidate is now in src/game/{atmosphere,feedback}.ts and the shared scene/view. See M2_ART_BIBLE.md. OneShotPlayer and exponentialResponse reuse the existing kit pin. Preferences extend schema 1 additively (absent old preferences get explicit defaults without clearing progress). Sound/haptic are commit-only; recovery/reload never replay cues. Motion respects OS reduced motion. Native HueFeedbackPlugin requires exact-APK/R8 checks and actual runtime still pending.
+
+33 unit / 20 core browser / 9 presentation / 6 local Yandex host scenarios; actual 390×844 UI episode recorded. This is not owner/phone art acceptance. Font choice/two-candidate comparison remains open. Build 0.2.0, versionCode 2.
+
 ## Next bounded package
 
 - Execute native SQLite bridge transactions on an Android runtime: before/after-commit force-stop, lost response/retry, full storage, corrupt DB preservation and restart. Native DB corruption handler deliberately does not delete the file. This is still NOT RUN.
 - Phone checks: first-five touch, rotation/background, keyboard where available, pin/selection visibility, timing and startup. Do not label browser layout checks physical Android acceptance.
 - Finish any M1 CORE/TECH acceptance gaps (including settling/audio/feel where required) against the actual requirement rows. Current visual surface is functional; M2 still needs the owner's one gameplay→win art episode before broad styling and font choice.
-- Then continue ROADMAP M2, not a new A/B/C art contest. Full campaign/meta/editor/export/cloud/daily/ads scope remains; nothing was cut.
+- Continue M2 typography and owner review against this actual slice, not a new A/B/C art contest. Full campaign/meta/editor/export/cloud/daily/ads scope remains; nothing was cut.
 
 ## Checks
 

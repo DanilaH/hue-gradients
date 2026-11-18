@@ -42,3 +42,7 @@ Native HueSQLitePlugin uses a process-wide writer and SQLite FULL synchronous tr
 Yandex SDK is optional for local startup. The host reuses kit script loading/activity and attaches LoadingAPI/GameplayAPI/pause/resume after init, without awaiting SDK metadata storage or identity. Native code never imports that host. Current visuals are an M1 functional surface using system typography; dreamy/PSX art, expressive settling and the font decision remain subject to M2/acceptance.
 
 Evidence: 30 unit, 20 Chromium/IndexedDB/input and 6 local SDK host scenarios; debug/R8 releaseCheck and exact-APK checks. Native SQLite runtime/process death, physical phone and actual hosted SDK remain NOT RUN. KIT IMPACT: REUSE, two local CANDIDATE seams in KIT_CANDIDATES.md; no common runtime was changed.
+
+## M2 executable review candidate — 18 November 2026
+
+Build 0.2.0/versionCode2. Exact visible RGB remain opaque; spatial ambient, 150ms interruptible commit-only settling, 650ms result dissolve, one own prism and procedural sound are described in M2_ART_BIBLE.md. Additive schema-1 preferences persist sound/haptics/motion without resetting older saves. Kit OneShotPlayer/exponentialResponse reused. Native system haptic is consumer-owned; no vibration permission or new runtime dependency. No correctness score enters feedback. Current system typography is provisional; two licensed font comparison, 150%/physical-phone QA and owner art approval remain pending. No mass art or other game/kit changes. KIT IMPACT: REUSE.

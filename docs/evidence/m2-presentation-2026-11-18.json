@@ -1,0 +1,140 @@
+{
+  "date": "2026-11-18",
+  "stage": "M2 executable owner-review candidate; NOT ART ACCEPTANCE",
+  "sourceCommit": "5903db1a61a850bf25355dd02e5bb4aa660bb1b3",
+  "runtimeCommit": "469928d03f4bae5053e23db26e82187bedbc252e",
+  "sourceSha256": {
+    "src/domain/workspace.ts": "01e8c480819f2b8829e92658faa86fbf38d968102c83f47f2c8d7363ad9db086",
+    "src/game/PuzzleScene.ts": "32c013bbc4c68e722044197b8c8fe40cfb7c9bc9eb36e3a7d98553e705906a84",
+    "src/game/atmosphere.ts": "b853b6a89886451f92842017e7ce8e3ede37671ef1ee3c67229a8ef796b7f019",
+    "src/game/feedback.ts": "b73d958ebb93d7e0e4b7f75e7432962f6d9dc8307b4542f8f5d1d2fa098fc388",
+    "src/game/game.css": "4b16dc1d3a0020c33fcf4ea7209f184d08e9bbe2061823d16d9a88613ed9d3b7",
+    "src/game/mountGame.ts": "977cc71bf2044ab3a1283f8b28a308bee4193bb5b389b4e6a609856f16543c67",
+    "src/app/nativeFeedback.ts": "0bce5d426a95b7420c54d23661ccc39614e6bc8a6358470fdeecb67baa320e31",
+    "native/android/app/src/main/java/com/danilah/huegradients/HueFeedbackPlugin.java": "359f63be56d6a94fe37a55c492cbe7e5b381c03c60a837c26efc537a077d1799",
+    "android-project.json": "52fb9a5f2f8fda6953b755e0baaa21ae731dc34f966e4b652ad16f0159da1b9d"
+  },
+  "unitTests": {
+    "passed": 33,
+    "files": 6
+  },
+  "coreBrowser": {
+    "browser": "Chromium",
+    "passed": [
+      "idempotence",
+      "payload mismatch",
+      "CAS with two connections",
+      "atomic rollback",
+      "reopen",
+      "lost bridge reply",
+      "unreadable ledger recovery",
+      "quota/retry identity",
+      "pin and deselect no-op",
+      "help durably recorded before preview, preview not restored",
+      "real drag win and reload without duplicate reward",
+      "next and restart confirmation",
+      "actual two-tab CAS",
+      "resize cancels captured drag",
+      "pointercancel rejects late release",
+      "background cancels captured drag",
+      "final pointerup coordinates and ignored second pointer",
+      "keyboard swap",
+      "first five through actual UI, unique completions and rights",
+      "320px, portrait and landscape layout"
+    ],
+    "pageErrors": [],
+    "limits": [
+      "No physical Android",
+      "No hosted Yandex SDK",
+      "No production cloud/ads"
+    ]
+  },
+  "presentationBrowser": {
+    "passed": [
+      "pin/deselect have no success audio or haptic",
+      "one victory cue after commit; CTA immediately enabled",
+      "restored victory never replays sound/haptic",
+      "new gesture interrupts settling without dropping the next move",
+      "sound/haptic/motion settings persist; muted actions stay silent",
+      "system reduced motion overrides the animation preference",
+      "actual displayed tile RGB unchanged by atmosphere",
+      "background stops ambient frames and feedback",
+      "failed transaction and explicit receipt recovery do not replay feedback"
+    ],
+    "pageErrors": [],
+    "limits": [
+      "Desktop Chromium, not a physical Android feel test",
+      "Font selection and owner art approval pending"
+    ]
+  },
+  "yandexHost": {
+    "passed": [
+      "local first frame before SDK init",
+      "LoadingAPI once after usable frame",
+      "GameplayAPI bridge",
+      "pause closes help",
+      "additive SDK/background blockers",
+      "offline SDK does not block play"
+    ],
+    "pageErrors": [],
+    "kind": "Local SDK stub and failed SDK request; hosted platform NOT RUN"
+  },
+  "exactDisplayRgb": {
+    "samples": 5,
+    "comparison": "Exact compositor screenshot RGB, no tolerance; points away from pin/selection"
+  },
+  "video": {
+    "source": "Actual Chromium UI at 390x844; desktop emulation, not phone",
+    "level": "gradient-005",
+    "preparation": "First four solved through UI before clip",
+    "durationSeconds": 10.54,
+    "pageErrors": [],
+    "sha256": "c812d247f0bb4774ea20905adab46413751c38211be886dde881b6513e097752"
+  },
+  "android": {
+    "debug": "PASS",
+    "r8ReleaseCheck": "PASS",
+    "sameTestSignerAsM1": true,
+    "exactApk": {
+      "kind": "releasecheck",
+      "package": "com.danilah.huegradients.releasecheck",
+      "versionName": "0.2.0",
+      "versionCode": 2,
+      "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+      "source": "local",
+      "apkSha256": "0c818e427bda6a79c99580b1ff17d9e7d1b9e87a52bf183564261f3aeb571513",
+      "bytes": 1150613,
+      "certificateSha256": "06534d5dedb7cd83e2eb694622c6ab7ae60926c594bcd58109f892358dc264b2",
+      "productionSigner": false,
+      "v2": true,
+      "zipalign16k": true,
+      "debuggable": false,
+      "webViewDebuggingConfigured": false,
+      "nativeInsetOwner": "content-root",
+      "webPayload": {
+        "native-build.json": "d6776c22b4d785acafac6f324de6e51d9700f8d00340e5638b59090fc0a0fc70",
+        "index.html": "6447e7cea2b80a6076e6fdebed85a595062c623410d2ff474d249af2fbc370e8",
+        "assets/dist-CMedSjkm.js": "067d9ca66629f984cf538346471032b4b24f9acd1cb914834126e2b88d3250fe",
+        "assets/index-C9Pm1LJ8.js": "e9187fa04a6beb51e1453ca69f5a89c10b2dbb07f98a800368884705d607c48e",
+        "assets/index-47D01KAC.css": "3974833a332527091983752ae0be5f3ec5ddecf4510d49ad30ce4806558b257a",
+        "assets/command-DsiNmMzb.js": "3bdb3eee67e5f0fe3039141e80a3f8764b0d75be05f0c89e4b81260fc3bd9e89",
+        "assets/native-BRf8Vtup.js": "c0ee103e5db093b632c2b0a8d00c59e51b8b10e97f54b99e0883aa6d66cb9e24",
+        "assets/web-BM7xF5pS.js": "874bbd026b2a3757b6c7bedc1bd163f0c735a3e0a943605c9853f660d828d658",
+        "assets/nativeFeedback-BdXlsEx8.js": "aa12bc0f39307f8a86d95c5b93e428317c5282ed05069350ea7ef8fd1ad69648"
+      },
+      "nativeRuntime": "NOT RUN",
+      "liveServices": "NOT INSTALLED BY THIS HOST TEMPLATE"
+    },
+    "nativeSQLiteAndHapticRuntime": "NOT RUN"
+  },
+  "guidanceDoctor": "READY_FOR_AGENT_DISCOVERY",
+  "specManifestFilesExact": 40,
+  "signingSafetyTests": 4,
+  "notExecuted": [
+    "Physical Android touch/SQLite/haptic/process-death/storage-pressure",
+    "Two bundled Cyrillic font comparison and 150% font acceptance",
+    "Owner art acceptance",
+    "Hosted Yandex/identity/cloud/live ads"
+  ],
+  "kitImpact": "REUSE: OneShotPlayer, exponentialResponse, activity/DPR/teardown; no upstream changes"
+}
