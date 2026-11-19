@@ -57,7 +57,22 @@ try {
   const pixels=model.attempts[model.activeLevelId].board.map((tile,i)=>({x:Math.round(box.x+(i%level.width+.23)*box.width/level.width),y:Math.round(box.y+4+(Math.floor(i/level.width)+.23)*(box.height-8)/level.height),rgb:level.solvedTileColors[tile]}));
   await writeFile('.test-output/m2/pixels.json',JSON.stringify(pixels));
   execFileSync('python3',['-c',`from PIL import Image\nimport json\nim=Image.open('.test-output/m2/gameplay.png').convert('RGB')\nfor p in json.load(open('.test-output/m2/pixels.json')):\n e=tuple(bytes.fromhex(p['rgb'][1:])); a=im.getpixel((p['x'],p['y'])); assert a==e,(a,e)\nprint('Exact RGB:',${pixels.length})`]); reports.push('actual displayed tile RGB unchanged by atmosphere');
+  await page.locator('#levels').click();
+  const pickerSurface=page.locator('#game-dialog .atmosphere');assert.equal(await pickerSurface.count(),1);
+  const currentLevel=page.locator('.level-rail [aria-current=true]');
+  await currentLevel.press('End');
+  const pixelsAtLockedLevel=()=>pickerSurface.evaluate(canvas=>{
+    const context=canvas.getContext('2d');
+    return [.2,.5,.8].map(t=>[...context.getImageData(Math.floor(canvas.width*t),Math.floor(canvas.height*t),1,1).data]);
+  });
+  const lockedColors=await pixelsAtLockedLevel();await currentLevel.press('ArrowLeft');
+  assert.deepEqual(await pixelsAtLockedLevel(),lockedColors);
+  const stillFrame=await pickerSurface.getAttribute('data-frames');await page.waitForTimeout(200);
+  assert.equal(await pickerSurface.getAttribute('data-frames'),stillFrame);
   await page.emulateMedia({reducedMotion:'no-preference'});
+  await page.waitForFunction(frame=>document.querySelector('#game-dialog .atmosphere')?.dataset.frames!==frame,stillFrame);
+  await page.keyboard.press('Escape');assert.equal(await page.locator('#hue-app > .atmosphere').count(),1);
+  reports.push('the same atmosphere animates in the picker, stays still with reduced motion and reveals no locked palette');
   await page.evaluate(()=>window.dispatchEvent(new Event('blur'))); const paused=await page.locator('.atmosphere').getAttribute('data-frames');
   await page.waitForTimeout(200); assert.equal(await page.locator('.atmosphere').getAttribute('data-frames'),paused); await page.evaluate(()=>window.dispatchEvent(new Event('focus'))); await idle(); reports.push('background stops ambient frames and feedback');
   assert.deepEqual(errors,[]); await context.close();

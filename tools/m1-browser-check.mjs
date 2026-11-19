@@ -189,7 +189,10 @@ try {
   assert.equal(await page.locator('.level-preview circle').count(), level.pinnedPositions.length);
   const stage = await page.locator('.level-stage').boundingBox();
   await page.mouse.move(stage.x + stage.width * .7, stage.y + stage.height / 2);
-  await page.mouse.down(); await page.mouse.move(stage.x + stage.width * .3, stage.y + stage.height / 2, { steps: 6 }); await page.mouse.up();
+  await page.mouse.down(); await page.mouse.move(stage.x + stage.width * .3, stage.y + stage.height / 2, { steps: 6 });
+  assert.equal(await selectedLevel.getAttribute('data-level-id'), saved.levelId);
+  assert.match(await page.locator('.level-preview').evaluate(node => getComputedStyle(node).translate), /^-/);
+  await page.mouse.up();
   assert.equal(await selectedLevel.getAttribute('data-level-id'), 'gradient-003');
   assert.equal(await page.locator('[data-level-action]').count(), 0);
   assert.equal(await page.locator('.level-preview rect').count(), 0);

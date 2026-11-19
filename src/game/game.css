@@ -10,17 +10,23 @@ button:focus-visible { outline: 3px solid #fff2de; outline-offset: 3px; }
 #game-root, #game-shell { height: 100%; min-height: 0; }
 #hue-app { isolation: isolate; height: 100%; display: grid; grid-template-rows: auto minmax(0,1fr) auto; position: relative; overflow: hidden; background: #151020; }
 html[data-host=browser] #hue-app { padding: env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px); }
-.atmosphere { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; filter: blur(2px); }
+.atmosphere {
+  position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;
+  image-rendering: pixelated; filter: blur(1.05px);
+}
 /* The board is the canvas. Secondary controls sit at its edges. */
-.hud { padding: 2px 8px; display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: center; gap: 4px; background: linear-gradient(#100a1d88,transparent); }
+.hud { padding: 2px 8px; display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: center; gap: 4px; background: linear-gradient(#160e27ab,#160e275c); text-shadow: 0 1px 4px #160e27; }
 .hud button { padding: 0 8px; border-color: transparent; background: transparent; }
 #levels { justify-self: start; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .875rem; font-weight: 550; }
 #settings { justify-self: end; min-width: 48px; font-size: 1.5rem; }
 h1 { font-size: 1rem; font-weight: 550; text-align: center; margin: 0; max-width: 52vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-#board-region { min-width: 0; min-height: 0; overflow: hidden; touch-action: none; transition: opacity 650ms ease; }
+#board-region {
+  min-width: 0; min-height: 0; margin-inline: clamp(3px,2.35vw,10px); overflow: hidden;
+  box-shadow: 0 0 25px #e6a6fc40; touch-action: none; transition: opacity 650ms ease;
+}
 #board-region canvas { display: block; touch-action: none; }
 #board-region canvas:focus-visible { outline: 2px solid white; outline-offset: -2px; }
-footer { min-height: 56px; padding: 2px 12px 6px; display: flex; gap: 10px; align-items: center; justify-content: center; background: linear-gradient(transparent,#100a1d88); }
+footer { min-height: 56px; padding: 2px 12px 6px; display: flex; gap: 10px; align-items: center; justify-content: center; background: linear-gradient(#160e273a,#160e27b2); }
 #guidance { margin: 0; max-width: 19em; font-size: .8125rem; line-height: 1.25; text-shadow: 0 1px 6px #100a1d; }
 #help { background: #21192d69; min-width: 108px; padding-inline: 12px; font-size: .875rem; }
 #game-dialog { color: #fff2de; background: #21192df5; border: 1px solid #e8d0bd70; border-radius: 20px; width: min(92%,420px); max-height: 86dvh; padding: 24px; overflow: auto; }
@@ -39,14 +45,14 @@ footer { min-height: 56px; padding: 2px 12px 6px; display: flex; gap: 10px; alig
 #hue-app[data-layer=result] #board-region { opacity: 0; transition-delay: 180ms; pointer-events: none; }
 #hue-app[data-layer=result] > .hud, #hue-app[data-layer=result] > footer { visibility: hidden; }
 #game-dialog[data-layer=result] { position: fixed; inset: 0; margin: 0; width: 100%; height: 100%; max-width: none; max-height: none; border: 0; border-radius: 0; padding: 20px; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; overflow: auto; }
-#game-dialog[data-layer=result]::backdrop { background: #100a1d18; backdrop-filter: none; }
-#game-dialog[data-layer=result] h2 { font-size: clamp(1.875rem,8vw,3.25rem); letter-spacing: .09em; text-transform: uppercase; text-shadow: 0 0 28px #fff2de70, 0 2px 12px #201432; margin: 12px 0 4px; }
+#game-dialog[data-layer=result]::backdrop { background: #12092244; backdrop-filter: none; }
+#game-dialog[data-layer=result] h2 { font-size: clamp(1.875rem,8vw,3.25rem); letter-spacing: .09em; text-transform: uppercase; text-shadow: 0 0 28px #fff2de70, 0 2px 6px #201432; margin: 12px 0 4px; }
 #game-dialog[data-layer=result] #dialog-copy { max-width: 360px; margin: 4px 0 12px; text-shadow: 0 1px 8px #171124; }
 #chapter-unlock { margin: 0 0 12px; font-size: .875rem; text-shadow: 0 1px 8px #171124; }
 #game-dialog[data-layer=result] #dialog-actions { width: min(100%,260px); margin-top: 8px; gap: 4px; }
 #game-dialog[data-layer=result] button { background: #fff0deed; color: #261e32; font-weight: 550; }
 #game-dialog[data-layer=result] button.quiet { background: transparent; color: #fff2de; border-color: transparent; font-weight: 400; text-shadow: 0 1px 8px #171124; }
-#victory-prism { width: clamp(96px,23vh,174px); height: clamp(96px,23vh,174px); flex-shrink: 0; margin-bottom: 8px; filter: drop-shadow(0 0 12px #fff1c878) drop-shadow(0 0 26px #d8b5ffb0); }
+#victory-prism { width: clamp(96px,23vh,174px); height: clamp(96px,23vh,174px); flex-shrink: 0; margin-bottom: 8px; filter: drop-shadow(0 0 9px #fff1c8bd) drop-shadow(0 0 28px #d8b5ffb0); }
 #victory-prism svg { width: 100%; height: 100%; }
 [data-motion=true] #victory-prism { animation: prism-appear 570ms ease-out both, floating-prism 6s ease-in-out infinite; }
 @keyframes prism-appear { from { opacity: 0; } to { opacity: 1; } }
@@ -74,9 +80,7 @@ footer { min-height: 56px; padding: 2px 12px 6px; display: flex; gap: 10px; alig
 #game-dialog[data-layer=meta] #dialog-actions { gap: 10px; }
 #game-dialog[data-picker=true] {
   position: fixed; inset: 0; margin: 0; width: 100%; height: 100%; max-width: none; max-height: none;
-  border: 0; border-radius: 0; padding: 0; overflow: auto;
-  background: radial-gradient(ellipse at 18% 30%,#3c2845,transparent 62%),
-    radial-gradient(ellipse at 91% 65%,#2a3548,transparent 55%), #151020;
+  border: 0; border-radius: 0; padding: 0; overflow: auto; isolation: isolate; background: #241639;
 }
 #game-dialog[data-picker=true]::backdrop { backdrop-filter: none; }
 #game-dialog[data-picker=true] button { -webkit-tap-highlight-color: transparent; }
@@ -85,6 +89,7 @@ footer { min-height: 56px; padding: 2px 12px 6px; display: flex; gap: 10px; alig
   --picker-bottom: clamp(10px,7dvh,64px);
   min-height: 100%; grid-template-rows: auto minmax(145px,1fr) auto auto auto;
   gap: 0; padding: 4px 0 var(--picker-bottom);
+  background: linear-gradient(#160d26b0,transparent 19%,transparent 65%,#160d26ab 94%);
 }
 html[data-host=browser] #game-dialog[data-picker=true] #dialog-actions {
   padding: max(4px,env(safe-area-inset-top)) env(safe-area-inset-right)
@@ -92,14 +97,14 @@ html[data-host=browser] #game-dialog[data-picker=true] #dialog-actions {
 }
 .level-picker-nav { display: flex; justify-content: space-between; gap: 6px; width: min(100%,600px); margin: auto; padding: 0 12px; }
 .level-picker-nav button, button.level-chapter-link {
-  padding: 6px 8px; border-color: transparent; background: transparent; font-size: .875rem;
+  padding: 6px 8px; border-color: transparent; background: transparent; font-size: .875rem; text-shadow: 0 1px 4px #160e27;
 }
 .level-stage {
   --field-width: min(80%,410px,58dvh);
   position: relative; width: min(100%,640px); justify-self: center; min-height: 145px;
   overflow: hidden; touch-action: pan-y pinch-zoom; user-select: none;
 }
-.level-preview, .level-peek { position: absolute; top: 12%; width: var(--field-width); height: 88%; display: grid; place-items: center; }
+.level-preview, .level-peek { position: absolute; top: 12%; width: var(--field-width); height: 88%; display: grid; place-items: center; translate: var(--picker-drag,0px) 0; }
 .level-preview { left: 50%; transform: translateX(-50%); }
 .level-stage .composition { height: 100%; min-height: 0; pointer-events: none; }
 .level-preview .composition-grid { filter: drop-shadow(0 9px 24px #0b08175e); }
@@ -120,9 +125,9 @@ html[data-host=browser] #game-dialog[data-picker=true] #dialog-actions {
 }
 .level-rail button {
   flex: 0 0 48px; height: 48px; padding: 0; border: 0; border-radius: 0;
-  background: transparent; color: #ddd1e2; font-size: .875rem; font-variant-numeric: tabular-nums;
+  background: transparent; color: #f1e5f3; font-size: .875rem; font-variant-numeric: tabular-nums; text-shadow: 0 1px 4px #160e27;
 }
-.level-rail button[data-status=Закрыт] { color: #b7a8be; }
+.level-rail button[data-status=Закрыт] { color: #daccde; }
 .level-rail button[data-status=Собран] { color: #eabed4; }
 .level-rail button[aria-current=true] { box-shadow: inset 0 -2px #fff2de; color: #fff2de; font-weight: 700; }
 .level-rail button:focus-visible { outline-offset: -4px; }
@@ -135,7 +140,7 @@ html[data-host=browser] #game-dialog[data-picker=true] #dialog-actions {
 #game-dialog[data-chapter-menu=true] .chapter-picker { grid-row: 3; }
 .chapter-picker button {
   display: flex; gap: 14px; align-items: center; text-align: left; min-height: 54px; padding: 6px 12px;
-  background: #21192d91; color: #fff2de; border-color: #fff2de33;
+  background: #20172dd4; color: #fff2de; border-color: #fff2de33;
 }
 .chapter-picker [data-locked=true] { color: #ded2e3; }
 .chapter-picker [aria-current=true] { border-color: #faedd6; }
@@ -148,7 +153,7 @@ html[data-host=browser] #game-dialog[data-picker=true] #dialog-actions {
 [data-chapter="4"] .chapter-swatch { background: linear-gradient(145deg,#6ccdda,#6b958f 50%,#6fad2e); }
 [data-locked=true] .chapter-swatch { filter: saturate(.32); opacity: .7; }
 .chapter-note { font-size: .875rem; margin: 0; text-align: center; }
-#game-dialog[data-chapter-menu=true] .chapter-note { grid-row: 4; padding: 0 12px; }
+#game-dialog[data-chapter-menu=true] .chapter-note { grid-row: 4; padding: 0 12px; text-shadow: 0 1px 4px #160e27, 0 1px 2px #160e27; }
 @media (orientation:landscape) and (max-height:450px) {
   #game-dialog[data-picker=true]:not([data-chapter-menu=true]) #dialog-actions {
     grid-template-columns: repeat(2,minmax(0,1fr)); grid-template-rows: auto 1fr auto auto auto;

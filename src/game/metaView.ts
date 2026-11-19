@@ -53,6 +53,13 @@ function pickerState(state: Workspace, id: string) {
   return state.completed.includes(id) ? 'Собран' : 'Доступен';
 }
 
+export function levelPreview(state: Workspace, id: string) {
+  const status = pickerState(state, id);
+  if (status === 'Закрыт') return null;
+  const level = getLevel(id);
+  return { level, board: status === 'Собран' ? null : state.attempts[id]?.board ?? level.startTileAtPosition };
+}
+
 function renderPicker(v: MetaView, route: PickerRoute): void {
   const { state, actions } = v;
   const index = chapterIndexFor(route.levelId);
@@ -106,10 +113,10 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
   function boardAt(id: string, style: string): void {
     const slot = document.createElement('div'); slot.className = style; stage.append(slot);
     slot.setAttribute('aria-hidden', 'true');
-    const level = getLevel(id), status = pickerState(state, id);
-    if (status === 'Закрыт') { slot.classList.add('level-locked'); return; }
-    const layout = status === 'Собран' ? undefined : state.attempts[id]?.board ?? level.startTileAtPosition;
-    slot.append(preview(level, false, layout, layout && style === 'level-preview' ? level.pinnedPositions : []));
+    const model = levelPreview(state, id);
+    if (!model) { slot.classList.add('level-locked'); return; }
+    const { level, board } = model;
+    slot.append(preview(level, false, board ?? undefined, board && style === 'level-preview' ? level.pinnedPositions : []));
   }
   const previous = chapter.levelIds[position - 1], next = chapter.levelIds[position + 1];
   if (previous) boardAt(previous, 'level-peek level-peek-prev');
@@ -122,11 +129,19 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
       stage.setPointerCapture(event.pointerId);
     }
   };
-  stage.onlostpointercapture = () => { drag = undefined; };
+  const cancelDrag = () => { drag = undefined; stage.style.removeProperty('--picker-drag'); };
+  stage.onpointermove = event => {
+    if (drag?.id !== event.pointerId) return;
+    const dx = event.clientX - drag.x;
+    if (Math.abs(dx) > Math.abs(event.clientY - drag.y)) {
+      stage.style.setProperty('--picker-drag', `${Math.max(-96, Math.min(96, dx))}px`);
+    }
+  };
+  stage.onlostpointercapture = cancelDrag;
   stage.onpointerup = event => {
     if (drag?.id !== event.pointerId) return;
     const dx = event.clientX - drag.x, dy = event.clientY - drag.y;
-    drag = undefined;
+    cancelDrag();
     if (Math.abs(dx) >= 34 && Math.abs(dx) > Math.abs(dy)) select(position + (dx < 0 ? 1 : -1));
   };
   const details = document.createElement('div'); details.className = 'level-actions'; actions.append(details);

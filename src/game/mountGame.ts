@@ -8,9 +8,10 @@ import { hashText } from '../local-store/command';
 import type { TransactionalLocalStore } from '../local-store/contracts';
 import { Session } from '../app/session';
 import { PuzzleScene, GAME_PRESENTABLE } from './PuzzleScene';
-import { Atmosphere } from './atmosphere';
+import { Atmosphere, type ColourPointer } from './atmosphere';
+import { boardGeometry, cellAt } from './geometry';
 import { GameFeedback, type Haptic } from './feedback';
-import { renderMeta, type MetaRoute } from './metaView';
+import { levelPreview, renderMeta, type MetaRoute } from './metaView';
 import { chapterIndexFor, recommendedLevel, rewardTitle } from '../domain/progression';
 import { authorView, findDraft, type CreativeAction } from '../domain/creative';
 import { makeField } from '../domain/editor';
@@ -61,6 +62,10 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   const initialAttempt = current().attempt ?? { schemaVersion: 1 as const, rulesVersion: 'gradient-rules-1' as const,
     contentVersion: 'gradient-prototype-0.1' as const, levelId: initialLevel.id, attemptId: 'quarantined-display', board: initialLevel.startTileAtPosition,
     moves: 0, assisted: false, assistsUsed: 0, completed: false };
+  function atmospherePoint(value: ColourPointer): ColourPointer {
+    const outer = root.getBoundingClientRect(), inner = region.getBoundingClientRect();
+    return { ...value, x: (value.x + inner.x - outer.x) / outer.width, y: (value.y + inner.y - outer.y) / outer.height };
+  }
   const scene = new PuzzleScene(initialLevel, initialAttempt, {
     paint, swap: (from, to) => {
       const { own, attempt } = current();
@@ -70,10 +75,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       if (current().own) { notice = 'Плитки с точкой закреплены'; render(); }
       else if (!session.state.onboarding.pinExplained) void run({ kind: 'pin' }, () => { notice = 'Плитки с точкой закреплены'; });
     },
-    interaction: value => {
-      const outer = root.getBoundingClientRect(), inner = region.getBoundingClientRect();
-      atmosphere.interaction(value ? { x: (value.x + inner.x - outer.x) / outer.width, y: (value.y + inner.y - outer.y) / outer.height, color: value.color } : null);
-    },
+    interaction: value => atmosphere.interaction(value ? atmospherePoint(value) : null),
   });
   let resolveFrame!: () => void;
   const frame = new Promise<void>(resolve => { resolveFrame = resolve; });
@@ -252,8 +254,15 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     for (const node of root.querySelectorAll<HTMLButtonElement>('.hud button,footer button')) node.disabled = busy || activity.isBlocked() || !!session.pending;
     if (attempt) scene.setView(level, attempt, layer === 'help', ready && !busy && !activity.isBlocked() && layer === 'none' && !session.pending);
     else scene.setView(level, initialAttempt, false, false);
-    atmosphere.setModel(level, layer === 'help' ? level.startTileAtPosition.map((_, i) => i) : (attempt?.board ?? initialAttempt.board));
-    atmosphere.configure(ready && !activity.isBlocked() && ['none', 'help', 'result'].includes(layer), motionAllowed());
+    const picker = layer === 'meta' && metaRoute.kind === 'chapter' ? metaRoute : null;
+    atmosphere.placeInside(picker ? dialog : root);
+    if (picker) {
+      const model = picker.chapterMenu === undefined ? levelPreview(session.state, picker.levelId) : null;
+      atmosphere.setModel(model?.level ?? null, model?.board ?? null);
+    } else {
+      atmosphere.setModel(level, layer === 'help' ? null : attempt?.board ?? initialAttempt.board);
+    }
+    atmosphere.configure(ready && !activity.isBlocked() && (picker !== null || ['none', 'help', 'result'].includes(layer)), motionAllowed());
     feedback.configure(session.state.preferences, !ready || activity.isBlocked());
     activity.setGameplayDesired(ready && !busy && layer === 'none' && !attempt?.completed && !activity.isBlocked());
     renderDialog(); paint();
@@ -278,9 +287,12 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       if (session.pending && !editorView) layer = 'recovery';
     } finally {
       busy = false; render(); resize();
-      const next = current().attempt;
+      const { level, attempt: next } = current();
       if (swapAccepted && (action.kind === 'swap' || action.kind === 'author-swap') && previous && next && previous.attemptId === next.attemptId && !activity.isBlocked()) {
         scene.presentSwap(previous, next, action.from, action.to, motionAllowed());
+        const { width, height } = region.getBoundingClientRect();
+        const cell = cellAt(boardGeometry(width, height, level.width, level.height), action.to);
+        atmosphere.accepted(atmospherePoint({ x: cell.x + cell.width / 2, y: cell.y + cell.height / 2, color: level.solvedTileColors[next.board[action.to]!]! }), next.completed);
         feedback.accepted(next.completed ? 'win' : 'swap');
       }
     }
