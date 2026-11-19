@@ -22,7 +22,7 @@ Author activeTest persists work/node/frozen Attempt; creative.playing controls c
 
 ## Next work
 
-1. **M5**: ROADMAP_1_0.md and TECHNICAL_SPEC_0_1.md for single HTTPS API/PostgreSQL, account/epoch/operation/proof contracts and graph conflict resolution. Preserve exact local transaction authority, provenance, archived migration backups and unique operation identity. Start with concrete server contracts/local fixtures; no credentials, production API or hosting are configured yet. Inspect the pinned kit identity/cloud API before adding infrastructure. Do not claim hosted/native acceptance from local models.
+1. **Owner override19 Nov: M5/cloud saves/accounts/synchronization ON HOLD.** Continue the local game and M6 daily/archive client/cache contracts. Do not start backend/auth/hosting preparations unless the owner resumes them. Retain current local transaction/provenance/backup seams. M6's common daily still requires a published catalog and trusted time; client preparation must not invent official dates, publication, completions or rewards from the device clock. Current30 daily definitions remain unassigned candidates. Real service/publishing requirements are deferred, not silently declared complete.
 2. Keep M2 tokens and read M2_ART_BIBLE before visual changes. Two licensed Cyrillic fonts, native150% text and owner review remain pending. Editor browser computed-font enlargement is smoke evidence only. No mass styling or new A/B/C contest.
 3. Native SQLite/haptic/process-death/storage-pressure/touch remains NOT RUN; no runtime/ADB was available. Hosted Yandex, identity/cloud/ads are external gates. Production register71 NOT RUN; full release unfinished.
 

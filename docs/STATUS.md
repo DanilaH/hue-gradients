@@ -10,8 +10,9 @@ Current internal build: **0.4.1/versionCode5**, branch feat/m0-foundation, draft
 | M3 | LOCAL IMPLEMENTATION: 60 campaign candidates, chapters, album, rights/mastery, page, separate copies and migration |
 | M4a | LOCAL IMPLEMENTATION: editor, immutable revisions, durable previews, recovery/branches, validator/fingerprint and author play |
 | M4b | LOCAL IMPLEMENTATION: clean/six PNG layouts/chapter page, distinct works, measured text, browser download/share and native bridge; real Android action acceptance pending |
-| M5 | NEXT: cloud/profile/epoch/operation contracts and synchronization |
-| M6–M8 | NOT STARTED |
+| M5 | ON HOLD by owner19 Nov: cloud/account/synchronization deferred from the current local milestone |
+| M6 | NEXT CLIENT WORK: local daily/archive state/cache; live shared calendar/catalog/trusted time remain unconfigured |
+| M7–M8 | NOT STARTED |
 
 Verified:149 unit tests (all33 independent editor fixtures and all60 campaign witnesses);19 editor +9 export +20 core +9 presentation +12 meta +6 local SDK browser scenarios =75 total. Actual UI includes first15 campaign completion and an assisted author completion without campaign credit. Two live editor tabs preserve variants. Real Chromium download matches preview bytes; independent Pillow checks every tile pixel/seam/region, PNG dimensions, CRC and sRGB in all eight renderers. Save-picker/share/daily-right responses in the export suite are labelled fixtures, not real platform acceptance.
 
