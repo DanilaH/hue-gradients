@@ -15,7 +15,7 @@ jobs:
         run: |
           node --input-type=module -e "import fs from 'node:fs'; const p=JSON.parse(fs.readFileSync('package.json')); fs.writeFileSync('package.json',JSON.stringify({private:true,type:'module',devDependencies:Object.fromEntries(['vitest','typescript','vite'].map(k=>[k,p.devDependencies[k]]))}));"
           npm install --ignore-scripts --no-audit --no-fund
-      - run: npx vitest run tests/puzzle.test.ts tests/workspace.test.ts
+      - run: npx vitest run tests/puzzle.test.ts tests/workspace.test.ts tests/campaign.test.ts
   host:
     runs-on: ubuntu-24.04
     steps:

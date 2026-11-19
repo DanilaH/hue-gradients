@@ -1,4 +1,4 @@
-import { applyAction, decodeWorkspace, newWorkspace, type Action, type Workspace } from '../domain/workspace';
+import { applyAction, decodeWorkspace, newWorkspace, upgradeWorkspace, type Action, type Workspace } from '../domain/workspace';
 import { prepareCommit } from '../local-store/command';
 import { StoreError, type PreparedCommit, type TransactionalLocalStore } from '../local-store/contracts';
 
@@ -14,12 +14,20 @@ export class Session {
     if (saved) {
       if (saved.schemaVersion !== 1 || saved.vaultId !== GUEST_VAULT || !Number.isSafeInteger(saved.localRevision) || saved.localRevision < 1) throw new StoreError('CORRUPT', 'Invalid workspace envelope');
       this.state = decodeWorkspace(saved.snapshotJson, this.fingerprints); this.revision = saved.localRevision;
+      const upgraded = upgradeWorkspace(this.state, this.fingerprints);
+      if (upgraded !== this.state) {
+        try { await this.write(upgraded, 'migrate-campaign-meta', saved.snapshotJson); }
+        catch (error) {
+          // A concurrent tab may already have committed exactly this migration.
+          if (!(error instanceof StoreError && error.code === 'CONFLICT' && this.state.policyVersion === 'campaign-meta-1')) throw error;
+        }
+      }
     } else {
       if (this.revision > 0) throw new StoreError('CORRUPT', 'Previously saved workspace disappeared');
       await this.write(newWorkspace(crypto.randomUUID()), 'initialize');
     }
   }
-  private async write(next: Workspace, kind: string): Promise<void> {
+  private async write(next: Workspace, kind: string, backupSnapshot?: string): Promise<void> {
     if (this.pending) throw new Error('Resolve pending operation first');
     const operationId = crypto.randomUUID();
     const attempt = next.attempts[next.activeLevelId];
@@ -27,9 +35,13 @@ export class Session {
       payloadJson: JSON.stringify({ schemaVersion: 1, kind, contentVersion: next.contentVersion, policyVersion: next.policyVersion,
         levelId: next.activeLevelId, fingerprint: this.fingerprints.get(next.activeLevelId), attempt,
         best: next.bests[next.activeLevelId], onboarding: next.onboarding,
+        newCopies: Object.values(next.albumCopies).filter(copy => !this.state?.albumCopies[copy.draftId]),
         newCompletions: next.completed.filter(id => !this.state?.completed.includes(id)),
         newRights: next.rights.filter(id => !this.state?.rights.includes(id)) }) };
-    this.pending = await prepareCommit({ operationId, vaultId: GUEST_VAULT, expectedRevision: this.revision, nextSnapshotJson: JSON.stringify(next), facts: [fact] });
+    const facts = [fact];
+    if (backupSnapshot !== undefined) facts.push({ id: `backup:${operationId}`, destination: { kind: 'guest', vaultId: GUEST_VAULT },
+      payloadJson: JSON.stringify({ schemaVersion: 1, kind: 'local-migration-backup', snapshotJson: backupSnapshot }) });
+    this.pending = await prepareCommit({ operationId, vaultId: GUEST_VAULT, expectedRevision: this.revision, nextSnapshotJson: JSON.stringify(next), facts });
     await this.resolvePending();
   }
   async resolvePending(): Promise<void> {

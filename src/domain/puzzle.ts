@@ -1,8 +1,11 @@
 /** Game-owned rules. This module has no renderer, SDK, clock or storage imports. */
 export const RULES_VERSION = 'gradient-rules-1';
 export const CONTENT_VERSION = 'gradient-prototype-0.1';
+export const CAMPAIGN_CONTENT_VERSION = 'gradient-campaign-candidates-0.1';
+export type ContentVersion = typeof CONTENT_VERSION | typeof CAMPAIGN_CONTENT_VERSION;
 
 export interface LevelDefinition {
+  readonly contentVersion?: ContentVersion;
   readonly id: string;
   readonly ordinal: number;
   readonly title: string;
@@ -17,7 +20,7 @@ export interface LevelDefinition {
 export interface Attempt {
   readonly schemaVersion: 1;
   readonly rulesVersion: typeof RULES_VERSION;
-  readonly contentVersion: typeof CONTENT_VERSION;
+  readonly contentVersion: ContentVersion;
   readonly levelId: string;
   readonly attemptId: string;
   readonly board: readonly number[];
@@ -75,14 +78,14 @@ export function createAttempt(level: LevelDefinition, attemptId: string): Attemp
   validateLevel(level);
   if (!attemptId) throw new Error('Missing attempt ID');
   return {
-    schemaVersion: 1, rulesVersion: RULES_VERSION, contentVersion: CONTENT_VERSION,
+    schemaVersion: 1, rulesVersion: RULES_VERSION, contentVersion: level.contentVersion ?? CONTENT_VERSION,
     levelId: level.id, attemptId, board: [...level.startTileAtPosition],
     moves: 0, assisted: false, assistsUsed: 0, completed: false,
   };
 }
 
 export function validateAttempt(level: LevelDefinition, attempt: Attempt): void {
-  if (attempt.schemaVersion !== 1 || attempt.rulesVersion !== RULES_VERSION || attempt.contentVersion !== CONTENT_VERSION ||
+  if (attempt.schemaVersion !== 1 || attempt.rulesVersion !== RULES_VERSION || attempt.contentVersion !== (level.contentVersion ?? CONTENT_VERSION) ||
       attempt.levelId !== level.id || typeof attempt.attemptId !== 'string' || !attempt.attemptId ||
       attempt.board.length !== level.width * level.height ||
       !integer(attempt.moves, 0, Number.MAX_SAFE_INTEGER) || !integer(attempt.assistsUsed, 0, Number.MAX_SAFE_INTEGER) ||

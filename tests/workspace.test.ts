@@ -15,14 +15,14 @@ function finish(state: ReturnType<typeof newWorkspace>) {
 test('completion, independent clean/assisted bests and base rights survive replay', () => {
   const first = levels[0]!;
   let state = finish(newWorkspace('clean-one'));
-  expect(state.completed).toEqual([first.id]); expect(state.rights).toEqual([`clean-export:${first.id}`]);
+  expect(state.completed).toEqual([first.id]); expect(state.rights).toContain(`clean-export:${first.id}`); expect(state.rights).toContain(`campaign-card:${first.id}`); expect(state.rights).toContain('export-clean');
   expect(state.onboarding.firstSwapDone).toBe(true);
   expect(state.bests[first.id]).toEqual({ fingerprint: fingerprints.get(first.id), rulesVersion: RULES_VERSION, clean: 1, assisted: null });
   state = applyAction(state, { kind: 'restart', levelId: first.id, attemptId: 'helped-two' }, fingerprints);
   state = applyAction(state, { kind: 'help', attemptId: 'helped-two' }, fingerprints);
   state = finish(state);
   expect(state.bests[first.id]?.clean).toBe(1); expect(state.bests[first.id]?.assisted).toBe(1);
-  expect(state.completed).toHaveLength(1); expect(state.rights).toHaveLength(1);
+  expect(state.completed).toHaveLength(1); expect(state.rights.filter(id => id.startsWith('campaign-card:'))).toHaveLength(1); expect(new Set(state.rights).size).toBe(state.rights.length);
   expect(decodeWorkspace(JSON.stringify(state), fingerprints)).toEqual(state);
 });
 test('stale attempt gestures and inaccessible campaign levels do not mutate state', () => {

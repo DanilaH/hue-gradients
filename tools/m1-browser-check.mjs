@@ -175,7 +175,7 @@ try {
     if (ordinal === 5) await page.screenshot({ path: '.test-output/m1/win.png' });
     await page.getByRole('button', { name: 'Дальше', exact: true }).click(); await idle();
   }
-  state = await readState(); assert.equal(state.completed.length, 5); assert.equal(state.rights.length, 5);
+  state = await readState(); assert.equal(state.completed.length, 5); assert.equal(state.rights.filter(id => id.startsWith('campaign-card:')).length, 5);
   reports.push('first five through actual UI, unique completions and rights');
   for (const viewport of [{ width: 320, height: 568 }, { width: 390, height: 844 }, { width: 844, height: 390 }]) {
     await page.setViewportSize(viewport); await page.waitForTimeout(100);
