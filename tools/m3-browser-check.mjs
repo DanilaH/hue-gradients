@@ -26,14 +26,22 @@ try{
  const selectLevel=n=>page.locator(`[data-level-id=gradient-${String(n).padStart(3,'0')}]`).click();
  const playSelected=async()=>{await page.locator('[data-level-action]').click();await idle();};
  const chapter=async n=>{await picker();await chapterMenu();await selectChapter(n);};
+ const openWorkMenu=async p=>p.getByLabel('Действия с работой').click();
+ const allWorks=async p=>{await openWorkMenu(p);await p.getByRole('button',{name:'Все работы',exact:true}).click();};
  for(let n=1;n<=4;n++){await solve(n);await page.getByRole('button',{name:'Дальше',exact:true}).click();await idle();}
  await chapter(1);await selectLevel(15);assert.equal(await page.locator('[data-level-action]').count(),0);assert.equal(await page.locator('.level-preview .composition-grid').count(),0);
  await selectLevel(5);await playSelected();await solve(5);
  assert((await state()).rights.includes('export-caption'));passed.push('first five remain sequential; fifth grants caption rights');
  assert.equal(await page.locator('#dialog-actions button').count(),2);
- await page.getByRole('button',{name:'В альбом',exact:true}).click();assert.equal(await page.locator('[data-album-level]').count(),5);assert.equal(await page.locator('[data-album-level=gradient-006]').count(),0);passed.push('album contains only completed previews; no solution leaks');
+ await page.getByRole('button',{name:'В альбом',exact:true}).click();
+ assert.equal(await page.locator('.work-card').getAttribute('data-level-id'),'gradient-005');
+ await page.getByRole('button',{name:'‹ Назад',exact:true}).click();await page.waitForSelector('#hue-app[data-layer=result]');
+ await page.getByRole('button',{name:'В альбом',exact:true}).click();await allWorks(page);
+ assert.equal(await page.locator('[data-album-level]').count(),5);assert.equal(await page.locator('[data-album-level=gradient-006]').count(),0);passed.push('result opens the exact completed card, Back returns to result and collection reveals only earned work');
  await page.locator('[data-album-level=gradient-001]').click();
+ await openWorkMenu(page);
  await page.getByRole('button',{name:'Повторить работу',exact:true}).click();await page.keyboard.press('Escape');await page.locator('[data-meta=card]').waitFor();
+ await openWorkMenu(page);
  await page.getByRole('button',{name:'Сохранить копию',exact:true}).click();
  await page.getByRole('textbox',{name:'Название копии'}).fill('Копия <b>моя</b>');
  const before=await state();await page.getByRole('button',{name:'Сохранить копию',exact:true}).click();await idle();
@@ -68,7 +76,7 @@ try{
  for(let n=10;n<=14;n++){await solve(n);if(n<14){await page.getByRole('button',{name:'Дальше',exact:true}).click();await idle();}}
  let current=await state();assert.equal(current.completed.length,15);assert(current.rights.includes('chapter-complete:chapter-01')&&current.rights.includes('export-strip'));
  assert.equal(await page.locator('#dialog-actions button').count(),2);
- await page.getByRole('button',{name:'В альбом',exact:true}).click();
+ await page.getByRole('button',{name:'В альбом',exact:true}).click();await allWorks(page);
  assert.equal(await page.locator('[data-album-level]').evaluateAll(nodes=>nodes.some(node=>node.scrollWidth>node.clientWidth+1)),false);await page.screenshot({path:'.test-output/m3/album.png'});await page.getByRole('button',{name:'Полная страница главы 1'}).click();assert.equal(await page.locator('.chapter-page .composition').count(),15);await page.screenshot({path:'.test-output/m3/chapter-page.png'});passed.push('14→15 stores page and format together; the album shows 15 earned works on the chapter page');
  for(const viewport of[{width:320,height:568},{width:844,height:390}]){
   await page.setViewportSize(viewport);await page.waitForTimeout(80);const bounds=await page.locator('#game-dialog').boundingBox();assert(bounds.x>=0&&bounds.x+bounds.width<=viewport.width+1);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
@@ -108,7 +116,8 @@ try{
   const store=await openIndexedDb(),old=await store.load('guest-local-v1');await store.commit(await prepareCommit({operationId:crypto.randomUUID(),vaultId:'guest-local-v1',expectedRevision:old.localRevision,nextSnapshotJson:JSON.stringify(state),facts:[]}));store.close();
  });
  await p.reload();await p.waitForSelector('#hue-app[data-layer=result]');assert.equal(await p.getByRole('button',{name:'Дальше',exact:true}).count(),0);
- assert((await p.locator('#dialog-copy').innerText()).includes('Кампания собрана'));await p.getByRole('button',{name:'В альбом',exact:true}).click();assert.equal(await p.locator('[data-album-level]').count(),60);
+ assert((await p.locator('#dialog-copy').innerText()).includes('Кампания собрана'));await p.getByRole('button',{name:'В альбом',exact:true}).click();
+ assert.equal(await p.locator('.work-card').getAttribute('data-level-id'),'gradient-060');await allWorks(p);assert.equal(await p.locator('[data-album-level]').count(),60);
  await p.getByRole('button',{name:'Экспорт',exact:true}).click();assert.equal(await p.getByRole('combobox',{name:'Макет'}).locator('option').count(),7);
  passed.push('all-60 imported checkpoint shows 60 cards, finite six formats and no fake next chapter');await all.close();
  await writeFile('.test-output/m3/browser.json',JSON.stringify({passed,pageErrors:errors,actualUiCompleted:'Chapter 1: all 15; non-linear selection after tutorial',fixtureCases:'14-completion v0.2 snapshots, with/without transaction fault',limits:['Physical Android and hosted services NOT RUN','Human acceptance of candidate content NOT RUN']},null,2));

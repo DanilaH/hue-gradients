@@ -14,7 +14,7 @@ interface MetaView {
   route: MetaRoute; state: Workspace; disabled: boolean;
   title: HTMLElement; copy: HTMLElement; actions: HTMLElement;
   navigate(route: MetaRoute): void; back(): void;
-  play(id: string): void; replay(id: string): void; saveCopy(id: string, name: string): void;
+  play(id: string): void; saveCopy(id: string, name: string): void;
   repeat(id: string): void;
   createWork(): void;
 }
@@ -218,22 +218,14 @@ export function renderMeta(v: MetaView): void {
   } else if (route.kind === 'card' || route.kind === 'copy') {
     const level = getLevel(route.levelId);
     v.title.textContent = level.title;
-    if (!state.completed.includes(level.id)) { label('Сначала соберите эту работу.'); back(); return; }
+    if (route.kind === 'card' || !state.completed.includes(level.id)) { label('Сначала соберите эту работу.'); back(); return; }
     actions.append(preview(level, true));
-    if (route.kind === 'card') {
-      const best = state.bests[level.id];
-      v.copy.textContent = `Кампания · глава ${chapterIndexFor(level.id) + 1}\nБез помощи: ${best?.clean ?? 'нет результата'} · с помощью: ${best?.assisted ?? 'нет результата'}`;
-      button('Повторить работу', () => v.replay(level.id));
-      button('Сохранить копию', () => v.navigate({ kind: 'copy', levelId: level.id }));
-      button('Экспорт', () => v.navigate({ kind: 'export', initialKey: `campaign:${level.id}` }));
-    } else {
-      v.copy.textContent = 'Копия сохранится отдельно. Оригинал и его рекорды останутся прежними.';
-      const label = document.createElement('label'); label.textContent = 'Название копии';
-      const input = document.createElement('input'); input.type = 'text'; input.value = `${level.title} — копия`; input.setAttribute('aria-label', 'Название копии'); input.disabled = v.disabled;
-      const error = document.createElement('p'); error.className = 'meta-note'; error.setAttribute('role','status');
-      label.append(input); actions.append(label, error);
-      button('Сохранить копию', () => { if ([...input.value.trim()].length > 80) error.textContent = 'До 80 символов. Сократите название.'; else v.saveCopy(level.id, input.value); });
-    }
+    v.copy.textContent = 'Копия сохранится отдельно. Оригинал и его рекорды останутся прежними.';
+    const name = document.createElement('label'); name.textContent = 'Название копии';
+    const input = document.createElement('input'); input.type = 'text'; input.value = `${level.title} — копия`; input.setAttribute('aria-label', 'Название копии'); input.disabled = v.disabled;
+    const error = document.createElement('p'); error.className = 'meta-note'; error.setAttribute('role','status');
+    name.append(input); actions.append(name, error);
+    button('Сохранить копию', () => { if ([...input.value.trim()].length > 80) error.textContent = 'До 80 символов. Сократите название.'; else v.saveCopy(level.id, input.value); });
     back();
   } else if (route.kind === 'draft') {
     const copy = state.albumCopies[route.draftId];

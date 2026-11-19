@@ -23,6 +23,30 @@ try {
  const state=()=>page.evaluate(async()=>{const{openIndexedDb}=await import('/src/local-store/indexed-db.ts');const s=await openIndexedDb(),r=await s.load('guest-local-v1');s.close();return{state:JSON.parse(r.snapshotJson),revision:r.localRevision};});
  await page.locator('#levels').click();await page.getByRole('button',{name:'Альбом',exact:true}).click();assert.equal(await page.getByRole('button',{name:'Экспорт',exact:true}).count(),0);assert.equal(await page.evaluate(()=>window.__shareCalls.length),0);
  passed.push('empty profile cannot export unfinished targets; no automatic share call');
+ await page.keyboard.press('Escape');await page.keyboard.press('Escape');
+ const field=await page.locator('#board-region canvas').boundingBox();
+ for(const i of[1,2])await page.mouse.click(field.x+(i+.5)*field.width/4,field.y+field.height/2);
+ await page.getByRole('button',{name:'В альбом',exact:true}).click();
+ const direct=page.getByRole('button',{name:'Сохранить PNG',exact:true});
+ const picture=page.locator('.work-card-preview');await page.waitForFunction(()=>!!document.querySelector('.work-card-preview')?.naturalWidth);
+ const proof=await state(),url0=await picture.getAttribute('src');
+ assert.equal(await page.locator('.work-card').getAttribute('data-level-id'),'gradient-001');
+ await page.evaluate(()=>window.showSaveFilePicker=async()=>{
+  window.__pickerActivation=navigator.userActivation.isActive;throw new DOMException('cancelled','AbortError');
+ });
+ await direct.click();await page.waitForFunction(()=>document.querySelector('.work-card-status')?.textContent.includes('отменено'));
+ assert.equal(await picture.getAttribute('src'),url0);assert(await page.evaluate(()=>window.__pickerActivation));
+ await page.evaluate(()=>window.showSaveFilePicker=undefined);
+ const directDownload=page.waitForEvent('download');await direct.click();const earned=await directDownload;
+ assert.equal(earned.suggestedFilename(),'Poluson-001.png');await earned.saveAs('.test-output/m4b/png/first-work.png');
+ const expectedHash=await picture.evaluate(async img=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',await (await fetch(img.src)).arrayBuffer())),v=>v.toString(16).padStart(2,'0')).join(''));
+ assert.equal(createHash('sha256').update(await readFile('.test-output/m4b/png/first-work.png')).digest('hex'),expectedHash);
+ assert.deepEqual(await state(),proof);
+ await page.setViewportSize({width:320,height:568});await page.evaluate(()=>document.documentElement.style.fontSize='150%');
+ const buttonBounds=await direct.boundingBox();assert(buttonBounds.height>=48&&buttonBounds.y+buttonBounds.height<=568);
+ await page.getByRole('button',{name:'‹ Назад',exact:true}).click();await page.locator('#hue-app[data-layer=result]').waitFor();
+ await page.setViewportSize({width:390,height:844});await page.evaluate(()=>document.documentElement.style.fontSize='');
+ passed.push('first real victory opens its exact file, one tap saves, picker cancellation permits retry and Back restores the result');
  // Populate a labelled imported checkpoint using the actual pure reducers, not invented bests.
  await page.evaluate(async()=>{
   const{openIndexedDb}=await import('/src/local-store/indexed-db.ts'),{prepareCommit,hashText}=await import('/src/local-store/command.ts');
