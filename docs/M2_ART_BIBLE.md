@@ -1,6 +1,6 @@
 # M2 presentation slice — 18 November 2026
 
-Status: EXECUTABLE OWNER-REVIEW CANDIDATE, not accepted ART-01…09. Build 0.2.0, Android versionCode 2. Owner reference remains docs/spec/reference/owner-art-reference.png (SHA256 872fd9800184a2e4cc52716cd258cbcb194841782745415ae6dd710aedc586ec). Its static concept establishes light/colour/texture, not measured motion.
+Status: EXECUTABLE OWNER-REVIEW CANDIDATE for ART-01…09. Latest visual preview is 0.4.4. Owner reference is docs/spec/reference/owner-art-reference.png (SHA256 872fd9800184a2e4cc52716cd258cbcb194841782745415ae6dd710aedc586ec). Its static concept establishes light, colour and texture.
 
 ## Confirmed gaps and implemented changes
 
@@ -15,8 +15,9 @@ Status: EXECUTABLE OWNER-REVIEW CANDIDATE, not accepted ART-01…09. Build 0.2.0
 ## Visual and behaviour tokens
 
 - Colour authority: level.solvedTileColors[tileId] on opaque Phaser tiles. No ambient blend, grain, blur, score or correctness effect touches their fill. Pin is a black/white marker; selection remains a separate contrast outline. Spatial sampling only uses visible colours/positions.
-- Background: 3×3 Gaussian samples, variance .07, saturation 2.3 only in ambient, radius .62 of its short backing side. Consumer artistic tuning, not kit defaults. Fixed grain seed; no flashing noise. Small slow drifts (.13/.11rad/s), colour response 420ms via kit exponentialResponse, pointer trail decay 300ms.
-- Budget: one Canvas2D ambient, maximum 240×320 backing pixels, at most 24 draws/s while active. Phaser sleeps at rest and runs only for direct input/150ms settling. This is a configured budget; phone GPU/battery/p95 not measured.
+- Background: the visible permutation feeds 3×3 Gaussian samples, variance .07. Nine tinted pools and three moving reflections provide the purple, peach and cyan light. The background uses a fixed 4×4 ordered texture, pixel scaling and a small CSS blur. The same canvas serves gameplay, result and picker. Chapters and locked levels use a neutral lighting palette.
+- Motion: kit exponentialResponse blends the palette over a 260ms response constant. A glow tracks the pointer during drag. A confirmed swap adds an expanding diffuse wave at the destination, with a longer decay on the win. The picker moves under the finger during a swipe. The motion preference and system reduced motion stop ambient animation.
+- Budget: one Canvas2D ambient, maximum 160×240 backing pixels, at most 24 draws/s while active. Phaser sleeps at rest and runs for direct input and the 150ms tile settling. Physical GPU, battery and frame-time acceptance are pending.
 - Swap/win authority: snapshot/receipt transaction first, presentation afterwards. Same/pin/outside/cancel/failed writes are silent. Explicit unknown-receipt recovery and restored results do not replay success cues. All swaps get the same response without evaluating correctness.
 - Swap sound: own 95ms decaying 330/660Hz tone. Win: own 550ms C4/E4/G4 phrase. No third-party audio file/license. Kit OneShotPlayer owns bounded voices and dropped/expired cues; no cue queue resumes after background. Native performHapticFeedback respects OS settings without a vibration permission.
 - Root cream #fff2de, dark foundation #151020, foreground/dialog separation #21192d. Primary controls 48px; hit geometry stays independent from decoration. Modal top layer never intercepts after close.
@@ -28,6 +29,6 @@ Current system-ui is PROVISIONAL. No bitmap/pseudo-pixel font was adopted. The r
 
 Owner acceptance on an actual build and a physical phone is pending. Browser screenshots/video are an honest desktop-emulation review aid, not phone evidence. M1 native SQLite/process death/storage pressure remains pending because no Android device/emulator is attached. Hosted Yandex, identity/cloud/live ads remain separate external gates.
 
-Actual review episode: solve the first four through UI, then record gradient-005: drag → accepted swaps → committed win → exact field → result. No injected board/completion or generated frames. tools/record-m2-preview.mjs reproduces it. Internal video is 390×844; deliverable is an MP4 plus the test-signed APK.
+Actual review episode: solve the first four through UI, then record the picker swipe, tile drag, accepted swaps and committed win on level 5. `tools/record-m2-preview.mjs` reproduces the gameplay segment. [0.4.4 build and capture evidence](evidence/dream-atmosphere-2026-11-19.json).
 
 KIT IMPACT: REUSE — OneShotPlayer and exponentialResponse added to existing lifecycle/DPR/teardown reuse. Palette, durations, audio synthesis, prism and guest preferences remain consumer policy. No common kit or other games changed.

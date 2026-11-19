@@ -4,6 +4,8 @@ Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and
 
 ## Current slice
 
+0.4.4/versionCode8 is a visual playtest candidate. Gameplay, result and the picker share one low-resolution atmosphere with luminous colour pools, ordered texture and soft blur. Confirmed exchanges fan out a light wave, and the picker tracks horizontal drag. The puzzle uses its opaque source colours and game hit geometry. The locked picker has a fixed palette and reduced motion freezes the light effects. [Visual decisions](M2_ART_BIBLE.md) · [Exact build and checks](evidence/dream-atmosphere-2026-11-19.json)
+
 0.4.2/versionCode6 implements the first approved UI simplification package: gameplay opens on the saved board, the compact HUD shows level/navigation/hint, and the first-swap cue is transient. The same hint persists assistance before revealing the solved field. The result shows the move count and chapter unlock if earned, with direct Next and Album actions. The board fades under the prize without delaying Next. The settings sheet contains restart and three toggles. Cancel and Back restore the source of a restart confirmation.
 
 0.4.3/versionCode7 implements step 1 of [the UI refinement plan](UI_REFINEMENT_PLAN.md). The picker opens on the current level. Unfinished tasks show their start or saved permutation. A completed task with no active replay shows the solved colors. Explicit Replay starts a fresh attempt and preserves earned rights and bests. Chapters open through the chapter-progress button. Locked selections show their opening condition. Back closes chapter selection, then returns to the same board. The recorded Chromium touch route preserves the complete IndexedDB snapshot and revision.
@@ -44,4 +46,4 @@ Runtime/guidance469928d03f4bae5053e23db26e82187bedbc252e, kit archive SHA256ba90
 
 Read SIGNING_PREVIEW.md. Keep .preview3 and reuse the privately saved TEST key HUE-test-preview-signing.keystore via ANDROID_PREVIEW_KEYSTORE. Never regenerate/commit it or use it as production. Old0.2 .releasecheck signer was lost; never ask owner to uninstall that app and lose data. 0.4.1 certificate matches0.3/0.4.0; actual Android update is untested. Production base appId/certificate policy unchanged, signer null.
 
-Delivered Poluson-0.4.3-preview.apk, package com.danilah.huegradients.preview3, versionCode7. [Build hash, signer and limits](evidence/level-picker-2026-11-19.json). Increment versionCode for the next test update.
+Delivered Poluson-0.4.4-preview.apk, package com.danilah.huegradients.preview3, versionCode8. [Build hash, signer and limits](evidence/dream-atmosphere-2026-11-19.json). Increment versionCode for the next test update.

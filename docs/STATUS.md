@@ -1,12 +1,12 @@
 # Status — 19 November 2026
 
-Current internal build: **0.4.3/versionCode7**, branch feat/m0-foundation, draft PR #1. Implementation checkpoints are on GitHub.
+Current internal build: **0.4.4/versionCode8**, branch feat/m0-foundation, draft PR #1. Implementation checkpoints are on GitHub.
 
 | Stage | Actual state |
 | --- | --- |
 | M0 | PARTIAL: reproducible platform builds; external gates in M0_GATES.md remain |
 | M1 | LOCAL IMPLEMENTATION: shared input/play, SQLite/IndexedDB transaction seam, CAS/ledger/recovery; native runtime acceptance pending |
-| M2 | EXECUTABLE REVIEW CANDIDATE: reactive atmosphere, committed feedback, settings, prism; owner typography/art/phone acceptance pending |
+| M2 | EXECUTABLE REVIEW CANDIDATE: brighter low-resolution atmosphere, light trails and committed waves for gameplay, result and picker |
 | M3 | LOCAL IMPLEMENTATION: 60 campaign candidates, chapters, album, rights/mastery, page, separate copies and migration |
 | M4a | LOCAL IMPLEMENTATION: editor, immutable revisions, durable previews, recovery/branches, validator/fingerprint and author play |
 | M4b | LOCAL IMPLEMENTATION: clean/six PNG layouts/chapter page, distinct works, measured text, browser download/share and native bridge; real Android action acceptance pending |
@@ -14,6 +14,8 @@ Current internal build: **0.4.3/versionCode7**, branch feat/m0-foundation, draft
 | M5 | ON HOLD by owner19 Nov: cloud/account/synchronization deferred from the current local milestone |
 | M6 | NEXT CLIENT WORK: local daily/archive state/cache; live shared calendar/catalog/trusted time remain unconfigured |
 | M7–M8 | NOT STARTED |
+
+0.4.4 checks exercise exact rendered tile colours, stored and system motion settings, active and paused picker animation, locked palettes and direct swipe. [0.4.4 evidence](evidence/dream-atmosphere-2026-11-19.json)
 
 Verified for 0.4.3: 149 unit tests, 21 core, 12 meta, 9 presentation, 19 editor and 9 export browser scenarios. Actual UI includes the first 15 campaign completions and an assisted author completion without campaign credit. Two live editor tabs preserve variants. Chromium download matches the preview bytes. Independent Pillow checks all eight renderers for tile colors, seams, dimensions and sRGB. Browser save-picker, share and daily-right scenarios use labelled fixtures. The six local SDK scenarios were last run for 0.4.2.
 
