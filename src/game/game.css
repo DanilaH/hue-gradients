@@ -72,25 +72,98 @@ footer { min-height: 56px; padding: 2px 12px 6px; display: flex; gap: 10px; alig
 /* Chapter picker and collection. */
 #game-dialog[data-layer=meta] { width: min(94%,520px); }
 #game-dialog[data-layer=meta] #dialog-actions { gap: 10px; }
-#game-dialog[data-picker=true] { max-width: 386px; padding: 16px; }
-#game-dialog[data-picker=true] h2 { margin: 0 0 8px; font-size: 1.3rem; text-align: center; }
-.level-picker-nav { display: flex; justify-content: space-between; gap: 6px; }
-.level-picker-nav button { padding: 6px 8px; border-color: transparent; background: transparent; font-size: .875rem; }
-.chapter-picker { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 7px; }
-.chapter-picker button { background: #382d47; color: #fff2de; padding: 6px 2px; }
-.chapter-picker [data-locked=true] { color: #e4d4e2; background: #281f34; border-style: dashed; }
-.chapter-picker [aria-current=true] { border-color: #faedd6; }
-.chapter-note { font-size: .875rem; margin: 0; text-align: center; }
-@media (orientation:landscape) and (max-height:450px) {
-  #game-dialog[data-picker=true] { max-width: 530px; padding: 12px; }
-  #game-dialog[data-picker=true] #dialog-actions { display: grid; grid-template-columns: minmax(125px,1fr) minmax(0,2fr); grid-template-areas: 'nav grid' 'picker grid' 'note grid'; align-content: center; gap: 5px 12px; }
-  .level-picker-nav { grid-area: nav; }
-  .chapter-picker { grid-area: picker; grid-template-columns: repeat(2,minmax(0,1fr)); }
-  .chapter-note { grid-area: note; }
-  .level-grid { grid-area: grid; }
+#game-dialog[data-picker=true] {
+  position: fixed; inset: 0; margin: 0; width: 100%; height: 100%; max-width: none; max-height: none;
+  border: 0; border-radius: 0; padding: 0; overflow: auto;
+  background: radial-gradient(ellipse at 18% 30%,#3c2845,transparent 62%),
+    radial-gradient(ellipse at 91% 65%,#2a3548,transparent 55%), #151020;
 }
-.level-grid { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 7px; }
-.level-grid button { padding: 6px 2px; min-width: 0; font-variant-numeric: tabular-nums; }
+#game-dialog[data-picker=true]::backdrop { backdrop-filter: none; }
+#game-dialog[data-picker=true] button { -webkit-tap-highlight-color: transparent; }
+#game-dialog[data-picker=true] h2 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); margin: 0; }
+#game-dialog[data-picker=true] #dialog-actions {
+  --picker-bottom: clamp(10px,7dvh,64px);
+  min-height: 100%; grid-template-rows: auto minmax(145px,1fr) auto auto auto;
+  gap: 0; padding: 4px 0 var(--picker-bottom);
+}
+html[data-host=browser] #game-dialog[data-picker=true] #dialog-actions {
+  padding: max(4px,env(safe-area-inset-top)) env(safe-area-inset-right)
+    max(var(--picker-bottom),env(safe-area-inset-bottom)) env(safe-area-inset-left);
+}
+.level-picker-nav { display: flex; justify-content: space-between; gap: 6px; width: min(100%,600px); margin: auto; padding: 0 12px; }
+.level-picker-nav button, button.level-chapter-link {
+  padding: 6px 8px; border-color: transparent; background: transparent; font-size: .875rem;
+}
+.level-stage {
+  --field-width: min(80%,410px,58dvh);
+  position: relative; width: min(100%,640px); justify-self: center; min-height: 145px;
+  overflow: hidden; touch-action: pan-y pinch-zoom; user-select: none;
+}
+.level-preview, .level-peek { position: absolute; top: 12%; width: var(--field-width); height: 88%; display: grid; place-items: center; }
+.level-preview { left: 50%; transform: translateX(-50%); }
+.level-stage .composition { height: 100%; min-height: 0; pointer-events: none; }
+.level-preview .composition-grid { filter: drop-shadow(0 9px 24px #0b08175e); }
+.level-peek { opacity: .46; }
+.level-peek-prev { right: calc(50% + var(--field-width) / 2 + 12px); }
+.level-peek-next { left: calc(50% + var(--field-width) / 2 + 12px); }
+.level-locked::before {
+  content: ''; width: min(100%,44dvh); max-height: 100%; aspect-ratio: 1;
+  border: 1px solid #dfc4e45c; border-radius: 3px;
+  background: linear-gradient(135deg,#d0a9da13,#1e213b52), #262139;
+}
+.level-actions { min-height: 50px; display: grid; place-items: center; padding: 0 12px; }
+.level-actions > button { width: min(78%,310px); font-weight: 550; }
+.level-rail {
+  display: flex; width: min(100%,440px); justify-self: center; overflow-x: auto; padding: 5px 12px 0;
+  scrollbar-width: none; overscroll-behavior-x: contain;
+  mask-image: linear-gradient(to right,transparent,#000 12px,#000 calc(100% - 12px),transparent);
+}
+.level-rail button {
+  flex: 0 0 48px; height: 48px; padding: 0; border: 0; border-radius: 0;
+  background: transparent; color: #ddd1e2; font-size: .875rem; font-variant-numeric: tabular-nums;
+}
+.level-rail button[data-status=Закрыт] { color: #b7a8be; }
+.level-rail button[data-status=Собран] { color: #eabed4; }
+.level-rail button[aria-current=true] { box-shadow: inset 0 -2px #fff2de; color: #fff2de; font-weight: 700; }
+.level-rail button:focus-visible { outline-offset: -4px; }
+.level-chapter-link { justify-self: center; }
+.level-chapter-link::after { content: '›'; margin-left: .45em; }
+#game-dialog[data-chapter-menu=true] #dialog-actions {
+  --picker-bottom: 10px; grid-template-rows: auto minmax(0,1fr) auto minmax(48px,1fr); gap: 8px;
+}
+.chapter-picker { display: grid; width: min(100% - 28px,520px); margin: 0 auto; gap: 8px; }
+#game-dialog[data-chapter-menu=true] .chapter-picker { grid-row: 3; }
+.chapter-picker button {
+  display: flex; gap: 14px; align-items: center; text-align: left; min-height: 54px; padding: 6px 12px;
+  background: #21192d91; color: #fff2de; border-color: #fff2de33;
+}
+.chapter-picker [data-locked=true] { color: #ded2e3; }
+.chapter-picker [aria-current=true] { border-color: #faedd6; }
+.chapter-swatch {
+  flex: 0 0 30px; aspect-ratio: 1; transform: rotate(45deg) scale(.8); border-radius: 2px;
+  background: linear-gradient(145deg,#e2d8a2,#c18d61 50%,#4957a1);
+}
+[data-chapter="2"] .chapter-swatch { background: linear-gradient(145deg,#e8c4bf,#87b25b 50%,#176339); }
+[data-chapter="3"] .chapter-swatch { background: linear-gradient(145deg,#e8bfd9,#a37d82 50%,#2e6317); }
+[data-chapter="4"] .chapter-swatch { background: linear-gradient(145deg,#6ccdda,#6b958f 50%,#6fad2e); }
+[data-locked=true] .chapter-swatch { filter: saturate(.32); opacity: .7; }
+.chapter-note { font-size: .875rem; margin: 0; text-align: center; }
+#game-dialog[data-chapter-menu=true] .chapter-note { grid-row: 4; padding: 0 12px; }
+@media (orientation:landscape) and (max-height:450px) {
+  #game-dialog[data-picker=true]:not([data-chapter-menu=true]) #dialog-actions {
+    grid-template-columns: repeat(2,minmax(0,1fr)); grid-template-rows: auto 1fr auto auto auto;
+    grid-template-areas: 'nav stage' '. stage' 'action stage' 'rail stage' 'chapters stage';
+    --picker-bottom: 10px;
+  }
+  .level-picker-nav { grid-area: nav; }
+  .level-stage { --field-width: min(76%,82dvh); grid-area: stage; }
+  .level-preview, .level-peek { top: 5%; height: 90%; }
+  .level-actions { grid-area: action; }
+  .level-rail { grid-area: rail; }
+  .level-chapter-link { grid-area: chapters; }
+  #game-dialog[data-chapter-menu=true] .level-picker-nav { grid-area: auto; }
+  .chapter-picker { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
 .meta-note { font-size: 13px; color: #eadcd0; margin: -3px 0 6px; }
 .album-tabs { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 5px; }
 .album-tabs button { font-size: 12px; padding: 8px 3px; min-width: 0; }
@@ -106,8 +179,6 @@ footer { min-height: 56px; padding: 2px 12px 6px; display: flex; gap: 10px; alig
 .chapter-page .composition { height: 68px; }
 .empty-composition { min-height: 68px; display: grid; place-items: center; background: #342a40; font-size: 12px; text-align: center; }
 #game-dialog input[type=text] { width: 100%; margin-top: 8px; min-height: 48px; font: inherit; background: #f6eadd; border: 1px solid #ccb2dc; border-radius: 8px; padding: 10px; color: #24192d; }
-.level-grid [data-done=true] { background: #41344c; color: #fff2de; }
-.level-grid [aria-current=true] { box-shadow: inset 0 0 0 2px #bd93c3; }
 #game-dialog[data-editor=true] { overflow: hidden; padding: 18px; }
 #game-dialog[data-editor=true] h2 { font-size: 21px; margin-bottom: 8px; overflow-wrap: anywhere; max-height: 3em; overflow: auto; }
 #game-dialog[data-editor=true] #dialog-copy { margin: 0; }

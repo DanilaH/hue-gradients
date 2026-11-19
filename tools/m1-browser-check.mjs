@@ -173,25 +173,69 @@ try {
   await page.evaluate(p => document.querySelector('#board-region canvas').dispatchEvent(new PointerEvent('pointerup', { pointerId: 1, clientX: p.x, clientY: p.y })), p2);
   await page.mouse.up(); await idle();
   assert.equal((await readState()).attempts['gradient-002'].moves, 1); reports.push('final pointerup coordinates and ignored second pointer');
+  await page.locator('#help').click(); await page.waitForSelector('#hue-app[data-layer=help]');
+  await page.keyboard.press('Escape');
   const beforePicker = await readState();
+  const saved = beforePicker.attempts[beforePicker.activeLevelId];
+  assert.equal(saved.assisted, true);
+  const level = JSON.parse(await readFile('docs/spec/prototype/levels-0.1.json', 'utf8')).levels.find(row => row.id === saved.levelId);
   await page.setViewportSize({ width: 320, height: 568 });
-  await page.locator('#levels').click();
-  await page.locator('[data-picker=true] .level-grid').waitFor();
+  const openPicker = async () => { await page.locator('#levels').click(); await page.locator('.level-stage').waitFor(); };
+  const selectedLevel = page.locator('.level-rail [aria-current=true]');
+  await openPicker();
+  assert.equal(await selectedLevel.getAttribute('data-level-id'), saved.levelId);
+  assert.deepEqual(await page.locator('.level-preview rect').evaluateAll(rects => rects.map(rect => rect.getAttribute('fill'))),
+    saved.board.map(tile => level.solvedTileColors[tile]));
+  assert.equal(await page.locator('.level-preview circle').count(), level.pinnedPositions.length);
+  const stage = await page.locator('.level-stage').boundingBox();
+  await page.mouse.move(stage.x + stage.width * .7, stage.y + stage.height / 2);
+  await page.mouse.down(); await page.mouse.move(stage.x + stage.width * .3, stage.y + stage.height / 2, { steps: 6 }); await page.mouse.up();
+  assert.equal(await selectedLevel.getAttribute('data-level-id'), 'gradient-003');
+  assert.equal(await page.locator('[data-level-action]').count(), 0);
+  assert.equal(await page.locator('.level-preview rect').count(), 0);
+  await selectedLevel.press('End');
+  assert.equal(await selectedLevel.getAttribute('data-level-id'), 'gradient-015');
+  await selectedLevel.press('ArrowLeft');
+  assert.equal(await selectedLevel.getAttribute('data-level-id'), 'gradient-014');
+  await page.locator('[data-open-chapters]').click();
+  assert.equal(await page.locator('.composition-grid').count(), 0);
   await page.locator('[data-chapter="2"]').click();
-  assert.equal(await page.locator('.level-grid button:enabled').count(), 0);
   assert.match(await page.locator('.chapter-note').innerText(), /Соберите 10/);
   const pickerText = await page.addStyleTag({ content: 'html, body { font-size: 24px !important; }' });
   assert.equal(await compactDialog(), true);
+  await page.screenshot({ path: '.test-output/m1/chapter-locked.png' });
+  await page.keyboard.press('Escape');
+  assert.equal(await selectedLevel.getAttribute('data-level-id'), 'gradient-014');
+  await page.locator('[data-level-id=gradient-002]').click();
+  assert.equal(await page.locator('.level-preview rect').count(), level.width * level.height);
+  const pickerFit = async () => page.locator('#game-dialog').evaluate(dialog => {
+    const anchors = [...dialog.querySelectorAll('.level-picker-nav button, [data-level-action], [data-open-chapters], .level-rail [aria-current=true]')];
+    return anchors.length === 5 && dialog.scrollHeight <= dialog.clientHeight + 1 && anchors.every(anchor => {
+      const { x, y, width, height } = anchor.getBoundingClientRect();
+      return x >= 0 && y >= 0 && x + width <= innerWidth + 1 && y + height <= innerHeight + 1 &&
+        anchor.contains(document.elementFromPoint(x + width / 2, y + height / 2));
+    });
+  });
+  assert.equal(await pickerFit(), true);
+  await page.screenshot({ path: '.test-output/m1/picker-small.png' });
   await pickerText.evaluate(element => element.remove());
+  await page.setViewportSize({ width: 844, height: 390 });
+  assert.equal(await pickerFit(), true);
   await page.getByRole('button', { name: '‹ Назад', exact: true }).click();
+  assert.equal(await page.locator('#hue-app').getAttribute('data-layer'), 'none');
+  await page.locator('#levels').focus();
+  await openPicker();
+  assert.equal(await selectedLevel.getAttribute('data-level-id'), saved.levelId);
+  await page.getByRole('button', { name: 'Продолжить', exact: true }).click();
   assert.equal(await page.locator('#hue-app').getAttribute('data-layer'), 'none');
   assert.deepEqual(await readState(), beforePicker);
   assert.equal(await page.locator('#guidance').isVisible(), false);
+  await page.setViewportSize({ width: 320, height: 568 });
   await page.locator('#settings').click();
   assert.equal(await compactDialog(), true);
   await page.getByRole('button', { name: 'Вернуться к игре' }).click();
   await page.setViewportSize({ width: 390, height: 844 });
-  reports.push('single-tap picker, locked chapter preview and Back preserve unfinished attempt');
+  reports.push('saved picker colors and assisted attempt, mouse swipe, keyboard rail and two-step Back preserve the entire save');
 
   const restart = async () => {
     await page.locator('#settings').click(); await page.locator('#restart').click(); await page.getByRole('button', { name: 'Начать заново', exact: true }).click(); await idle();

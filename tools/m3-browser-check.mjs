@@ -20,11 +20,15 @@ try{
   for(const[from,to]of witnesses.find(r=>r.id===level.id).legalOptimalWitness){for(const index of[from,to]){const r=await page.locator('#board-region canvas').boundingBox();await page.mouse.click(r.x+(index%level.width+.5)*r.width/level.width,r.y+4+(Math.floor(index/level.width)+.5)*(r.height-8)/level.height);}await idle();}
   await page.waitForSelector('#hue-app[data-layer=result]');assert((await state()).attempts[level.id].completed);
  };
- const picker=async()=>{for(let i=0;i<12&&(await page.locator('#hue-app').getAttribute('data-layer'))!=='none';i++)await page.keyboard.press('Escape');await page.locator('#levels').click();await page.locator('[data-picker=true] .level-grid').waitFor();};
- const chapter=async n=>{await picker();await page.locator(`[data-chapter="${n}"]`).click();};
+ const picker=async()=>{for(let i=0;i<12&&(await page.locator('#hue-app').getAttribute('data-layer'))!=='none';i++)await page.keyboard.press('Escape');await page.locator('#levels').click();await page.locator('.level-stage').waitFor();};
+ const chapterMenu=()=>page.locator('[data-open-chapters]').click();
+ const selectChapter=n=>page.locator(`[data-chapter="${n}"]`).click();
+ const selectLevel=n=>page.locator(`[data-level-id=gradient-${String(n).padStart(3,'0')}]`).click();
+ const playSelected=async()=>{await page.locator('[data-level-action]').click();await idle();};
+ const chapter=async n=>{await picker();await chapterMenu();await selectChapter(n);};
  for(let n=1;n<=4;n++){await solve(n);await page.getByRole('button',{name:'Дальше',exact:true}).click();await idle();}
- await chapter(1);assert(await page.locator('[data-level-id=gradient-015]').isDisabled());assert.equal(await page.locator('.composition-grid').count(),0);
- await page.locator('[data-level-id=gradient-005]').click();await solve(5);
+ await chapter(1);await selectLevel(15);assert.equal(await page.locator('[data-level-action]').count(),0);assert.equal(await page.locator('.level-preview .composition-grid').count(),0);
+ await selectLevel(5);await playSelected();await solve(5);
  assert((await state()).rights.includes('export-caption'));passed.push('first five remain sequential; fifth grants caption rights');
  assert.equal(await page.locator('#dialog-actions button').count(),2);
  await page.getByRole('button',{name:'В альбом',exact:true}).click();assert.equal(await page.locator('[data-album-level]').count(),5);assert.equal(await page.locator('[data-album-level=gradient-006]').count(),0);passed.push('album contains only completed previews; no solution leaks');
@@ -36,16 +40,31 @@ try{
  const copied=await state();assert.deepEqual(copied.completed,before.completed);assert.deepEqual(copied.bests,before.bests);assert.deepEqual(copied.rights,before.rights);
  assert.equal(Object.values(copied.albumCopies)[0].authorCompletions.length,0);assert.equal(await page.locator('#dialog-title b').count(),0);passed.push('copy persists with new identity, plain-text name and no progress/mastery farming');
  await page.reload();await page.waitForSelector('html[data-state=ready]');assert.equal(Object.keys((await state()).albumCopies).length,1);
- await chapter(1);assert(await page.locator('[data-level-id=gradient-015]').isEnabled());await page.locator('[data-level-id=gradient-015]').click();await solve(15);
+ await chapter(1);
+ await selectLevel(1);const beforeReplay=await state();
+ assert.equal(await page.locator('[data-level-action]').innerText(),'Повторить');
+ assert.deepEqual(await page.locator('.level-preview rect').evaluateAll(rects=>rects.map(rect=>rect.getAttribute('fill'))),defs[0].solvedTileColors);
+ await playSelected();
+ const replayed=await state();assert.equal(replayed.activeLevelId,defs[0].id);assert(replayed.completed.includes(defs[0].id));
+ assert.notEqual(replayed.attempts[defs[0].id].attemptId,beforeReplay.attempts[defs[0].id].attemptId);
+ assert.equal(replayed.attempts[defs[0].id].moves,0);assert.deepEqual(replayed.bests,beforeReplay.bests);
+ await picker();assert.equal(await page.locator('[data-level-action]').innerText(),'Продолжить');await playSelected();assert.deepEqual(await state(),replayed);
+ passed.push('finished board previews its result and starts a fresh replay; zero-move replay resumes with the same receipt');
+ await picker();await selectLevel(15);assert.equal(await page.locator('[data-level-action]').innerText(),'Играть');
+ assert.deepEqual(await page.locator('.level-preview rect').evaluateAll(rects=>rects.map(rect=>rect.getAttribute('fill'))),defs[14].startTileAtPosition.map(id=>defs[14].solvedTileColors[id]));
+ await playSelected();await solve(15);
  await page.getByRole('button',{name:'Дальше',exact:true}).click();await idle();assert.equal((await state()).activeLevelId,'gradient-006');passed.push('free choice after fifth and next-lowest recommendation');
  for(let n=6;n<=8;n++){await solve(n);await page.getByRole('button',{name:'Дальше',exact:true}).click();await idle();}
  assert.equal((await state()).completed.length,9);
- await picker();assert.equal(await page.locator('[data-chapter="2"]').getAttribute('data-locked'),'true');
- await page.locator('[data-chapter="1"]').click();await page.locator('[data-level-id=gradient-009]').click();await solve(9);
+ await picker();await chapterMenu();assert.equal(await page.locator('[data-chapter="2"]').getAttribute('data-locked'),'true');
+ await selectChapter(1);await selectLevel(9);await playSelected();await solve(9);
  assert.equal((await state()).completed.length,10);assert((await page.locator('#chapter-unlock').innerText()).includes('глава 2'));passed.push('9→10 unique completions opens chapter two before page completion');
- await picker();await page.screenshot({path:'.test-output/m3/chapters.png'});
- await page.locator('[data-chapter="2"]').click();assert.equal(await page.locator('[data-level-id]:enabled').count(),15);passed.push('all 15 levels of an opened later chapter are available');
- await chapter(1);await page.locator('[data-level-id=gradient-010]').click();
+ await picker();await chapterMenu();await page.screenshot({path:'.test-output/m3/chapters.png'});
+ await selectChapter(2);assert.equal(await page.locator('[data-level-id][data-status=Доступен]').count(),15);
+ assert.match(await page.locator('[data-open-chapters]').innerText(),/Глава 2/);
+ await page.screenshot({path:'.test-output/m3/chapter-two.png'});
+ passed.push('all 15 levels of an opened later chapter are available');
+ await chapter(1);await selectLevel(10);await playSelected();
  for(let n=10;n<=14;n++){await solve(n);if(n<14){await page.getByRole('button',{name:'Дальше',exact:true}).click();await idle();}}
  let current=await state();assert.equal(current.completed.length,15);assert(current.rights.includes('chapter-complete:chapter-01')&&current.rights.includes('export-strip'));
  assert.equal(await page.locator('#dialog-actions button').count(),2);
@@ -73,6 +92,10 @@ try{
   await p.waitForSelector('html[data-state=ready]');
   const migrated=await p.evaluate(async()=>{const{openIndexedDb}=await import('/src/local-store/indexed-db.ts');const s=await openIndexedDb(),r=await s.load('guest-local-v1'),facts=await s.listFacts('guest-local-v1');s.close();return{state:JSON.parse(r.snapshotJson),revision:r.localRevision,backups:facts.map(f=>JSON.parse(f.payloadJson)).filter(f=>f.kind==='local-migration-backup')};});
   assert.deepEqual(migrated.state.attempts,before.attempts);assert.deepEqual(migrated.state.bests,before.bests);assert.equal(migrated.state.policyVersion,'campaign-meta-1');assert.equal(migrated.backups.length,1);assert.equal(migrated.backups[0].snapshotJson,before.raw);assert.equal(migrated.revision,before.revision+1);assert.equal(migrated.state.lastCompletion,null);
+  await p.locator('#levels').click();
+  assert.equal(await p.locator('.level-rail [aria-current=true]').getAttribute('data-level-id'),'gradient-015');
+  assert.deepEqual(await p.locator('.level-preview rect').evaluateAll(rects=>rects.map(rect=>rect.getAttribute('fill'))),before.attempts['gradient-015'].board.map(id=>defs[14].solvedTileColors[id]));
+  await p.getByRole('button',{name:'Продолжить',exact:true}).click();assert.equal(await p.locator('#hue-app').getAttribute('data-layer'),'none');
   await p.reload();await p.waitForSelector('html[data-state=ready]');const rev=await p.evaluate(async()=>{const{openIndexedDb}=await import('/src/local-store/indexed-db.ts');const s=await openIndexedDb(),r=await s.load('guest-local-v1');s.close();return r.localRevision;});assert.equal(rev,migrated.revision);
   passed.push(fault?'failed migration rolls back backup/progress; retry preserves legacy state exactly':'legacy migration atomically preserves active board, assistance/bests and backup without ceremony');await c.close();
  }

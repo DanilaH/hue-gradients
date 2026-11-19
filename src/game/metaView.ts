@@ -1,12 +1,13 @@
 import { chapters, getLevel, levels } from '../domain/levels';
-import { chapterCount, chapterIndexFor, chapterIsOpen, levelIsOpen, META_POLICY } from '../domain/progression';
+import { chapterCount, chapterIndexFor, chapterIsOpen, levelIsOpen, META_POLICY, recommendedLevel } from '../domain/progression';
 import type { LevelDefinition } from '../domain/puzzle';
 import type { Workspace } from '../domain/workspace';
 import { hasAuthorProof } from '../domain/creative';
 import { canExport } from '../domain/export';
 import type { ExportRoute } from './exportView';
 
-export type MetaRoute = { kind: 'chapter' | 'page'; index: number } |
+type PickerRoute = { kind: 'chapter'; levelId: string; chapterMenu?: number };
+export type MetaRoute = PickerRoute | { kind: 'page'; index: number } |
   { kind: 'album'; tab: 'campaign' | 'daily' | 'own' } | { kind: 'card' | 'copy'; levelId: string } |
   { kind: 'draft'; draftId: string } | ExportRoute;
 interface MetaView {
@@ -14,76 +15,163 @@ interface MetaView {
   title: HTMLElement; copy: HTMLElement; actions: HTMLElement;
   navigate(route: MetaRoute): void; back(): void;
   play(id: string): void; replay(id: string): void; saveCopy(id: string, name: string): void;
+  repeat(id: string): void;
   createWork(): void;
 }
-function preview(level: Pick<LevelDefinition, 'width' | 'height' | 'solvedTileColors'>, large = false): HTMLElement {
+function actionButton(parent: HTMLElement, text: string, invoke: () => void, disabled: boolean): HTMLButtonElement {
+  const button = document.createElement('button');
+  button.type = 'button'; button.textContent = text; button.disabled = disabled;
+  button.onclick = invoke; parent.append(button); return button;
+}
+function preview(level: Pick<LevelDefinition, 'width' | 'height' | 'solvedTileColors'>, large = false,
+  board?: readonly number[], pins: readonly number[] = []): HTMLElement {
   const frame = document.createElement('div'); frame.className = large ? 'composition composition-large' : 'composition'; frame.setAttribute('aria-hidden', 'true');
   const ns = 'http://www.w3.org/2000/svg', cells = document.createElementNS(ns, 'svg');
   cells.setAttribute('class', 'composition-grid'); cells.setAttribute('viewBox', `0 0 ${level.width} ${level.height}`);
   cells.setAttribute('preserveAspectRatio', 'xMidYMid meet'); cells.setAttribute('shape-rendering', 'crispEdges');
-  level.solvedTileColors.forEach((color, position) => {
+  level.solvedTileColors.forEach((_, position) => {
+    const color = level.solvedTileColors[board?.[position] ?? position]!;
     const cell = document.createElementNS(ns, 'rect'); cell.setAttribute('x', String(position % level.width));
     cell.setAttribute('y', String(Math.floor(position / level.width))); cell.setAttribute('width', '1'); cell.setAttribute('height', '1');
     cell.setAttribute('fill', color); cells.append(cell);
   });
+  for (const position of pins) {
+    const pin = document.createElementNS(ns, 'circle');
+    pin.setAttribute('cx', String(position % level.width + .5));
+    pin.setAttribute('cy', String(Math.floor(position / level.width) + .5));
+    pin.setAttribute('r', '.045'); pin.setAttribute('fill', '#181322');
+    pin.setAttribute('stroke', '#fff2de'); pin.setAttribute('stroke-width', '.019');
+    cells.append(pin);
+  }
   frame.append(cells); return frame;
 }
+
+function pickerState(state: Workspace, id: string) {
+  if (!levelIsOpen(state, id)) return 'Закрыт';
+  const attempt = state.attempts[id];
+  if (attempt && !attempt.completed) return 'Начат';
+  return state.completed.includes(id) ? 'Собран' : 'Доступен';
+}
+
+function renderPicker(v: MetaView, route: PickerRoute): void {
+  const { state, actions } = v;
+  const index = chapterIndexFor(route.levelId);
+  const chapter = chapters[index]!;
+  const pickChapter = (chapterIndex: number) => `Глава ${chapterIndex + 1} · ${chapterCount(state, chapterIndex)}/${chapters[chapterIndex]!.levelIds.length}`;
+  const chapterRequirement = (chapterIndex: number) => `Соберите ${META_POLICY.chapterAt} работ главы ${chapterIndex}`;
+  const button = (text: string, invoke: () => void, parent: HTMLElement) => actionButton(parent, text, invoke, v.disabled);
+  const moveTo = (next: PickerRoute, focus: string) => {
+    v.navigate(next);
+    actions.querySelector<HTMLElement>(focus)?.focus({ preventScroll: true });
+  };
+  const nav = document.createElement('nav'); nav.className = 'level-picker-nav'; actions.append(nav);
+  button('‹ Назад', v.back, nav).className = 'quiet';
+  if (route.chapterMenu !== undefined) {
+    v.title.textContent = 'Главы';
+    const list = document.createElement('div'); list.className = 'chapter-picker'; actions.append(list);
+    chapters.forEach((_, chapterIndex) => {
+      const open = chapterIsOpen(state, chapterIndex);
+      const node = button(pickChapter(chapterIndex), () => {
+        if (!open) {
+          moveTo({ ...route, chapterMenu: chapterIndex }, `[data-chapter="${chapterIndex + 1}"]`);
+          return;
+        }
+        const levelId = chapterIndex === index ? route.levelId : chapterIndexFor(state.activeLevelId) === chapterIndex
+          ? state.activeLevelId : recommendedLevel(state, chapterIndex) ?? chapters[chapterIndex]!.levelIds[0]!;
+        moveTo({ kind: 'chapter', levelId }, '[data-open-chapters]');
+      }, list);
+      node.dataset.chapter = String(chapterIndex + 1); node.dataset.locked = String(!open);
+      if (!open) node.setAttribute('aria-label', `${pickChapter(chapterIndex)}, закрыта`);
+      if (chapterIndex === route.chapterMenu) node.setAttribute('aria-current', 'true');
+      const swatch = document.createElement('span'); swatch.className = 'chapter-swatch';
+      swatch.setAttribute('aria-hidden', 'true'); node.prepend(swatch);
+    });
+    const hint = document.createElement('p'); hint.className = 'chapter-note'; hint.setAttribute('aria-live', 'polite');
+    if (!chapterIsOpen(state, route.chapterMenu)) hint.textContent = chapterRequirement(route.chapterMenu);
+    actions.append(hint);
+    return;
+  }
+
+  v.title.textContent = 'Уровни';
+  button('Альбом', () => v.navigate({ kind: 'album', tab: 'campaign' }), nav).className = 'quiet';
+  const position = chapter.levelIds.indexOf(route.levelId);
+  const selectedState = pickerState(state, route.levelId);
+  const rail = document.createElement('div'); rail.className = 'level-rail';
+  rail.setAttribute('role', 'group'); rail.setAttribute('aria-label', 'Номера уровней');
+  const select = (next: number) => {
+    const levelId = chapter.levelIds[next];
+    if (levelId && next !== position && !v.disabled) moveTo({ kind: 'chapter', levelId }, '[aria-current=true][data-level-id]');
+  };
+  const stage = document.createElement('div'); stage.className = 'level-stage'; actions.append(stage);
+  function boardAt(id: string, style: string): void {
+    const slot = document.createElement('div'); slot.className = style; stage.append(slot);
+    slot.setAttribute('aria-hidden', 'true');
+    const level = getLevel(id), status = pickerState(state, id);
+    if (status === 'Закрыт') { slot.classList.add('level-locked'); return; }
+    const layout = status === 'Собран' ? undefined : state.attempts[id]?.board ?? level.startTileAtPosition;
+    slot.append(preview(level, false, layout, layout && style === 'level-preview' ? level.pinnedPositions : []));
+  }
+  const previous = chapter.levelIds[position - 1], next = chapter.levelIds[position + 1];
+  if (previous) boardAt(previous, 'level-peek level-peek-prev');
+  boardAt(route.levelId, 'level-preview');
+  if (next) boardAt(next, 'level-peek level-peek-next');
+  let drag: { id: number; x: number; y: number } | undefined;
+  stage.onpointerdown = event => {
+    if (!v.disabled && !drag && event.isPrimary && event.button === 0) {
+      drag = { id: event.pointerId, x: event.clientX, y: event.clientY };
+      stage.setPointerCapture(event.pointerId);
+    }
+  };
+  stage.onlostpointercapture = () => { drag = undefined; };
+  stage.onpointerup = event => {
+    if (drag?.id !== event.pointerId) return;
+    const dx = event.clientX - drag.x, dy = event.clientY - drag.y;
+    drag = undefined;
+    if (Math.abs(dx) >= 34 && Math.abs(dx) > Math.abs(dy)) select(position + (dx < 0 ? 1 : -1));
+  };
+  const details = document.createElement('div'); details.className = 'level-actions'; actions.append(details);
+  if (selectedState === 'Закрыт') {
+    const requirement = document.createElement('p'); requirement.className = 'chapter-note';
+    const ordinal = getLevel(route.levelId).ordinal;
+    requirement.textContent = `Соберите уровень ${ordinal <= 5 ? ordinal - 1 : 5}`; details.append(requirement);
+  } else {
+    const label = selectedState === 'Собран' ? 'Повторить' : selectedState === 'Начат' ? 'Продолжить' : 'Играть';
+    button(label, () => (selectedState === 'Собран' ? v.repeat : v.play)(route.levelId), details).dataset.levelAction = '';
+  }
+  actions.append(rail);
+  chapter.levelIds.forEach((id, number) => {
+    const ordinal = getLevel(id).ordinal;
+    const node = button(String(ordinal), () => select(number), rail);
+    node.className = 'quiet'; node.dataset.levelId = id;
+    const status = pickerState(state, id);
+    node.dataset.status = status;
+    node.setAttribute('aria-label', `Уровень ${ordinal}, ${status.toLowerCase()}`);
+    node.tabIndex = number === position ? 0 : -1;
+    if (number === position) node.setAttribute('aria-current', 'true');
+  });
+  rail.onkeydown = event => {
+    const offsets: Record<string, number> = { ArrowLeft: position - 1, ArrowRight: position + 1, Home: 0, End: chapter.levelIds.length - 1 };
+    const nextPosition = offsets[event.key];
+    if (Number.isInteger(nextPosition)) { event.preventDefault(); select(nextPosition!); }
+  };
+  requestAnimationFrame(() => {
+    if (!rail.isConnected) return;
+    const active = rail.querySelector<HTMLElement>('[aria-current=true]')!;
+    rail.scrollLeft += active.getBoundingClientRect().left - rail.getBoundingClientRect().left - (rail.clientWidth - active.offsetWidth) / 2;
+  });
+  const chapterLink = button(pickChapter(index), () => moveTo({ ...route, chapterMenu: index }, '[aria-current=true][data-chapter]'), actions);
+  chapterLink.className = 'quiet level-chapter-link'; chapterLink.dataset.openChapters = '';
+}
+
 export function renderMeta(v: MetaView): void {
   const { state, route, actions } = v;
   actions.dataset.meta = route.kind;
   const label = (text: string, className = '') => { const node = document.createElement('p'); node.textContent = text; node.className = className; actions.append(node); return node; };
-  const button = (text: string, handler: () => void, parent: HTMLElement = actions, disabled = false) => {
-    const node = document.createElement('button'); node.type = 'button'; node.textContent = text; node.disabled = disabled || v.disabled; node.onclick = handler; parent.append(node); return node;
-  };
+  const button = (text: string, handler: () => void, parent: HTMLElement = actions, disabled = false) =>
+    actionButton(parent, text, handler, disabled || v.disabled);
   const back = () => button('Назад', v.back);
   if (route.kind === 'chapter') {
-    const chapter = chapters[route.index]!;
-    const count = chapterCount(state, route.index);
-    v.title.textContent = 'Уровни';
-    const nav = document.createElement('div');
-    nav.className = 'level-picker-nav';
-    actions.append(nav);
-    button('‹ Назад', v.back, nav).className = 'quiet';
-    button('Альбом', () => v.navigate({ kind: 'album', tab: 'campaign' }), nav).className = 'quiet';
-
-    const picker = document.createElement('div');
-    picker.className = 'chapter-picker';
-    picker.setAttribute('role', 'group');
-    picker.setAttribute('aria-label', 'Главы');
-    actions.append(picker);
-    chapters.forEach((_, index) => {
-      const open = chapterIsOpen(state, index);
-      const node = button(String(index + 1), () => {
-        if (index !== route.index) v.navigate({ kind: 'chapter', index });
-        actions.querySelector<HTMLButtonElement>(`[data-chapter="${index + 1}"]`)?.focus({ preventScroll: true });
-      }, picker);
-      node.dataset.chapter = String(index + 1);
-      node.dataset.locked = String(!open);
-      node.setAttribute('aria-label', `Глава ${index + 1}${open ? '' : ', закрыта'}`);
-      if (index === route.index) node.setAttribute('aria-current', 'true');
-    });
-    const note = chapterIsOpen(state, route.index)
-      ? `Глава ${route.index + 1} · ${count}/15`
-      : `Соберите ${META_POLICY.chapterAt} работ главы ${route.index}`;
-    label(note, 'chapter-note').setAttribute('aria-live', 'polite');
-
-    const grid = document.createElement('div');
-    grid.className = 'level-grid';
-    actions.append(grid);
-    chapter.levelIds.forEach(id => {
-      const level = getLevel(id);
-      const done = state.completed.includes(id);
-      const attempt = state.attempts[id];
-      const inProgress = !!attempt && !attempt.completed;
-      const started = inProgress && (!!attempt.moves || done);
-      const open = levelIsOpen(state, id);
-      const activate = () => done && !inProgress ? v.navigate({ kind: 'card', levelId: id }) : v.play(id);
-      const node = button(`${level.ordinal}${started ? ' ·' : done ? ' ✓' : ''}`, activate, grid, !open);
-      node.dataset.levelId = id;
-      node.dataset.done = String(done);
-      node.setAttribute('aria-label', `${level.ordinal}. ${level.title}. ${started ? 'Начато' : done ? 'Собрано' : open ? 'Доступно' : 'Закрыто'}`);
-      if (id === state.activeLevelId) node.setAttribute('aria-current', 'true');
-    });
+    renderPicker(v, route);
   } else if (route.kind === 'album') {
     v.title.textContent = 'Альбом'; v.copy.textContent = route.tab === 'campaign' ? `${state.completed.length} собранных работ` : '';
     const tabs = document.createElement('div'); tabs.className = 'album-tabs'; actions.append(tabs);

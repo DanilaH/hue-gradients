@@ -53,7 +53,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   let editorView: EditorView | null = null, editorDraftId: string | null = null;
   let exportView: ExportView | null = null, exportRouteKey: string | null = null;
   let lastFocus: HTMLElement | null = null;
-  let metaRoute: MetaRoute = { kind: 'chapter', index: chapterIndexFor(session.state.activeLevelId) };
+  let metaRoute: MetaRoute = { kind: 'chapter', levelId: session.state.activeLevelId };
   let metaHistory: MetaRoute[] = [], metaReturn: Layer = 'none';
   let restartLevelId: string | null = null, restartReturn: Layer = 'none';
   const initialLevel = current().level;
@@ -122,6 +122,11 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (session.state.activeLevelId === id && session.state.attempts[id]) { after(); render(); }
     else void run({ kind: 'open', levelId: id, attemptId: crypto.randomUUID() }, after);
   }
+  function repeatLevel(id: string): void {
+    void run({ kind: 'restart', levelId: id, attemptId: crypto.randomUUID() }, () => {
+      metaHistory = []; layer = 'none';
+    });
+  }
   function askRestart(id: string): void { restartLevelId = id; restartReturn = layer; scene.cancel(); layer = 'restart'; render(); }
   function cancelRestart(): void { layer = restartReturn; render(); }
   function leaveAuthor(): void {
@@ -138,6 +143,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (exportKey !== exportRouteKey) { exportView?.destroy(); exportView = null; exportRouteKey = exportKey; }
     dialog.dataset.export = String(!!exportKey);
     dialog.dataset.picker = String(layer === 'meta' && metaRoute.kind === 'chapter');
+    dialog.dataset.chapterMenu = String(layer === 'meta' && metaRoute.kind === 'chapter' && metaRoute.chapterMenu !== undefined);
     const open = layer !== 'none' && layer !== 'help';
     if (!open) { if (dialog.open) { dialog.close(); lastFocus?.focus(); } return; }
     const draftId = layer === 'meta' && metaRoute.kind === 'draft' ? metaRoute.draftId : null;
@@ -203,7 +209,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       } else {
       renderMeta({ route: metaRoute, state: session.state, disabled: busy || activity.isBlocked() || !!session.pending,
         title: byId('dialog-title'), copy: byId('dialog-copy'), actions, navigate: showMeta, back: () => { back(); },
-        play: startLevel, replay: askRestart,
+        play: startLevel, replay: askRestart, repeat: repeatLevel,
         createWork: () => {
           const draftId = crypto.randomUUID();
           void run({ kind: 'editor-create', draftId, workId: crypto.randomUUID(), nodeId: crypto.randomUUID(), name: 'Моя композиция', field: makeField(), seed: 0 }, () => {
@@ -303,6 +309,11 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (exportView && layer === 'meta') { exportView.leave(); return true; }
     if (editorView && layer === 'meta') { void editorView.leave(); return true; }
     if (layer === 'meta') {
+      if (metaRoute.kind === 'chapter' && metaRoute.chapterMenu !== undefined) {
+        metaRoute = { kind: 'chapter', levelId: metaRoute.levelId };
+        render(); actions.querySelector<HTMLElement>('[data-open-chapters]')?.focus({ preventScroll: true });
+        return true;
+      }
       if (metaHistory.length) metaRoute = metaHistory.pop()!;
       else layer = metaReturn;
       render(); return true;
@@ -320,7 +331,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   }, { signal: listeners.signal });
   byId('levels').addEventListener('click', () => {
     if (current().own) leaveAuthor();
-    else showMeta({ kind: 'chapter', index: chapterIndexFor(session.state.activeLevelId) });
+    else showMeta({ kind: 'chapter', levelId: session.state.activeLevelId });
   }, { signal: listeners.signal });
   byId('settings').addEventListener('click', () => { scene.cancel(); layer = 'settings'; render(); }, { signal: listeners.signal });
   systemMotion.addEventListener('change', () => { scene.cancel(); render(); }, { signal: listeners.signal });
