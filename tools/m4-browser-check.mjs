@@ -16,7 +16,7 @@ try {
  const state=()=>page.evaluate(async()=>{const{openIndexedDb}=await import('/src/local-store/indexed-db.ts');const store=await openIndexedDb(),r=await store.load('guest-local-v1');store.close();return JSON.parse(r.snapshotJson);});
  const work=async()=>Object.values((await state()).creative.works)[0];
  const saved=()=>page.waitForFunction(()=>document.querySelector('.editor-status')?.textContent.includes('сохранён на устройстве'));
- await page.locator('#levels').click();await page.getByRole('button',{name:'Создать композицию',exact:true}).click();await idle();
+ await page.locator('#levels').click();await page.getByRole('button',{name:'Альбом',exact:true}).click();await page.getByRole('button',{name:'Мои работы',exact:true}).click();await page.getByRole('button',{name:'Создать композицию',exact:true}).click();await idle();
  assert.equal((await work()).nodes[(await work()).headNodeId].field.width,4);assert.deepEqual((await state()).completed,[]);passed.push('new 4×4 editor available before any campaign completion');
  await page.getByRole('textbox',{name:'Название работы'}).fill('<b>Моя 🌈</b>');
  await page.waitForFunction(async()=>{const{openIndexedDb}=await import('/src/local-store/indexed-db.ts');const s=await openIndexedDb(),r=await s.load('guest-local-v1');s.close();return Object.values(JSON.parse(r.snapshotJson).creative.works)[0].name==='<b>Моя 🌈</b>';});
@@ -49,12 +49,12 @@ try {
  await page.getByRole('button',{name:'Старт',exact:true}).click();await page.getByRole('button',{name:'Другое начало',exact:true}).click();await page.getByRole('button',{name:'Применить',exact:true}).click();await idle();
  current=await work();assert.notEqual(current.headNodeId,nodeId);assert.equal(current.completions.length,1);assert(!(await page.locator('.editor-validation').innerText()).includes('пройдена автором'));passed.push('different fixed start invalidates current verification while preserving old proof');
  await page.getByRole('button',{name:'Цвета',exact:true}).click();await page.getByLabel('Столбцы',{exact:true}).selectOption('5');await saved();
- await page.reload();await page.waitForSelector('html[data-state=ready]');await page.locator('#levels').click();await page.getByRole('button',{name:'Мои работы',exact:true}).click();await page.locator('[data-draft-id]').click();
+ await page.reload();await page.waitForSelector('html[data-state=ready]');await page.locator('#levels').click();await page.getByRole('button',{name:'Альбом',exact:true}).click();await page.getByRole('button',{name:'Мои работы',exact:true}).click();await page.locator('[data-draft-id]').click();
  assert((await page.locator('.editor-status').innerText()).includes('Восстановлен'));assert.equal(await page.getByLabel('Столбцы',{exact:true}).inputValue(),'5');await page.getByRole('button',{name:'Отмена',exact:true}).click();await idle();
  passed.push('interrupted preview restores from physical IndexedDB without changing the committed version');
  const beforeBranches=Object.keys((await work()).nodes).length;
  await page.getByLabel('Столбцы',{exact:true}).selectOption('5');await saved();
- const tab=await context.newPage();tab.on('pageerror',e=>errors.push(e.message));await tab.goto(base);await tab.waitForSelector('html[data-state=ready]');await tab.locator('#levels').click();await tab.getByRole('button',{name:'Мои работы',exact:true}).click();await tab.locator('[data-draft-id]').click();
+ const tab=await context.newPage();tab.on('pageerror',e=>errors.push(e.message));await tab.goto(base);await tab.waitForSelector('html[data-state=ready]');await tab.locator('#levels').click();await tab.getByRole('button',{name:'Альбом',exact:true}).click();await tab.getByRole('button',{name:'Мои работы',exact:true}).click();await tab.locator('[data-draft-id]').click();
  await tab.getByLabel('Столбцы',{exact:true}).selectOption('4');await tab.waitForFunction(()=>document.querySelector('.editor-status')?.textContent.includes('сохранён на устройстве'));
  const buffers=Object.values((await work()).buffers);assert.equal(buffers.length,2);assert.deepEqual(buffers.map(b=>b.field.width).sort(),[4,5]);
  await tab.getByRole('button',{name:'Применить',exact:true}).click();await tab.waitForFunction(()=>document.querySelector('#hue-app')?.dataset.busy==='false');

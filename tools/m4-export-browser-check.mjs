@@ -21,7 +21,7 @@ try {
  const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));await page.goto(base);await page.waitForSelector('html[data-state=ready]');
  const ready=()=>page.waitForSelector('.export-panel[data-ready=true]');
  const state=()=>page.evaluate(async()=>{const{openIndexedDb}=await import('/src/local-store/indexed-db.ts');const s=await openIndexedDb(),r=await s.load('guest-local-v1');s.close();return{state:JSON.parse(r.snapshotJson),revision:r.localRevision};});
- await page.locator('#levels').click();assert(await page.getByRole('button',{name:'Экспорт',exact:true}).isDisabled());assert.equal(await page.evaluate(()=>window.__shareCalls.length),0);
+ await page.locator('#levels').click();await page.getByRole('button',{name:'Альбом',exact:true}).click();assert.equal(await page.getByRole('button',{name:'Экспорт',exact:true}).count(),0);assert.equal(await page.evaluate(()=>window.__shareCalls.length),0);
  passed.push('empty profile cannot export unfinished targets; no automatic share call');
  // Populate a labelled imported checkpoint using the actual pure reducers, not invented bests.
  await page.evaluate(async()=>{
@@ -37,7 +37,7 @@ try {
   c=solve(applyCreative(c,{kind:'author-start',workId:'export-work',nodeId:'export-node-b',attemptId:'own-b'}));c=applyCreative(c,{kind:'author-exit'});s={...s,creative:c};
   const store=await openIndexedDb(),old=await store.load('guest-local-v1');await store.commit(await prepareCommit({operationId:crypto.randomUUID(),vaultId:'guest-local-v1',expectedRevision:old.localRevision,nextSnapshotJson:JSON.stringify(s),facts:[]}));store.close();
  });
- await page.reload();await page.waitForSelector('html[data-state=ready]');await page.keyboard.press('Escape');await page.locator('#levels').click();await page.getByRole('button',{name:'Экспорт',exact:true}).click();await ready();
+ await page.reload();await page.waitForSelector('html[data-state=ready]');await page.keyboard.press('Escape');await page.locator('#levels').click();await page.getByRole('button',{name:'Альбом',exact:true}).click();await page.getByRole('button',{name:'Экспорт',exact:true}).click();await ready();
  const before=await state(),previewHash=await page.locator('.export-preview').evaluate(async img=>{const b=await(await fetch(img.src)).arrayBuffer();return [...new Uint8Array(await crypto.subtle.digest('SHA-256',b))].map(v=>v.toString(16).padStart(2,'0')).join('');});
  const downloadPromise=page.waitForEvent('download');await page.getByRole('button',{name:'Сохранить изображение',exact:true}).click();const download=await downloadPromise;await download.saveAs('.test-output/m4b/png/ui-clean.png');
  assert.equal(createHash('sha256').update(await readFile('.test-output/m4b/png/ui-clean.png')).digest('hex'),previewHash);assert((await page.locator('.export-status').innerText()).includes('запрошена'));

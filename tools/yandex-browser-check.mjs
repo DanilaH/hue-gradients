@@ -1,11 +1,15 @@
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
-import { spawn } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import { writeFile } from 'node:fs/promises';
 let playwright;
 try { playwright = await import('playwright'); }
 catch { playwright = createRequire(`${process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES}/package.json`)('playwright'); }
-const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', '--config', 'vite.yandex.config.ts', '--mode', 'yandex', '--host', '127.0.0.1', '--port', '4174', '--strictPort'], { stdio: 'ignore' });
+const vite = 'node_modules/vite/bin/vite.js';
+const config = ['--config', 'vite.yandex.config.ts', '--mode', 'yandex'];
+// Exercise the upload build with the SDK stub so diagnostics cannot cover gameplay controls.
+execFileSync(process.execPath, [vite, 'build', ...config], { stdio: 'inherit' });
+const server = spawn(process.execPath, [vite, 'preview', ...config, '--host', '127.0.0.1', '--port', '4174', '--strictPort'], { stdio: 'ignore' });
 const base = 'http://127.0.0.1:4174';
 let browser;
 try {

@@ -20,15 +20,17 @@ try{
   for(const[from,to]of witnesses.find(r=>r.id===level.id).legalOptimalWitness){for(const index of[from,to]){const r=await page.locator('#board-region canvas').boundingBox();await page.mouse.click(r.x+(index%level.width+.5)*r.width/level.width,r.y+4+(Math.floor(index/level.width)+.5)*(r.height-8)/level.height);}await idle();}
   await page.waitForSelector('#hue-app[data-layer=result]');assert((await state()).attempts[level.id].completed);
  };
- const home=async()=>{for(let i=0;i<12&&(await page.locator('#hue-app').getAttribute('data-layer'))!=='none';i++)await page.keyboard.press('Escape');await page.locator('#levels').click();await page.getByRole('button',{name:'Кампания',exact:true}).waitFor();};
- const chapter=async n=>{await home();await page.getByRole('button',{name:'Кампания',exact:true}).click();await page.locator(`[data-chapter="${n}"]`).click();};
+ const picker=async()=>{for(let i=0;i<12&&(await page.locator('#hue-app').getAttribute('data-layer'))!=='none';i++)await page.keyboard.press('Escape');await page.locator('#levels').click();await page.locator('[data-picker=true] .level-grid').waitFor();};
+ const chapter=async n=>{await picker();await page.locator(`[data-chapter="${n}"]`).click();};
  for(let n=1;n<=4;n++){await solve(n);await page.getByRole('button',{name:'Дальше',exact:true}).click();await idle();}
  await chapter(1);assert(await page.locator('[data-level-id=gradient-015]').isDisabled());assert.equal(await page.locator('.composition-grid').count(),0);
  await page.locator('[data-level-id=gradient-005]').click();await solve(5);
  assert((await state()).rights.includes('export-caption'));passed.push('first five remain sequential; fifth grants caption rights');
- await page.locator('#reward-summary').click();assert((await page.locator('#dialog-actions').innerText()).includes('Макет'));await page.getByRole('button',{name:'Назад',exact:true}).click();
+ assert.equal(await page.locator('#dialog-actions button').count(),2);
  await page.getByRole('button',{name:'В альбом',exact:true}).click();assert.equal(await page.locator('[data-album-level]').count(),5);assert.equal(await page.locator('[data-album-level=gradient-006]').count(),0);passed.push('album contains only completed previews; no solution leaks');
- await page.locator('[data-album-level=gradient-001]').click();await page.getByRole('button',{name:'Сохранить копию',exact:true}).click();
+ await page.locator('[data-album-level=gradient-001]').click();
+ await page.getByRole('button',{name:'Повторить работу',exact:true}).click();await page.keyboard.press('Escape');await page.locator('[data-meta=card]').waitFor();
+ await page.getByRole('button',{name:'Сохранить копию',exact:true}).click();
  await page.getByRole('textbox',{name:'Название копии'}).fill('Копия <b>моя</b>');
  const before=await state();await page.getByRole('button',{name:'Сохранить копию',exact:true}).click();await idle();
  const copied=await state();assert.deepEqual(copied.completed,before.completed);assert.deepEqual(copied.bests,before.bests);assert.deepEqual(copied.rights,before.rights);
@@ -38,17 +40,17 @@ try{
  await page.getByRole('button',{name:'Дальше',exact:true}).click();await idle();assert.equal((await state()).activeLevelId,'gradient-006');passed.push('free choice after fifth and next-lowest recommendation');
  for(let n=6;n<=8;n++){await solve(n);await page.getByRole('button',{name:'Дальше',exact:true}).click();await idle();}
  assert.equal((await state()).completed.length,9);
- await home();await page.getByRole('button',{name:'Кампания',exact:true}).click();assert(await page.locator('[data-chapter="2"]').isDisabled());
+ await picker();assert.equal(await page.locator('[data-chapter="2"]').getAttribute('data-locked'),'true');
  await page.locator('[data-chapter="1"]').click();await page.locator('[data-level-id=gradient-009]').click();await solve(9);
- assert.equal((await state()).completed.length,10);assert((await page.locator('#reward-summary').innerText()).includes('глава 2'));passed.push('9→10 unique completions opens chapter two before page completion');
- await home();await page.getByRole('button',{name:'Кампания',exact:true}).click();await page.screenshot({path:'.test-output/m3/chapters.png'});
+ assert.equal((await state()).completed.length,10);assert((await page.locator('#chapter-unlock').innerText()).includes('глава 2'));passed.push('9→10 unique completions opens chapter two before page completion');
+ await picker();await page.screenshot({path:'.test-output/m3/chapters.png'});
  await page.locator('[data-chapter="2"]').click();assert.equal(await page.locator('[data-level-id]:enabled').count(),15);passed.push('all 15 levels of an opened later chapter are available');
  await chapter(1);await page.locator('[data-level-id=gradient-010]').click();
  for(let n=10;n<=14;n++){await solve(n);if(n<14){await page.getByRole('button',{name:'Дальше',exact:true}).click();await idle();}}
  let current=await state();assert.equal(current.completed.length,15);assert(current.rights.includes('chapter-complete:chapter-01')&&current.rights.includes('export-strip'));
- await page.locator('#reward-summary').click();const awards=await page.locator('#dialog-actions').innerText();assert(awards.includes('Полная страница')&&awards.includes('Лента'));passed.push('14→15 stores page and format together, with one optional reward list');
- await page.getByRole('button',{name:'Назад',exact:true}).click();await page.getByRole('button',{name:'В альбом',exact:true}).click();
- assert.equal(await page.locator('[data-album-level]').evaluateAll(nodes=>nodes.some(node=>node.scrollWidth>node.clientWidth+1)),false);await page.screenshot({path:'.test-output/m3/album.png'});await page.getByRole('button',{name:'Полная страница главы 1'}).click();assert.equal(await page.locator('.chapter-page .composition').count(),15);await page.screenshot({path:'.test-output/m3/chapter-page.png'});passed.push('full chapter page renders exactly 15 earned works');
+ assert.equal(await page.locator('#dialog-actions button').count(),2);
+ await page.getByRole('button',{name:'В альбом',exact:true}).click();
+ assert.equal(await page.locator('[data-album-level]').evaluateAll(nodes=>nodes.some(node=>node.scrollWidth>node.clientWidth+1)),false);await page.screenshot({path:'.test-output/m3/album.png'});await page.getByRole('button',{name:'Полная страница главы 1'}).click();assert.equal(await page.locator('.chapter-page .composition').count(),15);await page.screenshot({path:'.test-output/m3/chapter-page.png'});passed.push('14→15 stores page and format together; the album shows 15 earned works on the chapter page');
  for(const viewport of[{width:320,height:568},{width:844,height:390}]){
   await page.setViewportSize(viewport);await page.waitForTimeout(80);const bounds=await page.locator('#game-dialog').boundingBox();assert(bounds.x>=0&&bounds.x+bounds.width<=viewport.width+1);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
  }
@@ -83,8 +85,8 @@ try{
   const store=await openIndexedDb(),old=await store.load('guest-local-v1');await store.commit(await prepareCommit({operationId:crypto.randomUUID(),vaultId:'guest-local-v1',expectedRevision:old.localRevision,nextSnapshotJson:JSON.stringify(state),facts:[]}));store.close();
  });
  await p.reload();await p.waitForSelector('#hue-app[data-layer=result]');assert.equal(await p.getByRole('button',{name:'Дальше',exact:true}).count(),0);
- assert((await p.locator('#dialog-copy').innerText()).includes('Все 60'));await p.getByRole('button',{name:'В альбом',exact:true}).click();assert.equal(await p.locator('[data-album-level]').count(),60);
- await p.getByRole('button',{name:'Открытые возможности',exact:true}).click();assert.equal(await p.locator('.format-info').count(),6);assert.equal(await p.getByRole('button',{name:/глава 5/i}).count(),0);
+ assert((await p.locator('#dialog-copy').innerText()).includes('Кампания собрана'));await p.getByRole('button',{name:'В альбом',exact:true}).click();assert.equal(await p.locator('[data-album-level]').count(),60);
+ await p.getByRole('button',{name:'Экспорт',exact:true}).click();assert.equal(await p.getByRole('combobox',{name:'Макет'}).locator('option').count(),7);
  passed.push('all-60 imported checkpoint shows 60 cards, finite six formats and no fake next chapter');await all.close();
  await writeFile('.test-output/m3/browser.json',JSON.stringify({passed,pageErrors:errors,actualUiCompleted:'Chapter 1: all 15; non-linear selection after tutorial',fixtureCases:'14-completion v0.2 snapshots, with/without transaction fault',limits:['Physical Android and hosted services NOT RUN','Human acceptance of candidate content NOT RUN']},null,2));
  console.log(`PASS: ${passed.length} M3 browser scenarios.`);

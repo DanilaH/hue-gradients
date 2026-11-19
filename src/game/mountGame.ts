@@ -11,15 +11,15 @@ import { PuzzleScene, GAME_PRESENTABLE } from './PuzzleScene';
 import { Atmosphere } from './atmosphere';
 import { GameFeedback, type Haptic } from './feedback';
 import { renderMeta, type MetaRoute } from './metaView';
-import { chapterIndexFor, recommendedLevel, visibleRewards, rewardTitle } from '../domain/progression';
-import { authorBests, authorView, findDraft, type CreativeAction } from '../domain/creative';
+import { chapterIndexFor, recommendedLevel, rewardTitle } from '../domain/progression';
+import { authorView, findDraft, type CreativeAction } from '../domain/creative';
 import { makeField } from '../domain/editor';
 import { EditorView } from './editorView';
 import { ExportView } from './exportView';
 import { browserExportFiles, type ExportFiles } from '../app/exportFiles';
 import './game.css';
 
-type Layer = 'none' | 'help' | 'result' | 'meta' | 'restart' | 'rules' | 'recovery' | 'settings';
+type Layer = 'none' | 'help' | 'result' | 'meta' | 'restart' | 'recovery' | 'settings';
 interface Activity extends Pick<GameplayActivityCoordinator, 'isBlocked' | 'onBlockedChange' | 'setGameplayDesired'> {}
 
 export async function mountGame(parent: HTMLElement, store: TransactionalLocalStore, activity: Activity, options: { haptic?: Haptic; exportFiles?: ExportFiles } = {}): Promise<{ back(): boolean; destroy(): void }> {
@@ -33,10 +33,10 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     return { own, level, attempt: own?.attempt ?? session.state.attempts[level.id] };
   };
   parent.innerHTML = `<section id="hue-app" aria-label="Полусон">
-    <header class="hud"><button id="levels" class="quiet" aria-label="Открыть уровни">←</button><div class="level-label"><span id="ordinal"></span><h1 id="title"></h1></div><span id="moves" aria-label="Ходы"></span><button id="settings" class="quiet" aria-label="Настройки">⋯</button></header>
+    <header class="hud"><button id="levels" class="quiet">‹ Уровни</button><h1 id="title"></h1><button id="settings" class="quiet" aria-label="Настройки">⋯</button></header>
     <div id="board-region"></div>
-    <footer><p id="guidance" aria-live="polite"></p><div class="toolbar"><button id="help">Помощь</button><button id="restart" class="quiet">Заново</button><button id="rules" class="quiet" aria-label="Правила">?</button></div><p id="save-status" role="status"></p></footer>
-    <dialog id="game-dialog" aria-labelledby="dialog-title"><div id="victory-prism" aria-hidden="true" hidden><svg viewBox="0 0 200 200"><defs><linearGradient id="crystal-light" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff1bc"/><stop offset=".48" stop-color="#cab9ff"/><stop offset="1" stop-color="#7bdfeb"/></linearGradient></defs><path d="M100 12 180 100 100 188 20 100Z" fill="url(#crystal-light)" fill-opacity=".35" stroke="#fff6e4" stroke-width="1.6"/><path d="M100 12 100 100 20 100Z" fill="#fff0b9" fill-opacity=".47"/><path d="M100 12 180 100 100 100Z" fill="#c3efff" fill-opacity=".35"/><path d="M20 100 100 100 100 188Z" fill="#b692e6" fill-opacity=".56"/><path d="M100 100 180 100 100 188Z" fill="#90dbf3" fill-opacity=".25"/><path d="M100 12V188M20 100H180" fill="none" stroke="#fff5f1" stroke-width="1.2" stroke-opacity=".8"/></svg></div><h2 id="dialog-title"></h2><p id="dialog-copy"></p><button id="reward-summary" type="button" hidden></button><div id="dialog-actions"></div></dialog>
+    <footer><p id="guidance" aria-live="polite" hidden></p><button id="help" class="quiet">Подсказка</button></footer>
+    <dialog id="game-dialog" aria-labelledby="dialog-title"><div id="victory-prism" aria-hidden="true" hidden><svg viewBox="0 0 200 200"><defs><linearGradient id="crystal-light" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff1bc"/><stop offset=".48" stop-color="#cab9ff"/><stop offset="1" stop-color="#7bdfeb"/></linearGradient></defs><path d="M100 12 180 100 100 188 20 100Z" fill="url(#crystal-light)" fill-opacity=".35" stroke="#fff6e4" stroke-width="1.6"/><path d="M100 12 100 100 20 100Z" fill="#fff0b9" fill-opacity=".47"/><path d="M100 12 180 100 100 100Z" fill="#c3efff" fill-opacity=".35"/><path d="M20 100 100 100 100 188Z" fill="#b692e6" fill-opacity=".56"/><path d="M100 100 180 100 100 188Z" fill="#90dbf3" fill-opacity=".25"/><path d="M100 12V188M20 100H180" fill="none" stroke="#fff5f1" stroke-width="1.2" stroke-opacity=".8"/></svg></div><h2 id="dialog-title"></h2><p id="dialog-copy"></p><p id="chapter-unlock" hidden></p><div id="dialog-actions"></div></dialog>
   </section>`;
   const root = parent.querySelector<HTMLElement>('#hue-app')!;
   const region = root.querySelector<HTMLElement>('#board-region')!;
@@ -47,13 +47,14 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   const motionAllowed = () => session.state.preferences.motion && !systemMotion.matches && !activity.isBlocked();
   const byId = <T extends HTMLElement>(id: string) => root.querySelector<T>(`#${id}`)!;
   const listeners = new AbortController();
-  let alive = true, busy = false, ready = false, paintPending = false, status = 'Сохранено на устройстве';
+  let alive = true, busy = false, ready = false, paintPending = false, notice = '';
   let layer: Layer = current().attempt?.completed ? 'result' : 'none';
   if (!current().attempt) layer = 'recovery';
   let editorView: EditorView | null = null, editorDraftId: string | null = null;
   let exportView: ExportView | null = null, exportRouteKey: string | null = null;
-  let lastFocus: HTMLElement | null = null, menuExit = false;
-  let metaRoute: MetaRoute = { kind: 'home' }, metaHistory: MetaRoute[] = [], metaReturn: Layer = 'none';
+  let lastFocus: HTMLElement | null = null;
+  let metaRoute: MetaRoute = { kind: 'chapter', index: chapterIndexFor(session.state.activeLevelId) };
+  let metaHistory: MetaRoute[] = [], metaReturn: Layer = 'none';
   let restartLevelId: string | null = null, restartReturn: Layer = 'none';
   const initialLevel = current().level;
   // A quarantined attempt is never silently written as a fresh start. This value is only a display placeholder.
@@ -66,8 +67,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       if (attempt) void run({ kind: own ? 'author-swap' : 'swap', from, to, attemptId: attempt.attemptId });
     },
     pin: () => {
-      if (current().own) { status = 'Плитки с точкой закреплены.'; render(); }
-      else if (!session.state.onboarding.pinExplained) void run({ kind: 'pin' }, () => { status = 'Плитки с точкой закреплены. Меняй местами остальные.'; });
+      if (current().own) { notice = 'Плитки с точкой закреплены'; render(); }
+      else if (!session.state.onboarding.pinExplained) void run({ kind: 'pin' }, () => { notice = 'Плитки с точкой закреплены'; });
     },
     interaction: value => {
       const outer = root.getBoundingClientRect(), inner = region.getBoundingClientRect();
@@ -100,36 +101,43 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (game.scale.width !== w || game.scale.height !== h) { scene.cancel(); game.scale.resize(w, h); }
     paint();
   }
-  function button(text: string, action: () => void, quiet = false): void {
+  function button(text: string, action: () => void, quiet = false): HTMLButtonElement {
     const node = document.createElement('button'); node.type = 'button'; node.textContent = text;
     node.className = quiet ? 'quiet' : ''; node.disabled = busy || activity.isBlocked();
     node.onclick = action; actions.append(node);
+    return node;
   }
   function showMeta(route: MetaRoute): void {
     scene.cancel();
     if (layer !== 'meta') { metaReturn = layer; metaHistory = []; }
-    else if (JSON.stringify(route) !== JSON.stringify(metaRoute) && !(route.kind === 'album' && metaRoute.kind === 'album')) metaHistory.push(metaRoute);
+    else {
+      const samePicker = route.kind === metaRoute.kind && (route.kind === 'album' || route.kind === 'chapter');
+      if (!samePicker && JSON.stringify(route) !== JSON.stringify(metaRoute)) metaHistory.push(metaRoute);
+    }
     metaRoute = route; layer = 'meta'; render();
   }
   function startLevel(id: string): void {
     if (current().own) { void run({ kind: 'author-exit' }, () => queueMicrotask(() => startLevel(id))); return; }
-    const after = () => { metaHistory = []; menuExit = false; layer = session.state.attempts[id]?.completed ? 'result' : 'none'; };
+    const after = () => { metaHistory = []; notice = ''; layer = session.state.attempts[id]?.completed ? 'result' : 'none'; };
     if (session.state.activeLevelId === id && session.state.attempts[id]) { after(); render(); }
     else void run({ kind: 'open', levelId: id, attemptId: crypto.randomUUID() }, after);
   }
   function askRestart(id: string): void { restartLevelId = id; restartReturn = layer; scene.cancel(); layer = 'restart'; render(); }
+  function cancelRestart(): void { layer = restartReturn; render(); }
   function leaveAuthor(): void {
     const own = current().own; if (!own) return;
     void run({ kind: 'author-exit' }, () => { metaHistory = [{ kind: 'album', tab: 'own' }]; metaRoute = { kind: 'draft', draftId: own.work.draftId }; layer = 'meta'; });
   }
   function renderDialog(): void {
-    byId('reward-summary').hidden = true;
+    const chapterUnlock = byId('chapter-unlock');
+    chapterUnlock.hidden = true;
     delete actions.dataset.meta;
     dialog.dataset.layer = layer;
     if (editorView && !(layer === 'meta' && metaRoute.kind === 'draft')) { editorView.destroy(); editorView = null; editorDraftId = null; }
     const exportKey = layer === 'meta' && metaRoute.kind === 'export' ? JSON.stringify(metaRoute) : null;
     if (exportKey !== exportRouteKey) { exportView?.destroy(); exportView = null; exportRouteKey = exportKey; }
     dialog.dataset.export = String(!!exportKey);
+    dialog.dataset.picker = String(layer === 'meta' && metaRoute.kind === 'chapter');
     const open = layer !== 'none' && layer !== 'help';
     if (!open) { if (dialog.open) { dialog.close(); lastFocus?.focus(); } return; }
     const draftId = layer === 'meta' && metaRoute.kind === 'draft' ? metaRoute.draftId : null;
@@ -140,51 +148,44 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     const { level, attempt, own } = current();
     if (layer === 'result') {
       byId('dialog-title').textContent = own ? 'Проверка пройдена' : 'Собрано';
-      const best = own ? authorBests(own.work,own.node.nodeId) : session.state.bests[level.id];
       const count = attempt?.moves ?? 0, form = new Intl.PluralRules('ru').select(count);
       const word = form === 'one' ? 'ход' : form === 'few' ? 'хода' : 'ходов';
-      const score = attempt?.assisted ? best?.assisted : best?.clean;
-      byId('dialog-copy').textContent = `${count} ${word} · минимум ${level.minimumSwaps}\n${attempt?.assisted ? 'С помощью' : 'Без помощи'}${score != null ? ` · лучший результат ${score}` : ''}`;
+      byId('dialog-copy').textContent = `${count} ${word}`;
       if (own) {
-        byId('dialog-copy').textContent += '\nПодтверждена эта игровая версия. Прогресс кампании не меняется.';
         button('Вернуться в редактор', leaveAuthor);
-        button('Посмотреть поле', () => { layer = 'none'; render(); }, true);
-        button('Повторить проверку', () => void run({ kind: 'author-start', workId: own.work.workId, nodeId: own.node.nodeId, attemptId: crypto.randomUUID(), restart: true }, () => { layer = 'none'; }), true);
       } else {
-      const next = recommendedLevel(session.state, chapterIndexFor(level.id)) ?? recommendedLevel(session.state);
-      if (next) button('Дальше', () => startLevel(next));
-      else byId('dialog-copy').textContent += '\nВсе 60 работ кампании собраны.';
-      const receipt = session.state.lastCompletion;
-      const rewards = receipt?.attemptId === attempt?.attemptId ? visibleRewards(receipt!.newRights) : [];
-      if (rewards.length) {
-        const summary = byId<HTMLButtonElement>('reward-summary'); summary.hidden = false; summary.disabled = busy || activity.isBlocked();
-        summary.textContent = `${rewardTitle(rewards[0]!)}${rewards.length > 1 ? ` · ещё ${rewards.length - 1}` : ''}`;
-        summary.onclick = () => showMeta({ kind: 'rewards', ids: rewards });
-      }
-      button('Посмотреть поле', () => { layer = 'none'; render(); }, true);
-      button('Повторить', () => askRestart(level.id), true);
-      button('В альбом', () => showMeta({ kind: 'album', tab: 'campaign' }), true);
+        const next = recommendedLevel(session.state, chapterIndexFor(level.id)) ?? recommendedLevel(session.state);
+        const receipt = session.state.lastCompletion;
+        const unlocked = receipt && receipt.attemptId === attempt?.attemptId
+          ? receipt.newRights.find(id => id.startsWith('chapter-open:'))
+          : undefined;
+        if (unlocked) {
+          chapterUnlock.textContent = rewardTitle(unlocked);
+          chapterUnlock.hidden = false;
+        }
+        if (next) button('Дальше', () => startLevel(next));
+        else byId('dialog-copy').textContent += '\nКампания собрана';
+        button('В альбом', () => showMeta({ kind: 'album', tab: 'campaign' }), !!next);
       }
     } else if (layer === 'restart') {
       byId('dialog-title').textContent = 'Начать заново?';
-      byId('dialog-copy').textContent = `«${own ? level.title : getLevel(restartLevelId ?? level.id).title}» начнётся с исходного поля. Рекорды и пройденные уровни сохранятся.`;
-      button('Начать заново', () => void run(own ? { kind: 'author-start', workId: own.work.workId, nodeId: own.node.nodeId, attemptId: crypto.randomUUID(), restart: true } : { kind: 'restart', levelId: restartLevelId ?? level.id, attemptId: crypto.randomUUID() }, () => { metaHistory = []; menuExit = false; layer = 'none'; }));
-      button('Продолжить попытку', () => { layer = restartReturn; render(); }, true);
-    } else if (layer === 'rules') {
-      byId('dialog-title').textContent = 'Собери плавный градиент';
-      byId('dialog-copy').textContent = 'Нажми на две плитки или перетащи одну на другую. Плитки с точкой закреплены. Помощь покажет готовое поле и отметит попытку «с помощью». Ограничения ходов и таймера нет.';
-      button('Понятно', () => { layer = 'none'; render(); });
+      byId('dialog-copy').textContent = `«${own ? level.title : getLevel(restartLevelId ?? level.id).title}» начнётся с исходного поля.`;
+      button('Начать заново', () => void run(own ? { kind: 'author-start', workId: own.work.workId, nodeId: own.node.nodeId, attemptId: crypto.randomUUID(), restart: true } : { kind: 'restart', levelId: restartLevelId ?? level.id, attemptId: crypto.randomUUID() }, () => { metaHistory = []; layer = 'none'; }));
+      button('Отмена', cancelRestart, true);
     } else if (layer === 'settings') {
       byId('dialog-title').textContent = 'Настройки';
-      byId('dialog-copy').textContent = systemMotion.matches ? 'Устройство уменьшает движение — фон и переходы будут спокойными.' : 'Настрой отклик под себя.';
-      for (const [key, label] of [['motion', 'Движение фона'], ['sound', 'Звуки'], ['haptics', 'Вибрация']] as const) {
+      const close = button('×', () => { layer = 'none'; render(); }, true);
+      close.className = 'quiet settings-close';
+      close.setAttribute('aria-label', 'Вернуться к игре');
+      close.autofocus = true;
+      button('Заново', () => askRestart(session.state.activeLevelId), true).id = 'restart';
+      for (const [key, label] of [['sound', 'Звуки'], ['haptics', 'Вибрация'], ['motion', 'Движение фона']] as const) {
         const row = document.createElement('label'); row.className = 'setting';
         const input = document.createElement('input'); input.type = 'checkbox'; input.checked = session.state.preferences[key]; input.disabled = busy || activity.isBlocked();
         input.setAttribute('aria-label', label);
         input.onchange = () => void run({ kind: 'preferences', key, value: input.checked });
         const title = document.createElement('span'); title.textContent = label; row.append(title, input); actions.append(row);
       }
-      button('Вернуться к игре', () => { layer = 'none'; render(); });
     } else if (layer === 'meta') {
       const work = draftId && session.state.creative ? findDraft(session.state.creative, draftId) : null;
       if (metaRoute.kind === 'export') {
@@ -196,13 +197,13 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
         byId('dialog-title').textContent = work.name;
         if (!editorView) editorView = new EditorView(actions, { work, disabled: busy || activity.isBlocked(), pending: !!session.pending, commit: action => run(action), recover: recoverEditor,
           exportWork: (workId,nodeId) => showMeta({kind:'export',initialKey:`own:${workId}:${nodeId}`}),
-          play: (workId, nodeId) => void run({ kind: 'author-start', workId, nodeId, attemptId: crypto.randomUUID() }, () => { metaHistory = []; menuExit = false; layer = current().attempt?.completed ? 'result' : 'none'; }),
+          play: (workId, nodeId) => void run({ kind: 'author-start', workId, nodeId, attemptId: crypto.randomUUID() }, () => { metaHistory = []; layer = current().attempt?.completed ? 'result' : 'none'; }),
           back: () => { metaHistory = []; metaRoute = { kind: 'album', tab: 'own' }; layer = 'meta'; render(); } });
         editorView.update(work, busy || activity.isBlocked(), !!session.pending);
       } else {
       renderMeta({ route: metaRoute, state: session.state, disabled: busy || activity.isBlocked() || !!session.pending,
         title: byId('dialog-title'), copy: byId('dialog-copy'), actions, navigate: showMeta, back: () => { back(); },
-        resume: () => { metaHistory = []; layer = 'none'; render(); }, play: startLevel, replay: askRestart,
+        play: startLevel, replay: askRestart,
         createWork: () => {
           const draftId = crypto.randomUUID();
           void run({ kind: 'editor-create', draftId, workId: crypto.randomUUID(), nodeId: crypto.randomUUID(), name: 'Моя композиция', field: makeField(), seed: 0 }, () => {
@@ -222,7 +223,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
         byId('dialog-copy').textContent = 'Эта попытка повреждена. Её данные будут сохранены отдельно; пройденные уровни и рекорды останутся.';
         button('Начать эту попытку заново', () => void run({ kind: 'restart', levelId: level.id, attemptId: crypto.randomUUID() }, () => { layer = 'none'; }));
       } else {
-        byId('dialog-copy').textContent = 'Не удалось подтвердить запись. Последнее подтверждённое состояние сохранено. Повторная проверка использует ту же операцию.';
+        byId('dialog-copy').textContent = notice || 'Не удалось подтвердить запись.';
         button('Повторить проверку', () => void recover());
       }
     }
@@ -236,12 +237,13 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     root.dataset.mode = own ? 'author' : 'campaign';
     root.dataset.motion = String(motionAllowed());
     root.style.setProperty('--color-a', level.solvedTileColors[0]!); root.style.setProperty('--color-b', level.solvedTileColors.at(-1)!);
-    byId('ordinal').textContent = own ? 'Моя работа · авторская проверка' : `Полусон · ${level.ordinal} / ${levels.length}`; byId('title').textContent = level.title;
-    byId('moves').textContent = `${attempt?.moves ?? 0} ход.`;
-    byId('guidance').textContent = layer === 'help' ? 'Готовое поле. Закрой помощь, чтобы продолжить.' : !session.state.onboarding.firstSwapDone ? 'Поменяй две плитки местами' : 'Собери плавный переход цвета';
-    byId('save-status').textContent = busy ? 'Сохраняем…' : status;
-    byId<HTMLButtonElement>('help').textContent = layer === 'help' ? 'Закрыть помощь' : attempt?.completed ? 'Результат' : 'Помощь';
-    for (const node of root.querySelectorAll<HTMLButtonElement>('.hud button,.toolbar button')) node.disabled = busy || activity.isBlocked() || !!session.pending;
+    byId('levels').textContent = own ? '‹ Редактор' : '‹ Уровни';
+    byId('title').textContent = own ? level.title : `Уровень ${level.ordinal}`;
+    const guidance = byId('guidance');
+    guidance.textContent = layer === 'help' ? 'Готовое поле' : notice || (!own && !session.state.onboarding.firstSwapDone ? 'Поменяй две плитки местами' : '');
+    guidance.hidden = !guidance.textContent;
+    byId<HTMLButtonElement>('help').textContent = layer === 'help' ? 'К игре' : attempt?.completed ? 'Результат' : 'Подсказка';
+    for (const node of root.querySelectorAll<HTMLButtonElement>('.hud button,footer button')) node.disabled = busy || activity.isBlocked() || !!session.pending;
     if (attempt) scene.setView(level, attempt, layer === 'help', ready && !busy && !activity.isBlocked() && layer === 'none' && !session.pending);
     else scene.setView(level, initialAttempt, false, false);
     atmosphere.setModel(level, layer === 'help' ? level.startTileAtPosition.map((_, i) => i) : (attempt?.board ?? initialAttempt.board));
@@ -259,14 +261,14 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       const changed = await session.act(action);
       if (!alive) return false;
       succeeded = true;
-      status = changed ? 'Сохранено на устройстве' : status;
       if (changed) {
+        notice = '';
         after?.();
         if ((action.kind === 'swap' || action.kind === 'author-swap') && current().attempt?.completed) layer = 'result';
         swapAccepted = action.kind === 'swap' || action.kind === 'author-swap';
       }
     } catch {
-      status = session.pending ? 'Проверяем результат сохранения' : 'Поле изменилось в другом окне. Повтори действие.';
+      notice = session.pending ? 'Не удалось подтвердить сохранение.' : 'Поле изменилось в другом окне. Повтори действие.';
       if (session.pending && !editorView) layer = 'recovery';
     } finally {
       busy = false; render(); resize();
@@ -283,15 +285,15 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     busy = true; render();
     try {
       if (session.pending) await session.resolvePending(); else await session.load();
-      status = 'Сохранено на устройстве'; layer = current().attempt?.completed ? 'result' : 'none';
-    } catch { status = 'Проверка пока недоступна. Можно попробовать ещё раз.'; layer = 'recovery'; }
+      notice = ''; layer = current().attempt?.completed ? 'result' : 'none';
+    } catch { notice = 'Не удалось проверить сохранение. Попробуй ещё раз.'; layer = 'recovery'; }
     finally { busy = false; render(); }
   }
   async function recoverEditor(): Promise<boolean> {
     if (busy || activity.isBlocked()) return false;
     busy = true; render(); let success = false;
     try { if (session.pending) await session.resolvePending(); else await session.load(); success = true; }
-    catch { status = 'Проверка пока недоступна. Можно попробовать ещё раз.'; }
+    catch { notice = 'Не удалось проверить сохранение. Попробуй ещё раз.'; }
     finally { busy = false; render(); }
     return success;
   }
@@ -302,13 +304,13 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (editorView && layer === 'meta') { void editorView.leave(); return true; }
     if (layer === 'meta') {
       if (metaHistory.length) metaRoute = metaHistory.pop()!;
-      else if (menuExit) return false;
       else layer = metaReturn;
       render(); return true;
     }
+    if (layer === 'restart') { cancelRestart(); return true; }
     if (layer !== 'none') { layer = 'none'; render(); return true; }
     if (current().own) { leaveAuthor(); return true; }
-    menuExit = true; showMeta({ kind: 'home' }); return true;
+    return false;
   };
   byId('help').addEventListener('click', () => {
     if (layer === 'help') { layer = 'none'; render(); return; }
@@ -316,9 +318,10 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (attempt?.completed) { layer = 'result'; render(); }
     else if (attempt) void run({ kind: own ? 'author-help' : 'help', attemptId: attempt.attemptId }, () => { if (!activity.isBlocked()) layer = 'help'; });
   }, { signal: listeners.signal });
-  byId('restart').addEventListener('click', () => askRestart(session.state.activeLevelId), { signal: listeners.signal });
-  byId('rules').addEventListener('click', () => { scene.cancel(); layer = 'rules'; render(); }, { signal: listeners.signal });
-  byId('levels').addEventListener('click', () => { if (current().own) leaveAuthor(); else { menuExit = false; showMeta({ kind: 'home' }); } }, { signal: listeners.signal });
+  byId('levels').addEventListener('click', () => {
+    if (current().own) leaveAuthor();
+    else showMeta({ kind: 'chapter', index: chapterIndexFor(session.state.activeLevelId) });
+  }, { signal: listeners.signal });
   byId('settings').addEventListener('click', () => { scene.cancel(); layer = 'settings'; render(); }, { signal: listeners.signal });
   systemMotion.addEventListener('change', () => { scene.cancel(); render(); }, { signal: listeners.signal });
   dialog.addEventListener('cancel', event => { event.preventDefault(); if (!back()) { layer = 'none'; render(); } }, { signal: listeners.signal });

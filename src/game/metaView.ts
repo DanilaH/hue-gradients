@@ -1,19 +1,18 @@
-import { getTierProgress } from '@danilah/mini-games-kit/core';
 import { chapters, getLevel, levels } from '../domain/levels';
-import { chapterCount, chapterIndexFor, chapterIsOpen, EXPORT_FORMATS, levelIsOpen, recommendedLevel, rewardTitle } from '../domain/progression';
+import { chapterCount, chapterIndexFor, chapterIsOpen, levelIsOpen, META_POLICY } from '../domain/progression';
 import type { LevelDefinition } from '../domain/puzzle';
 import type { Workspace } from '../domain/workspace';
 import { hasAuthorProof } from '../domain/creative';
 import { canExport } from '../domain/export';
 import type { ExportRoute } from './exportView';
 
-export type MetaRoute = { kind: 'home' | 'levels' | 'rights' } | { kind: 'chapter' | 'page'; index: number } |
+export type MetaRoute = { kind: 'chapter' | 'page'; index: number } |
   { kind: 'album'; tab: 'campaign' | 'daily' | 'own' } | { kind: 'card' | 'copy'; levelId: string } |
-  { kind: 'draft'; draftId: string } | { kind: 'rewards'; ids: readonly string[] } | ExportRoute;
+  { kind: 'draft'; draftId: string } | ExportRoute;
 interface MetaView {
   route: MetaRoute; state: Workspace; disabled: boolean;
   title: HTMLElement; copy: HTMLElement; actions: HTMLElement;
-  navigate(route: MetaRoute): void; back(): void; resume(): void;
+  navigate(route: MetaRoute): void; back(): void;
   play(id: string): void; replay(id: string): void; saveCopy(id: string, name: string): void;
   createWork(): void;
 }
@@ -37,48 +36,54 @@ export function renderMeta(v: MetaView): void {
     const node = document.createElement('button'); node.type = 'button'; node.textContent = text; node.disabled = disabled || v.disabled; node.onclick = handler; parent.append(node); return node;
   };
   const back = () => button('Назад', v.back);
-  const earnedLabel = (id: string): string => state.rights.includes(id) ? 'Открыт' : 'Пока закрыт';
-  if (route.kind === 'home') {
-    v.title.textContent = 'Полусон';
-    v.copy.textContent = `Собрано ${state.completed.length} из ${levels.length}`;
-    const active = state.attempts[state.activeLevelId];
-    if (active && !active.completed) button(`${active.moves ? 'Продолжить' : 'Начать'}: ${getLevel(state.activeLevelId).title}`, () => v.play(state.activeLevelId));
-    else { const next = recommendedLevel(state); if (next) button(`Продолжить: ${getLevel(next).title}`, () => v.play(next)); else label('Все 60 работ кампании собраны. Можно пересматривать работы и сохранять отдельные копии.'); }
-    button('Кампания', () => v.navigate({ kind: 'levels' }));
-    button('Альбом', () => v.navigate({ kind: 'album', tab: 'campaign' }));
-    button('Создать композицию', v.createWork);
-    button('Мои работы', () => v.navigate({ kind: 'album', tab: 'own' }));
-    button('Экспорт', () => v.navigate({ kind: 'export' }), actions, !canExport(state,'clean'));
-    button('Открытые возможности', () => v.navigate({ kind: 'rights' }));
-    button('Вернуться к полю', v.resume);
-  } else if (route.kind === 'levels') {
-    v.title.textContent = 'Кампания'; v.copy.textContent = `${state.completed.length} / ${levels.length} работ`;
-    chapters.forEach((chapter, index) => {
-      const count = chapterCount(state, index), open = chapterIsOpen(state, index);
-      const node = button(`Глава ${index + 1} · ${count}/15${count === 15 ? ' · собрано полностью' : ''}`, () => v.navigate({ kind: 'chapter', index }), actions, !open);
+  if (route.kind === 'chapter') {
+    const chapter = chapters[route.index]!;
+    const count = chapterCount(state, route.index);
+    v.title.textContent = 'Уровни';
+    const nav = document.createElement('div');
+    nav.className = 'level-picker-nav';
+    actions.append(nav);
+    button('‹ Назад', v.back, nav).className = 'quiet';
+    button('Альбом', () => v.navigate({ kind: 'album', tab: 'campaign' }), nav).className = 'quiet';
+
+    const picker = document.createElement('div');
+    picker.className = 'chapter-picker';
+    picker.setAttribute('role', 'group');
+    picker.setAttribute('aria-label', 'Главы');
+    actions.append(picker);
+    chapters.forEach((_, index) => {
+      const open = chapterIsOpen(state, index);
+      const node = button(String(index + 1), () => {
+        if (index !== route.index) v.navigate({ kind: 'chapter', index });
+        actions.querySelector<HTMLButtonElement>(`[data-chapter="${index + 1}"]`)?.focus({ preventScroll: true });
+      }, picker);
       node.dataset.chapter = String(index + 1);
-      label(open ? count >= 10 && index < chapters.length - 1 ? 'Следующая глава открыта' : count === 15 ? 'Полная страница альбома' : 'Можно выбирать доступные задачи' : `Решите 10 задач главы ${index}`, 'meta-note');
+      node.dataset.locked = String(!open);
+      node.setAttribute('aria-label', `Глава ${index + 1}${open ? '' : ', закрыта'}`);
+      if (index === route.index) node.setAttribute('aria-current', 'true');
     });
-    back();
-  } else if (route.kind === 'chapter') {
-    const chapter = chapters[route.index]!, count = chapterCount(state, route.index);
-    v.title.textContent = `Глава ${route.index + 1}`; v.copy.textContent = `${count} / 15 собраны`;
-    if (!chapterIsOpen(state, route.index)) { label(`Решите 10 задач главы ${route.index}`); back(); return; }
-    const tier = getTierProgress(count, [10, 15]);
-    const nextGoal = tier.complete ? tier.nextTier : { target: tier.target, remaining: tier.target - count };
-    label(count === 15 ? 'Страница собрана полностью' : nextGoal?.target === 10 && route.index < chapters.length - 1 ? `До следующей главы: ${nextGoal.remaining}` : `До полной страницы: ${15 - count}`, 'meta-goal');
-    const next = recommendedLevel(state, route.index);
-    if (next) button(`Дальше: ${getLevel(next).ordinal}. ${getLevel(next).title}`, () => v.play(next));
-    const grid = document.createElement('div'); grid.className = 'level-grid'; actions.append(grid);
+    const note = chapterIsOpen(state, route.index)
+      ? `Глава ${route.index + 1} · ${count}/15`
+      : `Соберите ${META_POLICY.chapterAt} работ главы ${route.index}`;
+    label(note, 'chapter-note').setAttribute('aria-live', 'polite');
+
+    const grid = document.createElement('div');
+    grid.className = 'level-grid';
+    actions.append(grid);
     chapter.levelIds.forEach(id => {
-      const level = getLevel(id), done = state.completed.includes(id), started = !!state.attempts[id]?.moves;
-      const node = button(`${level.ordinal}${done ? ' ✓' : started ? ' ·' : ''}`, () => v.play(id), grid, !levelIsOpen(state, id));
-      node.dataset.levelId = id; node.setAttribute('aria-label', `${level.ordinal}. ${level.title}. ${done ? 'Собрано' : started ? 'Начато' : levelIsOpen(state, id) ? 'Доступно' : 'Закрыто'}`);
-      // No target colours/ready image exists on an unfinished task button.
+      const level = getLevel(id);
+      const done = state.completed.includes(id);
+      const attempt = state.attempts[id];
+      const inProgress = !!attempt && !attempt.completed;
+      const started = inProgress && (!!attempt.moves || done);
+      const open = levelIsOpen(state, id);
+      const activate = () => done && !inProgress ? v.navigate({ kind: 'card', levelId: id }) : v.play(id);
+      const node = button(`${level.ordinal}${started ? ' ·' : done ? ' ✓' : ''}`, activate, grid, !open);
+      node.dataset.levelId = id;
+      node.dataset.done = String(done);
+      node.setAttribute('aria-label', `${level.ordinal}. ${level.title}. ${started ? 'Начато' : done ? 'Собрано' : open ? 'Доступно' : 'Закрыто'}`);
+      if (id === state.activeLevelId) node.setAttribute('aria-current', 'true');
     });
-    if (route.index === 0 && !state.completed.includes(levels[4]!.id)) label('Первые пять — по порядку. После пятой можно выбирать любую задачу главы.', 'meta-note');
-    if (count === 15) button('Посмотреть полную страницу', () => v.navigate({ kind: 'page', index: route.index }));
-    button('В альбом', () => v.navigate({ kind: 'album', tab: 'campaign' })); back();
   } else if (route.kind === 'album') {
     v.title.textContent = 'Альбом'; v.copy.textContent = route.tab === 'campaign' ? `${state.completed.length} собранных работ` : '';
     const tabs = document.createElement('div'); tabs.className = 'album-tabs'; actions.append(tabs);
@@ -105,7 +110,8 @@ export function renderMeta(v: MetaView): void {
       }
       if (!Object.keys(state.creative?.works??{}).length) label('Создайте свою композицию или сохраните копию собранной работы.');
     } else label('Пока нет собранных ежедневных работ.');
-    button('Открытые возможности', () => v.navigate({ kind: 'rights' })); back();
+    if (route.tab === 'campaign' && canExport(state, 'clean')) button('Экспорт', () => v.navigate({ kind: 'export' }));
+    back();
   } else if (route.kind === 'card' || route.kind === 'copy') {
     const level = getLevel(route.levelId);
     v.title.textContent = level.title;
@@ -139,17 +145,5 @@ export function renderMeta(v: MetaView): void {
     v.copy.textContent = `${chapterCount(state, route.index)} / 15`;
     if (chapterCount(state,route.index)===15) button('Сохранить страницу', () => v.navigate({kind:'export',chapterIndex:route.index}));
     back();
-  } else if (route.kind === 'rewards') {
-    v.title.textContent = 'Открытия этой работы';
-    route.ids.forEach(id => label(rewardTitle(id))); back();
-  } else if (route.kind === 'rights') {
-    v.title.textContent = 'Открытые возможности';
-    v.copy.textContent = 'Шесть макетов: три за кампанию и три за ежедневные работы.';
-    label(canExport(state,'clean') ? 'Чистый вид работы — открыт с первой победы' : 'Чистый вид работы — с первой победы');
-    EXPORT_FORMATS.forEach(format => label(`${format.title} · ${earnedLabel(format.id)}\n${format.threshold} разных ${format.source === 'campaign' ? 'работ кампании' : 'ежедневных задач, включая архив'}`, 'format-info'));
-    const tier = getTierProgress(state.completed.length, [5,15,30]);
-    const target = tier.complete ? tier.nextTier : { target: tier.target, remaining: tier.target - state.completed.length };
-    label(target ? `Следующий макет кампании: ещё ${target.remaining}` : state.completed.length === levels.length ? 'Все три макета кампании открыты. Работы остаются в альбоме; можно сохранять копии.' : 'Все три макета кампании открыты. Следующие цели — полные страницы и личное мастерство.', 'meta-goal'); back();
-    if(canExport(state,'clean'))button('Открыть экспорт',()=>v.navigate({kind:'export'}));
   }
 }

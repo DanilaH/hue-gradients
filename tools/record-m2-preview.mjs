@@ -29,10 +29,9 @@ try {
  await page.mouse.up();await idle();await page.waitForTimeout(650);
  for(const [source,target]of pairs.slice(1)){await tap(level,source);await page.waitForTimeout(350);await tap(level,target);await idle();await page.waitForTimeout(500);}
  await page.waitForSelector('#hue-app[data-layer=result]');await page.waitForTimeout(1200);await page.screenshot({path:'.test-output/m2/review-win.png'});
- await page.waitForTimeout(1300);await page.getByRole('button',{name:'Посмотреть поле'}).click();await page.waitForTimeout(900);
- await page.getByRole('button',{name:'Результат',exact:true}).click();await page.waitForTimeout(1600);
+ await page.waitForTimeout(1300);await page.getByRole('button',{name:'Дальше',exact:true}).click();await idle();await page.waitForTimeout(900);
  const duration=(Date.now()-start)/1000-trimStart,video=page.video();await context.close();const input=await video.path();
  execFileSync('ffmpeg',['-y','-ss',String(trimStart),'-i',input,'-t',String(duration),'-an','-c:v','libx264','-preset','fast','-crf','21','-pix_fmt','yuv420p','-movflags','+faststart','.test-output/m2/Poluson-M2-gameplay-win.mp4'],{stdio:'ignore'});
  await writeFile('.test-output/m2/video.json',JSON.stringify({source:'Actual Chromium UI at 390x844; desktop emulation, not phone',level:level.id,preparation:'First four solved through UI before clip',durationSeconds:duration,pageErrors:errors},null,2));
- if(errors.length)throw Error(errors.join('; '));console.log('Recorded actual gameplay → committed win → exact field → result.');
+ if(errors.length)throw Error(errors.join('; '));console.log('Recorded actual gameplay → committed win → next puzzle.');
 }finally{await browser?.close();server.kill();}

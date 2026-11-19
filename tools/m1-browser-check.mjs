@@ -99,6 +99,14 @@ try {
   };
   const tap = async index => { const p = await center(index); await page.mouse.click(p.x, p.y); };
   const idle = () => page.waitForFunction(() => document.querySelector('#hue-app')?.dataset.busy === 'false');
+  const compactDialog = async () => page.locator('#game-dialog').evaluate(dialog => {
+    const candidates = [...dialog.querySelectorAll('button:enabled, input:enabled')];
+    return candidates.length > 0 && dialog.scrollHeight <= dialog.clientHeight + 1 && candidates.every(element => {
+      const rect = element.getBoundingClientRect();
+      return rect.left >= 0 && rect.right <= innerWidth + 1 && rect.top >= 0 && rect.bottom <= innerHeight + 1 &&
+        element.contains(document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2));
+    });
+  });
   const before = await readState();
   await tap(0); await idle(); await tap(1); await tap(1); await idle();
   assert.equal((await readState()).attempts[before.activeLevelId].moves, 0); reports.push('pin and deselect no-op');
@@ -112,13 +120,21 @@ try {
   await page.mouse.move(target.x, target.y); await page.mouse.up(); await idle();
   await page.waitForSelector('#hue-app[data-layer=result]');
   let state = await readState(); assert.equal(state.completed.length, 1); assert.equal(state.attempts[state.activeLevelId].moves, 1);
+  await page.setViewportSize({ width: 320, height: 568 });
+  const largerText = await page.addStyleTag({ content: 'html, body { font-size: 24px !important; }' });
+  assert.equal(await compactDialog(), true);
+  assert.equal(await page.locator('#dialog-actions button').count(), 2);
+  await largerText.evaluate(element => element.remove());
+  await page.setViewportSize({ width: 390, height: 844 });
   const completedRevision = state.revision;
   await page.reload(); await page.waitForSelector('#hue-app[data-layer=result]');
   state = await readState(); assert.equal(state.revision, completedRevision); assert.equal(state.completed.length, 1);
   reports.push('real drag win and reload without duplicate reward');
   await page.getByRole('button', { name: 'Дальше', exact: true }).click(); await idle();
   assert.equal((await readState()).activeLevelId, 'gradient-002');
-  await page.locator('#restart').click(); await page.getByRole('button', { name: 'Продолжить попытку' }).click();
+  await page.locator('#settings').click(); await page.locator('#restart').click(); await page.getByRole('button', { name: 'Отмена', exact: true }).click();
+  assert.equal(await page.locator('#hue-app').getAttribute('data-layer'), 'settings');
+  await page.getByRole('button', { name: 'Вернуться к игре' }).click();
   assert.equal((await readState()).activeLevelId, 'gradient-002'); reports.push('next and restart confirmation');
   // Real two-tab writes share IndexedDB. The losing action is discarded rather than rebased.
   const tab = await context.newPage(); await tab.goto(base); await tab.waitForSelector('html[data-state=ready]');
@@ -157,8 +173,28 @@ try {
   await page.evaluate(p => document.querySelector('#board-region canvas').dispatchEvent(new PointerEvent('pointerup', { pointerId: 1, clientX: p.x, clientY: p.y })), p2);
   await page.mouse.up(); await idle();
   assert.equal((await readState()).attempts['gradient-002'].moves, 1); reports.push('final pointerup coordinates and ignored second pointer');
+  const beforePicker = await readState();
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.locator('#levels').click();
+  await page.locator('[data-picker=true] .level-grid').waitFor();
+  await page.locator('[data-chapter="2"]').click();
+  assert.equal(await page.locator('.level-grid button:enabled').count(), 0);
+  assert.match(await page.locator('.chapter-note').innerText(), /Соберите 10/);
+  const pickerText = await page.addStyleTag({ content: 'html, body { font-size: 24px !important; }' });
+  assert.equal(await compactDialog(), true);
+  await pickerText.evaluate(element => element.remove());
+  await page.getByRole('button', { name: '‹ Назад', exact: true }).click();
+  assert.equal(await page.locator('#hue-app').getAttribute('data-layer'), 'none');
+  assert.deepEqual(await readState(), beforePicker);
+  assert.equal(await page.locator('#guidance').isVisible(), false);
+  await page.locator('#settings').click();
+  assert.equal(await compactDialog(), true);
+  await page.getByRole('button', { name: 'Вернуться к игре' }).click();
+  await page.setViewportSize({ width: 390, height: 844 });
+  reports.push('single-tap picker, locked chapter preview and Back preserve unfinished attempt');
+
   const restart = async () => {
-    await page.locator('#restart').click(); await page.getByRole('button', { name: 'Начать заново', exact: true }).click(); await idle();
+    await page.locator('#settings').click(); await page.locator('#restart').click(); await page.getByRole('button', { name: 'Начать заново', exact: true }).click(); await idle();
   };
   await restart();
   const canvas = page.locator('#board-region canvas'); await canvas.focus();
