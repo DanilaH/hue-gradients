@@ -3,6 +3,7 @@ import { chapters, getLevel, levels } from '../domain/levels';
 import { chapterCount, chapterIndexFor, chapterIsOpen, EXPORT_FORMATS, levelIsOpen, recommendedLevel, rewardTitle } from '../domain/progression';
 import type { LevelDefinition } from '../domain/puzzle';
 import type { Workspace } from '../domain/workspace';
+import { hasAuthorProof } from '../domain/creative';
 
 export type MetaRoute = { kind: 'home' | 'levels' | 'rights' } | { kind: 'chapter' | 'page'; index: number } |
   { kind: 'album'; tab: 'campaign' | 'daily' | 'own' } | { kind: 'card' | 'copy'; levelId: string } |
@@ -12,6 +13,7 @@ interface MetaView {
   title: HTMLElement; copy: HTMLElement; actions: HTMLElement;
   navigate(route: MetaRoute): void; back(): void; resume(): void;
   play(id: string): void; replay(id: string): void; saveCopy(id: string, name: string): void;
+  createWork(): void;
 }
 function preview(level: Pick<LevelDefinition, 'width' | 'height' | 'solvedTileColors'>, large = false): HTMLElement {
   const frame = document.createElement('div'); frame.className = large ? 'composition composition-large' : 'composition'; frame.setAttribute('aria-hidden', 'true');
@@ -42,6 +44,8 @@ export function renderMeta(v: MetaView): void {
     else { const next = recommendedLevel(state); if (next) button(`Продолжить: ${getLevel(next).title}`, () => v.play(next)); else label('Все 60 работ кампании собраны. Можно пересматривать работы и сохранять отдельные копии.'); }
     button('Кампания', () => v.navigate({ kind: 'levels' }));
     button('Альбом', () => v.navigate({ kind: 'album', tab: 'campaign' }));
+    button('Создать композицию', v.createWork);
+    button('Мои работы', () => v.navigate({ kind: 'album', tab: 'own' }));
     button('Открытые возможности', () => v.navigate({ kind: 'rights' }));
     button('Вернуться к полю', v.resume);
   } else if (route.kind === 'levels') {
@@ -90,12 +94,13 @@ export function renderMeta(v: MetaView): void {
       if (!state.completed.length) { label('Здесь появятся ваши собранные градиенты. Незавершённые работы не раскрывают готовое поле.'); button('Вернуться к первой работе', () => v.play(levels[0]!.id)); }
       chapters.forEach((c,index) => { if (chapterCount(state,index) === 15) button(`Полная страница главы ${index+1}`, () => v.navigate({ kind:'page',index })); });
     } else if (route.tab === 'own') {
-      for (const copy of Object.values(state.albumCopies)) {
-        const node = button('', () => v.navigate({ kind: 'draft', draftId: copy.draftId }), grid); node.dataset.draftId = copy.draftId;
-        node.append(preview(copy.snapshot)); const title = document.createElement('span'); title.textContent = copy.name; node.append(title);
-        const status = document.createElement('small'); status.textContent = 'Сохранённая копия · черновик'; node.append(status);
+      button('Создать композицию', v.createWork);
+      for (const work of Object.values(state.creative?.works ?? {})) {
+        const node = button('', () => v.navigate({ kind: 'draft', draftId: work.draftId }), grid); node.dataset.draftId = work.draftId;
+        node.append(preview(work.nodes[work.headNodeId]!.field)); const title = document.createElement('span'); title.textContent = work.name; node.append(title);
+        const status = document.createElement('small'); status.textContent = hasAuthorProof(work,work.headNodeId) ? 'Пройдено автором' : 'Черновик · не проверен'; node.append(status);
       }
-      if (!Object.keys(state.albumCopies).length) label('Сохраните копию собранной работы — она останется здесь отдельно от оригинала.');
+      if (!Object.keys(state.creative?.works??{}).length) label('Создайте свою композицию или сохраните копию собранной работы.');
     } else label('Пока нет собранных ежедневных работ.');
     button('Открытые возможности', () => v.navigate({ kind: 'rights' })); back();
   } else if (route.kind === 'card' || route.kind === 'copy') {

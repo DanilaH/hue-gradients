@@ -1,5 +1,7 @@
 import { applyAction, decodeWorkspace, newWorkspace, upgradeWorkspace, type Action, type Workspace } from '../domain/workspace';
-import { prepareCommit } from '../local-store/command';
+import { hashText, prepareCommit } from '../local-store/command';
+import { applyCreative, validateCreativeHashes, type CreativeAction } from '../domain/creative';
+import { editorFingerprintPayload } from '../domain/editor';
 import { StoreError, type PreparedCommit, type TransactionalLocalStore } from '../local-store/contracts';
 
 export const GUEST_VAULT = 'guest-local-v1';
@@ -8,18 +10,25 @@ export class Session {
   state!: Workspace;
   revision = 0;
   pending: PreparedCommit | null = null;
+  private readonly hashes = new Map<string, Promise<string>>();
+  private readonly digest = (payload: string): Promise<string> => {
+    let result = this.hashes.get(payload);
+    if (!result) { result = hashText(payload); this.hashes.set(payload, result); }
+    return result;
+  };
   constructor(readonly store: TransactionalLocalStore, readonly fingerprints: ReadonlyMap<string, string>) {}
   async load(): Promise<void> {
     const saved = await this.store.load(GUEST_VAULT);
     if (saved) {
       if (saved.schemaVersion !== 1 || saved.vaultId !== GUEST_VAULT || !Number.isSafeInteger(saved.localRevision) || saved.localRevision < 1) throw new StoreError('CORRUPT', 'Invalid workspace envelope');
       this.state = decodeWorkspace(saved.snapshotJson, this.fingerprints); this.revision = saved.localRevision;
+      if (this.state.creative) await validateCreativeHashes(this.state.creative, this.digest);
       const upgraded = upgradeWorkspace(this.state, this.fingerprints);
       if (upgraded !== this.state) {
-        try { await this.write(upgraded, 'migrate-campaign-meta', saved.snapshotJson); }
+        try { await this.write(upgraded, this.state.policyVersion === 'm1-local-1' ? 'migrate-campaign-meta' : 'migrate-creative-local', saved.snapshotJson); }
         catch (error) {
           // A concurrent tab may already have committed exactly this migration.
-          if (!(error instanceof StoreError && error.code === 'CONFLICT' && this.state.policyVersion === 'campaign-meta-1')) throw error;
+          if (!(error instanceof StoreError && error.code === 'CONFLICT' && this.state.policyVersion === 'campaign-meta-1' && this.state.creative)) throw error;
         }
       }
     } else {
@@ -27,7 +36,7 @@ export class Session {
       await this.write(newWorkspace(crypto.randomUUID()), 'initialize');
     }
   }
-  private async write(next: Workspace, kind: string, backupSnapshot?: string): Promise<void> {
+  private async write(next: Workspace, kind: string, backupSnapshot?: string, creativeAction?: CreativeAction): Promise<void> {
     if (this.pending) throw new Error('Resolve pending operation first');
     const operationId = crypto.randomUUID();
     const attempt = next.attempts[next.activeLevelId];
@@ -35,6 +44,7 @@ export class Session {
       payloadJson: JSON.stringify({ schemaVersion: 1, kind, contentVersion: next.contentVersion, policyVersion: next.policyVersion,
         levelId: next.activeLevelId, fingerprint: this.fingerprints.get(next.activeLevelId), attempt,
         best: next.bests[next.activeLevelId], onboarding: next.onboarding,
+        creativeAction, authorTest: creativeAction?.kind.startsWith('author-') ? next.creative?.activeTest : undefined,
         newCopies: Object.values(next.albumCopies).filter(copy => !this.state?.albumCopies[copy.draftId]),
         newCompletions: next.completed.filter(id => !this.state?.completed.includes(id)),
         newRights: next.rights.filter(id => !this.state?.rights.includes(id)) }) };
@@ -66,11 +76,19 @@ export class Session {
     const saved = await this.store.load(command.vaultId);
     if (!saved || saved.localRevision < command.expectedRevision + 1) throw new StoreError('CORRUPT', 'Committed snapshot unavailable');
     const decoded = decodeWorkspace(saved.snapshotJson, this.fingerprints);
+    if (decoded.creative) await validateCreativeHashes(decoded.creative, this.digest);
     this.state = decoded; this.revision = saved.localRevision; this.pending = null;
   }
-  async act(action: Action): Promise<boolean> {
-    const next = applyAction(this.state, action, this.fingerprints);
+  async act(action: Action | CreativeAction): Promise<boolean> {
+    const creativeAction = action.kind.startsWith('editor-') || action.kind.startsWith('author-') ? action as CreativeAction : undefined;
+    let next: Workspace;
+    if (creativeAction) {
+      if (!this.state.creative) throw new Error('Editor migration required');
+      const fingerprint = 'field' in creativeAction ? await this.digest(editorFingerprintPayload(creativeAction.field)) : undefined;
+      const creative = applyCreative(this.state.creative, creativeAction, fingerprint);
+      next = creative === this.state.creative ? this.state : { ...this.state, creative };
+    } else next = applyAction(this.state, action as Action, this.fingerprints);
     if (next === this.state) return false;
-    await this.write(next, action.kind); return true;
+    await this.write(next, action.kind, undefined, creativeAction); return true;
   }
 }

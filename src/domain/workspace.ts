@@ -1,6 +1,7 @@
 import { CAMPAIGN_CONTENT_VERSION, CONTENT_VERSION, createAttempt, proposeHelp, proposeSwap, RULES_VERSION, validateAttempt, validateLevel, type Attempt, type ContentVersion, type LevelDefinition } from './puzzle';
 import { getLevel, levels } from './levels';
 import { earnedRights, isKnownRight, levelIsOpen, META_POLICY } from './progression';
+import { initialCreative, validateCreative, type CreativeState } from './creative';
 
 export interface Best { fingerprint: string; rulesVersion: typeof RULES_VERSION; clean: number | null; assisted: number | null }
 export interface Preferences { sound: boolean; haptics: boolean; motion: boolean }
@@ -21,6 +22,8 @@ export interface Workspace {
   quarantine: { levelId: string; rawAttempt: string }[];
   preferences: Preferences;
   albumCopies: Record<string, AlbumCopy>;
+  /** Absent only in pre-editor saves; Session backs up and migrates before use. */
+  creative?: CreativeState;
   lastCompletion: { attemptId: string; levelId: string; newRights: string[] } | null;
 }
 export type Action = { kind: 'swap'; from: number; to: number; attemptId: string } |
@@ -33,7 +36,7 @@ export function newWorkspace(attemptId: string): Workspace {
   const level = levels[0]!;
   return { schemaVersion: 1, contentVersion: CAMPAIGN_CONTENT_VERSION, policyVersion: META_POLICY.version, activeLevelId: level.id,
     attempts: { [level.id]: createAttempt(level, attemptId) }, completed: [], bests: {}, rights: ['chapter-open:chapter-01'],
-    onboarding: { version: 1, firstSwapDone: false, pinExplained: false }, quarantine: [], preferences: { ...DEFAULT_PREFERENCES }, albumCopies: {}, lastCompletion: null };
+    onboarding: { version: 1, firstSwapDone: false, pinExplained: false }, quarantine: [], preferences: { ...DEFAULT_PREFERENCES }, albumCopies: {}, creative: initialCreative({}), lastCompletion: null };
 }
 export function canonicalJson(value: unknown): string {
   if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
@@ -49,9 +52,10 @@ export function fingerprintPayload(level: LevelDefinition): string {
 }
 /** Does not mutate/persist during decode. Session commits this upgrade and its backup before exposing awards. */
 export function upgradeWorkspace(state: Workspace, fingerprints: ReadonlyMap<string, string>): Workspace {
-  if (state.policyVersion === META_POLICY.version) return state;
-  return { ...state, contentVersion: CAMPAIGN_CONTENT_VERSION, policyVersion: META_POLICY.version,
+  if (state.policyVersion === META_POLICY.version && state.creative) return state;
+  const upgraded: Workspace = state.policyVersion === META_POLICY.version ? state : { ...state, contentVersion: CAMPAIGN_CONTENT_VERSION, policyVersion: META_POLICY.version,
     rights: earnedRights(state, fingerprints), albumCopies: {}, lastCompletion: null };
+  return { ...upgraded, creative: initialCreative(upgraded.albumCopies) };
 }
 const safeId = (id: unknown): id is string => typeof id === 'string' && /^[a-zA-Z0-9:._-]{1,160}$/.test(id);
 const record = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value);
@@ -105,6 +109,14 @@ export function decodeWorkspace(json: string, fingerprints: ReadonlyMap<string, 
         !Array.isArray(receipt.newRights) || new Set(receipt.newRights).size !== receipt.newRights.length ||
         receipt.newRights.some(id => !state.rights.includes(id)))) throw new Error('Invalid reward receipt');
   }
+  if (Object.hasOwn(state, 'creative')) {
+    validateCreative(state.creative!);
+    for (const copy of Object.values(state.albumCopies)) {
+      const work = state.creative!.works[copy.workId], node = work?.nodes[copy.nodeId];
+      if (!work || work.draftId !== copy.draftId || work.provenance.kind !== 'campaign' || work.provenance.levelId !== copy.provenance.levelId || !node || node.fingerprint !== copy.fingerprint ||
+          fingerprintPayload({ ...node.field, id: work.workId, ordinal: 0, title: work.name, minimumSwaps: copy.snapshot.minimumSwaps }) !== fingerprintPayload({ ...copy.snapshot, id: work.workId, ordinal: 0, title: copy.name })) throw new Error('Missing original copied revision');
+    }
+  }
   return state;
 }
 
@@ -123,7 +135,9 @@ export function applyAction(state: Workspace, action: Action, fingerprints: Read
     const copy: AlbumCopy = { schemaVersion: 1, draftId: action.draftId, workId: action.workId, nodeId: action.nodeId, parentNodeIds: [],
       name, fingerprint: fingerprints.get(source.id)!, rulesVersion: RULES_VERSION, provenance: { kind: 'campaign', levelId: source.id, fingerprint: fingerprints.get(source.id)! },
       snapshot: { width: source.width, height: source.height, solvedTileColors: [...source.solvedTileColors], pinnedPositions: [...source.pinnedPositions], startTileAtPosition: [...source.startTileAtPosition], minimumSwaps: source.minimumSwaps }, authorCompletions: [] };
-    return { ...state, albumCopies: { ...state.albumCopies, [copy.draftId]: copy } };
+    const creative = state.creative ?? initialCreative(state.albumCopies), copiedWork = initialCreative({ [copy.draftId]: copy }).works;
+    const nextCreative = { ...creative, works: { ...creative.works, ...copiedWork } }; validateCreative(nextCreative);
+    return { ...state, albumCopies: { ...state.albumCopies, [copy.draftId]: copy }, creative: nextCreative };
   }
   const level = getLevel(state.activeLevelId), attempt = state.attempts[level.id];
   if (action.kind === 'open' || action.kind === 'restart') {

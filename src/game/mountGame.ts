@@ -12,6 +12,9 @@ import { Atmosphere } from './atmosphere';
 import { GameFeedback, type Haptic } from './feedback';
 import { renderMeta, type MetaRoute } from './metaView';
 import { chapterIndexFor, recommendedLevel, visibleRewards, rewardTitle } from '../domain/progression';
+import { authorBests, authorView, findDraft, type CreativeAction } from '../domain/creative';
+import { makeField } from '../domain/editor';
+import { EditorView } from './editorView';
 import './game.css';
 
 type Layer = 'none' | 'help' | 'result' | 'meta' | 'restart' | 'rules' | 'recovery' | 'settings';
@@ -21,6 +24,11 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   const fingerprints = new Map(await Promise.all(levels.map(async level => [level.id, await hashText(fingerprintPayload(level))] as const)));
   const session = new Session(store, fingerprints);
   await session.load();
+  const current = () => {
+    const own = session.state.creative?.playing ? authorView(session.state.creative) : null;
+    const level = own?.level ?? getLevel(session.state.activeLevelId);
+    return { own, level, attempt: own?.attempt ?? session.state.attempts[level.id] };
+  };
   parent.innerHTML = `<section id="hue-app" aria-label="Полусон">
     <header class="hud"><button id="levels" class="quiet" aria-label="Открыть уровни">←</button><div class="level-label"><span id="ordinal"></span><h1 id="title"></h1></div><span id="moves" aria-label="Ходы"></span><button id="settings" class="quiet" aria-label="Настройки">⋯</button></header>
     <div id="board-region"></div>
@@ -37,23 +45,25 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   const byId = <T extends HTMLElement>(id: string) => root.querySelector<T>(`#${id}`)!;
   const listeners = new AbortController();
   let alive = true, busy = false, ready = false, paintPending = false, status = 'Сохранено на устройстве';
-  let layer: Layer = session.state.attempts[session.state.activeLevelId]?.completed ? 'result' : 'none';
-  if (!session.state.attempts[session.state.activeLevelId]) layer = 'recovery';
+  let layer: Layer = current().attempt?.completed ? 'result' : 'none';
+  if (!current().attempt) layer = 'recovery';
+  let editorView: EditorView | null = null, editorDraftId: string | null = null;
   let lastFocus: HTMLElement | null = null, menuExit = false;
   let metaRoute: MetaRoute = { kind: 'home' }, metaHistory: MetaRoute[] = [], metaReturn: Layer = 'none';
   let restartLevelId: string | null = null, restartReturn: Layer = 'none';
-  const initialLevel = getLevel(session.state.activeLevelId);
+  const initialLevel = current().level;
   // A quarantined attempt is never silently written as a fresh start. This value is only a display placeholder.
-  const initialAttempt = session.state.attempts[initialLevel.id] ?? { schemaVersion: 1 as const, rulesVersion: 'gradient-rules-1' as const,
+  const initialAttempt = current().attempt ?? { schemaVersion: 1 as const, rulesVersion: 'gradient-rules-1' as const,
     contentVersion: 'gradient-prototype-0.1' as const, levelId: initialLevel.id, attemptId: 'quarantined-display', board: initialLevel.startTileAtPosition,
     moves: 0, assisted: false, assistsUsed: 0, completed: false };
   const scene = new PuzzleScene(initialLevel, initialAttempt, {
     paint, swap: (from, to) => {
-      const attempt = session.state.attempts[session.state.activeLevelId];
-      if (attempt) void run({ kind: 'swap', from, to, attemptId: attempt.attemptId });
+      const { own, attempt } = current();
+      if (attempt) void run({ kind: own ? 'author-swap' : 'swap', from, to, attemptId: attempt.attemptId });
     },
     pin: () => {
-      if (!session.state.onboarding.pinExplained) void run({ kind: 'pin' }, () => { status = 'Плитки с точкой закреплены. Меняй местами остальные.'; });
+      if (current().own) { status = 'Плитки с точкой закреплены.'; render(); }
+      else if (!session.state.onboarding.pinExplained) void run({ kind: 'pin' }, () => { status = 'Плитки с точкой закреплены. Меняй местами остальные.'; });
     },
     interaction: value => {
       const outer = root.getBoundingClientRect(), inner = region.getBoundingClientRect();
@@ -98,27 +108,42 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     metaRoute = route; layer = 'meta'; render();
   }
   function startLevel(id: string): void {
+    if (current().own) { void run({ kind: 'author-exit' }, () => queueMicrotask(() => startLevel(id))); return; }
     const after = () => { metaHistory = []; menuExit = false; layer = session.state.attempts[id]?.completed ? 'result' : 'none'; };
     if (session.state.activeLevelId === id && session.state.attempts[id]) { after(); render(); }
     else void run({ kind: 'open', levelId: id, attemptId: crypto.randomUUID() }, after);
   }
   function askRestart(id: string): void { restartLevelId = id; restartReturn = layer; scene.cancel(); layer = 'restart'; render(); }
+  function leaveAuthor(): void {
+    const own = current().own; if (!own) return;
+    void run({ kind: 'author-exit' }, () => { metaHistory = [{ kind: 'album', tab: 'own' }]; metaRoute = { kind: 'draft', draftId: own.work.draftId }; layer = 'meta'; });
+  }
   function renderDialog(): void {
     byId('reward-summary').hidden = true;
     delete actions.dataset.meta;
     dialog.dataset.layer = layer;
+    if (editorView && !(layer === 'meta' && metaRoute.kind === 'draft')) { editorView.destroy(); editorView = null; editorDraftId = null; }
     const open = layer !== 'none' && layer !== 'help';
     if (!open) { if (dialog.open) { dialog.close(); lastFocus?.focus(); } return; }
-    byId('dialog-copy').textContent = ''; actions.replaceChildren();
+    const draftId = layer === 'meta' && metaRoute.kind === 'draft' ? metaRoute.draftId : null;
+    if (editorDraftId !== draftId) { editorView?.destroy(); editorView = null; editorDraftId = draftId; }
+    dialog.dataset.editor = String(!!draftId);
+    byId('dialog-copy').textContent = ''; if (!editorView) actions.replaceChildren();
     dialog.dataset.layer = layer; byId('victory-prism').hidden = layer !== 'result';
-    const level = getLevel(session.state.activeLevelId), attempt = session.state.attempts[level.id];
+    const { level, attempt, own } = current();
     if (layer === 'result') {
-      byId('dialog-title').textContent = 'Собрано';
-      const best = session.state.bests[level.id];
+      byId('dialog-title').textContent = own ? 'Проверка пройдена' : 'Собрано';
+      const best = own ? authorBests(own.work,own.node.nodeId) : session.state.bests[level.id];
       const count = attempt?.moves ?? 0, form = new Intl.PluralRules('ru').select(count);
       const word = form === 'one' ? 'ход' : form === 'few' ? 'хода' : 'ходов';
       const score = attempt?.assisted ? best?.assisted : best?.clean;
       byId('dialog-copy').textContent = `${count} ${word} · минимум ${level.minimumSwaps}\n${attempt?.assisted ? 'С помощью' : 'Без помощи'}${score != null ? ` · лучший результат ${score}` : ''}`;
+      if (own) {
+        byId('dialog-copy').textContent += '\nПодтверждена эта игровая версия. Прогресс кампании не меняется.';
+        button('Вернуться в редактор', leaveAuthor);
+        button('Посмотреть поле', () => { layer = 'none'; render(); }, true);
+        button('Повторить проверку', () => void run({ kind: 'author-start', workId: own.work.workId, nodeId: own.node.nodeId, attemptId: crypto.randomUUID(), restart: true }, () => { layer = 'none'; }), true);
+      } else {
       const next = recommendedLevel(session.state, chapterIndexFor(level.id)) ?? recommendedLevel(session.state);
       if (next) button('Дальше', () => startLevel(next));
       else byId('dialog-copy').textContent += '\nВсе 60 работ кампании собраны.';
@@ -132,10 +157,11 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       button('Посмотреть поле', () => { layer = 'none'; render(); }, true);
       button('Повторить', () => askRestart(level.id), true);
       button('В альбом', () => showMeta({ kind: 'album', tab: 'campaign' }), true);
+      }
     } else if (layer === 'restart') {
       byId('dialog-title').textContent = 'Начать заново?';
-      byId('dialog-copy').textContent = `«${getLevel(restartLevelId ?? level.id).title}» начнётся с исходного поля. Рекорды и пройденные уровни сохранятся.`;
-      button('Начать заново', () => void run({ kind: 'restart', levelId: restartLevelId ?? level.id, attemptId: crypto.randomUUID() }, () => { metaHistory = []; menuExit = false; layer = 'none'; }));
+      byId('dialog-copy').textContent = `«${own ? level.title : getLevel(restartLevelId ?? level.id).title}» начнётся с исходного поля. Рекорды и пройденные уровни сохранятся.`;
+      button('Начать заново', () => void run(own ? { kind: 'author-start', workId: own.work.workId, nodeId: own.node.nodeId, attemptId: crypto.randomUUID(), restart: true } : { kind: 'restart', levelId: restartLevelId ?? level.id, attemptId: crypto.randomUUID() }, () => { metaHistory = []; menuExit = false; layer = 'none'; }));
       button('Продолжить попытку', () => { layer = restartReturn; render(); }, true);
     } else if (layer === 'rules') {
       byId('dialog-title').textContent = 'Собери плавный градиент';
@@ -153,15 +179,30 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       }
       button('Вернуться к игре', () => { layer = 'none'; render(); });
     } else if (layer === 'meta') {
+      const work = draftId && session.state.creative ? findDraft(session.state.creative, draftId) : null;
+      if (work) {
+        byId('dialog-title').textContent = work.name;
+        if (!editorView) editorView = new EditorView(actions, { work, disabled: busy || activity.isBlocked(), pending: !!session.pending, commit: action => run(action), recover: recoverEditor,
+          play: (workId, nodeId) => void run({ kind: 'author-start', workId, nodeId, attemptId: crypto.randomUUID() }, () => { metaHistory = []; menuExit = false; layer = current().attempt?.completed ? 'result' : 'none'; }),
+          back: () => { metaHistory = []; metaRoute = { kind: 'album', tab: 'own' }; layer = 'meta'; render(); } });
+        editorView.update(work, busy || activity.isBlocked(), !!session.pending);
+      } else {
       renderMeta({ route: metaRoute, state: session.state, disabled: busy || activity.isBlocked() || !!session.pending,
         title: byId('dialog-title'), copy: byId('dialog-copy'), actions, navigate: showMeta, back: () => { back(); },
         resume: () => { metaHistory = []; layer = 'none'; render(); }, play: startLevel, replay: askRestart,
+        createWork: () => {
+          const draftId = crypto.randomUUID();
+          void run({ kind: 'editor-create', draftId, workId: crypto.randomUUID(), nodeId: crypto.randomUUID(), name: 'Моя композиция', field: makeField(), seed: 0 }, () => {
+            metaHistory = [{ kind: 'album', tab: 'own' }]; metaRoute = { kind: 'draft', draftId }; layer = 'meta';
+          });
+        },
         saveCopy: (levelId, name) => {
           const draftId = crypto.randomUUID();
           void run({ kind: 'copy', levelId, name, draftId, workId: crypto.randomUUID(), nodeId: crypto.randomUUID() }, () => {
             metaHistory = [{ kind: 'album', tab: 'own' }]; metaRoute = { kind: 'draft', draftId }; layer = 'meta';
           });
         } });
+      }
     } else {
       byId('dialog-title').textContent = 'Сохранение требует проверки';
       if (!attempt && !session.pending) {
@@ -176,12 +217,13 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   }
   function render(): void {
     if (!alive) return;
-    const level = getLevel(session.state.activeLevelId), attempt = session.state.attempts[level.id];
+    const { level, attempt, own } = current();
     if (!attempt && !session.pending) layer = 'recovery';
     root.dataset.level = level.id; root.dataset.moves = String(attempt?.moves ?? 0); root.dataset.busy = String(busy); root.dataset.layer = layer;
+    root.dataset.mode = own ? 'author' : 'campaign';
     root.dataset.motion = String(motionAllowed());
     root.style.setProperty('--color-a', level.solvedTileColors[0]!); root.style.setProperty('--color-b', level.solvedTileColors.at(-1)!);
-    byId('ordinal').textContent = `Полусон · ${level.ordinal} / ${levels.length}`; byId('title').textContent = level.title;
+    byId('ordinal').textContent = own ? 'Моя работа · авторская проверка' : `Полусон · ${level.ordinal} / ${levels.length}`; byId('title').textContent = level.title;
     byId('moves').textContent = `${attempt?.moves ?? 0} ход.`;
     byId('guidance').textContent = layer === 'help' ? 'Готовое поле. Закрой помощь, чтобы продолжить.' : !session.state.onboarding.firstSwapDone ? 'Поменяй две плитки местами' : 'Собери плавный переход цвета';
     byId('save-status').textContent = busy ? 'Сохраняем…' : status;
@@ -195,44 +237,55 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     activity.setGameplayDesired(ready && !busy && layer === 'none' && !attempt?.completed && !activity.isBlocked());
     renderDialog(); paint();
   }
-  async function run(action: Action, after?: () => void): Promise<void> {
-    if (busy || session.pending || activity.isBlocked()) return;
-    const previous = session.state.attempts[session.state.activeLevelId];
-    let swapAccepted = false;
+  async function run(action: Action | CreativeAction, after?: () => void): Promise<boolean> {
+    if (busy || session.pending || activity.isBlocked()) return false;
+    const previous = current().attempt;
+    let swapAccepted = false, succeeded = false;
     busy = true; render();
     try {
       const changed = await session.act(action);
-      if (!alive) return;
+      if (!alive) return false;
+      succeeded = true;
       status = changed ? 'Сохранено на устройстве' : status;
       if (changed) {
         after?.();
-        if (action.kind === 'swap' && session.state.attempts[session.state.activeLevelId]?.completed) layer = 'result';
-        swapAccepted = action.kind === 'swap';
+        if ((action.kind === 'swap' || action.kind === 'author-swap') && current().attempt?.completed) layer = 'result';
+        swapAccepted = action.kind === 'swap' || action.kind === 'author-swap';
       }
     } catch {
       status = session.pending ? 'Проверяем результат сохранения' : 'Поле изменилось в другом окне. Повтори действие.';
-      if (session.pending) layer = 'recovery';
+      if (session.pending && !editorView) layer = 'recovery';
     } finally {
       busy = false; render(); resize();
-      const next = session.state.attempts[session.state.activeLevelId];
-      if (swapAccepted && action.kind === 'swap' && previous && next && previous.attemptId === next.attemptId && !activity.isBlocked()) {
+      const next = current().attempt;
+      if (swapAccepted && (action.kind === 'swap' || action.kind === 'author-swap') && previous && next && previous.attemptId === next.attemptId && !activity.isBlocked()) {
         scene.presentSwap(previous, next, action.from, action.to, motionAllowed());
         feedback.accepted(next.completed ? 'win' : 'swap');
       }
     }
+    return succeeded;
   }
   async function recover(): Promise<void> {
     if (busy) return;
     busy = true; render();
     try {
       if (session.pending) await session.resolvePending(); else await session.load();
-      status = 'Сохранено на устройстве'; layer = session.state.attempts[session.state.activeLevelId]?.completed ? 'result' : 'none';
+      status = 'Сохранено на устройстве'; layer = current().attempt?.completed ? 'result' : 'none';
     } catch { status = 'Проверка пока недоступна. Можно попробовать ещё раз.'; layer = 'recovery'; }
     finally { busy = false; render(); }
+  }
+  async function recoverEditor(): Promise<boolean> {
+    if (busy || activity.isBlocked()) return false;
+    busy = true; render(); let success = false;
+    try { if (session.pending) await session.resolvePending(); else await session.load(); success = true; }
+    catch { status = 'Проверка пока недоступна. Можно попробовать ещё раз.'; }
+    finally { busy = false; render(); }
+    return success;
   }
   const back = (): boolean => {
     if (busy || layer === 'recovery') return true;
     scene.cancel();
+    if (editorView && layer === 'meta') { void editorView.leave(); return true; }
     if (layer === 'meta') {
       if (metaHistory.length) metaRoute = metaHistory.pop()!;
       else if (menuExit) return false;
@@ -240,17 +293,18 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       render(); return true;
     }
     if (layer !== 'none') { layer = 'none'; render(); return true; }
+    if (current().own) { leaveAuthor(); return true; }
     menuExit = true; showMeta({ kind: 'home' }); return true;
   };
   byId('help').addEventListener('click', () => {
     if (layer === 'help') { layer = 'none'; render(); return; }
-    const attempt = session.state.attempts[session.state.activeLevelId];
+    const { attempt, own } = current();
     if (attempt?.completed) { layer = 'result'; render(); }
-    else if (attempt) void run({ kind: 'help', attemptId: attempt.attemptId }, () => { if (!activity.isBlocked()) layer = 'help'; });
+    else if (attempt) void run({ kind: own ? 'author-help' : 'help', attemptId: attempt.attemptId }, () => { if (!activity.isBlocked()) layer = 'help'; });
   }, { signal: listeners.signal });
   byId('restart').addEventListener('click', () => askRestart(session.state.activeLevelId), { signal: listeners.signal });
   byId('rules').addEventListener('click', () => { scene.cancel(); layer = 'rules'; render(); }, { signal: listeners.signal });
-  byId('levels').addEventListener('click', () => { menuExit = false; showMeta({ kind: 'home' }); }, { signal: listeners.signal });
+  byId('levels').addEventListener('click', () => { if (current().own) leaveAuthor(); else { menuExit = false; showMeta({ kind: 'home' }); } }, { signal: listeners.signal });
   byId('settings').addEventListener('click', () => { scene.cancel(); layer = 'settings'; render(); }, { signal: listeners.signal });
   systemMotion.addEventListener('change', () => { scene.cancel(); render(); }, { signal: listeners.signal });
   dialog.addEventListener('cancel', event => { event.preventDefault(); if (!back()) { layer = 'none'; render(); } }, { signal: listeners.signal });
@@ -262,7 +316,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   window.addEventListener('focus', () => {
     if (busy || session.pending || !ready) return;
     busy = true;
-    void session.load().then(() => { if (!session.state.attempts[session.state.activeLevelId]) layer = 'recovery'; }).catch(() => { layer = 'recovery'; })
+    void session.load().then(() => { if (!current().attempt) layer = 'recovery'; }).catch(() => { layer = 'recovery'; })
       .finally(() => { busy = false; render(); });
   }, { signal: listeners.signal });
   const unblock = activity.onBlockedChange(blocked => {
@@ -271,5 +325,5 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     render();
   });
   await frame; ready = true; render(); resize();
-  return { back, destroy() { alive = false; listeners.abort(); observer.disconnect(); unblock(); atmosphere.destroy(); feedback.destroy(); activity.setGameplayDesired(false); store.close(); destroyRenderer(game); } };
+  return { back, destroy() { alive = false; editorView?.destroy(); listeners.abort(); observer.disconnect(); unblock(); atmosphere.destroy(); feedback.destroy(); activity.setGameplayDesired(false); store.close(); destroyRenderer(game); } };
 }

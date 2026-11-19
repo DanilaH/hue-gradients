@@ -1,0 +1,2274 @@
+{
+  "oracle": "docs/spec/tools/validate_release_candidates.py; independent frozen inputs/results",
+  "cases": [
+    {
+      "case": "valid baseline",
+      "input": {
+        "id": "gradient-006",
+        "ordinal": 6,
+        "title": "Опора сверху и снизу",
+        "intent": "Восстановить промежуточные строки между двумя закреплёнными краями.",
+        "sequenceRole": "practice",
+        "width": 4,
+        "height": 4,
+        "anchorRule": "top_bottom",
+        "pinnedPositions": [
+          0,
+          1,
+          2,
+          3,
+          12,
+          13,
+          14,
+          15
+        ],
+        "cornerColorsTLTRBLBR": [
+          "#E5B8B2",
+          "#ADB7E1",
+          "#BA7843",
+          "#416B73"
+        ],
+        "solvedTileColors": [
+          "#E5B8B2",
+          "#D2B8C2",
+          "#C0B7D1",
+          "#ADB7E1",
+          "#D7A38D",
+          "#BDA19D",
+          "#A39FAD",
+          "#899EBC",
+          "#C88D68",
+          "#A78A78",
+          "#868788",
+          "#658498",
+          "#BA7843",
+          "#927453",
+          "#696F63",
+          "#416B73"
+        ],
+        "startTileAtPosition": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          6,
+          9,
+          4,
+          10,
+          8,
+          11,
+          7,
+          12,
+          13,
+          14,
+          15
+        ],
+        "seed": 4255260502,
+        "minimumSwaps": 7
+      },
+      "expected": {
+        "errors": [],
+        "warnings": [],
+        "minimumSwaps": 7,
+        "minimumNominalOklab": 0.041081225,
+        "closestMovablePair": [
+          6,
+          7
+        ],
+        "orientationAmbiguities": [],
+        "fingerprint": "afdd5d4d141ad1affca5ef2a8eb6b4b3a83d35a91d8f8932526a9b4cc8b584ae"
+      }
+    },
+    {
+      "case": "not an object",
+      "input": null,
+      "expected": {
+        "errors": [
+          "FIELD_OBJECT"
+        ],
+        "warnings": []
+      }
+    },
+    {
+      "case": "boolean is not width",
+      "input": {
+        "id": "gradient-006",
+        "ordinal": 6,
+        "title": "Опора сверху и снизу",
+        "intent": "Восстановить промежуточные строки между двумя закреплёнными краями.",
+        "sequenceRole": "practice",
+        "width": true,
+        "height": 4,
+        "anchorRule": "top_bottom",
+        "pinnedPositions": [
+          0,
+          1,
+          2,
+          3,
+          12,
+          13,
+          14,
+          15
+        ],
+        "cornerColorsTLTRBLBR": [
+          "#E5B8B2",
+          "#ADB7E1",
+          "#BA7843",
+          "#416B73"
+        ],
+        "solvedTileColors": [
+          "#E5B8B2",
+          "#D2B8C2",
+          "#C0B7D1",
+          "#ADB7E1",
+          "#D7A38D",
+          "#BDA19D",
+          "#A39FAD",
+          "#899EBC",
+          "#C88D68",
+          "#A78A78",
+          "#868788",
+          "#658498",
+          "#BA7843",
+          "#927453",
+          "#696F63",
+          "#416B73"
+        ],
+        "startTileAtPosition": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          6,
+          9,
+          4,
+          10,
+          8,
+          11,
+          7,
+          12,
+          13,
+          14,
+          15
+        ],
+        "seed": 4255260502,
+        "minimumSwaps": 7
+      },
+      "expected": {
+        "errors": [
+          "DIMENSIONS"
+        ],
+        "warnings": []
+      }
+    },
+    {
+      "case": "zero width",
+      "input": {
+        "id": "gradient-006",
+        "ordinal": 6,
+        "title": "Опора сверху и снизу",
+        "intent": "Восстановить промежуточные строки между двумя закреплёнными краями.",
+        "sequenceRole": "practice",
+        "width": 0,
+        "height": 4,
+        "anchorRule": "top_bottom",
+        "pinnedPositions": [
+          0,
+          1,
+          2,
+          3,
+          12,
+          13,
+          14,
+          15
+        ],
+        "cornerColorsTLTRBLBR": [
+          "#E5B8B2",
+          "#ADB7E1",
+          "#BA7843",
+          "#416B73"
+        ],
+        "solvedTileColors": [
+          "#E5B8B2",
+          "#D2B8C2",
+          "#C0B7D1",
+          "#ADB7E1",
+          "#D7A38D",
+          "#BDA19D",
+          "#A39FAD",
+          "#899EBC",
+          "#C88D68",
+          "#A78A78",
+          "#868788",
+          "#658498",
+          "#BA7843",
+          "#927453",
+          "#696F63",
+          "#416B73"
+        ],
+        "startTileAtPosition": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          6,
+          9,
+          4,
+          10,
+          8,
+          11,
+          7,
+          12,
+          13,
+          14,
+          15
+        ],
+        "seed": 4255260502,
+        "minimumSwaps": 7
+      },
+      "expected": {
+        "errors": [
+          "DIMENSIONS"
+        ],
+        "warnings": []
+      }
+    },
+    {
+      "case": "seven columns",
+      "input": {
+        "id": "gradient-006",
+        "ordinal": 6,
+        "title": "Опора сверху и снизу",
+        "intent": "Восстановить промежуточные строки между двумя закреплёнными краями.",
+        "sequenceRole": "practice",
+        "width": 7,
+        "height": 4,
+        "anchorRule": "top_bottom",
+        "pinnedPositions": [
+          0,
+          1,
+          2,
+          3,
+          12,
+          13,
+          14,
+          15
+        ],
+        "cornerColorsTLTRBLBR": [
+          "#E5B8B2",
+          "#ADB7E1",
+          "#BA7843",
+          "#416B73"
+        ],
+        "solvedTileColors": [
+          "#E5B8B2",
+          "#D2B8C2",
+          "#C0B7D1",
+          "#ADB7E1",
+          "#D7A38D",
+          "#BDA19D",
+          "#A39FAD",
+          "#899EBC",
+          "#C88D68",
+          "#A78A78",
+          "#868788",
+          "#658498",
+          "#BA7843",
+          "#927453",
+          "#696F63",
+          "#416B73"
+        ],
+        "startTileAtPosition": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          6,
+          9,
+          4,
+          10,
+          8,
+          11,
+          7,
+          12,
+          13,
+          14,
+          15
+        ],
+        "seed": 4255260502,
+        "minimumSwaps": 7
+      },
+      "expected": {
+        "errors": [
+          "DIMENSIONS"
+        ],
+        "warnings": []
+      }
+    },
+    {
+      "case": "six rows",
+      "input": {
+        "id": "gradient-006",
+        "ordinal": 6,
+        "title": "Опора сверху и снизу",
+        "intent": "Восстановить промежуточные строки между двумя закреплёнными краями.",
+        "sequenceRole": "practice",
+        "width": 4,
+        "height": 6,
+        "anchorRule": "top_bottom",
+        "pinnedPositions": [
+          0,
+          1,
+          2,
+          3,
+          12,
+          13,
+          14,
+          15
+        ],
+        "cornerColorsTLTRBLBR": [
+          "#E5B8B2",
+          "#ADB7E1",
+          "#BA7843",
+          "#416B73"
+        ],
+        "solvedTileColors": [
+          "#E5B8B2",
+          "#D2B8C2",
+          "#C0B7D1",
+          "#ADB7E1",
+          "#D7A38D",
+          "#BDA19D",
+          "#A39FAD",
+          "#899EBC",
+          "#C88D68",
+          "#A78A78",
+          "#868788",
+          "#658498",
+          "#BA7843",
+          "#927453",
+          "#696F63",
+          "#416B73"
+        ],
+        "startTileAtPosition": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          6,
+          9,
+          4,
+          10,
+          8,
+          11,
+          7,
+          12,
+          13,
+          14,
+          15
+        ],
+        "seed": 4255260502,
+        "minimumSwaps": 7
+      },
+      "expected": {
+        "errors": [
+          "DIMENSIONS"
+        ],
+        "warnings": []
+      }
+    },
+    {
+      "case": "duplicate pin",
+      "input": {
+        "id": "gradient-006",
+        "ordinal": 6,
+        "title": "Опора сверху и снизу",
+        "intent": "Восстановить промежуточные строки между двумя закреплёнными краями.",
+        "sequenceRole": "practice",
+        "width": 4,
+        "height": 4,
+        "anchorRule": "top_bottom",
+        "pinnedPositions": [
+          0,
+          1,
+          2,
+          3,
+          12,
+          13,
+          14,
+          15,
+          0
+        ],
+        "cornerColorsTLTRBLBR": [
+          "#E5B8B2",
+          "#ADB7E1",
+          "#BA7843",
+          "#416B73"
+        ],
+        "solvedTileColors": [
+          "#E5B8B2",
+          "#D2B8C2",
+          "#C0B7D1",
+          "#ADB7E1",
+          "#D7A38D",
+          "#BDA19D",
+          "#A39FAD",
+          "#899EBC",
+          "#C88D68",
+          "#A78A78",
+          "#868788",
+          "#658498",
+          "#BA7843",
+          "#927453",
+          "#696F63",
+          "#416B73"
+        ],
+        "startTileAtPosition": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          6,
+          9,
+          4,
+          10,
+          8,
+          11,
+          7,
+          12,
+          13,
+          14,
+          15
+        ],
+        "seed": 4255260502,
+        "minimumSwaps": 7
+      },
+      "expected": {
+        "errors": [
+          "DUPLICATE_PIN"
+        ],
+        "warnings": []
+      }
+    },
+    {
+      "case": "negative pin",
+      "input": {
+        "id": "gradient-006",
+        "ordinal": 6,
+        "title": "Опора сверху и снизу",
+        "intent": "Восстановить промежуточные строки между двумя закреплёнными краями.",
+        "sequenceRole": "practice",
+        "width": 4,
+        "height": 4,
+        "anchorRule": "top_bottom",
+        "pinnedPositions": [
+          -1
+        ],
+        "cornerColorsTLTRBLBR": [
+          "#E5B8B2",
+          "#ADB7E1",
+          "#BA7843",
+          "#416B73"
+        ],
+        "solvedTileColors": [
+          "#E5B8B2",
+          "#D2B8C2",
+          "#C0B7D1",
+          "#ADB7E1",
+          "#D7A38D",
+          "#BDA19D",
+          "#A39FAD",
+          "#899EBC",
+          "#C88D68",
+          "#A78A78",
+          "#868788",
+          "#658498",
+          "#BA7843",
+          "#927453",
+          "#696F63",
+          "#416B73"
+        ],
+        "startTileAtPosition": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          6,
+          9,
+          4,
+          10,
+          8,
+          11,
+          7,
+          12,
+          13,
+          14,
+          15
+        ],
+        "seed": 4255260502,
+        "minimumSwaps": 7
+      },
+      "expected": {
+        "errors": [
+          "PIN_INDEX"
+        ],
+        "warnings": []
+      }
+    },
+    {
+      "case": "boolean pin",
+      "input": {
+        "id": "gradient-006",
+        "ordinal": 6,
+        "title": "Опора сверху и снизу",
+        "intent": "Восстановить промежуточные строки между двумя закреплёнными краями.",
+        "sequenceRole": "practice",
+        "width": 4,
+        "height": 4,
+        "anchorRule": "top_bottom",
+        "pinnedPositions": [
+          true,
+          2
+        ],
+        "cornerColorsTLTRBLBR": [
+          "#E5B8B2",
+          "#ADB7E1",
+          "#BA7843",
+          "#416B73"
+        ],
+        "solvedTileColors": [
+          "#E5B8B2",
+          "#D2B8C2",
+          "#C0B7D1",
+          "#ADB7E1",
+          "#D7A38D",
+          "#BDA19D",
+          "#A39FAD",
+          "#899EBC",
+          "#C88D68",
+          "#A78A78",
+          "#868788",
+          "#658498",
+          "#BA7843",
+          "#927453",
+          "#696F63",
+          "#416B73"
+        ],
+        "startTileAtPosition": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          6,
+          9,
+          4,
+          10,
+          8,
+          11,
+          7,
+          12,
+          13,
+          14,
+          15
+        ],
+        "seed": 4255260502,
+        "minimumSwaps": 7
+      },
+      "expected": {
+        "errors": [
+          "PIN_INDEX"
+        ],
+        "warnings": []
+      }
+    },
+    {
+      "case": "invalid RGB",
+      "input": {
+        "id": "gradient-006",
+        "ordinal": 6,
+        "title": "Опора сверху и снизу",
+        "intent": "Восстановить промежуточные строки между двумя закреплёнными краями.",
+        "sequenceRole": "practice",
+        "width": 4,
+        "height": 4,
+        "anchorRule": "top_bottom",
+        "pinnedPositions": [
+          0,
+          1,
+          2,
+          3,
+          12,
+          13,
+          14,
+          15
+        ],
+        "cornerColorsTLTRBLBR": [
+          "#E5B8B2",
+          "#ADB7E1",
+          "#BA7843",
+          "#416B73"
+        ],
+        "solvedTileColors": [
+          "red",
+          "#D2B8C2",
+          "#C0B7D1",
+          "#ADB7E1",
+          "#D7A38D",
+          "#BDA19D",
+          "#A39FAD",
+          "#899EBC",
+          "#C88D68",
+          "#A78A78",
+          "#868788",
+          "#658498",
+          "#BA7843",
+          "#927453",
+          "#696F63",
+          "#416B73"
+        ],
+        "startTileAtPosition": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          6,
+          9,
+          4,
+          10,
+          8,
+          11,
+          7,
+          12,
+          13,
+          14,
+          15
+        ],
+        "seed": 4255260502,
+        "minimumSwaps": 7
+      },
+      "expected": {
+        "errors": [
+          "COLORS"
+        ],
+        "warnings": []
+      }
+    },
+    {
+      "case": "short color array",
+      "input": {
+        "id": "gradient-006",
+        "ordinal": 6,
+        "title": "Опора сверху и снизу",
+        "intent": "Восстановить промежуточные строки между двумя закреплёнными краями.",
+        "sequenceRole": "practice",
+        "width": 4,
+        "height": 4,
+        "anchorRule": "top_bottom",
+        "pinnedPositions": [
+          0,
+          1,
+          2,
+          3,
+          12,
+          13,
+          14,
+          15
+        ],
+        "cornerColorsTLTRBLBR": [
+          "#E5B8B2",
+          "#ADB7E1",
+          "#BA7843",
+          "#416B73"
+        ],
+        "solvedTileColors": [
+          "#E5B8B2",
+          "#D2B8C2",
+          "#C0B7D1",
+          "#ADB7E1",
+          "#D7A38D",
+          "#BDA19D",
+          "#A39FAD",
+          "#899EBC",
+          "#C88D68",
+          "#A78A78",
+          "#868788",
+          "#658498",
+          "#BA7843",
+          "#927453",
+          "#696F63"
+        ],
+        "startTileAtPosition": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          6,
+          9,
+          4,
+          10,
+          8,
+          11,
+          7,
+          12,
+          13,
+          14,
+          15
+        ],
+        "seed": 4255260502,
+        "minimumSwaps": 7
+      },
+      "expected": {
+        "errors": [
+          "COLORS"
+        ],
+        "warnings": []
+      }
+    },
+    {
+      "case": "duplicate permutation",
+      "input": {
+        "id": "gradient-006",
+        "ordinal": 6,
+        "title": "Опора сверху и снизу",
+        "intent": "Восстановить промежуточные строки между двумя закреплёнными краями.",
+        "sequenceRole": "practice",
+        "width": 4,
+        "height": 4,
+        "anchorRule": "top_bottom",
+        "pinnedPositions": [
+          0,
+          1,
+          2,
+          3,
+          12,
+          13,
+          14,
+          15
+        ],
+        "cornerColorsTLTRBLBR": [
+          "#E5B8B2",
+          "#ADB7E1",
+          "#BA7843",
+          "#416B73"
+        ],
+        "solvedTileColors": [
+          "#E5B8B2",
+          "#D2B8C2",
+          "#C0B7D1",
+          "#ADB7E1",
+          "#D7A38D",
+          "#BDA19D",
+          "#A39FAD",
+          "#899EBC",
+          "#C88D68",
+          "#A78A78",
+          "#868788",
+          "#658498",
+          "#BA7843",
+          "#927453",
+          "#696F63",
+          "#416B73"
+        ],
+        "startTileAtPosition": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "seed": 4255260502,
+        "minimumSwaps": 7
+      },
+      "expected": {
+        "errors": [
+          "PERMUTATION"
+        ],
+        "warnings": []
+      }
+    },
+    {
+      "case": "moving a pinned tile",
+      "input": {
+        "id": "gradient-006",
+        "ordinal": 6,
+        "title": "Опора сверху и снизу",
+        "intent": "Восстановить промежуточные строки между двумя закреплёнными краями.",
+        "sequenceRole": "practice",
+        "width": 4,
+        "height": 4,
+        "anchorRule": "top_bottom",
+        "pinnedPositions": [
+          0,
+          1,
+          2,
+          3,
+          12,
+          13,
+          14,
+          15
+        ],
+        "cornerColorsTLTRBLBR": [
+          "#E5B8B2",
+          "#ADB7E1",
+          "#BA7843",
+          "#416B73"
+        ],
+        "solvedTileColors": [
+          "#E5B8B2",
+          "#D2B8C2",
+          "#C0B7D1",
+          "#ADB7E1",
+          "#D7A38D",
+          "#BDA19D",
+          "#A39FAD",
+          "#899EBC",
+          "#C88D68",
+          "#A78A78",
+          "#868788",
+          "#658498",
+          "#BA7843",
+          "#927453",
+          "#696F63",
+          "#416B73"
+        ],
+        "startTileAtPosition": [
+          1,
+          0,
+          2,
+          3,
+          5,
+          6,
+          9,
+          4,
+          10,
+          8,
+          11,
+          7,
+          12,
+          13,
+          14,
+          15
+        ],
+        "seed": 4255260502,
+        "minimumSwaps": 7
+      },
+      "expected": {
+        "errors": [
+          "PIN_MOVED"
+        ],
+        "warnings": [],
+        "minimumSwaps": 8,
+        "minimumNominalOklab": 0.041081225,
+        "closestMovablePair": [
+          6,
+          7
+        ],
+        "orientationAmbiguities": [],
+        "fingerprint": "9f3dbb967f2f63afae28319b1cf6c833ca87eab2b6297bdef2e92fc8d0a8fb2e"
+      }
+    },
+    {
+      "case": "no anchors",
+      "input": {
+        "id": "gradient-006",
+        "ordinal": 6,
+        "title": "Опора сверху и снизу",
+        "intent": "Восстановить промежуточные строки между двумя закреплёнными краями.",
+        "sequenceRole": "practice",
+        "width": 4,
+        "height": 4,
+        "anchorRule": "top_bottom",
+        "pinnedPositions": [],
+        "cornerColorsTLTRBLBR": [
+          "#E5B8B2",
+          "#ADB7E1",
+          "#BA7843",
+          "#416B73"
+        ],
+        "solvedTileColors": [
+          "#E5B8B2",
+          "#D2B8C2",
+          "#C0B7D1",
+          "#ADB7E1",
+          "#D7A38D",
+          "#BDA19D",
+          "#A39FAD",
+          "#899EBC",
+          "#C88D68",
+          "#A78A78",
+          "#868788",
+          "#658498",
+          "#BA7843",
+          "#927453",
+          "#696F63",
+          "#416B73"
+        ],
+        "startTileAtPosition": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          0
+        ],
+        "seed": 4255260502,
+        "minimumSwaps": 7
+      },
+      "expected": {
+        "errors": [
+          "ANCHOR_COUNT",
+          "ANCHOR_COLORS",
+          "ORIENTATION_AMBIGUITY"
+        ],
+        "warnings": [],
+        "minimumSwaps": 15,
+        "minimumNominalOklab": 0.033194004,
+        "closestMovablePair": [
+          1,
+          2
+        ],
+        "orientationAmbiguities": [
+          "mirror-x",
+          "mirror-y",
+          "rotate-180",
+          "transpose",
+          "anti-transpose",
+          "rotate-90",
+          "rotate-270"
+        ],
+        "fingerprint": "151138d58fb019abd325f0d477bc59b1d7550d51973da798ed0bdb01ae4b3205"
+      }
+    },
+    {
+      "case": "one movable tile",
+      "input": {
+        "id": "gradient-006",
+        "ordinal": 6,
+        "title": "Опора сверху и снизу",
+        "intent": "Восстановить промежуточные строки между двумя закреплёнными краями.",
+        "sequenceRole": "practice",
+        "width": 4,
+        "height": 4,
+        "anchorRule": "top_bottom",
+        "pinnedPositions": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+        ],
+        "cornerColorsTLTRBLBR": [
+          "#E5B8B2",
+          "#ADB7E1",
+          "#BA7843",
+          "#416B73"
+        ],
+        "solvedTileColors": [
+          "#E5B8B2",
+          "#D2B8C2",
+          "#C0B7D1",
+          "#ADB7E1",
+          "#D7A38D",
+          "#BDA19D",
+          "#A39FAD",
+          "#899EBC",
+          "#C88D68",
+          "#A78A78",
+          "#868788",
+          "#658498",
+          "#BA7843",
+          "#927453",
+          "#696F63",
+          "#416B73"
+        ],
+        "startTileAtPosition": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "seed": 4255260502,
+        "minimumSwaps": 7
+      },
+      "expected": {
+        "errors": [
+          "MOVABLE_COUNT",
+          "ALREADY_SOLVED_START"
+        ],
+        "warnings": [],
+        "minimumSwaps": 0,
+        "minimumNominalOklab": null,
+        "closestMovablePair": null,
+        "orientationAmbiguities": [],
+        "fingerprint": "fc46a132d987296008bc5c21c1b3c8e0b96c5b32f371d422d5484b424b8e718a"
+      }
+    },
+    {
+      "case": "solved initial board",
+      "input": {
+        "id": "gradient-006",
+        "ordinal": 6,
+        "title": "Опора сверху и снизу",
+        "intent": "Восстановить промежуточные строки между двумя закреплёнными краями.",
+        "sequenceRole": "practice",
+        "width": 4,
+        "height": 4,
+        "anchorRule": "top_bottom",
+        "pinnedPositions": [
+          0,
+          1,
+          2,
+          3,
+          12,
+          13,
+          14,
+          15
+        ],
+        "cornerColorsTLTRBLBR": [
+          "#E5B8B2",
+          "#ADB7E1",
+          "#BA7843",
+          "#416B73"
+        ],
+        "solvedTileColors": [
+          "#E5B8B2",
+          "#D2B8C2",
+          "#C0B7D1",
+          "#ADB7E1",
+          "#D7A38D",
+          "#BDA19D",
+          "#A39FAD",
+          "#899EBC",
+          "#C88D68",
+          "#A78A78",
+          "#868788",
+          "#658498",
+          "#BA7843",
+          "#927453",
+          "#696F63",
+          "#416B73"
+        ],
+        "startTileAtPosition": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "seed": 4255260502,
+        "minimumSwaps": 7
+      },
+      "expected": {
+        "errors": [
+          "ALREADY_SOLVED_START"
+        ],
+        "warnings": [],
+        "minimumSwaps": 0,
+        "minimumNominalOklab": 0.041081225,
+        "closestMovablePair": [
+          6,
+          7
+        ],
+        "orientationAmbiguities": [],
+        "fingerprint": "85d98494680d8b8828f69ee434738da09804b142de99a9a4ae6b873674811309"
+      }
+    },
+    {
+      "case": "malformed corner colors",
+      "input": {
+        "id": "gradient-006",
+        "ordinal": 6,
+        "title": "Опора сверху и снизу",
+        "intent": "Восстановить промежуточные строки между двумя закреплёнными краями.",
+        "sequenceRole": "practice",
+        "width": 4,
+        "height": 4,
+        "anchorRule": "top_bottom",
+        "pinnedPositions": [
+          0,
+          1,
+          2,
+          3,
+          12,
+          13,
+          14,
+          15
+        ],
+        "cornerColorsTLTRBLBR": [
+          "#000000"
+        ],
+        "solvedTileColors": [
+          "#E5B8B2",
+          "#D2B8C2",
+          "#C0B7D1",
+          "#ADB7E1",
+          "#D7A38D",
+          "#BDA19D",
+          "#A39FAD",
+          "#899EBC",
+          "#C88D68",
+          "#A78A78",
+          "#868788",
+          "#658498",
+          "#BA7843",
+          "#927453",
+          "#696F63",
+          "#416B73"
+        ],
+        "startTileAtPosition": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          6,
+          9,
+          4,
+          10,
+          8,
+          11,
+          7,
+          12,
+          13,
+          14,
+          15
+        ],
+        "seed": 4255260502,
+        "minimumSwaps": 7
+      },
+      "expected": {
+        "errors": [
+          "CORNERS"
+        ],
+        "warnings": [],
+        "minimumSwaps": 7,
+        "minimumNominalOklab": 0.041081225,
+        "closestMovablePair": [
+          6,
+          7
+        ],
+        "orientationAmbiguities": [],
+        "fingerprint": "afdd5d4d141ad1affca5ef2a8eb6b4b3a83d35a91d8f8932526a9b4cc8b584ae"
+      }
+    },
+    {
+      "case": "rendered RGB disagrees with corners",
+      "input": {
+        "id": "gradient-006",
+        "ordinal": 6,
+        "title": "Опора сверху и снизу",
+        "intent": "Восстановить промежуточные строки между двумя закреплёнными краями.",
+        "sequenceRole": "practice",
+        "width": 4,
+        "height": 4,
+        "anchorRule": "top_bottom",
+        "pinnedPositions": [
+          0,
+          1,
+          2,
+          3,
+          12,
+          13,
+          14,
+          15
+        ],
+        "cornerColorsTLTRBLBR": [
+          "#E5B8B2",
+          "#ADB7E1",
+          "#BA7843",
+          "#416B73"
+        ],
+        "solvedTileColors": [
+          "#012345",
+          "#D2B8C2",
+          "#C0B7D1",
+          "#ADB7E1",
+          "#D7A38D",
+          "#BDA19D",
+          "#A39FAD",
+          "#899EBC",
+          "#C88D68",
+          "#A78A78",
+          "#868788",
+          "#658498",
+          "#BA7843",
+          "#927453",
+          "#696F63",
+          "#416B73"
+        ],
+        "startTileAtPosition": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          6,
+          9,
+          4,
+          10,
+          8,
+          11,
+          7,
+          12,
+          13,
+          14,
+          15
+        ],
+        "seed": 4255260502,
+        "minimumSwaps": 7
+      },
+      "expected": {
+        "errors": [
+          "COLOR_RECONSTRUCTION"
+        ],
+        "warnings": [],
+        "minimumSwaps": 7,
+        "minimumNominalOklab": 0.041081225,
+        "closestMovablePair": [
+          6,
+          7
+        ],
+        "orientationAmbiguities": [],
+        "fingerprint": "ce2c9526f0b1620d011dbc90d4c29d155755df2a3a030b1f4a11ced0f6fcc6b6"
+      }
+    },
+    {
+      "case": "white board rejected",
+      "input": {
+        "id": "gradient-006",
+        "ordinal": 6,
+        "title": "Опора сверху и снизу",
+        "intent": "Восстановить промежуточные строки между двумя закреплёнными краями.",
+        "sequenceRole": "practice",
+        "width": 4,
+        "height": 4,
+        "anchorRule": "top_bottom",
+        "pinnedPositions": [
+          0,
+          1,
+          2,
+          3,
+          12,
+          13,
+          14,
+          15
+        ],
+        "cornerColorsTLTRBLBR": [
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF"
+        ],
+        "solvedTileColors": [
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF"
+        ],
+        "startTileAtPosition": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          6,
+          9,
+          4,
+          10,
+          8,
+          11,
+          7,
+          12,
+          13,
+          14,
+          15
+        ],
+        "seed": 4255260502,
+        "minimumSwaps": 7
+      },
+      "expected": {
+        "errors": [
+          "DUPLICATE_MOVABLE_RGB",
+          "ANCHOR_COLORS"
+        ],
+        "warnings": [
+          "CLOSE_COLORS_REVIEW"
+        ],
+        "minimumSwaps": 7,
+        "minimumNominalOklab": 0.0,
+        "closestMovablePair": [
+          4,
+          5
+        ],
+        "orientationAmbiguities": [],
+        "fingerprint": "6f3cf5022aae02fbd1e644521ab60a4f112db570e82ecc2bfe5b158d69dabf93"
+      }
+    },
+    {
+      "case": "white anchors rejected",
+      "input": {
+        "id": "gradient-006",
+        "ordinal": 6,
+        "title": "Опора сверху и снизу",
+        "intent": "Восстановить промежуточные строки между двумя закреплёнными краями.",
+        "sequenceRole": "practice",
+        "width": 4,
+        "height": 4,
+        "anchorRule": "top_bottom",
+        "pinnedPositions": [
+          0,
+          1,
+          2,
+          3,
+          12,
+          13,
+          14,
+          15
+        ],
+        "cornerColorsTLTRBLBR": [
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF"
+        ],
+        "solvedTileColors": [
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF"
+        ],
+        "startTileAtPosition": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          6,
+          9,
+          4,
+          10,
+          8,
+          11,
+          7,
+          12,
+          13,
+          14,
+          15
+        ],
+        "seed": 4255260502,
+        "minimumSwaps": 7
+      },
+      "expected": {
+        "errors": [
+          "DUPLICATE_MOVABLE_RGB",
+          "ANCHOR_COLORS"
+        ],
+        "warnings": [
+          "CLOSE_COLORS_REVIEW"
+        ],
+        "minimumSwaps": 7,
+        "minimumNominalOklab": 0.0,
+        "closestMovablePair": [
+          4,
+          5
+        ],
+        "orientationAmbiguities": [],
+        "fingerprint": "6f3cf5022aae02fbd1e644521ab60a4f112db570e82ecc2bfe5b158d69dabf93"
+      }
+    },
+    {
+      "case": "diagonal anchors allow transpose",
+      "input": {
+        "width": 3,
+        "height": 3,
+        "pinnedPositions": [
+          0,
+          4,
+          8
+        ],
+        "cornerColorsTLTRBLBR": [
+          "#101010",
+          "#E01010",
+          "#10E010",
+          "#E0E010"
+        ],
+        "solvedTileColors": [
+          "#101010",
+          "#781010",
+          "#E01010",
+          "#107810",
+          "#787810",
+          "#E07810",
+          "#10E010",
+          "#78E010",
+          "#E0E010"
+        ],
+        "startTileAtPosition": [
+          0,
+          2,
+          3,
+          5,
+          4,
+          6,
+          7,
+          1,
+          8
+        ]
+      },
+      "expected": {
+        "errors": [
+          "ORIENTATION_AMBIGUITY"
+        ],
+        "warnings": [],
+        "minimumSwaps": 5,
+        "minimumNominalOklab": 0.05123648,
+        "closestMovablePair": [
+          6,
+          7
+        ],
+        "orientationAmbiguities": [
+          "transpose"
+        ],
+        "fingerprint": "1724e8ca2c071dd207b3f4eb62fbe1589a2b34f3992ceea2933d12b95e2482eb"
+      }
+    },
+    {
+      "case": "four distinct corners remove transpose ambiguity",
+      "input": {
+        "width": 3,
+        "height": 3,
+        "pinnedPositions": [
+          0,
+          2,
+          6,
+          8
+        ],
+        "cornerColorsTLTRBLBR": [
+          "#101010",
+          "#E01010",
+          "#10E010",
+          "#E0E010"
+        ],
+        "solvedTileColors": [
+          "#101010",
+          "#781010",
+          "#E01010",
+          "#107810",
+          "#787810",
+          "#E07810",
+          "#10E010",
+          "#78E010",
+          "#E0E010"
+        ],
+        "startTileAtPosition": [
+          0,
+          3,
+          2,
+          4,
+          5,
+          7,
+          6,
+          1,
+          8
+        ]
+      },
+      "expected": {
+        "errors": [],
+        "warnings": [],
+        "minimumSwaps": 4,
+        "minimumNominalOklab": 0.105989482,
+        "closestMovablePair": [
+          3,
+          4
+        ],
+        "orientationAmbiguities": [],
+        "fingerprint": "bb34eb42d1598bff623ab99405f309130800daf1ba7259848cb65a3ed86d44b5"
+      }
+    },
+    {
+      "case": "different anchors but duplicate movable RGB",
+      "input": {
+        "width": 3,
+        "height": 3,
+        "pinnedPositions": [
+          0,
+          2,
+          6,
+          8
+        ],
+        "cornerColorsTLTRBLBR": [
+          "#000000",
+          "#808080",
+          "#808080",
+          "#FFFFFF"
+        ],
+        "solvedTileColors": [
+          "#000000",
+          "#404040",
+          "#808080",
+          "#404040",
+          "#808080",
+          "#C0C0C0",
+          "#808080",
+          "#C0C0C0",
+          "#FFFFFF"
+        ],
+        "startTileAtPosition": [
+          0,
+          3,
+          2,
+          4,
+          5,
+          7,
+          6,
+          1,
+          8
+        ]
+      },
+      "expected": {
+        "errors": [
+          "DUPLICATE_MOVABLE_RGB"
+        ],
+        "warnings": [
+          "CLOSE_COLORS_REVIEW"
+        ],
+        "minimumSwaps": 4,
+        "minimumNominalOklab": 0.0,
+        "closestMovablePair": [
+          1,
+          3
+        ],
+        "orientationAmbiguities": [],
+        "fingerprint": "15594499f2383b1e21bfbca89934108899a749596843f790f2cd3f3474a550a0"
+      }
+    },
+    {
+      "case": "close colors warn but do not reject",
+      "input": {
+        "id": "gradient-053",
+        "ordinal": 53,
+        "title": "Композиция 53",
+        "intent": "Восстановить направление одного ряда; короткое знакомое действие.",
+        "sequenceRole": "recovery",
+        "width": 6,
+        "height": 1,
+        "anchorRule": "ends",
+        "pinnedPositions": [
+          0,
+          5
+        ],
+        "cornerColorsTLTRBLBR": [
+          "#6CDAAC",
+          "#D5E8BF",
+          "#6CDAAC",
+          "#D5E8BF"
+        ],
+        "solvedTileColors": [
+          "#6CDAAC",
+          "#81DDB0",
+          "#96E0B4",
+          "#ABE2B7",
+          "#C0E5BB",
+          "#D5E8BF"
+        ],
+        "startTileAtPosition": [
+          0,
+          3,
+          4,
+          2,
+          1,
+          5
+        ],
+        "seed": 79528337,
+        "minimumSwaps": 3
+      },
+      "expected": {
+        "errors": [],
+        "warnings": [
+          "CLOSE_COLORS_REVIEW"
+        ],
+        "minimumSwaps": 3,
+        "minimumNominalOklab": 0.023860695,
+        "closestMovablePair": [
+          1,
+          2
+        ],
+        "orientationAmbiguities": [],
+        "fingerprint": "07afa9890fd19a1f627b9cbc023dd8ae7a4ab439d5ed9158c446da2d1536811c"
+      }
+    },
+    {
+      "case": "one row with distinct endpoints",
+      "input": {
+        "width": 6,
+        "height": 1,
+        "pinnedPositions": [
+          0,
+          5
+        ],
+        "cornerColorsTLTRBLBR": [
+          "#000000",
+          "#FFFFFF",
+          "#000000",
+          "#FFFFFF"
+        ],
+        "solvedTileColors": [
+          "#000000",
+          "#333333",
+          "#666666",
+          "#999999",
+          "#CCCCCC",
+          "#FFFFFF"
+        ],
+        "startTileAtPosition": [
+          0,
+          2,
+          3,
+          4,
+          1,
+          5
+        ]
+      },
+      "expected": {
+        "errors": [],
+        "warnings": [],
+        "minimumSwaps": 3,
+        "minimumNominalOklab": 0.162268853,
+        "closestMovablePair": [
+          3,
+          4
+        ],
+        "orientationAmbiguities": [],
+        "fingerprint": "80a7cc03fa8adc315515c02e2b02742628d64957985623fef6c9593a53a7802d"
+      }
+    },
+    {
+      "case": "metadata is not gameplay revision",
+      "left": {
+        "input": {
+          "width": 6,
+          "height": 1,
+          "pinnedPositions": [
+            0,
+            5
+          ],
+          "cornerColorsTLTRBLBR": [
+            "#000000",
+            "#FFFFFF",
+            "#000000",
+            "#FFFFFF"
+          ],
+          "solvedTileColors": [
+            "#000000",
+            "#333333",
+            "#666666",
+            "#999999",
+            "#CCCCCC",
+            "#FFFFFF"
+          ],
+          "startTileAtPosition": [
+            0,
+            2,
+            3,
+            4,
+            1,
+            5
+          ]
+        },
+        "sha256": "80a7cc03fa8adc315515c02e2b02742628d64957985623fef6c9593a53a7802d"
+      },
+      "right": {
+        "input": {
+          "width": 6,
+          "height": 1,
+          "pinnedPositions": [
+            0,
+            5
+          ],
+          "cornerColorsTLTRBLBR": [
+            "#000000",
+            "#FFFFFF",
+            "#000000",
+            "#FFFFFF"
+          ],
+          "solvedTileColors": [
+            "#000000",
+            "#333333",
+            "#666666",
+            "#999999",
+            "#CCCCCC",
+            "#FFFFFF"
+          ],
+          "startTileAtPosition": [
+            0,
+            2,
+            3,
+            4,
+            1,
+            5
+          ],
+          "id": "renamed-id",
+          "title": "Новое имя",
+          "seed": 999,
+          "author": "example"
+        },
+        "sha256": "80a7cc03fa8adc315515c02e2b02742628d64957985623fef6c9593a53a7802d"
+      },
+      "fingerprintEqual": true
+    },
+    {
+      "case": "pin order is not gameplay revision",
+      "left": {
+        "input": {
+          "width": 6,
+          "height": 1,
+          "pinnedPositions": [
+            0,
+            5
+          ],
+          "cornerColorsTLTRBLBR": [
+            "#000000",
+            "#FFFFFF",
+            "#000000",
+            "#FFFFFF"
+          ],
+          "solvedTileColors": [
+            "#000000",
+            "#333333",
+            "#666666",
+            "#999999",
+            "#CCCCCC",
+            "#FFFFFF"
+          ],
+          "startTileAtPosition": [
+            0,
+            2,
+            3,
+            4,
+            1,
+            5
+          ]
+        },
+        "sha256": "80a7cc03fa8adc315515c02e2b02742628d64957985623fef6c9593a53a7802d"
+      },
+      "right": {
+        "input": {
+          "width": 6,
+          "height": 1,
+          "pinnedPositions": [
+            5,
+            0
+          ],
+          "cornerColorsTLTRBLBR": [
+            "#000000",
+            "#FFFFFF",
+            "#000000",
+            "#FFFFFF"
+          ],
+          "solvedTileColors": [
+            "#000000",
+            "#333333",
+            "#666666",
+            "#999999",
+            "#CCCCCC",
+            "#FFFFFF"
+          ],
+          "startTileAtPosition": [
+            0,
+            2,
+            3,
+            4,
+            1,
+            5
+          ]
+        },
+        "sha256": "80a7cc03fa8adc315515c02e2b02742628d64957985623fef6c9593a53a7802d"
+      },
+      "fingerprintEqual": true
+    },
+    {
+      "case": "hex case is not gameplay revision",
+      "left": {
+        "input": {
+          "width": 6,
+          "height": 1,
+          "pinnedPositions": [
+            0,
+            5
+          ],
+          "cornerColorsTLTRBLBR": [
+            "#000000",
+            "#FFFFFF",
+            "#000000",
+            "#FFFFFF"
+          ],
+          "solvedTileColors": [
+            "#000000",
+            "#333333",
+            "#666666",
+            "#999999",
+            "#CCCCCC",
+            "#FFFFFF"
+          ],
+          "startTileAtPosition": [
+            0,
+            2,
+            3,
+            4,
+            1,
+            5
+          ]
+        },
+        "sha256": "80a7cc03fa8adc315515c02e2b02742628d64957985623fef6c9593a53a7802d"
+      },
+      "right": {
+        "input": {
+          "width": 6,
+          "height": 1,
+          "pinnedPositions": [
+            0,
+            5
+          ],
+          "cornerColorsTLTRBLBR": [
+            "#000000",
+            "#FFFFFF",
+            "#000000",
+            "#FFFFFF"
+          ],
+          "solvedTileColors": [
+            "#000000",
+            "#333333",
+            "#666666",
+            "#999999",
+            "#cccccc",
+            "#ffffff"
+          ],
+          "startTileAtPosition": [
+            0,
+            2,
+            3,
+            4,
+            1,
+            5
+          ]
+        },
+        "sha256": "80a7cc03fa8adc315515c02e2b02742628d64957985623fef6c9593a53a7802d"
+      },
+      "fingerprintEqual": true
+    },
+    {
+      "case": "unused corners do not affect one-row reconstruction",
+      "input": {
+        "width": 6,
+        "height": 1,
+        "pinnedPositions": [
+          0,
+          5
+        ],
+        "cornerColorsTLTRBLBR": [
+          "#000000",
+          "#FFFFFF",
+          "#FF0000",
+          "#00FF00"
+        ],
+        "solvedTileColors": [
+          "#000000",
+          "#333333",
+          "#666666",
+          "#999999",
+          "#CCCCCC",
+          "#FFFFFF"
+        ],
+        "startTileAtPosition": [
+          0,
+          2,
+          3,
+          4,
+          1,
+          5
+        ]
+      },
+      "expected": {
+        "errors": [],
+        "warnings": [],
+        "minimumSwaps": 3,
+        "minimumNominalOklab": 0.162268853,
+        "closestMovablePair": [
+          3,
+          4
+        ],
+        "orientationAmbiguities": [],
+        "fingerprint": "80a7cc03fa8adc315515c02e2b02742628d64957985623fef6c9593a53a7802d"
+      }
+    },
+    {
+      "case": "unused corner parameters are not gameplay revision",
+      "left": {
+        "input": {
+          "width": 6,
+          "height": 1,
+          "pinnedPositions": [
+            0,
+            5
+          ],
+          "cornerColorsTLTRBLBR": [
+            "#000000",
+            "#FFFFFF",
+            "#000000",
+            "#FFFFFF"
+          ],
+          "solvedTileColors": [
+            "#000000",
+            "#333333",
+            "#666666",
+            "#999999",
+            "#CCCCCC",
+            "#FFFFFF"
+          ],
+          "startTileAtPosition": [
+            0,
+            2,
+            3,
+            4,
+            1,
+            5
+          ]
+        },
+        "sha256": "80a7cc03fa8adc315515c02e2b02742628d64957985623fef6c9593a53a7802d"
+      },
+      "right": {
+        "input": {
+          "width": 6,
+          "height": 1,
+          "pinnedPositions": [
+            0,
+            5
+          ],
+          "cornerColorsTLTRBLBR": [
+            "#000000",
+            "#FFFFFF",
+            "#FF0000",
+            "#00FF00"
+          ],
+          "solvedTileColors": [
+            "#000000",
+            "#333333",
+            "#666666",
+            "#999999",
+            "#CCCCCC",
+            "#FFFFFF"
+          ],
+          "startTileAtPosition": [
+            0,
+            2,
+            3,
+            4,
+            1,
+            5
+          ]
+        },
+        "sha256": "80a7cc03fa8adc315515c02e2b02742628d64957985623fef6c9593a53a7802d"
+      },
+      "fingerprintEqual": true
+    },
+    {
+      "case": "different start invalidates completion",
+      "left": {
+        "input": {
+          "width": 6,
+          "height": 1,
+          "pinnedPositions": [
+            0,
+            5
+          ],
+          "cornerColorsTLTRBLBR": [
+            "#000000",
+            "#FFFFFF",
+            "#000000",
+            "#FFFFFF"
+          ],
+          "solvedTileColors": [
+            "#000000",
+            "#333333",
+            "#666666",
+            "#999999",
+            "#CCCCCC",
+            "#FFFFFF"
+          ],
+          "startTileAtPosition": [
+            0,
+            2,
+            3,
+            4,
+            1,
+            5
+          ]
+        },
+        "sha256": "80a7cc03fa8adc315515c02e2b02742628d64957985623fef6c9593a53a7802d"
+      },
+      "right": {
+        "input": {
+          "width": 6,
+          "height": 1,
+          "pinnedPositions": [
+            0,
+            5
+          ],
+          "cornerColorsTLTRBLBR": [
+            "#000000",
+            "#FFFFFF",
+            "#000000",
+            "#FFFFFF"
+          ],
+          "solvedTileColors": [
+            "#000000",
+            "#333333",
+            "#666666",
+            "#999999",
+            "#CCCCCC",
+            "#FFFFFF"
+          ],
+          "startTileAtPosition": [
+            0,
+            4,
+            1,
+            2,
+            3,
+            5
+          ]
+        },
+        "sha256": "820649dbbbf58c9531bb68f2f9a424b911a839a24f98bcea3172fb88929366c4"
+      },
+      "fingerprintEqual": false
+    },
+    {
+      "case": "visible RGB invalidates completion",
+      "left": {
+        "input": {
+          "width": 6,
+          "height": 1,
+          "pinnedPositions": [
+            0,
+            5
+          ],
+          "cornerColorsTLTRBLBR": [
+            "#000000",
+            "#FFFFFF",
+            "#000000",
+            "#FFFFFF"
+          ],
+          "solvedTileColors": [
+            "#000000",
+            "#333333",
+            "#666666",
+            "#999999",
+            "#CCCCCC",
+            "#FFFFFF"
+          ],
+          "startTileAtPosition": [
+            0,
+            2,
+            3,
+            4,
+            1,
+            5
+          ]
+        },
+        "sha256": "80a7cc03fa8adc315515c02e2b02742628d64957985623fef6c9593a53a7802d"
+      },
+      "right": {
+        "input": {
+          "width": 6,
+          "height": 1,
+          "pinnedPositions": [
+            0,
+            5
+          ],
+          "cornerColorsTLTRBLBR": [
+            "#000000",
+            "#FFFFFF",
+            "#000000",
+            "#FFFFFF"
+          ],
+          "solvedTileColors": [
+            "#000000",
+            "#343434",
+            "#666666",
+            "#999999",
+            "#CCCCCC",
+            "#FFFFFF"
+          ],
+          "startTileAtPosition": [
+            0,
+            2,
+            3,
+            4,
+            1,
+            5
+          ]
+        },
+        "sha256": "5378c6002c5a94c9cd743336efdcdafdf54440abdb8e0c6952e62d904fe8577b"
+      },
+      "fingerprintEqual": false
+    },
+    {
+      "case": "pin mask invalidates completion",
+      "left": {
+        "input": {
+          "width": 6,
+          "height": 1,
+          "pinnedPositions": [
+            0,
+            5
+          ],
+          "cornerColorsTLTRBLBR": [
+            "#000000",
+            "#FFFFFF",
+            "#000000",
+            "#FFFFFF"
+          ],
+          "solvedTileColors": [
+            "#000000",
+            "#333333",
+            "#666666",
+            "#999999",
+            "#CCCCCC",
+            "#FFFFFF"
+          ],
+          "startTileAtPosition": [
+            0,
+            2,
+            3,
+            4,
+            1,
+            5
+          ]
+        },
+        "sha256": "80a7cc03fa8adc315515c02e2b02742628d64957985623fef6c9593a53a7802d"
+      },
+      "right": {
+        "input": {
+          "width": 6,
+          "height": 1,
+          "pinnedPositions": [
+            0,
+            4,
+            5
+          ],
+          "cornerColorsTLTRBLBR": [
+            "#000000",
+            "#FFFFFF",
+            "#000000",
+            "#FFFFFF"
+          ],
+          "solvedTileColors": [
+            "#000000",
+            "#333333",
+            "#666666",
+            "#999999",
+            "#CCCCCC",
+            "#FFFFFF"
+          ],
+          "startTileAtPosition": [
+            0,
+            2,
+            3,
+            4,
+            1,
+            5
+          ]
+        },
+        "sha256": "1a4050bc2a3bea7043c5f979849e11ec844794ab0632e58f7816aa0681185174"
+      },
+      "fingerprintEqual": false
+    }
+  ]
+}
