@@ -1,4 +1,4 @@
-import { ExportError, fitField, measuredLines, type ExportPlan } from '../domain/export';
+import { ExportError, fitField, measuredLines, type ExportField, type ExportPlan } from '../domain/export';
 
 // Provisional existing UI tokens; font approval is still an M2 owner-review gate.
 export const EXPORT_STYLE={paper:'#FFF2DE',ink:'#261E32',font:'52px system-ui, sans-serif',lineHeight:64};
@@ -26,11 +26,48 @@ export async function srgbPng(blob:Blob):Promise<Blob> {
   if(!ended||offset!==bytes.length)throw new ExportError('UNAVAILABLE','Повреждён PNG.');
   return new Blob(parts,{type:'image/png'});
 }
-export async function renderExport(plan:ExportPlan):Promise<Blob> {
-  const canvas=document.createElement('canvas');canvas.width=plan.layout.width;canvas.height=plan.layout.height;
-  const ctx=canvas.getContext('2d',{alpha:false,colorSpace:'srgb'});if(!ctx)throw new ExportError('UNAVAILABLE','Не удалось подготовить изображение. Попробуйте ещё раз.');
-  try {
-    ctx.imageSmoothingEnabled=false;ctx.fillStyle=EXPORT_STYLE.paper;ctx.fillRect(0,0,canvas.width,canvas.height);
+function samplesOnAxis(pixels: number, nodes: number) {
+  if (nodes === 1) return Array.from({ length: pixels }, () => ({ low: 0, high: 0, near: 1, far: 0, span: 1 }));
+  // Put nodes on the nearest pixel centres, including both outermost pixels.
+  const anchors = Array.from({ length: nodes }, (_, i) => Math.round(i * (pixels - 1) / (nodes - 1)));
+  let low = 0;
+  return Array.from({ length: pixels }, (_, pixel) => {
+    while (low + 1 < nodes - 1 && pixel > anchors[low + 1]!) low++;
+    const left = anchors[low]!, right = anchors[low + 1]!;
+    return { low, high: low + 1, near: right - pixel, far: pixel - left, span: right - left };
+  });
+}
+
+function drawGradient(ctx: CanvasRenderingContext2D, field: ExportField, width: number, height: number): void {
+  const image = ctx.createImageData(width, height);
+  const { data } = image;
+  const colours = field.solvedTileColors.map(colour => {
+    const rgb = Number.parseInt(colour.slice(1), 16);
+    return [rgb >>> 16, (rgb >>> 8) & 255, rgb & 255];
+  });
+  const horizontal = samplesOnAxis(width, field.width);
+  let index = 0;
+  for (const y of samplesOnAxis(height, field.height)) {
+    const top = y.low * field.width, bottom = y.high * field.width;
+    for (const x of horizontal) {
+      const a = colours[top + x.low]!, b = colours[top + x.high]!;
+      const c = colours[bottom + x.low]!, d = colours[bottom + x.high]!;
+      const span = x.span * y.span;
+      // Blend the encoded sRGB components and round only at the final pixel.
+      for (let channel = 0; channel < 3; channel++) {
+        const upper = a[channel]! * x.near + b[channel]! * x.far;
+        const lower = c[channel]! * x.near + d[channel]! * x.far;
+        data[index++] = Math.round((upper * y.near + lower * y.far) / span);
+      }
+      data[index++] = 255;
+    }
+  }
+  ctx.putImageData(image, 0, 0);
+}
+
+function drawLayout(ctx: CanvasRenderingContext2D, plan: ExportPlan): void {
+    const { width, height } = plan.layout;
+    ctx.imageSmoothingEnabled=false;ctx.fillStyle=EXPORT_STYLE.paper;ctx.fillRect(0,0,width,height);
     if(plan.format==='export-frame'){ctx.strokeStyle=EXPORT_STYLE.ink;ctx.lineWidth=4;ctx.strokeRect(96,96,1808,1808);}
     plan.works.forEach((work,index)=>{
       const f=work.field,fit=fitField(f,plan.layout.fields[index]!);
@@ -45,6 +82,14 @@ export async function renderExport(plan:ExportPlan):Promise<Blob> {
       if(ascent+descent+(lines.length-1)*EXPORT_STYLE.lineHeight>text.height)throw new ExportError('TEXT_OVERFLOW','Сократите подпись.');
       lines.forEach((line,i)=>{const m=ctx.measureText(line);if(measure(line)>text.width)throw new ExportError('TEXT_OVERFLOW','Сократите подпись.');ctx.fillText(line,text.x+Math.ceil(Math.max(0,m.actualBoundingBoxLeft)),text.y+ascent+i*EXPORT_STYLE.lineHeight);});
     }
+}
+
+export async function renderExport(plan:ExportPlan):Promise<Blob> {
+  const canvas=document.createElement('canvas');canvas.width=plan.layout.width;canvas.height=plan.layout.height;
+  const ctx=canvas.getContext('2d',{alpha:false,colorSpace:'srgb'});if(!ctx)throw new ExportError('UNAVAILABLE','Не удалось подготовить изображение. Попробуйте ещё раз.');
+  try {
+    if (plan.format === 'clean') drawGradient(ctx, plan.works[0]!.field, canvas.width, canvas.height);
+    else drawLayout(ctx, plan);
     const raw=await new Promise<Blob>((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(new ExportError('UNAVAILABLE','Не удалось подготовить PNG. Проверьте свободную память.')),'image/png'));
     return await srgbPng(raw);
   } finally {canvas.width=1;canvas.height=1;}

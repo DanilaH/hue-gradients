@@ -42,7 +42,7 @@ export class ExportView {
   private drawOptions():void {
     const scroll=this.content.scrollTop;this.options.replaceChildren();
     const label=document.createElement('label');label.textContent='Макет';const select=document.createElement('select');select.setAttribute('aria-label','Макет');
-    const formats:[ExportFormat,string][]=[['clean','Чистое поле'],...EXPORT_FORMATS.map(f=>[f.id,`${f.title} · ${f.threshold} ${f.source==='campaign'?'работ кампании':'ежедневных работ'}`]as [ExportFormat,string])];
+    const formats:[ExportFormat,string][]=[['clean','Чистый градиент'],...EXPORT_FORMATS.map(f=>[f.id,`${f.title} · ${f.threshold} ${f.source==='campaign'?'работ кампании':'ежедневных работ'}`]as [ExportFormat,string])];
     if(this.props.route.chapterIndex!==undefined)formats.push(['chapter-page',`Страница главы ${this.props.route.chapterIndex+1}`]);
     for(const [id,title]of formats){const option=document.createElement('option');option.value=id;const open=canExport(this.state,id,this.props.route.chapterIndex);option.textContent=`${title}${open?'':' · закрыто'}`;option.disabled=!open;select.append(option);}select.value=this.format;
     select.onchange=()=>{this.format=select.value as ExportFormat;if(!this.selections.has(this.format))this.selections.set(this.format,[]);this.drawOptions();this.refresh();};label.append(select);this.options.append(label);

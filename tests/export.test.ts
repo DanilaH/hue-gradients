@@ -26,7 +26,7 @@ test('format thresholds and chapter page use committed ownership, with no export
   const before=JSON.stringify(fifteen);const page=exportPlan(fifteen,{format:'chapter-page',keys:[],caption:'ignored',chapterIndex:0});
   expect(page.works.map(w=>w.key)).toEqual(levels.slice(0,15).map(l=>`campaign:${l.id}`));expect(page.caption).toBe('Глава 1');expect(JSON.stringify(fifteen)).toBe(before);
 });
-test('exact seven template geometries and clean aspect use integer square tiles',()=>{
+test('seven template geometries fit square tiles and clean fills the portrait wallpaper',()=>{
   const expected:Record<string,[number,number,number[]]>= {
     'export-caption':[1800,2000,[96,96,1608]],'export-strip':[2400,960,[96,144,672,864,144,672,1632,144,672]],
     'export-grid':[2000,2000,[96,96,856,1048,96,856,96,1048,856,1048,1048,856]],'export-frame':[2000,2000,[200,200,1600]],
@@ -34,7 +34,12 @@ test('exact seven template geometries and clean aspect use integer square tiles'
     'chapter-page':[1800,3000,[208,752,1296,1840,2384].flatMap(y=>[108,652,1196].flatMap(x=>[x,y,496]))],
   };
   for(const[id,[width,height,regions]]of Object.entries(expected)){const l=EXPORT_LAYOUTS[id as Exclude<ExportFormat,'clean'>];expect([l.width,l.height]).toEqual([width,height]);expect(l.fields.flatMap(r=>[r.x,r.y,r.width])).toEqual(regions);expect(l.fields.every(r=>r.width===r.height)).toBe(true);}
-  const state=completed(15);for(const l of levels.slice(0,15)){const p=exportPlan(state,{format:'clean',keys:[`campaign:${l.id}`],caption:'not rendered'}),s=Math.floor(1800/Math.max(l.width,l.height));expect([p.layout.width,p.layout.height]).toEqual([l.width*s,l.height*s]);}
+  const state=completed(15);
+  for(const level of levels.slice(0,15)){
+    const plan=exportPlan(state,{format:'clean',keys:[`campaign:${level.id}`],caption:'not rendered'});
+    expect(plan.layout).toEqual({width:1080,height:1920,fields:[{x:0,y:0,width:1080,height:1920}]});
+    expect(plan.works[0]?.field).toBe(level);
+  }
   expect(fitField({width:6,height:1,solvedTileColors:Array(6).fill('#123456')},{x:96,y:96,width:1608,height:1608})).toEqual({x:96,y:766,width:1608,height:268,tileSize:268});
 });
 test('selection must be complete and different logical works, not two revisions of one work',async()=>{

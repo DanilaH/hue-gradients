@@ -29,7 +29,7 @@ h1 { font-size: 1rem; font-weight: 550; text-align: center; margin: 0; max-width
 footer { min-height: 56px; padding: 2px 12px 6px; display: flex; gap: 10px; align-items: center; justify-content: center; background: linear-gradient(#160e273a,#160e27b2); }
 #guidance { margin: 0; max-width: 19em; font-size: .8125rem; line-height: 1.25; text-shadow: 0 1px 6px #100a1d; }
 #help { background: #21192d69; min-width: 108px; padding-inline: 12px; font-size: .875rem; }
-#game-dialog { color: #fff2de; background: #21192df5; border: 1px solid #e8d0bd70; border-radius: 20px; width: min(92%,420px); max-height: 86dvh; padding: 24px; overflow: auto; }
+#game-dialog { color: #fff2de; background: #21192df5; border: 1px solid #e8d0bd70; border-radius: 20px; width: min(92%,420px); max-height: 86vh; max-height: 86dvh; padding: 24px; overflow: auto; }
 #game-dialog::backdrop { background: #0d081978; backdrop-filter: blur(6px); }
 #game-dialog:not([open]) { display: none !important; }
 #game-dialog h2 { font-size: 26px; font-weight: 500; margin: 0 0 14px; }
@@ -87,10 +87,11 @@ footer { min-height: 56px; padding: 2px 12px 6px; display: flex; gap: 10px; alig
   position: absolute; top: 16px; left: 92px; right: 64px; margin: 0; overflow: hidden; text-overflow: ellipsis;
   white-space: nowrap; text-align: center; font-size: 1rem; pointer-events: none; text-shadow: 0 1px 5px #150d22;
 }
-#game-dialog[data-work-card=true] #dialog-actions { min-height: 100%; gap: 0; }
+#game-dialog[data-work-card=true] #dialog-actions { height: 100%; gap: 0; }
 .work-card {
-  display: grid; min-height: 100%; grid-template-rows: auto minmax(100px,1fr) auto auto;
-  justify-items: center; align-items: center; padding: 4px 12px clamp(12px,5dvh,40px);
+  display: grid; min-height: 0; grid-template-rows: auto minmax(100px,1fr) auto auto;
+  justify-items: center; align-items: center;
+  padding: 4px 12px clamp(12px,5vh,40px); padding-bottom: clamp(12px,5dvh,40px);
   background: linear-gradient(#160d26b4,transparent 20%,transparent 63%,#160d26a8 96%);
 }
 .work-card-nav { display: flex; align-items: center; justify-content: space-between; width: 100%; align-self: start; }
@@ -102,12 +103,12 @@ footer { min-height: 56px; padding: 2px 12px 6px; display: flex; gap: 10px; alig
 .work-card-menu { position: absolute; right: 0; top: 48px; width: max-content; border-radius: 12px; background: #241833f7; padding: 4px; display: grid; box-shadow: 0 8px 30px #160d2670; }
 .work-card-menu button { text-align: left; background: transparent; border: 0; }
 .work-card-menu p { margin: 6px 10px; font-size: .8125rem; color: #e4d2e7; }
-.work-card-preview { display: block; object-fit: contain; width: min(92%,420px); height: 100%; min-height: 0; max-height: 54dvh; image-rendering: pixelated; filter: drop-shadow(0 10px 23px #180f2950); }
+.work-card-preview { display: block; object-fit: contain; width: min(92%,420px); height: 100%; min-height: 0; max-height: 54vh; max-height: 54dvh; filter: drop-shadow(0 10px 23px #180f2950); }
 .work-card > button { width: min(90%,310px); }
 .work-card-status { min-height: 2.9em; max-width: 28ch; margin: 8px 0 0; font-size: .875rem; text-align: center; text-shadow: 0 1px 4px #160e27; }
 @media (orientation:landscape) and (max-height:450px) {
   .work-card { padding-bottom: 4px; grid-template-rows: auto minmax(80px,1fr) auto auto; }
-  .work-card-preview { max-height: 46dvh; }
+  .work-card-preview { max-height: 46vh; max-height: 46dvh; }
 }
 #game-dialog[data-picker=true] {
   position: fixed; inset: 0; margin: 0; width: 100%; height: 100%; max-width: none; max-height: none;
@@ -241,7 +242,7 @@ html[data-host=browser] #game-dialog[data-picker=true] #dialog-actions {
 #game-dialog[data-export=true] { overflow: hidden; padding: 18px; }
 #game-dialog[data-export=true] h2 { font-size: 21px; margin-bottom: 8px; }
 #game-dialog[data-export=true] #dialog-copy { margin: 0; }
-.export-panel { display: flex; flex-direction: column; gap: 8px; height: min(72dvh,680px); min-height: 0; }
+.export-panel { display: flex; flex-direction: column; gap: 8px; height: min(72vh,680px); height: min(72dvh,680px); min-height: 0; }
 .export-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex-shrink: 0; }
 .export-controls button { min-width: 0; font-size: 14px; padding: 8px; }
 .export-back { grid-column: 1 / -1; }
@@ -257,7 +258,7 @@ html[data-host=browser] #game-dialog[data-picker=true] #dialog-actions {
 .export-work input { flex-shrink: 0; width: 24px; height: 24px; accent-color: #e3ccf8; }
 .export-work small { display: block; font-size: 12px; color: #eadcd0; }
 @media (max-height:450px) {
-  .export-panel { height: 66dvh; gap: 4px; }
+  .export-panel { height: 66vh; height: 66dvh; gap: 4px; }
   .export-controls { grid-template-columns: 1.5fr 1fr 1fr; gap: 5px; }
   .export-back { grid-column: auto; }
 }
