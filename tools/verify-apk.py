@@ -12,7 +12,7 @@ if a.kind=='release':assert cert==(cfg.get('certificateSha256') or '').lower(),'
 elif cfg.get('certificateSha256'):assert cert!=cfg['certificateSha256'].lower(),'Release-check must not use the production signer'
 alignment=run('zipalign','-c','-P','16','4',a.apk)
 badging=run('aapt','dump','badging',a.apk);manifest=run('aapt','dump','xmltree',a.apk,'AndroidManifest.xml')
-package=cfg['appId']+('.releasecheck' if a.kind=='releasecheck' else '')
+package=cfg['appId']+(cfg.get('testPackageSuffix','.releasecheck') if a.kind=='releasecheck' else '')
 assert f"package: name='{package}'" in badging
 assert f"versionCode='{cfg['versionCode']}'" in badging and f"versionName='{cfg['versionName']}'" in badging
 assert 'application-debuggable' not in badging

@@ -14,5 +14,6 @@
     "Startup diagnostics JSON",
     "data-debug-panel"
   ],
-  "appName": "\u041f\u043e\u043b\u0443\u0441\u043e\u043d"
+  "appName": "\u041f\u043e\u043b\u0443\u0441\u043e\u043d",
+  "testPackageSuffix": ".preview3"
 }

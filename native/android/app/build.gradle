@@ -12,7 +12,7 @@ android {
  buildTypes {
   debug { manifestPlaceholders=[hostAppLabel:'@string/app_preview_name'];applicationIdSuffix '.playtest';if(System.getenv('ANDROID_PREVIEW_KEYSTORE'))signingConfig signingConfigs.preview }
   release { debuggable false;minifyEnabled true;shrinkResources true;signingConfig signingConfigs.production;proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),'proguard-rules.pro' }
-  releaseCheck { initWith release;manifestPlaceholders=[hostAppLabel:'@string/app_check_name'];applicationIdSuffix '.releasecheck';signingConfig System.getenv('ANDROID_PREVIEW_KEYSTORE')?signingConfigs.preview:signingConfigs.debug;matchingFallbacks=['release'] }
+  releaseCheck { initWith release;manifestPlaceholders=[hostAppLabel:'@string/app_check_name'];applicationIdSuffix (cfg.testPackageSuffix ?: '.releasecheck');signingConfig System.getenv('ANDROID_PREVIEW_KEYSTORE')?signingConfigs.preview:signingConfigs.debug;matchingFallbacks=['release'] }
  }
 }
 repositories { flatDir { dirs '../capacitor-cordova-android-plugins/src/main/libs','libs' } }

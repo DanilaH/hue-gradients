@@ -23,7 +23,8 @@
     "yandex:check": "npm run build:yandex && node tools/yandex-audit.mjs",
     "spec:check": "node tools/check-spec.mjs",
     "test:browser": "node tools/m1-browser-check.mjs",
-    "test:presentation": "node tools/m2-browser-check.mjs"
+    "test:presentation": "node tools/m2-browser-check.mjs",
+    "test:meta": "node tools/m3-browser-check.mjs"
   },
   "dependencies": {
     "@capacitor/android": "8.6.0",

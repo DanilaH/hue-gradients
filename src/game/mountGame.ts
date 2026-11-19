@@ -134,7 +134,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       button('В альбом', () => showMeta({ kind: 'album', tab: 'campaign' }), true);
     } else if (layer === 'restart') {
       byId('dialog-title').textContent = 'Начать заново?';
-      byId('dialog-copy').textContent = 'Текущая попытка начнётся с исходного поля. Рекорды и пройденные уровни сохранятся.';
+      byId('dialog-copy').textContent = `«${getLevel(restartLevelId ?? level.id).title}» начнётся с исходного поля. Рекорды и пройденные уровни сохранятся.`;
       button('Начать заново', () => void run({ kind: 'restart', levelId: restartLevelId ?? level.id, attemptId: crypto.randomUUID() }, () => { metaHistory = []; menuExit = false; layer = 'none'; }));
       button('Продолжить попытку', () => { layer = restartReturn; render(); }, true);
     } else if (layer === 'rules') {

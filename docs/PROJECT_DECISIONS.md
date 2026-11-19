@@ -46,3 +46,11 @@ Evidence: 30 unit, 20 Chromium/IndexedDB/input and 6 local SDK host scenarios; d
 ## M2 executable review candidate — 18 November 2026
 
 Build 0.2.0/versionCode2. Exact visible RGB remain opaque; spatial ambient, 150ms interruptible commit-only settling, 650ms result dissolve, one own prism and procedural sound are described in M2_ART_BIBLE.md. Additive schema-1 preferences persist sound/haptics/motion without resetting older saves. Kit OneShotPlayer/exponentialResponse reused. Native system haptic is consumer-owned; no vibration permission or new runtime dependency. No correctness score enters feedback. Current system typography is provisional; two licensed font comparison, 150%/physical-phone QA and owner art approval remain pending. No mass art or other game/kit changes. KIT IMPACT: REUSE.
+
+## M3 campaign/meta — 19 November 2026
+
+0.3.0/versionCode3 appends authored campaign candidates to 60 without changing first15 data or their contentVersion/fingerprints. campaign-meta-1 opens tasks freely after fifth and later chapters at 10 unique predecessor completions; 15/15 yields a full page. Awards are stored once; assistance still counts for ordinary campaign completion. getTierProgress supplies finite display only, never award authority. Copies have new draft/work/node IDs and no inherited author completion or campaign credit.
+
+Session commits legacy policy migration and an exact raw backup in one snapshot+facts+ledger transaction before exposing backfilled rights. Previously earned rights are unioned, not revoked by raised thresholds. Unknown/newer schema still stops mutation. M4 must distinguish local-migration-backup facts from completion facts. SVG previews preserve non-square aspect and stay inside cards. No unfinished target previews or fake seventh export/next chapter are shown.
+
+All60 editorial statuses remain candidates, including individual unresolved colour warnings027/037/053/060. Browser automation is not human/phone acceptance. M4 creative editing/revisions/export and M2 font/owner acceptance remain open. Isolated .preview3 handles an unavailable old transient test signer; see SIGNING_PREVIEW.md. Production package/key settings are unchanged. KIT IMPACT: REUSE; no upstream repository changed.

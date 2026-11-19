@@ -1,40 +1,35 @@
-# Session handoff
+# Resume — 19 November 2026
 
-Owner authorized roadmap implementation and asked for reliable continuation without giant dumps or blob/base64 output. Keep reads bounded, publish checkpoints and update this file. Do not re-read the whole research archive or rebuild the foundation from memory.
+Read AGENTS.md, PROJECT_DECISIONS.md and STATUS.md. Owner authorized roadmap implementation. Keep reads bounded; do not paste blobs/base64/traces or re-read the whole archive. Commit checkpoints. Preserve newer remote work before editing.
 
-## Resume
+## Current state
 
-1. Read AGENTS.md, PROJECT_DECISIONS.md and STATUS.md. Check current GitHub HEAD and worktree; preserve newer work.
-2. Runtime/guidance pin: 469928d03f4bae5053e23db26e82187bedbc252e. Spec source: 812b926ebfc82c6b0e5f3c6506145de2331028a0. No silent upgrades.
-3. Shared game: src/game/mountGame.ts + PuzzleScene.ts. Native entry src/main.ts chooses HueSQLite on-device and IndexedDB in desktop development; web/src/main.ts imports only the IndexedDB/shared game path.
-4. Rules/data: src/domain/puzzle.ts, levels.ts, workspace.ts. First15 SHA256 remains 55efdbd17d6e77c23753ea5f6b494de25e02c3c8a05459a92fbbcee8eb34ae51. Do not regenerate it.
-5. Storage/session: src/local-store/{contracts,command,indexed-db,native}.ts; native HueSQLitePlugin.java; src/app/session.ts. One transaction includes snapshot, best/rights, immutable facts and receipt. CAS conflicts reload authority and discard the stale action. Unknown results retain the same prepared operation and resolve through the ledger; never write an empty fallback.
+M3 local implementation, version0.3.0/versionCode3. Shared game: src/game/mountGame.ts/PuzzleScene.ts; functional meta routes in metaView.ts. Pure rules/workspace/progression live in src/domain. Snapshot/facts/receipt transaction remains native SQLite or browser IndexedDB. Runtime/guidance pin469928d03f4bae5053e23db26e82187bedbc252e; no silent upgrade.
 
-## What exists
+60 campaign definitions now execute. First15 exact source SHA25655efdbd17d6e77c23753ea5f6b494de25e02c3c8a05459a92fbbcee8eb34ae51 and legacy contentVersion remain unchanged. New45 are authored candidates, not regenerated or editorially accepted. Their four colour warnings and per-fingerprint review rows are docs/content/CAMPAIGN_REVIEW_2026-11-19.json.
 
-All 15 definitions are playable sequentially. First five have been completed through the real browser UI. Tap–tap, direct drag, final pointerup, keyboard, pins, cancellation on geometry/background/capture changes, help persisted before preview, restart confirmation, result restoration, separate bests and unique base rights are wired to the real store. One corrupt attempt is quarantined without clearing progress. Full profile/schema corruption stops mutation instead of resetting it.
+Progress: firstfive sequential, then free choice. Next existing chapter opens at10/15; full page at15/15. A helper recommendation is not a lock. Unique cards/rights/mastery and separate clean/assisted bests commit once. New rights appear in an optional compact list, not Claim windows. All60 means no fake chapter5 or next task. Album never reveals unfinished targets.
 
-A normal lostpointercapture following pointerup must NOT clear a completed tap selection. A second pointer's cancel must NOT cancel the active pointer. Geometry is checked at the release event as well as resize callbacks; keep the browser regression scenarios.
+Old m1-local-1 snapshots are decoded/validated, upgraded to campaign-meta-1 and backed up in the same DB transaction before new rights are displayed. The exact original snapshot is archived as a guest fact kind local-migration-backup; M5 transfer must not mistake it for a completion. A failed migration leaves original data and no reward UI. Current-schema corruption/unknown future schemas never become empty defaults.
 
-Yandex local play does not await SDK init, metadata storage, login or ads. Optional Loading/Gameplay/pause callbacks attach later. Both entrypoints mark ready only after an authored POST_RENDER. Activity blockers remain additive.
+Album copies are durably separate draft/work/node roots with provenance and an immutable snapshot; authorCompletions is empty. UI only promises Save copy/read draft. The original source/best/progress is untouched. M4 must add actual creative editing and version history with explicit migration; do not pass these seed copies off as a finished editor.
 
-## Latest presentation checkpoint
+M2 atmosphere/settling/audio/haptic remain the existing executable candidate: M2_ART_BIBLE.md. The font comparison/150% and owner/physical-phone acceptance are still open; do not call them PASS.
 
-M2 executable candidate is now in src/game/{atmosphere,feedback}.ts and the shared scene/view. See M2_ART_BIBLE.md. OneShotPlayer and exponentialResponse reuse the existing kit pin. Preferences extend schema 1 additively (absent old preferences get explicit defaults without clearing progress). Sound/haptic are commit-only; recovery/reload never replay cues. Motion respects OS reduced motion. Native HueFeedbackPlugin requires exact-APK/R8 checks and actual runtime still pending.
+## Next package
 
-33 unit / 20 core browser / 9 presentation / 6 local Yandex host scenarios; actual 390×844 UI episode recorded. This is not owner/phone art acceptance. Font choice/two-candidate comparison remains open. Build 0.2.0, versionCode 2.
+1. M4 from ROADMAP_1_0.md and CONTENT_EDITOR_SPEC_0_1.md: real editor, immutable revisions, author testing, all six PNG renderers and share/error/cancel states. Preserve the M3 rights and draft provenance; no campaign credit from own work.
+2. Finish the two-font Cyrillic comparison and enlarged-text check, then obtain feedback on the actual M2 episode before mass art. No new A/B/C setting contest.
+3. Native SQLite/haptic/process-death/storage-pressure and physical touch acceptance remain NOT RUN. An Android runtime/ADB was not available in this workspace; no native runtime scenario was executed. Hosted Yandex, production identity/cloud/ads also remain external gates. Full release is not done.
 
-## Next bounded package
+## Validation
 
-- Execute native SQLite bridge transactions on an Android runtime: before/after-commit force-stop, lost response/retry, full storage, corrupt DB preservation and restart. Native DB corruption handler deliberately does not delete the file. This is still NOT RUN.
-- Phone checks: first-five touch, rotation/background, keyboard where available, pin/selection visibility, timing and startup. Do not label browser layout checks physical Android acceptance.
-- Finish any M1 CORE/TECH acceptance gaps (including settling/audio/feel where required) against the actual requirement rows. Current visual surface is functional; M2 still needs the owner's one gameplay→win art episode before broad styling and font choice.
-- Continue M2 typography and owner review against this actual slice, not a new A/B/C art contest. Full campaign/meta/editor/export/cloud/daily/ads scope remains; nothing was cut.
+99 unit tests including all60 supplied witnesses; 20 core browser; 9 presentation; 6 local Yandex SDK scenarios; 12 M3 browser scenarios. M3 UI really solved all15 of chapter1 out of order after tutorial. All60 imported state and legacy fault fixtures are labelled fixtures, not human/phone playthroughs. TypeScript/web/Yandex audits, strict pinned guidance doctor and exact spec hashes are recorded in evidence/m3-campaign-2026-11-19.json. Run npm run check, yandex:check, spec:check; test:browser/test:presentation and tools/m3-browser-check.mjs as relevant. Browser scripts start Vite themselves and accept CHROMIUM_PATH.
 
-## Checks
+Native changes: android:sync:release, Gradle debug/R8 releaseCheck, verify-apk.py on the exact artifact. Do not commit another scratch checkout into capacitor.settings.gradle when Capacitor resolves a node_modules symlink. The cached kit tgz hash matched kit-pins.json exactly; dependencies were reused at that pin.
 
-`npm run check`, `npm run yandex:check`, `npm run spec:check`; strict pinned guidance doctor; `python3 tests/signing_safety.py`.
-`npm run test:browser` starts its own Vite server; needs Playwright + Chromium. `node tools/yandex-browser-check.mjs` runs six local SDK host scenarios. CHROMIUM_PATH may select the environment's headless shell. Tests write bounded summaries under .test-output/m1; do not paste complete traces into chat.
-Native changes: android:sync:release, Gradle assembleDebug/assembleReleaseCheck, tools/verify-apk.py on the exact APK. No test-signing artifact is a production-signed release. Capacitor sync may resolve a local node_modules symlink; never commit another scratch directory into capacitor.settings.gradle.
+## Test signer continuity
 
-KIT IMPACT: REUSE; narrow local transactional/optional-host candidates recorded in KIT_CANDIDATES.md. External setup remains M0_GATES.md. No other repositories changed.
+Read SIGNING_PREVIEW.md before building. Old0.2 test signer was lost with transient storage; do not claim in-place update compatibility. 0.3 test package is com.danilah.huegradients.preview3, alongside the old .releasecheck installation. Retrieve the privately saved file named HUE-test-preview-signing.keystore and pass its path as ANDROID_PREVIEW_KEYSTORE for future builds. Reuse this key and .preview3; increment versionCode. Never commit key bytes, regenerate it silently or use it as production signing. Production appId/certificate policy remains unchanged.
+
+KIT IMPACT: REUSE (getTierProgress plus prior OneShotPlayer/lifecycle/DPR/teardown). A signer-retention guidance candidate is recorded without upstream changes. No other game/kit repository changed.

@@ -15,10 +15,14 @@ interface MetaView {
 }
 function preview(level: Pick<LevelDefinition, 'width' | 'height' | 'solvedTileColors'>, large = false): HTMLElement {
   const frame = document.createElement('div'); frame.className = large ? 'composition composition-large' : 'composition'; frame.setAttribute('aria-hidden', 'true');
-  const cells = document.createElement('div'); cells.className = 'composition-grid';
-  cells.style.gridTemplateColumns = `repeat(${level.width},1fr)`; cells.style.gridTemplateRows = `repeat(${level.height},1fr)`;
-  cells.style.aspectRatio = `${level.width}/${level.height}`;
-  for (const color of level.solvedTileColors) { const cell = document.createElement('span'); cell.style.backgroundColor = color; cells.append(cell); }
+  const ns = 'http://www.w3.org/2000/svg', cells = document.createElementNS(ns, 'svg');
+  cells.setAttribute('class', 'composition-grid'); cells.setAttribute('viewBox', `0 0 ${level.width} ${level.height}`);
+  cells.setAttribute('preserveAspectRatio', 'xMidYMid meet'); cells.setAttribute('shape-rendering', 'crispEdges');
+  level.solvedTileColors.forEach((color, position) => {
+    const cell = document.createElementNS(ns, 'rect'); cell.setAttribute('x', String(position % level.width));
+    cell.setAttribute('y', String(Math.floor(position / level.width))); cell.setAttribute('width', '1'); cell.setAttribute('height', '1');
+    cell.setAttribute('fill', color); cells.append(cell);
+  });
   frame.append(cells); return frame;
 }
 export function renderMeta(v: MetaView): void {
@@ -35,7 +39,7 @@ export function renderMeta(v: MetaView): void {
     v.copy.textContent = `Собрано ${state.completed.length} из ${levels.length}`;
     const active = state.attempts[state.activeLevelId];
     if (active && !active.completed) button(`${active.moves ? 'Продолжить' : 'Начать'}: ${getLevel(state.activeLevelId).title}`, () => v.play(state.activeLevelId));
-    else { const next = recommendedLevel(state); if (next) button(`Продолжить: ${getLevel(next).title}`, () => v.play(next)); else label('Все 60 работ кампании собраны. Можно заполнить страницы и улучшить личные рекорды.'); }
+    else { const next = recommendedLevel(state); if (next) button(`Продолжить: ${getLevel(next).title}`, () => v.play(next)); else label('Все 60 работ кампании собраны. Можно пересматривать работы и сохранять отдельные копии.'); }
     button('Кампания', () => v.navigate({ kind: 'levels' }));
     button('Альбом', () => v.navigate({ kind: 'album', tab: 'campaign' }));
     button('Открытые возможности', () => v.navigate({ kind: 'rights' }));
@@ -134,6 +138,6 @@ export function renderMeta(v: MetaView): void {
     EXPORT_FORMATS.forEach(format => label(`${format.title} · ${earnedLabel(format.id)}\n${format.threshold} разных ${format.source === 'campaign' ? 'работ кампании' : 'ежедневных задач, включая архив'}`, 'format-info'));
     const tier = getTierProgress(state.completed.length, [5,15,30]);
     const target = tier.complete ? tier.nextTier : { target: tier.target, remaining: tier.target - state.completed.length };
-    label(target ? `Следующий макет кампании: ещё ${target.remaining}` : 'Все три макета кампании открыты. Следующие цели — полные страницы и личное мастерство.', 'meta-goal'); back();
+    label(target ? `Следующий макет кампании: ещё ${target.remaining}` : state.completed.length === levels.length ? 'Все три макета кампании открыты. Работы остаются в альбоме; можно сохранять копии.' : 'Все три макета кампании открыты. Следующие цели — полные страницы и личное мастерство.', 'meta-goal'); back();
   }
 }
