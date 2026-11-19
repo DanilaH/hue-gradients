@@ -24,7 +24,7 @@ Author activeTest persists work/node/frozen Attempt; creative.playing controls c
 
 ## Next work
 
-1. **Next: second UI package.** Simplify collection to completed / own. Move replay, best and copy to the work card's overflow. Let the displayed composition save its PNG directly. Show a work picker for multi-work layouts only. Keep palette and author play visible in the editor. Put size, pins, start and history behind the editor menu. Verify copy, older drafts and exports using normal entry points. Cloud/account synchronization (M5) remains on hold. A real shared daily requires its published catalog and trusted time.
+1. **Next: level and chapter picker.** Follow [the UI refinement plan](UI_REFINEMENT_PLAN.md), starting with one large board preview and one action for the selected level. Then simplify collection and PNG, editor, and field/result details in that order. Verify saved attempts, older drafts and exports using normal entry points. Cloud/account synchronization (M5) remains on hold. A real shared daily requires its published catalog and trusted time.
 2. Keep M2 tokens and read M2_ART_BIBLE before visual changes. Two licensed Cyrillic fonts, native150% text and owner review remain pending. Editor browser computed-font enlargement is smoke evidence only. No mass styling or new A/B/C contest.
 3. Native SQLite/haptic/process-death/storage-pressure/touch remains NOT RUN; no runtime/ADB was available. Hosted Yandex, identity/cloud/ads are external gates. Production register71 NOT RUN; full release unfinished.
 
