@@ -51,6 +51,16 @@ with zipfile.ZipFile(a.apk) as z:
     for method in ['save','share','savedDocument']:assert any(re.search(r"name\s*:\s*'"+method+"'",b) for b in exporter),method
     assert package+'.hue-export' in manifest,'Export provider authority does not follow the installed package'
     assert 'android.permission.WRITE_EXTERNAL_STORAGE' not in manifest and 'android.permission.READ_EXTERNAL_STORAGE' not in manifest
+    provider=[b for b in re.split(r'(?=^      E: )',manifest,flags=re.M) if package+'.hue-export' in b];assert len(provider)==1
+    assert re.search(r'android:exported[^\n]*\(type 0x12\)0x0(?:\s|$)',provider[0])
+    assert re.search(r'android:grantUriPermissions[^\n]*\(type 0x12\)0xffffffff',provider[0])
+    resources=run('aapt2','dump','resources',a.apk)
+    export_xml=re.search(r'resource (0x[0-9a-f]+) xml/hue_export_paths\s+\(\) \(file\) (\S+) type=XML',resources);assert export_xml,'Export provider resource missing'
+    assert '@'+export_xml[1] in provider[0],'Provider references unexpected paths resource'
+    export_paths=run('aapt','dump','xmltree',a.apk,export_xml[2])
+    assert 'E: cache-path' in export_paths and 'path="hue-exports/"' in export_paths
+    assert len(re.findall(r'E: [\w-]+-path',export_paths))==1,'Provider exposes additional directories'
+    (a.out/'export-provider-paths.txt').write_text(export_paths)
 mapping=Path('native/android/app/build/outputs/mapping')/('release' if a.kind=='release' else 'releaseCheck')/'mapping.txt';assert mapping.is_file() and mapping.stat().st_size>1000
 report={'kind':a.kind,'package':package,'versionName':cfg['versionName'],'versionCode':cfg['versionCode'],'kitRef':stamp['kitRef'],'source':os.environ.get('GITHUB_SHA','local'),'apkSha256':hashlib.sha256(a.apk.read_bytes()).hexdigest(),'bytes':a.apk.stat().st_size,'certificateSha256':cert,'productionSigner':a.kind=='release','v2':True,'zipalign16k':True,'debuggable':False,'webViewDebuggingConfigured':False,'nativeInsetOwner':'content-root','webPayload':web,'nativeRuntime':'NOT RUN','liveServices':'NOT INSTALLED BY THIS HOST TEMPLATE'}
 for name,text in [('signing.txt',sign),('badging.txt',badging),('manifest.txt',manifest),('alignment.txt',alignment)]: (a.out/name).write_text(text)

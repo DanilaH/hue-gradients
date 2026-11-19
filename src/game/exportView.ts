@@ -22,7 +22,7 @@ export class ExportView {
   }
   update(state:Workspace,disabled:boolean):void {
     this.state=state;this.disabled=disabled;this.catalog=eligibleExportWorks(state);
-    const key=JSON.stringify([state.rights,this.catalog.map(w=>[w.key,w.field]),this.props.route.chapterIndex===undefined?null:state.completed]);
+    const key=JSON.stringify([state.rights,this.catalog.map(w=>[w.key,w.title,w.source,w.field]),this.props.route.chapterIndex===undefined?null:state.completed]);
     if(this.authorityKey&&key!==this.authorityKey){this.drawOptions();this.refresh();}this.authorityKey=key;this.controlsState();
   }
   destroy():void{this.disposed=true;this.generation++;clearTimeout(this.timer);if(this.url)URL.revokeObjectURL(this.url);this.panel.remove();}

@@ -1,6 +1,6 @@
 {
   "name": "hue-gradients",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "private": true,
   "type": "module",
   "engines": {
@@ -25,7 +25,8 @@
     "test:browser": "node tools/m1-browser-check.mjs",
     "test:presentation": "node tools/m2-browser-check.mjs",
     "test:meta": "node tools/m3-browser-check.mjs",
-    "test:editor": "node tools/m4-browser-check.mjs"
+    "test:editor": "node tools/m4-browser-check.mjs",
+    "test:export": "node tools/m4-export-browser-check.mjs && python3 tools/check-export-pixels.py"
   },
   "dependencies": {
     "@capacitor/android": "8.6.0",

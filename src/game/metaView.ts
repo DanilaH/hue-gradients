@@ -145,7 +145,7 @@ export function renderMeta(v: MetaView): void {
   } else if (route.kind === 'rights') {
     v.title.textContent = 'Открытые возможности';
     v.copy.textContent = 'Шесть макетов: три за кампанию и три за ежедневные работы.';
-    label(state.rights.includes('export-clean') ? 'Чистый вид работы — открыт с первой победы' : 'Чистый вид работы — с первой победы');
+    label(canExport(state,'clean') ? 'Чистый вид работы — открыт с первой победы' : 'Чистый вид работы — с первой победы');
     EXPORT_FORMATS.forEach(format => label(`${format.title} · ${earnedLabel(format.id)}\n${format.threshold} разных ${format.source === 'campaign' ? 'работ кампании' : 'ежедневных задач, включая архив'}`, 'format-info'));
     const tier = getTierProgress(state.completed.length, [5,15,30]);
     const target = tier.complete ? tier.nextTier : { target: tier.target, remaining: tier.target - state.completed.length };

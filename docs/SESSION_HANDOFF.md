@@ -1,10 +1,14 @@
 # Resume — 19 November 2026
 
-Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md and M4_EDITOR_IMPLEMENTATION.md. Owner authorized roadmap continuation. Bound file reads/output; no blobs/base64 or whole-archive re-reads. Commit checkpoints and preserve newer remote work. Current branch feat/m0-foundation, draft PR #1; main still contains the original README.
+Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and M4_EXPORT_IMPLEMENTATION.md. Owner authorized roadmap continuation. Bound file reads/output; no blobs/base64 or whole-archive re-reads. Commit checkpoints and preserve newer remote work. Branch feat/m0-foundation, draft PR #1; main still contains the original README.
 
 ## Current slice
 
-0.4.0/versionCode4 implements M4a (roadmap items1–3). Full M4 gate remains open. Pure domain/editor.ts and creative.ts; stable live form game/editorView.ts; author play reuses mountGame.ts/PuzzleScene.ts. Existing campaign/meta/presentation remains.
+0.4.1/versionCode5 implements local M4 editor/export. Full M4 native/production gate stays open. Pure domain/editor.ts, creative.ts, export.ts; stable editorView.ts/exportView.ts; exact exportRenderer.ts. Author play reuses mountGame.ts/PuzzleScene.ts; existing campaign/meta/presentation remains.
+
+Export derives verified work from official completion or author proof. Multiple revisions share one logical work ID and cannot fill multiple composition slots. First real author victory enables basic clean locally without adding official rights. Campaign formats use committed rights; daily formats stay closed until M6. The eight renderer geometries and chapter-page order follow the original spec, with exact square integer sRGB tiles. Actual Canvas text metrics reject overflow without truncation/shrink; existing provisional system font52px/line64px awaits M2 approval. Prepared PNG File is shared by preview and delivery; no export action writes workspace/progress/rights.
+
+Web browserExportFiles invokes cached-file share/picker directly from the click. Fallback download is only requested, never falsely called saved. Errors/cancel keep preview/caption. Android nativeExport.ts is imported only by src/main.ts; web/Yandex bundle stays separate. HueExportPlugin uses document picker and package-specific non-exported FileProvider limited to cache/hue-exports. It drops base64 after private file preparation so large PNGs do not enter saved activity Bundles; UI launches/main thread, document IO/background writer. Keep its private ActivityCallback method/name through R8. verify-apk.py checks bridge/callback, installed authority, compiled narrow resource paths and no broad storage permissions. Chooser-open is not delivery/publication proof. Real native action runtime remains NOT RUN.
 
 Workspace schema1 gains an optional-for-old-saves creative member with its own schemaVersion1. Session validates old snapshots then atomically commits conversion plus an exact raw backup before exposing M3 copies as editable roots. PolicyVersion stays campaign-meta-1; missing creative triggers migrate-creative-local. Unknown schemas/corruption stop loading, never become empty defaults. Local-migration-backup facts are archival, never completion facts during M5 transfer.
 
@@ -18,7 +22,7 @@ Author activeTest persists work/node/frozen Attempt; creative.playing controls c
 
 ## Next work
 
-1. **M4b**: ROADMAP_1_0.md, CONTENT_EDITOR_SPEC_0_1.md, SCREEN_STATE_SPEC_0_1.md. Clean +six earned PNG formats +system15-work chapter page; integer square tiles, exact sRGB, distinct logical works, actual font metrics, overflow error preserving text. Explicit native/web save/share with cancel/OS-denial/space/insufficient-work recovery. No renderer exists yet; do not call M4 complete.
+1. **M5**: ROADMAP_1_0.md and TECHNICAL_SPEC_0_1.md for single HTTPS API/PostgreSQL, account/epoch/operation/proof contracts and graph conflict resolution. Preserve exact local transaction authority, provenance, archived migration backups and unique operation identity. Start with concrete server contracts/local fixtures; no credentials, production API or hosting are configured yet. Inspect the pinned kit identity/cloud API before adding infrastructure. Do not claim hosted/native acceptance from local models.
 2. Keep M2 tokens and read M2_ART_BIBLE before visual changes. Two licensed Cyrillic fonts, native150% text and owner review remain pending. Editor browser computed-font enlargement is smoke evidence only. No mass styling or new A/B/C contest.
 3. Native SQLite/haptic/process-death/storage-pressure/touch remains NOT RUN; no runtime/ADB was available. Hosted Yandex, identity/cloud/ads are external gates. Production register71 NOT RUN; full release unfinished.
 
@@ -28,7 +32,7 @@ First15 SHA25655efdbd17d6e77c23753ea5f6b494de25e02c3c8a05459a92fbbcee8eb34ae51 a
 
 ## Tests/builds
 
-142 unit;20 core +9 presentation +12 meta +19 editor +6 local SDK browser =66. npm run check, yandex:check, spec:check and strict pinned guidance doctor pass. test:editor includes actual UI author completion, two live tabs, physical IndexedDB and labelled fault/migration fixtures. All60 witnesses are replay evidence, not human/phone acceptance. Evidence/m4-editor-2026-11-19.json has exact source/APK hashes and limits.
+149 unit;20 core +9 presentation +12 meta +19 editor +9 export +6 local SDK browser =75. npm run check, yandex:check, spec:check and strict doctor pass. test:editor includes actual author UI and two live tabs. test:export includes actual Chromium download and eight Canvas PNGs decoded independently by tools/check-export-pixels.py (Pillow pinned in tools/requirements-test.txt). Its30 campaign/two author checkpoints, daily rights and share/save-picker responses are explicitly fixtures. All60 witnesses remain replay evidence, not human/phone acceptance. Evidence/m4-export-2026-11-19.json has exact source/APK hashes and limits.
 
 Native: android:sync:release; Gradle debug/R8 releaseCheck; verify-apk.py on the exact artifact. Browser suites start Vite themselves; do not sync native concurrently because it may reload their pages. CHROMIUM_PATH accepts headless shell. Normalize generated capacitor.settings.gradle to ../../node_modules if symlink resolves into another scratch project; never commit that external path.
 
@@ -36,6 +40,6 @@ Runtime/guidance469928d03f4bae5053e23db26e82187bedbc252e, kit archive SHA256ba90
 
 ## Preview signing/artifact
 
-Read SIGNING_PREVIEW.md. Keep .preview3 and reuse the privately saved TEST key HUE-test-preview-signing.keystore via ANDROID_PREVIEW_KEYSTORE. Never regenerate/commit it or use it as production. Old0.2 .releasecheck signer was lost; never ask owner to uninstall that app and lose data. 0.4 certificate matches0.3; actual Android update is untested. Production base appId/certificate policy unchanged, signer null.
+Read SIGNING_PREVIEW.md. Keep .preview3 and reuse the privately saved TEST key HUE-test-preview-signing.keystore via ANDROID_PREVIEW_KEYSTORE. Never regenerate/commit it or use it as production. Old0.2 .releasecheck signer was lost; never ask owner to uninstall that app and lose data. 0.4.1 certificate matches0.3/0.4.0; actual Android update is untested. Production base appId/certificate policy unchanged, signer null.
 
-Delivered Poluson-M4a-0.4.0-preview.apk SHA2562d9a4d7d3867e5053077e17d27d99ded70ec829b5c189fa07491fcbc35754870. Package com.danilah.huegradients.preview3/versionCode4/certificate3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85. APK saved separately for owner; code/docs backed by Git. Increment versionCode next time.
+Delivered Poluson-M4-0.4.1-preview.apk SHA256a2c64c510dbd38b8a92c78b30601b5cebc8557cd7acef3274f8f20146df28b41. Package com.danilah.huegradients.preview3/versionCode5/certificate3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85. APK saved separately for owner; code/docs backed by Git. Increment versionCode next time.
