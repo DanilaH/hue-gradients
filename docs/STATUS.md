@@ -1,6 +1,6 @@
 # Status — 19 November 2026
 
-Current internal build: **0.4.5/versionCode9**, branch feat/m0-foundation, draft PR #1. Implementation checkpoints are on GitHub.
+Current internal build: **0.4.6/versionCode10**, branch feat/m0-foundation, draft PR #1. Implementation checkpoints are on GitHub.
 
 | Stage | Actual state |
 | --- | --- |
@@ -9,11 +9,13 @@ Current internal build: **0.4.5/versionCode9**, branch feat/m0-foundation, draft
 | M2 | EXECUTABLE REVIEW CANDIDATE: brighter low-resolution atmosphere, light trails and committed waves for gameplay, result and picker |
 | M3 | LOCAL IMPLEMENTATION: 60 campaign candidates, chapters, album, rights/mastery, page, separate copies and migration |
 | M4a | LOCAL IMPLEMENTATION: editor, immutable revisions, durable previews, recovery/branches, validator/fingerprint and author play |
-| M4b | LOCAL IMPLEMENTATION: clean/six PNG layouts/chapter page, distinct works, measured text, browser download/share and native bridge; real Android action acceptance pending |
+| M4b | LOCAL IMPLEMENTATION: continuous clean PNG, six tiled layouts and chapter page, distinct works, measured text, browser download/share and native bridge. Android device acceptance pending |
 | UI simplification | PR #2 stage 1 ready for owner playtest: lift, glass exchange, palette prism and one-tap PNG from the completed work |
 | M5 | ON HOLD by owner19 Nov: cloud/account/synchronization deferred from the current local milestone |
 | M6 | NEXT CLIENT WORK: local daily/archive state/cache; live shared calendar/catalog/trusted time remain unconfigured |
 | M7–M8 | NOT STARTED |
+
+0.4.6 implements the [issue #3](https://github.com/DanilaH/hue-gradients/issues/3) export. The work card prepares a continuous, edge-to-edge 1080×1920 sRGB gradient from the solved work. [0.4.6 build and verification](evidence/clean-gradient-2026-11-19.json)
 
 0.4.5 groups the first stage from [PR #2](https://github.com/DanilaH/hue-gradients/pull/2) into a test-signed preview. [Build, video and saved PNG checks](evidence/feel-episode-2026-11-19.json)
 
