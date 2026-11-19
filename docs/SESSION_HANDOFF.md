@@ -4,6 +4,8 @@ Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and
 
 ## Current slice
 
+0.4.7/versionCode11 implements the album package from [PR #2](https://github.com/DanilaH/hue-gradients/pull/2). Two full-screen tabs show colour prints, and the victory card links to its print in the collection. Back restores the tab, scroll and source focus. The collection uses its colour grid for collage selection with earned layouts and distinct logical work slots. The focused preview saves the exact PNG. The 15/15 chapter uses the same save path. Verified own works open the currently displayed revision and draft prints open the editor. [Evidence and captures](evidence/album-2026-11-19.json).
+
 0.4.6/versionCode10 applies [issue #3](https://github.com/DanilaH/hue-gradients/issues/3) to the clean PNG. The exported portrait is 1080×1920 sRGB with exact solved anchors at rounded pixel centres and the outermost pixels. A row blends horizontally, a column vertically, and a 2D field bilinearly. The selected verified author revision supplies its own anchors. One prepared PNG powers preview, one-tap save and the work-card share action. [Evidence](evidence/clean-gradient-2026-11-19.json).
 
 0.4.5/versionCode9 is the first playable episode from [PR #2](https://github.com/DanilaH/hue-gradients/pull/2). Drag lifts one tile and exposes its well. Committed swaps play a glass contact, with an interval on the last move and one glint on the result prism. Its four faces sample the solved corners or four positions along the strip. The result opens the exact campaign card. PNG preview and one-tap save use the same prepared file and the host delivery bridge. Replay, copy, other layouts and collection navigation live in the card menu. [Evidence and capture limits](evidence/feel-episode-2026-11-19.json).
@@ -30,7 +32,7 @@ Author activeTest persists work/node/frozen Attempt; creative.playing controls c
 
 ## Next work
 
-1. **After owner playtest: PR #2 stage 2 and the album collection.** Follow [the UI refinement plan](UI_REFINEMENT_PLAN.md) alongside the PR’s screen designs. Two tabs, one-tap clean export for the displayed verified work and a work picker for multi-work layouts. Then refine the editor and field/result in that order. Verify copy, older drafts and exports through the normal routes. M5 remains on hold. A shared daily requires a published catalog and trusted time.
+1. **After owner playtest: the PR #2 editor package.** Follow [the UI refinement plan](UI_REFINEMENT_PLAN.md) alongside the PR’s screen designs. Verify older drafts, saved branches and the exact selected revision through the editor and album routes. Field, pause and result polish follows. M5 remains on hold. A shared daily requires a published catalog and trusted time.
 2. Keep M2 tokens and read M2_ART_BIBLE before visual changes. Two licensed Cyrillic fonts, native150% text and owner review remain pending. Editor browser computed-font enlargement is smoke evidence only. No mass styling or new A/B/C contest.
 3. Native SQLite/haptic/process-death/storage-pressure/touch remains NOT RUN; no runtime/ADB was available. Hosted Yandex, identity/cloud/ads are external gates. Production register71 NOT RUN; full release unfinished.
 
@@ -50,4 +52,4 @@ Runtime/guidance469928d03f4bae5053e23db26e82187bedbc252e, kit archive SHA256ba90
 
 Read SIGNING_PREVIEW.md. Keep .preview3 and reuse the privately saved TEST key HUE-test-preview-signing.keystore via ANDROID_PREVIEW_KEYSTORE. Never regenerate/commit it or use it as production. Old0.2 .releasecheck signer was lost; never ask owner to uninstall that app and lose data. 0.4.1 certificate matches0.3/0.4.0; actual Android update is untested. Production base appId/certificate policy unchanged, signer null.
 
-Poluson-0.4.6-preview.apk uses package com.danilah.huegradients.preview3 and versionCode10. [Build hash, signer and runtime coverage](evidence/clean-gradient-2026-11-19.json). Increment versionCode for the next test update.
+Poluson-0.4.7-preview.apk uses package com.danilah.huegradients.preview3 and versionCode11. [Build hash, signer and runtime coverage](evidence/album-2026-11-19.json). Increment versionCode for the next test update.
