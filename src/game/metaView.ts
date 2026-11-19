@@ -4,10 +4,12 @@ import { chapterCount, chapterIndexFor, chapterIsOpen, EXPORT_FORMATS, levelIsOp
 import type { LevelDefinition } from '../domain/puzzle';
 import type { Workspace } from '../domain/workspace';
 import { hasAuthorProof } from '../domain/creative';
+import { canExport } from '../domain/export';
+import type { ExportRoute } from './exportView';
 
 export type MetaRoute = { kind: 'home' | 'levels' | 'rights' } | { kind: 'chapter' | 'page'; index: number } |
   { kind: 'album'; tab: 'campaign' | 'daily' | 'own' } | { kind: 'card' | 'copy'; levelId: string } |
-  { kind: 'draft'; draftId: string } | { kind: 'rewards'; ids: readonly string[] };
+  { kind: 'draft'; draftId: string } | { kind: 'rewards'; ids: readonly string[] } | ExportRoute;
 interface MetaView {
   route: MetaRoute; state: Workspace; disabled: boolean;
   title: HTMLElement; copy: HTMLElement; actions: HTMLElement;
@@ -46,6 +48,7 @@ export function renderMeta(v: MetaView): void {
     button('Альбом', () => v.navigate({ kind: 'album', tab: 'campaign' }));
     button('Создать композицию', v.createWork);
     button('Мои работы', () => v.navigate({ kind: 'album', tab: 'own' }));
+    button('Экспорт', () => v.navigate({ kind: 'export' }), actions, !canExport(state,'clean'));
     button('Открытые возможности', () => v.navigate({ kind: 'rights' }));
     button('Вернуться к полю', v.resume);
   } else if (route.kind === 'levels') {
@@ -113,6 +116,7 @@ export function renderMeta(v: MetaView): void {
       v.copy.textContent = `Кампания · глава ${chapterIndexFor(level.id) + 1}\nБез помощи: ${best?.clean ?? 'нет результата'} · с помощью: ${best?.assisted ?? 'нет результата'}`;
       button('Повторить работу', () => v.replay(level.id));
       button('Сохранить копию', () => v.navigate({ kind: 'copy', levelId: level.id }));
+      button('Экспорт', () => v.navigate({ kind: 'export', initialKey: `campaign:${level.id}` }));
     } else {
       v.copy.textContent = 'Копия сохранится отдельно. Оригинал и его рекорды останутся прежними.';
       const label = document.createElement('label'); label.textContent = 'Название копии';
@@ -132,11 +136,13 @@ export function renderMeta(v: MetaView): void {
     v.title.textContent = `Страница главы ${route.index + 1}`;
     const grid = document.createElement('div'); grid.className = 'chapter-page'; actions.append(grid);
     chapter.levelIds.forEach(id => { if (state.completed.includes(id)) grid.append(preview(getLevel(id))); else { const empty = document.createElement('div'); empty.className = 'empty-composition'; empty.textContent = 'Ещё не собрано'; grid.append(empty); } });
-    v.copy.textContent = `${chapterCount(state, route.index)} / 15`; back();
+    v.copy.textContent = `${chapterCount(state, route.index)} / 15`;
+    if (chapterCount(state,route.index)===15) button('Сохранить страницу', () => v.navigate({kind:'export',chapterIndex:route.index}));
+    back();
   } else if (route.kind === 'rewards') {
     v.title.textContent = 'Открытия этой работы';
     route.ids.forEach(id => label(rewardTitle(id))); back();
-  } else {
+  } else if (route.kind === 'rights') {
     v.title.textContent = 'Открытые возможности';
     v.copy.textContent = 'Шесть макетов: три за кампанию и три за ежедневные работы.';
     label(state.rights.includes('export-clean') ? 'Чистый вид работы — открыт с первой победы' : 'Чистый вид работы — с первой победы');
@@ -144,5 +150,6 @@ export function renderMeta(v: MetaView): void {
     const tier = getTierProgress(state.completed.length, [5,15,30]);
     const target = tier.complete ? tier.nextTier : { target: tier.target, remaining: tier.target - state.completed.length };
     label(target ? `Следующий макет кампании: ещё ${target.remaining}` : state.completed.length === levels.length ? 'Все три макета кампании открыты. Работы остаются в альбоме; можно сохранять копии.' : 'Все три макета кампании открыты. Следующие цели — полные страницы и личное мастерство.', 'meta-goal'); back();
+    if(canExport(state,'clean'))button('Открыть экспорт',()=>v.navigate({kind:'export'}));
   }
 }

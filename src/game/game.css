@@ -116,6 +116,29 @@ footer { padding: 4px 12px 8px; text-align: center; background: linear-gradient(
 .editor-palette input { width: 100%; height: 48px; border: 1px solid #fff2de55; border-radius: 8px; background: #342a40; padding: 5px; }
 .editor-validation { font-size: 14px; border-left: 3px solid #e9c5ae; padding-left: 10px; }
 .editor-validation p { margin: 5px 0; }
+#game-dialog[data-export=true] { overflow: hidden; padding: 18px; }
+#game-dialog[data-export=true] h2 { font-size: 21px; margin-bottom: 8px; }
+#game-dialog[data-export=true] #dialog-copy { margin: 0; }
+.export-panel { display: flex; flex-direction: column; gap: 8px; height: min(72dvh,680px); min-height: 0; }
+.export-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex-shrink: 0; }
+.export-controls button { min-width: 0; font-size: 14px; padding: 8px; }
+.export-back { grid-column: 1 / -1; }
+.export-status { margin: 0; min-height: 2.8em; font-size: 13px; }
+.export-content { overflow: auto; min-height: 0; padding: 2px; }
+.export-preview { display: block; width: 100%; max-height: 260px; object-fit: contain; margin: 0 0 16px; }
+.export-options { display: grid; gap: 12px; }
+.export-options select,.export-options textarea { width: 100%; min-height: 48px; margin-top: 6px; padding: 8px; font: inherit; color: #24192d; background: #f6eadd; border: 1px solid #ccb2dc; border-radius: 8px; }
+.export-options select { font-size: 13px; }
+.export-options textarea { resize: vertical; }
+.export-work-list { display: grid; gap: 6px; }
+.export-work { display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 8px; background: #342a40; border-radius: 10px; overflow-wrap: anywhere; }
+.export-work input { flex-shrink: 0; width: 24px; height: 24px; accent-color: #e3ccf8; }
+.export-work small { display: block; font-size: 12px; color: #eadcd0; }
+@media (max-height:450px) {
+  .export-panel { height: 66dvh; gap: 4px; }
+  .export-controls { grid-template-columns: 1.5fr 1fr 1fr; gap: 5px; }
+  .export-back { grid-column: auto; }
+}
 @media (max-height:450px) {
   .editor-panel { height: 66dvh; gap: 4px; }
   .editor-name { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 8px; }

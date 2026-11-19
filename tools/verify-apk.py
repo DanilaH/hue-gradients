@@ -46,6 +46,11 @@ with zipfile.ZipFile(a.apk) as z:
     descriptor='L'+cfg['appId'].replace('.','/')+'/HueFeedbackPlugin;'
     feedback=[b for b in blocks if re.search(r"Class descriptor\s*:\s*'"+re.escape(descriptor)+"'",b)];assert feedback,'Haptic bridge removed by R8'
     assert any(re.search(r"name\s*:\s*'pulse'",b) for b in feedback),'Haptic method removed by R8'
+    descriptor='L'+cfg['appId'].replace('.','/')+'/HueExportPlugin;'
+    exporter=[b for b in blocks if re.search(r"Class descriptor\s*:\s*'"+re.escape(descriptor)+"'",b)];assert exporter,'Export bridge removed by R8'
+    for method in ['save','share','savedDocument']:assert any(re.search(r"name\s*:\s*'"+method+"'",b) for b in exporter),method
+    assert package+'.hue-export' in manifest,'Export provider authority does not follow the installed package'
+    assert 'android.permission.WRITE_EXTERNAL_STORAGE' not in manifest and 'android.permission.READ_EXTERNAL_STORAGE' not in manifest
 mapping=Path('native/android/app/build/outputs/mapping')/('release' if a.kind=='release' else 'releaseCheck')/'mapping.txt';assert mapping.is_file() and mapping.stat().st_size>1000
 report={'kind':a.kind,'package':package,'versionName':cfg['versionName'],'versionCode':cfg['versionCode'],'kitRef':stamp['kitRef'],'source':os.environ.get('GITHUB_SHA','local'),'apkSha256':hashlib.sha256(a.apk.read_bytes()).hexdigest(),'bytes':a.apk.stat().st_size,'certificateSha256':cert,'productionSigner':a.kind=='release','v2':True,'zipalign16k':True,'debuggable':False,'webViewDebuggingConfigured':False,'nativeInsetOwner':'content-root','webPayload':web,'nativeRuntime':'NOT RUN','liveServices':'NOT INSTALLED BY THIS HOST TEMPLATE'}
 for name,text in [('signing.txt',sign),('badging.txt',badging),('manifest.txt',manifest),('alignment.txt',alignment)]: (a.out/name).write_text(text)

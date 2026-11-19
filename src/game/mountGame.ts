@@ -15,15 +15,18 @@ import { chapterIndexFor, recommendedLevel, visibleRewards, rewardTitle } from '
 import { authorBests, authorView, findDraft, type CreativeAction } from '../domain/creative';
 import { makeField } from '../domain/editor';
 import { EditorView } from './editorView';
+import { ExportView } from './exportView';
+import { browserExportFiles, type ExportFiles } from '../app/exportFiles';
 import './game.css';
 
 type Layer = 'none' | 'help' | 'result' | 'meta' | 'restart' | 'rules' | 'recovery' | 'settings';
 interface Activity extends Pick<GameplayActivityCoordinator, 'isBlocked' | 'onBlockedChange' | 'setGameplayDesired'> {}
 
-export async function mountGame(parent: HTMLElement, store: TransactionalLocalStore, activity: Activity, options: { haptic?: Haptic } = {}): Promise<{ back(): boolean; destroy(): void }> {
+export async function mountGame(parent: HTMLElement, store: TransactionalLocalStore, activity: Activity, options: { haptic?: Haptic; exportFiles?: ExportFiles } = {}): Promise<{ back(): boolean; destroy(): void }> {
   const fingerprints = new Map(await Promise.all(levels.map(async level => [level.id, await hashText(fingerprintPayload(level))] as const)));
   const session = new Session(store, fingerprints);
   await session.load();
+  const exportFiles = options.exportFiles ?? browserExportFiles();
   const current = () => {
     const own = session.state.creative?.playing ? authorView(session.state.creative) : null;
     const level = own?.level ?? getLevel(session.state.activeLevelId);
@@ -48,6 +51,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   let layer: Layer = current().attempt?.completed ? 'result' : 'none';
   if (!current().attempt) layer = 'recovery';
   let editorView: EditorView | null = null, editorDraftId: string | null = null;
+  let exportView: ExportView | null = null, exportRouteKey: string | null = null;
   let lastFocus: HTMLElement | null = null, menuExit = false;
   let metaRoute: MetaRoute = { kind: 'home' }, metaHistory: MetaRoute[] = [], metaReturn: Layer = 'none';
   let restartLevelId: string | null = null, restartReturn: Layer = 'none';
@@ -123,12 +127,15 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     delete actions.dataset.meta;
     dialog.dataset.layer = layer;
     if (editorView && !(layer === 'meta' && metaRoute.kind === 'draft')) { editorView.destroy(); editorView = null; editorDraftId = null; }
+    const exportKey = layer === 'meta' && metaRoute.kind === 'export' ? JSON.stringify(metaRoute) : null;
+    if (exportKey !== exportRouteKey) { exportView?.destroy(); exportView = null; exportRouteKey = exportKey; }
+    dialog.dataset.export = String(!!exportKey);
     const open = layer !== 'none' && layer !== 'help';
     if (!open) { if (dialog.open) { dialog.close(); lastFocus?.focus(); } return; }
     const draftId = layer === 'meta' && metaRoute.kind === 'draft' ? metaRoute.draftId : null;
     if (editorDraftId !== draftId) { editorView?.destroy(); editorView = null; editorDraftId = draftId; }
     dialog.dataset.editor = String(!!draftId);
-    byId('dialog-copy').textContent = ''; if (!editorView) actions.replaceChildren();
+    byId('dialog-copy').textContent = ''; if (!editorView && !exportView) actions.replaceChildren();
     dialog.dataset.layer = layer; byId('victory-prism').hidden = layer !== 'result';
     const { level, attempt, own } = current();
     if (layer === 'result') {
@@ -180,9 +187,15 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       button('Вернуться к игре', () => { layer = 'none'; render(); });
     } else if (layer === 'meta') {
       const work = draftId && session.state.creative ? findDraft(session.state.creative, draftId) : null;
-      if (work) {
+      if (metaRoute.kind === 'export') {
+        byId('dialog-title').textContent = 'Экспорт изображения';
+        if (!exportView) exportView = new ExportView(actions, { state: session.state, disabled: busy || activity.isBlocked(), route: metaRoute, files: exportFiles,
+          back: () => { if (metaHistory.length) metaRoute = metaHistory.pop()!; else layer = metaReturn; render(); } });
+        exportView.update(session.state,busy || activity.isBlocked());
+      } else if (work) {
         byId('dialog-title').textContent = work.name;
         if (!editorView) editorView = new EditorView(actions, { work, disabled: busy || activity.isBlocked(), pending: !!session.pending, commit: action => run(action), recover: recoverEditor,
+          exportWork: (workId,nodeId) => showMeta({kind:'export',initialKey:`own:${workId}:${nodeId}`}),
           play: (workId, nodeId) => void run({ kind: 'author-start', workId, nodeId, attemptId: crypto.randomUUID() }, () => { metaHistory = []; menuExit = false; layer = current().attempt?.completed ? 'result' : 'none'; }),
           back: () => { metaHistory = []; metaRoute = { kind: 'album', tab: 'own' }; layer = 'meta'; render(); } });
         editorView.update(work, busy || activity.isBlocked(), !!session.pending);
@@ -285,6 +298,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   const back = (): boolean => {
     if (busy || layer === 'recovery') return true;
     scene.cancel();
+    if (exportView && layer === 'meta') { exportView.leave(); return true; }
     if (editorView && layer === 'meta') { void editorView.leave(); return true; }
     if (layer === 'meta') {
       if (metaHistory.length) metaRoute = metaHistory.pop()!;
@@ -325,5 +339,5 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     render();
   });
   await frame; ready = true; render(); resize();
-  return { back, destroy() { alive = false; editorView?.destroy(); listeners.abort(); observer.disconnect(); unblock(); atmosphere.destroy(); feedback.destroy(); activity.setGameplayDesired(false); store.close(); destroyRenderer(game); } };
+  return { back, destroy() { alive = false; editorView?.destroy(); exportView?.destroy(); exportFiles.destroy?.(); listeners.abort(); observer.disconnect(); unblock(); atmosphere.destroy(); feedback.destroy(); activity.setGameplayDesired(false); store.close(); destroyRenderer(game); } };
 }

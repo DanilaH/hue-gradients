@@ -15,7 +15,7 @@ try {
     ? (await import('./local-store/native')).openNativeStore()
     : await openIndexedDb();
   startup.mark('storageReady');
-  const feedback = Capacitor.isNativePlatform() ? { haptic: (await import('./app/nativeFeedback')).nativeHaptic } : {};
+  const feedback = Capacitor.isNativePlatform() ? { haptic: (await import('./app/nativeFeedback')).nativeHaptic, exportFiles: (await import('./app/nativeExport')).nativeExportFiles } : {};
   app = await mountGame(document.querySelector<HTMLElement>('#game-root')!, store, platform.activity, feedback);
   startup.mark('firstFrame');
   cover.hidden = true;

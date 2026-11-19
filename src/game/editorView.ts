@@ -6,6 +6,7 @@ interface EditorProps {
   pending:boolean; recover():Promise<boolean>;
   commit(action:CreativeAction):Promise<boolean>;
   play(workId:string,nodeId:string):void;
+  exportWork(workId:string,nodeId:string):void;
   back():void;
 }
 /** Owns the live form, not durable authority. Re-rendering busy/host state never destroys input. */
@@ -103,7 +104,7 @@ export class EditorView {
     const lines=check.errors.length?check.errors:check.warnings;
     for(const key of lines){const p=document.createElement('p');p.textContent=FIELD_MESSAGES[key]??key;box.append(p);}
     if(!lines.length)box.textContent=this.dirty?'Поле пригодно для проверки после применения.':hasAuthorProof(this.work,this.baseNodeId)?'Эта игровая версия пройдена автором.':'Поле пригодно для авторской проверки.';
-    if(!this.dirty && hasAuthorProof(this.work,this.baseNodeId)) {const best=authorBests(this.work,this.baseNodeId),p=document.createElement('p');p.textContent=`Без помощи: ${best.clean??'нет результата'} · с помощью: ${best.assisted??'нет результата'}`;box.append(p);}
+    if(!this.dirty && hasAuthorProof(this.work,this.baseNodeId)) {const best=authorBests(this.work,this.baseNodeId),p=document.createElement('p');p.textContent=`Без помощи: ${best.clean??'нет результата'} · с помощью: ${best.assisted??'нет результата'}`;box.append(p);this.button('Экспорт этой версии',()=>void(async()=>{if(await this.flush())this.props.exportWork(this.work.workId,this.baseNodeId);})(),box);}
     this.content.append(box);
   }
   private change(field:EditorField):void {this.field=field;this.changed();this.draw();}
