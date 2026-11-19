@@ -64,7 +64,7 @@ try {
   assert.deepEqual(await state(),before);
   return hash;
  }
- await page.locator('#levels').click();await page.getByRole('button',{name:'Альбом',exact:true}).click();assert.equal(await page.getByRole('button',{name:'Экспорт',exact:true}).count(),0);assert.equal(await page.evaluate(()=>window.__shareCalls.length),0);
+ await page.locator('#levels').click();await page.getByRole('button',{name:'Альбом',exact:true}).click();assert.equal(await page.getByRole('button',{name:'Коллаж',exact:true}).count(),0);assert.equal(await page.evaluate(()=>window.__shareCalls.length),0);
  passed.push('empty profile cannot export unfinished targets; no automatic share call');
  await page.keyboard.press('Escape');await page.keyboard.press('Escape');
  await solve(levels[0]);
@@ -119,7 +119,30 @@ try {
   c=solve(applyCreative(c,{kind:'author-start',workId:'export-work',nodeId:'export-node-b',attemptId:'own-b'}));c=applyCreative(c,{kind:'author-exit'});s={...s,creative:c};
   const store=await openIndexedDb(),old=await store.load('guest-local-v1');await store.commit(await prepareCommit({operationId:crypto.randomUUID(),vaultId:'guest-local-v1',expectedRevision:old.localRevision,nextSnapshotJson:JSON.stringify(s),facts:[]}));store.close();
  });
- await page.reload();await page.waitForSelector('html[data-state=ready]');await page.keyboard.press('Escape');await page.locator('#levels').click();await page.getByRole('button',{name:'Альбом',exact:true}).click();await page.getByRole('button',{name:'Экспорт',exact:true}).click();await ready();
+ await page.reload();await page.waitForSelector('html[data-state=ready]');await page.keyboard.press('Escape');
+ await page.locator('#levels').click();await button('Альбом').click();await button('Мои работы').click();
+ await page.locator('[data-draft-id=export-draft]').click();
+ assert.equal(await page.locator('.work-card').getAttribute('data-work-key'),'own:export-work:export-node-b');
+ await page.waitForFunction(()=>document.querySelector('.work-card-preview')?.naturalWidth===1080);
+ const ownPicture=page.locator('.work-card-preview'),ownHash=await imageHash(ownPicture);
+ const ownSave=page.waitForEvent('download');await button('Сохранить PNG').click();
+ await (await ownSave).saveAs('.test-output/m4b/png/own-card.png');
+ assert.equal(createHash('sha256').update(await readFile('.test-output/m4b/png/own-card.png')).digest('hex'),ownHash);
+ const ownNode=(await state()).state.creative.works['export-work'].nodes['export-node-b'];
+ wallpapers.push({format:'clean',file:'own-card.png',works:[ownNode.field]});
+ await button('‹ Назад').click();assert.equal(await button('Мои работы').getAttribute('aria-pressed'),'true');
+ assert.equal(await page.evaluate(()=>document.activeElement?.dataset.draftId),'export-draft');
+
+ await button('Коллаж').click();
+ for(const id of ['a','b'])await page.locator(`[data-album-focus="own:export-work:export-node-${id}"]`).click();
+ assert.deepEqual(await page.locator('.album-print[aria-pressed=true]').evaluateAll(nodes=>nodes.map(n=>n.dataset.albumFocus)),['own:export-work:export-node-b']);
+ await button('Собранное').click();await page.locator('[data-album-level=gradient-001]').click();
+ await button('Мои работы').click();assert.equal(await page.locator('.album-print[aria-pressed=true]').getAttribute('data-album-focus'),'own:export-work:export-node-b');
+ assert.match(await page.locator('.album-selection p').innerText(),/2 из 3/);
+ await button('‹ Назад').click();await button('Собранное').click();
+ passed.push('verified own gallery card downloads the displayed revision and mixed collage replaces earlier revisions in one slot');
+
+ await page.locator('[data-album-level=gradient-001]').click();await page.getByLabel('Действия с работой').click();await button('Другие макеты').click();await ready();
  const before=await state(),previewHash=await page.locator('.export-preview').evaluate(async img=>{const b=await(await fetch(img.src)).arrayBuffer();return [...new Uint8Array(await crypto.subtle.digest('SHA-256',b))].map(v=>v.toString(16).padStart(2,'0')).join('');});
  const downloadPromise=page.waitForEvent('download');await page.getByRole('button',{name:'Сохранить изображение',exact:true}).click();const download=await downloadPromise;await download.saveAs('.test-output/m4b/png/ui-clean.png');
  assert.equal(createHash('sha256').update(await readFile('.test-output/m4b/png/ui-clean.png')).digest('hex'),previewHash);assert((await page.locator('.export-status').innerText()).includes('запрошена'));

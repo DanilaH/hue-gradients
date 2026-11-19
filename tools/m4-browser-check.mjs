@@ -16,7 +16,7 @@ try {
  const state=()=>page.evaluate(async()=>{const{openIndexedDb}=await import('/src/local-store/indexed-db.ts');const store=await openIndexedDb(),r=await store.load('guest-local-v1');store.close();return JSON.parse(r.snapshotJson);});
  const work=async()=>Object.values((await state()).creative.works)[0];
  const saved=()=>page.waitForFunction(()=>document.querySelector('.editor-status')?.textContent.includes('сохранён на устройстве'));
- await page.locator('#levels').click();await page.getByRole('button',{name:'Альбом',exact:true}).click();await page.getByRole('button',{name:'Мои работы',exact:true}).click();await page.getByRole('button',{name:'Создать композицию',exact:true}).click();await idle();
+ await page.locator('#levels').click();await page.getByRole('button',{name:'Альбом',exact:true}).click();await page.getByRole('button',{name:'Мои работы',exact:true}).click();await page.getByRole('button',{name:'Создать',exact:true}).click();await idle();
  assert.equal((await work()).nodes[(await work()).headNodeId].field.width,4);assert.deepEqual((await state()).completed,[]);passed.push('new 4×4 editor available before any campaign completion');
  await page.getByRole('textbox',{name:'Название работы'}).fill('<b>Моя 🌈</b>');
  await page.waitForFunction(async()=>{const{openIndexedDb}=await import('/src/local-store/indexed-db.ts');const s=await openIndexedDb(),r=await s.load('guest-local-v1');s.close();return Object.values(JSON.parse(r.snapshotJson).creative.works)[0].name==='<b>Моя 🌈</b>';});

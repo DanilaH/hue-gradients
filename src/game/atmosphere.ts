@@ -1,6 +1,7 @@
 import { exponentialResponse } from '@danilah/mini-games-kit/feel';
 import type { LevelDefinition } from '../domain/puzzle';
 
+type PaletteField = Pick<LevelDefinition, 'width' | 'height' | 'solvedTileColors'>;
 export type RGB = readonly [number, number, number];
 export interface ColourPointer { x: number; y: number; color: string }
 const rgb = (hex: string): RGB => [1, 3, 5].map(offset => Number.parseInt(hex.slice(offset, offset + 2), 16)) as unknown as RGB;
@@ -9,7 +10,7 @@ const rgb = (hex: string): RGB => [1, 3, 5].map(offset => Number.parseInt(hex.sl
 const gels = ['#DC5CEA', '#8160EB', '#38DABC', '#F69D6E', '#BD5EDC', '#4AC7ED', '#BD7CFA', '#ED729F', '#546AE1'].map(rgb);
 const dither = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
 /** Uses only visible tile colours and positions. No solution score, distance or minimum enters this function. */
-export function spatialPalette(level: Pick<LevelDefinition, 'width' | 'height' | 'solvedTileColors'>, board: readonly number[] | null): RGB[] {
+export function spatialPalette(level: PaletteField, board: readonly number[] | null): RGB[] {
   const samples: RGB[] = [];
   for (let y = 0; y < 3; y++) for (let x = 0; x < 3; x++) {
     let weight = 0; const sum = [0, 0, 0];
@@ -31,7 +32,7 @@ export class Atmosphere {
   private readonly texture: CanvasPattern | null;
   private target: RGB[] = gels;
   private current: RGB[] = gels;
-  private level: LevelDefinition | null = null;
+  private level: PaletteField | null = null;
   private board: readonly number[] | null = null;
   private pointer: ColourPointer | null = null;
   private ripple: (ColourPointer & { started: number; win: boolean }) | null = null;
@@ -67,7 +68,7 @@ export class Atmosphere {
     host.prepend(this.canvas);
     this.pointer = null; this.pointerPower = 0; this.pointerHeld = false; this.ripple = null;
   }
-  setModel(level: LevelDefinition | null, board: readonly number[] | null): void {
+  setModel(level: PaletteField | null, board: readonly number[] | null): void {
     if (this.level === level && this.board === board) return;
     this.level = level; this.board = board; this.target = level ? spatialPalette(level, board) : gels;
     if (!this.active || !this.motion) { this.current = this.target; this.draw(); }

@@ -65,6 +65,16 @@ function drawGradient(ctx: CanvasRenderingContext2D, field: ExportField, width: 
   ctx.putImageData(image, 0, 0);
 }
 
+export function gradientThumbnail(field: ExportField): HTMLCanvasElement {
+  const canvas = document.createElement('canvas');
+  canvas.width = 96;
+  canvas.height = 64;
+  const context = canvas.getContext('2d', { alpha: false, colorSpace: 'srgb' });
+  if (context) drawGradient(context, field, canvas.width, canvas.height);
+  canvas.setAttribute('aria-hidden', 'true');
+  return canvas;
+}
+
 function drawLayout(ctx: CanvasRenderingContext2D, plan: ExportPlan): void {
     const { width, height } = plan.layout;
     ctx.imageSmoothingEnabled=false;ctx.fillStyle=EXPORT_STYLE.paper;ctx.fillRect(0,0,width,height);

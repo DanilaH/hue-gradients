@@ -2,21 +2,18 @@ import { chapters, getLevel, levels } from '../domain/levels';
 import { chapterCount, chapterIndexFor, chapterIsOpen, levelIsOpen, META_POLICY, recommendedLevel } from '../domain/progression';
 import type { LevelDefinition } from '../domain/puzzle';
 import type { Workspace } from '../domain/workspace';
-import { hasAuthorProof } from '../domain/creative';
-import { canExport } from '../domain/export';
+import type { AlbumRoute } from './albumView';
 import type { ExportRoute } from './exportView';
 
 type PickerRoute = { kind: 'chapter'; levelId: string; chapterMenu?: number };
-export type MetaRoute = PickerRoute | { kind: 'page'; index: number } |
-  { kind: 'album'; tab: 'campaign' | 'daily' | 'own' } | { kind: 'card' | 'copy'; levelId: string } |
-  { kind: 'draft'; draftId: string } | ExportRoute;
+export type MetaRoute = PickerRoute | AlbumRoute | { kind: 'card' | 'copy'; levelId: string } |
+  { kind: 'own-card'; workId: string; nodeId: string } | { kind: 'draft'; draftId: string } | ExportRoute;
 interface MetaView {
   route: MetaRoute; state: Workspace; disabled: boolean;
   title: HTMLElement; copy: HTMLElement; actions: HTMLElement;
   navigate(route: MetaRoute): void; back(): void;
   play(id: string): void; saveCopy(id: string, name: string): void;
   repeat(id: string): void;
-  createWork(): void;
 }
 function actionButton(parent: HTMLElement, text: string, invoke: () => void, disabled: boolean): HTMLButtonElement {
   const button = document.createElement('button');
@@ -187,34 +184,6 @@ export function renderMeta(v: MetaView): void {
   const back = () => button('Назад', v.back);
   if (route.kind === 'chapter') {
     renderPicker(v, route);
-  } else if (route.kind === 'album') {
-    v.title.textContent = 'Альбом'; v.copy.textContent = route.tab === 'campaign' ? `${state.completed.length} собранных работ` : '';
-    const tabs = document.createElement('div'); tabs.className = 'album-tabs'; actions.append(tabs);
-    for (const [tab, name] of [['campaign', 'Кампания'], ['daily', 'Ежедневные'], ['own', 'Мои работы']] as const) {
-      const node = button(name, () => v.navigate({ kind: 'album', tab }), tabs); node.setAttribute('aria-pressed', String(route.tab === tab));
-    }
-    const grid = document.createElement('div'); grid.className = 'album-grid'; actions.append(grid);
-    if (route.tab === 'campaign') {
-      for (const level of levels.filter(l => state.completed.includes(l.id))) {
-        const node = button('', () => v.navigate({ kind: 'card', levelId: level.id }), grid); node.dataset.albumLevel = level.id;
-        node.append(preview(level));
-        const title = document.createElement('span'); title.textContent = `${level.ordinal}. ${level.title}`; node.append(title);
-        const best = state.bests[level.id];
-        if (best?.clean != null) { const badge = document.createElement('small'); badge.textContent = best.clean === level.minimumSwaps ? 'Идеально без помощи' : 'Без помощи'; node.append(badge); }
-      }
-      if (!state.completed.length) { label('Здесь появятся ваши собранные градиенты. Незавершённые работы не раскрывают готовое поле.'); button('Вернуться к первой работе', () => v.play(levels[0]!.id)); }
-      chapters.forEach((c,index) => { if (chapterCount(state,index) === 15) button(`Полная страница главы ${index+1}`, () => v.navigate({ kind:'page',index })); });
-    } else if (route.tab === 'own') {
-      button('Создать композицию', v.createWork);
-      for (const work of Object.values(state.creative?.works ?? {})) {
-        const node = button('', () => v.navigate({ kind: 'draft', draftId: work.draftId }), grid); node.dataset.draftId = work.draftId;
-        node.append(preview(work.nodes[work.headNodeId]!.field)); const title = document.createElement('span'); title.textContent = work.name; node.append(title);
-        const status = document.createElement('small'); status.textContent = hasAuthorProof(work,work.headNodeId) ? 'Пройдено автором' : 'Черновик · не проверен'; node.append(status);
-      }
-      if (!Object.keys(state.creative?.works??{}).length) label('Создайте свою композицию или сохраните копию собранной работы.');
-    } else label('Пока нет собранных ежедневных работ.');
-    if (route.tab === 'campaign' && canExport(state, 'clean')) button('Экспорт', () => v.navigate({ kind: 'export' }));
-    back();
   } else if (route.kind === 'card' || route.kind === 'copy') {
     const level = getLevel(route.levelId);
     v.title.textContent = level.title;
@@ -232,13 +201,5 @@ export function renderMeta(v: MetaView): void {
     v.title.textContent = copy?.name ?? 'Копия не найдена';
     if (copy) { v.copy.textContent = 'Сохранённая копия · черновик\nИсходная работа не изменилась. Авторское прохождение ещё не выполнено.'; actions.append(preview(copy.snapshot, true)); }
     button('Мои работы', () => v.navigate({ kind: 'album', tab: 'own' })); back();
-  } else if (route.kind === 'page') {
-    const chapter = chapters[route.index]!;
-    v.title.textContent = `Страница главы ${route.index + 1}`;
-    const grid = document.createElement('div'); grid.className = 'chapter-page'; actions.append(grid);
-    chapter.levelIds.forEach(id => { if (state.completed.includes(id)) grid.append(preview(getLevel(id))); else { const empty = document.createElement('div'); empty.className = 'empty-composition'; empty.textContent = 'Ещё не собрано'; grid.append(empty); } });
-    v.copy.textContent = `${chapterCount(state, route.index)} / 15`;
-    if (chapterCount(state,route.index)===15) button('Сохранить страницу', () => v.navigate({kind:'export',chapterIndex:route.index}));
-    back();
   }
 }

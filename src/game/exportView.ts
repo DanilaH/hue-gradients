@@ -1,24 +1,43 @@
-import { canExport, eligibleExportWorks, exportPlan, exportWorkCount, ExportError, EXPORT_LAYOUTS, type ExportFormat, type ExportWork } from '../domain/export';
+import { canExport, eligibleExportWorks, exportPlan, exportWorkCount, selectExportWork, ExportError, EXPORT_LAYOUTS, type ExportFormat, type ExportWork } from '../domain/export';
 import { EXPORT_FORMATS } from '../domain/progression';
 import type { Workspace } from '../domain/workspace';
 import { exportResultMessage, type ExportFiles } from '../app/exportFiles';
 import { renderExport } from './exportRenderer';
+import type { AlbumSelection } from './albumView';
 
-export interface ExportRoute { kind:'export'; initialKey?:string; chapterIndex?:number }
+export interface ExportRoute { kind:'export'; initialKey?:string; chapterIndex?:number; preset?:AlbumSelection }
+export const isFocusedExport = (route: ExportRoute) => route.chapterIndex !== undefined || !!route.preset;
+export function exportScreenTitle(route: ExportRoute): string {
+  if (route.chapterIndex !== undefined) return `Страница главы ${route.chapterIndex + 1}`;
+  return EXPORT_FORMATS.find(format => format.id === route.preset?.format)?.title ?? 'Другие макеты';
+}
 interface Props { state:Workspace; disabled:boolean; route:ExportRoute; files:ExportFiles; back():void }
 export class ExportView {
   private state:Workspace;private disabled:boolean;private format:ExportFormat;private catalog:ExportWork[];
   private readonly selections=new Map<ExportFormat,string[]>();private caption='';private file:File|null=null;private url:string|null=null;
   private generation=0;private disposed=false;private sending=false;private timer:ReturnType<typeof setTimeout>|undefined;
-  private message='Выберите макет и работы.';private authorityKey='';
+  private message='';private authorityKey='';
+  private readonly focused: boolean;
   private readonly panel=document.createElement('div');private readonly controls=document.createElement('div');private readonly status=document.createElement('p');
   private readonly content=document.createElement('div');private readonly preview=document.createElement('img');private readonly options=document.createElement('div');
   constructor(parent:HTMLElement,private readonly props:Props) {
-    this.state=props.state;this.disabled=props.disabled;this.catalog=eligibleExportWorks(this.state);this.format=props.route.chapterIndex===undefined?'clean':'chapter-page';
-    const first=props.route.initialKey??this.catalog[0]?.key;this.selections.set(this.format,first?[first]:[]);
-    this.panel.className='export-panel';this.controls.className='export-controls';this.status.className='export-status';this.status.setAttribute('role','status');
+    this.state=props.state;this.disabled=props.disabled;this.catalog=eligibleExportWorks(this.state);
+    this.focused=isFocusedExport(props.route);
+    this.format=props.route.preset?.format??(props.route.chapterIndex===undefined?'clean':'chapter-page');
+    const first=props.route.initialKey??this.catalog[0]?.key;
+    this.selections.set(this.format,props.route.preset?[...props.route.preset.keys]:first?[first]:[]);
+    this.panel.className='export-panel';this.panel.dataset.focused=String(this.focused);this.controls.className='export-controls';this.status.className='export-status';this.status.setAttribute('role','status');
     this.content.className='export-content';this.options.className='export-options';this.preview.className='export-preview';this.preview.alt='Точный предпросмотр PNG';this.preview.hidden=true;
-    this.panel.append(this.controls,this.status,this.content);this.content.append(this.preview,this.options);parent.append(this.panel);this.drawOptions();this.refresh();
+    if(this.focused) {
+      const nav=document.createElement('nav');
+      nav.className='export-focus-nav';
+      this.button('Назад',()=>this.leave(),nav).className='quiet export-back';
+      this.panel.append(nav,this.preview,this.controls,this.status);
+    } else {
+      this.content.append(this.options);
+      this.panel.append(this.controls,this.status,this.preview,this.content);
+    }
+    parent.append(this.panel);this.drawOptions();this.refresh();
   }
   update(state:Workspace,disabled:boolean):void {
     this.state=state;this.disabled=disabled;this.catalog=eligibleExportWorks(state);
@@ -32,20 +51,29 @@ export class ExportView {
   }
   private controlsState():void {
     this.controls.replaceChildren();this.status.textContent=this.message;
-    this.button('Сохранить изображение',()=>void this.send('save'),this.controls,!this.file).dataset.saveImage='';
+    this.button(this.focused?'Сохранить PNG':'Сохранить изображение',()=>void this.send('save'),this.controls,!this.file).dataset.saveImage='';
     const available=this.file?this.props.files.canShare(this.file):false;
-    this.button('Поделиться',()=>void this.send('share'),this.controls,!this.file||!available).dataset.shareImage='';
-    this.button('Назад',()=>this.leave(),this.controls).className='quiet export-back';
+    if(!this.focused||available) this.button('Поделиться',()=>void this.send('share'),this.controls,!this.file||!available).dataset.shareImage='';
+    if(!this.focused) this.button('Назад',()=>this.leave(),this.controls).className='quiet export-back';
+    const focusBack=this.panel.querySelector<HTMLButtonElement>('.export-focus-nav button');
+    if(focusBack)focusBack.disabled=this.disabled||this.sending;
     this.options.querySelectorAll<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>('input,select,textarea').forEach(e=>{e.disabled=this.disabled||this.sending||e.dataset.unavailable==='true';});
     const note=this.options.querySelector<HTMLElement>('.export-share-note');if(note)note.textContent=this.file&&!available?'В этом браузере отправка файла недоступна. Сохраните PNG.':'';
   }
   private drawOptions():void {
+    if(this.focused)return;
     const scroll=this.content.scrollTop;this.options.replaceChildren();
     const label=document.createElement('label');label.textContent='Макет';const select=document.createElement('select');select.setAttribute('aria-label','Макет');
     const formats:[ExportFormat,string][]=[['clean','Чистый градиент'],...EXPORT_FORMATS.map(f=>[f.id,`${f.title} · ${f.threshold} ${f.source==='campaign'?'работ кампании':'ежедневных работ'}`]as [ExportFormat,string])];
-    if(this.props.route.chapterIndex!==undefined)formats.push(['chapter-page',`Страница главы ${this.props.route.chapterIndex+1}`]);
     for(const [id,title]of formats){const option=document.createElement('option');option.value=id;const open=canExport(this.state,id,this.props.route.chapterIndex);option.textContent=`${title}${open?'':' · закрыто'}`;option.disabled=!open;select.append(option);}select.value=this.format;
-    select.onchange=()=>{this.format=select.value as ExportFormat;if(!this.selections.has(this.format))this.selections.set(this.format,[]);this.drawOptions();this.refresh();};label.append(select);this.options.append(label);
+    select.onchange=()=>{
+      this.format=select.value as ExportFormat;
+      if(!this.selections.has(this.format)) {
+        const first=exportWorkCount(this.format)===1?this.props.route.initialKey:undefined;
+        this.selections.set(this.format,first?[first]:[]);
+      }
+      this.drawOptions();this.refresh();
+    };label.append(select);this.options.append(label);
     if(this.format!=='chapter-page') {
       const count=exportWorkCount(this.format),keys=this.selections.get(this.format)??[],selectedWorks=keys.map(k=>this.catalog.find(w=>w.key===k)?.workId);
       const summary=document.createElement('p');summary.className='meta-note';summary.textContent=`Выбрано ${keys.length} / ${count}. Разные версии одной работы занимают одно место.`;this.options.append(summary);
@@ -53,7 +81,7 @@ export class ExportView {
       for(const work of this.catalog) {
         const row=document.createElement('label');row.className='export-work';const input=document.createElement('input');input.type='checkbox';input.checked=keys.includes(work.key);input.setAttribute('aria-label',`${work.title} · ${work.source}`);input.dataset.exportKey=work.key;
         input.dataset.unavailable=String(count>1&&!input.checked&&keys.length>=count&&!selectedWorks.includes(work.workId));
-        input.onchange=()=>{let next=[...keys];if(input.checked){if(count===1)next=[work.key];else{const previous=next.findIndex(k=>this.catalog.find(w=>w.key===k)?.workId===work.workId);if(previous>=0)next[previous]=work.key;else next.push(work.key);}}else next=next.filter(k=>k!==work.key);this.selections.set(this.format,next);this.drawOptions();this.refresh();};
+        input.onchange=()=>{this.selections.set(this.format,selectExportWork(keys,work,this.catalog,count));this.drawOptions();this.refresh();};
         const title=document.createElement('span');title.textContent=work.title;const small=document.createElement('small');small.textContent=work.source;title.append(small);row.append(input,title);list.append(row);
       }
       if(!this.catalog.length){const p=document.createElement('p');p.textContent='Сначала соберите работу кампании или пройдите свою композицию.';list.append(p);}
@@ -74,7 +102,7 @@ export class ExportView {
       const request={format:this.format,keys:this.selections.get(this.format)??[],caption:this.caption,...(this.props.route.chapterIndex===undefined?{}:{chapterIndex:this.props.route.chapterIndex})};
       const plan=exportPlan(this.state,request),blob=await renderExport(plan);if(this.disposed||generation!==this.generation)return;
       const file=new File([blob],`Poluson-${this.format}.png`,{type:'image/png'});if(this.url)URL.revokeObjectURL(this.url);this.url=URL.createObjectURL(file);this.preview.src=this.url;this.preview.hidden=false;this.file=file;
-      this.message=`PNG готов · ${plan.layout.width} × ${plan.layout.height} пикселей`;this.panel.dataset.ready='true';
+      this.message=this.focused?'':`PNG готов · ${plan.layout.width} × ${plan.layout.height} пикселей`;this.panel.dataset.ready='true';
     }catch(error){if(this.disposed||generation!==this.generation)return;this.message=error instanceof ExportError?error.message:'Не удалось подготовить PNG. Попробуйте другой макет или повторите выбор.';this.panel.dataset.ready='false';}
     this.controlsState();
   }

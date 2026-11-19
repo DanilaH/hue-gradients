@@ -38,6 +38,13 @@ export function canExport(state:Workspace,format:ExportFormat,chapterIndex?:numb
   return state.rights.includes(format);
 }
 export function exportWorkCount(format:ExportFormat):number {return format==='clean'?1:EXPORT_LAYOUTS[format].fields.length;}
+export function selectExportWork(keys: readonly string[], work: ExportWork, catalog: readonly ExportWork[], limit: number): string[] {
+  if (keys.includes(work.key)) return keys.filter(key => key !== work.key);
+  if (limit === 1) return [work.key];
+  const previous = keys.findIndex(key => catalog.find(entry => entry.key === key)?.workId === work.workId);
+  if (previous >= 0) return keys.map((key, index) => index === previous ? work.key : key);
+  return keys.length < limit ? [...keys, work.key] : [...keys];
+}
 function validateExportField(field:ExportField):void {
   if(!Number.isInteger(field.width)||field.width<1||field.width>6||!Number.isInteger(field.height)||field.height<1||field.height>5||field.solvedTileColors.length!==field.width*field.height||field.solvedTileColors.some(c=>!/^#[0-9a-f]{6}$/i.test(c)))throw new ExportError('INVALID_FIELD','Не удалось прочитать цвета работы.');
 }

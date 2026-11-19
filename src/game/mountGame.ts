@@ -13,10 +13,11 @@ import { boardGeometry, cellAt } from './geometry';
 import { GameFeedback, type Haptic } from './feedback';
 import { levelPreview, renderMeta, type MetaRoute } from './metaView';
 import { chapterIndexFor, recommendedLevel, rewardTitle } from '../domain/progression';
-import { authorView, findDraft, type CreativeAction } from '../domain/creative';
+import { authorBests, authorView, findDraft, hasAuthorProof, type CreativeAction } from '../domain/creative';
 import { makeField } from '../domain/editor';
 import { EditorView } from './editorView';
-import { ExportView } from './exportView';
+import { ExportView, exportScreenTitle, isFocusedExport } from './exportView';
+import { albumPositionKey, renderAlbum, type AlbumPosition, type AlbumRoute } from './albumView';
 import { WorkCardView } from './workCardView';
 import { colourPrism, flashPrismEdge, victoryPrism } from './victoryPrism';
 import { browserExportFiles, type ExportFiles } from '../app/exportFiles';
@@ -56,6 +57,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   let editorView: EditorView | null = null, editorDraftId: string | null = null;
   let exportView: ExportView | null = null, exportRouteKey: string | null = null;
   let workCard: WorkCardView | null = null, workCardId: string | null = null;
+  let shownAlbum: AlbumRoute | null = null;
+  const albumPositions = new Map<string, AlbumPosition>();
   const prism = byId('victory-prism');
   let prismGlint: Animation | null = null;
   let lastFocus: HTMLElement | null = null;
@@ -118,7 +121,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     scene.cancel();
     if (layer !== 'meta') { metaReturn = layer; metaHistory = []; }
     else {
-      const samePicker = route.kind === metaRoute.kind && (route.kind === 'album' || route.kind === 'chapter');
+      const samePicker = route.kind === 'chapter' && metaRoute.kind === 'chapter'
+        || route.kind === 'album' && metaRoute.kind === 'album' && !!route.selection === !!metaRoute.selection;
       if (!samePicker && JSON.stringify(route) !== JSON.stringify(metaRoute)) metaHistory.push(metaRoute);
     }
     metaRoute = route; layer = 'meta'; render();
@@ -143,7 +147,36 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   function selectedWork(): string | null {
     return layer === 'meta' && metaRoute.kind === 'card' && session.state.completed.includes(metaRoute.levelId) ? metaRoute.levelId : null;
   }
+  function selectedAuthorWork() {
+    if (layer !== 'meta' || metaRoute.kind !== 'own-card') return null;
+    const work = session.state.creative?.works[metaRoute.workId];
+    return work && hasAuthorProof(work, metaRoute.nodeId) ? { work, nodeId: metaRoute.nodeId } : null;
+  }
+  function popMeta(): void {
+    const previous = metaHistory.pop();
+    if (previous) metaRoute = previous;
+    else layer = metaReturn;
+    render();
+  }
+  function createWork(): void {
+    const draftId = crypto.randomUUID();
+    void run({ kind: 'editor-create', draftId, workId: crypto.randomUUID(), nodeId: crypto.randomUUID(), name: 'Моя композиция', field: makeField(), seed: 0 },
+      () => showMeta({ kind: 'draft', draftId }));
+  }
+  function rememberAlbum(): void {
+    if (!shownAlbum) return;
+    const scroller = actions.querySelector('.album-scroll');
+    if (!scroller) return;
+    const key = albumPositionKey(shownAlbum);
+    const active = document.activeElement instanceof HTMLElement && actions.contains(document.activeElement)
+      ? document.activeElement.dataset.albumFocus : undefined;
+    const focus = active ?? albumPositions.get(key)?.focus;
+    albumPositions.set(key, { scroll: scroller.scrollTop, ...(focus ? { focus } : {}) });
+  }
   function renderDialog(): void {
+    rememberAlbum();
+    shownAlbum = layer === 'meta' && metaRoute.kind === 'album' ? metaRoute : null;
+    dialog.dataset.album = String(!!shownAlbum);
     const chapterUnlock = byId('chapter-unlock');
     chapterUnlock.hidden = true;
     delete actions.dataset.meta;
@@ -151,10 +184,12 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (editorView && !(layer === 'meta' && metaRoute.kind === 'draft')) { editorView.destroy(); editorView = null; editorDraftId = null; }
     const exportKey = layer === 'meta' && metaRoute.kind === 'export' ? JSON.stringify(metaRoute) : null;
     if (exportKey !== exportRouteKey) { exportView?.destroy(); exportView = null; exportRouteKey = exportKey; }
-    const cardId = selectedWork();
-    if (cardId !== workCardId) { workCard?.destroy(); workCard = null; workCardId = cardId; }
-    dialog.dataset.workCard = String(cardId !== null);
+    const cardId = selectedWork(), authorCard = selectedAuthorWork();
+    const cardKey = cardId ? `campaign:${cardId}` : authorCard ? `own:${authorCard.work.workId}:${authorCard.nodeId}` : null;
+    if (cardKey !== workCardId) { workCard?.destroy(); workCard = null; workCardId = cardKey; }
+    dialog.dataset.workCard = String(cardKey !== null);
     dialog.dataset.export = String(!!exportKey);
+    dialog.dataset.exportFocus = String(layer === 'meta' && metaRoute.kind === 'export' && isFocusedExport(metaRoute));
     dialog.dataset.picker = String(layer === 'meta' && metaRoute.kind === 'chapter');
     dialog.dataset.chapterMenu = String(layer === 'meta' && metaRoute.kind === 'chapter' && metaRoute.chapterMenu !== undefined);
     if (layer !== 'result' || !motionAllowed()) { prismGlint?.cancel(); prismGlint = null; }
@@ -209,38 +244,59 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       }
     } else if (layer === 'meta') {
       const work = draftId && session.state.creative ? findDraft(session.state.creative, draftId) : null;
-      if (cardId !== null) {
-        const finished = getLevel(cardId);
-        byId('dialog-title').textContent = finished.title;
-        if (!workCard) workCard = new WorkCardView(actions, session.state, finished, exportFiles, {
-          back: () => { back(); }, replay: () => askRestart(cardId),
-          copy: () => showMeta({ kind: 'copy', levelId: cardId }),
-          layouts: () => showMeta({ kind: 'export', initialKey: `campaign:${cardId}` }),
-          collection: metaHistory.length === 0 && metaReturn === 'result' ? () => showMeta({ kind: 'album', tab: 'campaign' }) : undefined,
+      if (cardKey) {
+        const finished = cardId ? getLevel(cardId) : null;
+        const title = finished?.title ?? authorCard!.work.name;
+        byId('dialog-title').textContent = title;
+        if (!workCard) workCard = new WorkCardView(actions, session.state, {
+          key: cardKey, title,
+          ...(finished ? {
+            levelId: finished.id, filename: `Poluson-${String(finished.ordinal).padStart(3, '0')}.png`, best: session.state.bests[finished.id]!,
+          } : {
+            filename: 'Poluson-own.png', best: authorBests(authorCard!.work, authorCard!.nodeId),
+            detail: `Версия ${Object.keys(authorCard!.work.nodes).indexOf(authorCard!.nodeId) + 1} · пройдена автором`,
+          }),
+        }, exportFiles, {
+          back: popMeta,
+          layouts: () => showMeta({ kind: 'export', initialKey: cardKey }),
+          ...(finished ? {
+            replay: () => askRestart(finished.id),
+            copy: () => showMeta({ kind: 'copy', levelId: finished.id }),
+            ...(metaHistory.length === 0 && metaReturn === 'result' ? {
+              collection: () => {
+                const route = { kind: 'album', tab: 'campaign' } as const;
+                const key = albumPositionKey(route);
+                albumPositions.set(key, { scroll: albumPositions.get(key)?.scroll ?? 0, focus: finished.id, reveal: true });
+                showMeta(route);
+              },
+            } : {}),
+          } : { edit: () => {
+            const draftId = authorCard!.work.draftId, previous = metaHistory.at(-1);
+            if (previous?.kind === 'draft' && previous.draftId === draftId) popMeta();
+            else showMeta({ kind: 'draft', draftId });
+          } }),
         });
         workCard.update(busy || activity.isBlocked() || !!session.pending);
       } else if (metaRoute.kind === 'export') {
-        byId('dialog-title').textContent = 'Экспорт изображения';
-        if (!exportView) exportView = new ExportView(actions, { state: session.state, disabled: busy || activity.isBlocked(), route: metaRoute, files: exportFiles,
-          back: () => { if (metaHistory.length) metaRoute = metaHistory.pop()!; else layer = metaReturn; render(); } });
+        byId('dialog-title').textContent = exportScreenTitle(metaRoute);
+        if (!exportView) exportView = new ExportView(actions, { state: session.state, disabled: busy || activity.isBlocked(), route: metaRoute, files: exportFiles, back: popMeta });
         exportView.update(session.state,busy || activity.isBlocked());
+      } else if (shownAlbum) {
+        byId('dialog-title').textContent = shownAlbum.selection ? 'Коллаж' : 'Альбом';
+        renderAlbum(actions, { state: session.state, disabled: busy || activity.isBlocked() || !!session.pending, route: shownAlbum,
+          position: albumPositions.get(albumPositionKey(shownAlbum)), navigate: showMeta, back: popMeta, createWork,
+          play: () => startLevel(session.state.activeLevelId) });
       } else if (work) {
         byId('dialog-title').textContent = work.name;
         if (!editorView) editorView = new EditorView(actions, { work, disabled: busy || activity.isBlocked(), pending: !!session.pending, commit: action => run(action), recover: recoverEditor,
-          exportWork: (workId,nodeId) => showMeta({kind:'export',initialKey:`own:${workId}:${nodeId}`}),
+          exportWork: (workId,nodeId) => showMeta({kind:'own-card',workId,nodeId}),
           play: (workId, nodeId) => void run({ kind: 'author-start', workId, nodeId, attemptId: crypto.randomUUID() }, () => { metaHistory = []; layer = current().attempt?.completed ? 'result' : 'none'; }),
-          back: () => { metaHistory = []; metaRoute = { kind: 'album', tab: 'own' }; layer = 'meta'; render(); } });
+          back: popMeta });
         editorView.update(work, busy || activity.isBlocked(), !!session.pending);
       } else {
       renderMeta({ route: metaRoute, state: session.state, disabled: busy || activity.isBlocked() || !!session.pending,
         title: byId('dialog-title'), copy: byId('dialog-copy'), actions, navigate: showMeta, back: () => { back(); },
         play: startLevel, repeat: repeatLevel,
-        createWork: () => {
-          const draftId = crypto.randomUUID();
-          void run({ kind: 'editor-create', draftId, workId: crypto.randomUUID(), nodeId: crypto.randomUUID(), name: 'Моя композиция', field: makeField(), seed: 0 }, () => {
-            metaHistory = [{ kind: 'album', tab: 'own' }]; metaRoute = { kind: 'draft', draftId }; layer = 'meta';
-          });
-        },
         saveCopy: (levelId, name) => {
           const draftId = crypto.randomUUID();
           void run({ kind: 'copy', levelId, name, draftId, workId: crypto.randomUUID(), nodeId: crypto.randomUUID() }, () => {
@@ -278,17 +334,22 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (attempt) scene.setView(level, attempt, layer === 'help', ready && !busy && !activity.isBlocked() && layer === 'none' && !session.pending);
     else scene.setView(level, initialAttempt, false, false);
     const picker = layer === 'meta' && metaRoute.kind === 'chapter' ? metaRoute : null;
-    const cardId = selectedWork();
-    atmosphere.placeInside(picker || cardId ? dialog : root);
+    const cardId = selectedWork(), authorCard = selectedAuthorWork();
+    const gallery = layer === 'meta' && (metaRoute.kind === 'album' || metaRoute.kind === 'export' && isFocusedExport(metaRoute));
+    atmosphere.placeInside(picker || cardId || authorCard || gallery ? dialog : root);
     if (picker) {
       const model = picker.chapterMenu === undefined ? levelPreview(session.state, picker.levelId) : null;
       atmosphere.setModel(model?.level ?? null, model?.board ?? null);
     } else if (cardId) {
       atmosphere.setModel(getLevel(cardId), null);
+    } else if (authorCard) {
+      atmosphere.setModel(authorCard.work.nodes[authorCard.nodeId]!.field, null);
+    } else if (gallery) {
+      atmosphere.setModel(null, null);
     } else {
       atmosphere.setModel(level, layer === 'help' ? null : attempt?.board ?? initialAttempt.board);
     }
-    atmosphere.configure(ready && !activity.isBlocked() && (picker !== null || cardId !== null || ['none', 'help', 'result'].includes(layer)), motionAllowed());
+    atmosphere.configure(ready && !activity.isBlocked() && (picker !== null || cardId !== null || authorCard !== null || gallery || ['none', 'help', 'result'].includes(layer)), motionAllowed());
     feedback.configure(session.state.preferences, !ready || activity.isBlocked());
     activity.setGameplayDesired(ready && !busy && layer === 'none' && !attempt?.completed && !activity.isBlocked());
     renderDialog(); paint();
@@ -354,9 +415,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
         render(); actions.querySelector<HTMLElement>('[data-open-chapters]')?.focus({ preventScroll: true });
         return true;
       }
-      if (metaHistory.length) metaRoute = metaHistory.pop()!;
-      else layer = metaReturn;
-      render(); return true;
+      popMeta(); return true;
     }
     if (layer === 'restart') { cancelRestart(); return true; }
     if (layer !== 'none') { layer = 'none'; render(); return true; }
