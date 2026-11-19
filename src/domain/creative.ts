@@ -15,8 +15,8 @@ export type CreativeAction =
   { kind:'editor-create'; draftId:string; workId:string; nodeId:string; name:string; field:EditorField; seed:number } |
   { kind:'editor-rename'; workId:string; name:string } |
   { kind:'editor-buffer'; workId:string; buffer:EditorBuffer } |
-  { kind:'editor-discard'; workId:string; editId:string } |
-  { kind:'editor-apply'; workId:string; nodeId:string; baseNodeId:string; editId:string; field:EditorField; seed:number } |
+  { kind:'editor-discard'; workId:string; editId:string; recoveredEditId?:string } |
+  { kind:'editor-apply'; workId:string; nodeId:string; baseNodeId:string; editId:string; recoveredEditId?:string; field:EditorField; seed:number } |
   { kind:'editor-select'; workId:string; nodeId:string } |
   { kind:'author-start'; workId:string; nodeId:string; attemptId:string; restart?:boolean } |
   { kind:'author-swap'; attemptId:string; from:number; to:number } |
@@ -90,6 +90,7 @@ export async function validateCreativeHashes(state:CreativeState, digest:(s:stri
 export function applyCreative(state:CreativeState,action:CreativeAction,fingerprint?:string):CreativeState {
   if(action.kind==='author-exit') return state.playing ? {...state,playing:false} : state;
   if(action.kind==='author-swap' || action.kind==='author-help') {
+    if(!state.playing)return state;
     const view=authorView(state);if(!view || view.attempt.attemptId!==action.attemptId)return state;
     const next=action.kind==='author-swap'?proposeSwap(view.level,view.attempt,action.from,action.to):proposeHelp(view.attempt);
     if(next===view.attempt)return state;
@@ -111,12 +112,12 @@ export function applyCreative(state:CreativeState,action:CreativeAction,fingerpr
     if(!safeId(b.editId)||!work.nodes[b.baseNodeId]||!seedOK(b.seed))throw new Error('Invalid edit buffer');
     next={...work,buffers:{...work.buffers,[b.editId]:b}};
   } else if(action.kind==='editor-discard') {
-    if(!work.buffers[action.editId])return state;
-    const buffers={...work.buffers};delete buffers[action.editId];next={...work,buffers};
+    if(!work.buffers[action.editId]&&(!action.recoveredEditId||!work.buffers[action.recoveredEditId]))return state;
+    const buffers={...work.buffers};delete buffers[action.editId];if(action.recoveredEditId)delete buffers[action.recoveredEditId];next={...work,buffers};
   } else if(action.kind==='editor-apply') {
     assertField(action.field);
     if(!safeId(action.nodeId)||!work.nodes[action.baseNodeId]||work.nodes[action.nodeId]||!hashOK(fingerprint)||!seedOK(action.seed))throw new Error('Invalid editor revision');
-    const buffers={...work.buffers};delete buffers[action.editId];
+    const buffers={...work.buffers};delete buffers[action.editId];if(action.recoveredEditId)delete buffers[action.recoveredEditId];
     // A stale edit becomes a recoverable branch; it never replaces a newer head.
     const changed=fingerprint!==work.nodes[action.baseNodeId]!.fingerprint;
     const node:CreativeNode={nodeId:action.nodeId,parentNodeIds:[action.baseNodeId],field:action.field,fingerprint,rulesVersion:RULES_VERSION,seed:action.seed};
@@ -128,6 +129,7 @@ export function applyCreative(state:CreativeState,action:CreativeAction,fingerpr
   } else if(action.kind==='author-start') {
     const node=work.nodes[action.nodeId];if(!node)throw new Error('Missing author revision');
     if(!action.restart && state.activeTest?.workId===work.workId && state.activeTest.nodeId===node.nodeId)return state.playing ? state : {...state,playing:true};
+    if(!safeId(action.attemptId)||Object.values(state.works).some(w=>w.completions.some(c=>c.attemptId===action.attemptId)))throw new Error('Invalid author attempt identity');
     return {...state,playing:true,activeTest:{workId:work.workId,nodeId:node.nodeId,attempt:createAttempt(playableField(node.field,`${work.workId}:${node.nodeId}`,work.name),action.attemptId)}};
   }
   const result={...state,works:{...state.works,[work.workId]:next}};validateCreative(result);return result;

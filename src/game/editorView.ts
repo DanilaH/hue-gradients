@@ -12,6 +12,7 @@ interface EditorProps {
 export class EditorView {
   private work:CreativeWork; private disabled:boolean; private field:EditorField; private seed:number; private baseNodeId:string;
   private editId:string; private dirty=false; private nameDirty=false; private disposed=false; private timer:ReturnType<typeof setTimeout>|undefined;
+  private recoveredEditId:string|undefined;
   private queue:Promise<boolean>=Promise.resolve(true); private sequence=0; private savedSequence=0;
   private pending=false; private failedAction:CreativeAction|null=null;
   private exitPrompt=false;
@@ -24,7 +25,7 @@ export class EditorView {
     this.work=props.work;this.disabled=props.disabled;
     const buffer=Object.values(this.work.buffers).at(-1),node=this.work.nodes[this.work.headNodeId]!;
     this.baseNodeId=buffer?.baseNodeId??node.nodeId;this.field=buffer?.field??node.field;this.seed=buffer?.seed??node.seed;
-    this.editId=buffer?.editId??crypto.randomUUID();this.dirty=!!buffer;
+    this.editId=crypto.randomUUID();this.recoveredEditId=buffer?.editId;this.dirty=!!buffer;
     if(buffer)this.message='Восстановлен сохранённый предпросмотр. Примените или отмените изменения.';
     this.panel.className='editor-panel';this.controls.className='editor-controls';this.content.className='editor-content';
     this.status.className='editor-status';this.status.setAttribute('role','status');
@@ -128,11 +129,11 @@ export class EditorView {
     }
     this.message=this.dirty?'Предпросмотр сохранён на устройстве · ещё не применён':'Сохранено на устройстве';this.drawControls();return true;
   }
-  private adopt(nodeId:string):void {const node=this.work.nodes[nodeId]!;this.baseNodeId=nodeId;this.field=node.field;this.seed=node.seed;this.editId=crypto.randomUUID();this.dirty=false;this.sequence=0;this.savedSequence=0;this.draw();}
+  private adopt(nodeId:string):void {const node=this.work.nodes[nodeId]!;this.baseNodeId=nodeId;this.field=node.field;this.seed=node.seed;this.editId=crypto.randomUUID();this.recoveredEditId=undefined;this.dirty=false;this.sequence=0;this.savedSequence=0;this.draw();}
   private async apply():Promise<void> {
     if(!await this.flush())return;
     const nodeId=crypto.randomUUID();
-    if(!await this.enqueue({kind:'editor-apply',workId:this.work.workId,nodeId,baseNodeId:this.baseNodeId,editId:this.editId,field:this.field,seed:this.seed})){this.message='Версия не сохранена. Повторите: ваш вариант станет отдельной веткой, если работа изменилась.';this.drawControls();return;}
+    if(!await this.enqueue({kind:'editor-apply',workId:this.work.workId,nodeId,baseNodeId:this.baseNodeId,editId:this.editId,...(this.recoveredEditId?{...(this.recoveredEditId?{recoveredEditId:this.recoveredEditId}:{})}:{}),field:this.field,seed:this.seed})){this.message='Версия не сохранена. Повторите: ваш вариант станет отдельной веткой, если работа изменилась.';this.drawControls();return;}
     const saved=this.work.nodes[nodeId];
     this.message=saved&&this.work.headNodeId!==nodeId?'Сохранена отдельная ветка. Откройте её в истории.':'Версия сохранена на устройстве';
     this.adopt(saved?.nodeId??this.baseNodeId);
@@ -140,7 +141,7 @@ export class EditorView {
   private async cancel():Promise<void> {
     clearTimeout(this.timer);await this.queue;
     if(this.nameDirty&&!await this.flush())return;
-    if(this.work.buffers[this.editId]&&!await this.enqueue({kind:'editor-discard',workId:this.work.workId,editId:this.editId})){this.message='Отмена не сохранена. Повторите действие.';this.drawControls();return;}
+    if((this.work.buffers[this.editId]||(this.recoveredEditId&&this.work.buffers[this.recoveredEditId]))&&!await this.enqueue({kind:'editor-discard',workId:this.work.workId,editId:this.editId,...(this.recoveredEditId?{recoveredEditId:this.recoveredEditId}:{})})){this.message='Отмена не сохранена. Повторите действие.';this.drawControls();return;}
     this.message='Изменения отменены';this.adopt(this.baseNodeId);
   }
   private async play():Promise<void> {if(await this.flush())this.props.play(this.work.workId,this.baseNodeId);}
@@ -159,6 +160,6 @@ export class EditorView {
       const p=document.createElement('p');p.className='meta-note';p.textContent=`Версия ${index+1} · ${node.field.width}×${node.field.height}${node.nodeId===this.work.headNodeId?' · текущая':!parents.has(node.nodeId)?' · ветка':''}${hasAuthorProof(this.work,node.nodeId)?' · пройдена автором':' · не проверена'}`;this.content.append(p);
       this.button(`Открыть версию ${index+1}`,()=>void(async()=>{if(!await this.flush())return;if(await this.enqueue({kind:'editor-select',workId:this.work.workId,nodeId:node.nodeId})){this.message='Открыта сохранённая версия';this.adopt(node.nodeId);}})(),this.content);
     });
-    Object.values(this.work.buffers).forEach((buffer,index)=>this.button(`Продолжить предпросмотр ${index+1}`,()=>{this.baseNodeId=buffer.baseNodeId;this.field=buffer.field;this.seed=buffer.seed;this.editId=buffer.editId;this.dirty=true;this.sequence=0;this.savedSequence=0;this.message='Восстановлен сохранённый предпросмотр';this.mode='palette';this.draw();},this.content));
+    Object.values(this.work.buffers).forEach((buffer,index)=>this.button(`Продолжить предпросмотр ${index+1}`,()=>{this.baseNodeId=buffer.baseNodeId;this.field=buffer.field;this.seed=buffer.seed;this.editId=crypto.randomUUID();this.recoveredEditId=buffer.editId;this.dirty=true;this.sequence=0;this.savedSequence=0;this.message='Восстановлен сохранённый предпросмотр';this.mode='palette';this.draw();},this.content));
   }
 }

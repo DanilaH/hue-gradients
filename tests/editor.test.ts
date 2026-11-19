@@ -76,6 +76,18 @@ test('buffer apply/cancel and metadata-only apply retain immutable history',asyn
   state=await act(state,{kind:'editor-apply',workId:'work',nodeId:'unused',baseNodeId:'root',editId:'edit',field:root.field,seed:888});
   expect(Object.keys(state.works.work!.nodes)).toEqual(['root']);
 });
+test('resumed previews use independent edit identities; applying one does not discard another tab buffer',async()=>{
+  let state=await draft();
+  for(const [id,width]of [['recovered',4],['tab-a',5],['tab-b',6]]as const)state=applyCreative(state,{kind:'editor-buffer',workId:'work',buffer:{editId:id,baseNodeId:'root',field:makeField(width,4),seed:0}});
+  state=await act(state,{kind:'editor-apply',workId:'work',nodeId:'applied',baseNodeId:'root',editId:'tab-a',recoveredEditId:'recovered',field:makeField(5,4),seed:0});
+  expect(Object.keys(state.works.work!.buffers)).toEqual(['tab-b']);expect(state.works.work!.buffers['tab-b']!.field.width).toBe(6);
+});
+test('stale author input after leaving never mutates a suspended attempt',async()=>{
+  let state=applyCreative(await draft(),{kind:'author-start',workId:'work',nodeId:'root',attemptId:'author'});
+  state=applyCreative(state,{kind:'author-exit'});
+  expect(applyCreative(state,{kind:'author-help',attemptId:'author'})).toBe(state);
+  expect(applyCreative(state,{kind:'author-swap',attemptId:'author',from:1,to:2})).toBe(state);
+});
 test('damaged hashes, cyclic histories, duplicate IDs and forged completed-attempt receipts are rejected',async()=>{
   const state=await draft(),bad=structuredClone(state);bad.works.work!.nodes.root!.fingerprint='0'.repeat(64);
   await expect(validateCreativeHashes(bad,hashText)).rejects.toThrow('fingerprint');

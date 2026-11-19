@@ -129,6 +129,7 @@ export function applyAction(state: Workspace, action: Action, fingerprints: Read
     if (!state.completed.includes(action.levelId) || state.albumCopies[action.draftId]) return state;
     if (![action.draftId, action.workId, action.nodeId].every(safeId) || new Set([action.draftId, action.workId, action.nodeId]).size !== 3) throw new Error('Invalid copy identity');
     const existingIds = Object.values(state.albumCopies).flatMap(c => [c.draftId, c.workId, c.nodeId]);
+    existingIds.push(...Object.values(state.creative?.works ?? {}).flatMap(w => [w.draftId, w.workId, ...Object.keys(w.nodes), ...Object.keys(w.buffers)]));
     if ([action.draftId, action.workId, action.nodeId].some(id => existingIds.includes(id))) throw new Error('Copy identity collision');
     const source = getLevel(action.levelId), name = action.name.trim() || 'Моя композиция';
     if ([...name].length > 80) throw new Error('Copy name too long');
