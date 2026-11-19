@@ -1,0 +1,84 @@
+{
+  "sourceCommit": "3546c59959629c2251c1813b6d45a11024d8e5d8",
+  "requirements": "https://github.com/DanilaH/hue-gradients/pull/2",
+  "baseline": "a0de06a7136516f1a420bd316ca9654e27ca64d1",
+  "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+  "kitImpact": "REUSE",
+  "apk": {
+    "name": "Poluson-0.4.5-preview.apk",
+    "package": "com.danilah.huegradients.preview3",
+    "versionName": "0.4.5",
+    "versionCode": 9,
+    "bytes": 1192052,
+    "apkSha256": "73d9726cc02c55716cc29be72f432f10983ce64e676887c28e1a291e523bd79b",
+    "certificateSha256": "3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85",
+    "nativeRuntime": "NOT RUN",
+    "kind": "releaseCheck",
+    "testSignerMatches": "0.4.4/versionCode8"
+  },
+  "video": {
+    "name": "Poluson-0.4.5-episode.mp4",
+    "sha256": "12b9362cdafb13b94cc78b950b724b3676b51be4a637de71f525afa5b504d188",
+    "seconds": 22.88,
+    "resolution": "390×844",
+    "audio": "Actual game Web Audio output captured to Opus and synchronised with browser footage, delivered as AAC",
+    "segments": [
+      {
+        "level": 8,
+        "capture": "baseline-warm",
+        "audioCues": 3
+      },
+      {
+        "level": 8,
+        "capture": "warm",
+        "audioCues": 3
+      },
+      {
+        "level": 2,
+        "capture": "cold",
+        "audioCues": 2
+      }
+    ]
+  },
+  "savedPng": [
+    {
+      "name": "Poluson-008.png",
+      "pixels": [
+        1800,
+        300
+      ],
+      "sha256": "691002f9f4230f0118541e1cb57cabf4552eae87ea8dbad8a211d0032cb0f1e2"
+    },
+    {
+      "name": "Poluson-002.png",
+      "pixels": [
+        1800,
+        360
+      ],
+      "sha256": "8f568175f2d760268b5a04d8099049bf5896d64d4f05ee12e3cbeb6117c7b114"
+    }
+  ],
+  "checks": {
+    "unit": 149,
+    "chromium": {
+      "core": 21,
+      "presentation": 12,
+      "meta": 12,
+      "export": 10
+    },
+    "independentPngRendererFixtures": 8,
+    "release": [
+      "exact APK inspection",
+      "Gradle debug/R8 releaseCheck",
+      "standard and release web",
+      "Yandex audit",
+      "strict guidance doctor",
+      "40 exact spec files"
+    ]
+  },
+  "limits": [
+    "Chromium desktop play and recording",
+    "Android installation, physical audio/haptics, native picker and performance NOT RUN",
+    "System picker cancel/retry exercised using a browser fixture"
+  ]
+}

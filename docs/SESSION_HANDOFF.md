@@ -4,6 +4,8 @@ Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and
 
 ## Current slice
 
+0.4.5/versionCode9 is the first playable episode from [PR #2](https://github.com/DanilaH/hue-gradients/pull/2). Drag lifts one tile and exposes its well. Committed swaps play a glass contact, with an interval on the last move and one glint on the result prism. Its four faces sample the solved corners or four positions along the strip. The result opens the exact campaign card. PNG preview and one-tap save use the same prepared file and the host delivery bridge. Replay, copy, other layouts and collection navigation live in the card menu. [Evidence and capture limits](evidence/feel-episode-2026-11-19.json).
+
 0.4.4/versionCode8 is a visual playtest candidate. Gameplay, result and the picker share one low-resolution atmosphere with luminous colour pools, ordered texture and soft blur. Confirmed exchanges fan out a light wave, and the picker tracks horizontal drag. The puzzle uses its opaque source colours and game hit geometry. The locked picker has a fixed palette and reduced motion freezes the light effects. [Visual decisions](M2_ART_BIBLE.md) · [Exact build and checks](evidence/dream-atmosphere-2026-11-19.json)
 
 0.4.2/versionCode6 implements the first approved UI simplification package: gameplay opens on the saved board, the compact HUD shows level/navigation/hint, and the first-swap cue is transient. The same hint persists assistance before revealing the solved field. The result shows the move count and chapter unlock if earned, with direct Next and Album actions. The board fades under the prize without delaying Next. The settings sheet contains restart and three toggles. Cancel and Back restore the source of a restart confirmation.
@@ -26,7 +28,7 @@ Author activeTest persists work/node/frozen Attempt; creative.playing controls c
 
 ## Next work
 
-1. **Next: album and PNG, step 2 of [the UI refinement plan](UI_REFINEMENT_PLAN.md).** Two tabs, one-tap clean export for the displayed verified work and a work picker for multi-work layouts. Then refine the editor and field/result in that order. Verify copy, older drafts and exports through the normal routes. M5 remains on hold. A shared daily requires a published catalog and trusted time.
+1. **After owner playtest: PR #2 stage 2 and the album collection.** Follow [the UI refinement plan](UI_REFINEMENT_PLAN.md) alongside the PR’s screen designs. Two tabs, one-tap clean export for the displayed verified work and a work picker for multi-work layouts. Then refine the editor and field/result in that order. Verify copy, older drafts and exports through the normal routes. M5 remains on hold. A shared daily requires a published catalog and trusted time.
 2. Keep M2 tokens and read M2_ART_BIBLE before visual changes. Two licensed Cyrillic fonts, native150% text and owner review remain pending. Editor browser computed-font enlargement is smoke evidence only. No mass styling or new A/B/C contest.
 3. Native SQLite/haptic/process-death/storage-pressure/touch remains NOT RUN; no runtime/ADB was available. Hosted Yandex, identity/cloud/ads are external gates. Production register71 NOT RUN; full release unfinished.
 
@@ -46,4 +48,4 @@ Runtime/guidance469928d03f4bae5053e23db26e82187bedbc252e, kit archive SHA256ba90
 
 Read SIGNING_PREVIEW.md. Keep .preview3 and reuse the privately saved TEST key HUE-test-preview-signing.keystore via ANDROID_PREVIEW_KEYSTORE. Never regenerate/commit it or use it as production. Old0.2 .releasecheck signer was lost; never ask owner to uninstall that app and lose data. 0.4.1 certificate matches0.3/0.4.0; actual Android update is untested. Production base appId/certificate policy unchanged, signer null.
 
-Delivered Poluson-0.4.4-preview.apk, package com.danilah.huegradients.preview3, versionCode8. [Build hash, signer and limits](evidence/dream-atmosphere-2026-11-19.json). Increment versionCode for the next test update.
+Delivered Poluson-0.4.5-preview.apk, package com.danilah.huegradients.preview3, versionCode9. [Build hash, signer and limits](evidence/feel-episode-2026-11-19.json). Increment versionCode for the next test update.

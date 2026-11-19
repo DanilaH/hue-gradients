@@ -1,6 +1,6 @@
 # Status — 19 November 2026
 
-Current internal build: **0.4.4/versionCode8**, branch feat/m0-foundation, draft PR #1. Implementation checkpoints are on GitHub.
+Current internal build: **0.4.5/versionCode9**, branch feat/m0-foundation, draft PR #1. Implementation checkpoints are on GitHub.
 
 | Stage | Actual state |
 | --- | --- |
@@ -10,10 +10,12 @@ Current internal build: **0.4.4/versionCode8**, branch feat/m0-foundation, draft
 | M3 | LOCAL IMPLEMENTATION: 60 campaign candidates, chapters, album, rights/mastery, page, separate copies and migration |
 | M4a | LOCAL IMPLEMENTATION: editor, immutable revisions, durable previews, recovery/branches, validator/fingerprint and author play |
 | M4b | LOCAL IMPLEMENTATION: clean/six PNG layouts/chapter page, distinct works, measured text, browser download/share and native bridge; real Android action acceptance pending |
-| UI simplification | FULL-SCREEN LEVEL AND CHAPTER PICKER VERIFIED IN CHROMIUM. Next: album and PNG |
+| UI simplification | PR #2 stage 1 ready for owner playtest: lift, glass exchange, palette prism and one-tap PNG from the completed work |
 | M5 | ON HOLD by owner19 Nov: cloud/account/synchronization deferred from the current local milestone |
 | M6 | NEXT CLIENT WORK: local daily/archive state/cache; live shared calendar/catalog/trusted time remain unconfigured |
 | M7–M8 | NOT STARTED |
+
+0.4.5 groups the first stage from [PR #2](https://github.com/DanilaH/hue-gradients/pull/2) into a test-signed preview. [Build, video and saved PNG checks](evidence/feel-episode-2026-11-19.json)
 
 0.4.4 checks exercise exact rendered tile colours, stored and system motion settings, active and paused picker animation, locked palettes and direct swipe. [0.4.4 evidence](evidence/dream-atmosphere-2026-11-19.json)
 

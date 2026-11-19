@@ -1,6 +1,6 @@
 # M2 presentation slice — 18 November 2026
 
-Status: EXECUTABLE OWNER-REVIEW CANDIDATE for ART-01…09. Latest visual preview is 0.4.4. Owner reference is docs/spec/reference/owner-art-reference.png (SHA256 872fd9800184a2e4cc52716cd258cbcb194841782745415ae6dd710aedc586ec). Its static concept establishes light, colour and texture.
+Status: EXECUTABLE OWNER-REVIEW CANDIDATE for ART-01…09. Latest playable feel preview is 0.4.5. Owner reference is docs/spec/reference/owner-art-reference.png (SHA256 872fd9800184a2e4cc52716cd258cbcb194841782745415ae6dd710aedc586ec). Its static concept establishes light, colour and texture.
 
 ## Confirmed gaps and implemented changes
 
@@ -19,7 +19,8 @@ Status: EXECUTABLE OWNER-REVIEW CANDIDATE for ART-01…09. Latest visual preview
 - Motion: kit exponentialResponse blends the palette over a 260ms response constant. A glow tracks the pointer during drag. A confirmed swap adds an expanding diffuse wave at the destination, with a longer decay on the win. The picker moves under the finger during a swipe. The motion preference and system reduced motion stop ambient animation.
 - Budget: one Canvas2D ambient, maximum 160×240 backing pixels, at most 24 draws/s while active. Phaser sleeps at rest and runs for direct input and the 150ms tile settling. Physical GPU, battery and frame-time acceptance are pending.
 - Swap/win authority: snapshot/receipt transaction first, presentation afterwards. Same/pin/outside/cancel/failed writes are silent. Explicit unknown-receipt recovery and restored results do not replay success cues. All swaps get the same response without evaluating correctness.
-- Swap sound: own 95ms decaying 330/660Hz tone. Win: own 550ms C4/E4/G4 phrase. No third-party audio file/license. Kit OneShotPlayer owns bounded voices and dropped/expired cues; no cue queue resumes after background. Native performHapticFeedback respects OS settings without a vibration permission.
+- Swap sound: a procedural dry contact excites three closely related variants of glass resonance. The short cue lasts 136ms. The final contact has one 560ms buffer with an upper interval beginning 98ms into the cue. A one-shot prism glint starts at the upper tone. Kit OneShotPlayer replaces the previous glass cue with a short fade and bounds active voices. Native performHapticFeedback respects OS settings.
+- Drag draws an empty matte recess at the origin. The lifted tile gets a shadow and a thin light edge, and its centre keeps the source RGB. The prism samples the four exact solved corner colours or four positions across a strip. Reduced motion leaves a static prism and active result controls.
 - Root cream #fff2de, dark foundation #151020, foreground/dialog separation #21192d. Primary controls 48px; hit geometry stays independent from decoration. Modal top layer never intercepts after close.
 - System reduced motion disables drift, settling, dissolve and prism floating. Preference changes are additive schema-1 data, committed atomically; old saves preserve all attempts/results/assistance.
 
@@ -29,6 +30,6 @@ Current system-ui is PROVISIONAL. No bitmap/pseudo-pixel font was adopted. The r
 
 Owner acceptance on an actual build and a physical phone is pending. Browser screenshots/video are an honest desktop-emulation review aid, not phone evidence. M1 native SQLite/process death/storage pressure remains pending because no Android device/emulator is attached. Hosted Yandex, identity/cloud/live ads remain separate external gates.
 
-Actual review episode: solve the first four through UI, then record the picker swipe, tile drag, accepted swaps and committed win on level 5. `tools/record-m2-preview.mjs` reproduces the gameplay segment. [0.4.4 build and capture evidence](evidence/dream-atmosphere-2026-11-19.json).
+The 0.4.5 review compares the same warm level 8 moves in 0.4.4 and 0.4.5, then shows cold level 2. Both new episodes include a cancelled drag, final exchange, the work card and the downloaded PNG. Audio is recorded directly from the same game Web Audio graph. [Build and capture evidence](evidence/feel-episode-2026-11-19.json).
 
 KIT IMPACT: REUSE — OneShotPlayer and exponentialResponse added to existing lifecycle/DPR/teardown reuse. Palette, durations, audio synthesis, prism and guest preferences remain consumer policy. No common kit or other games changed.
