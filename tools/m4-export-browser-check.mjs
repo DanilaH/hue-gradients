@@ -162,7 +162,7 @@ try {
   const first=makeField(6,1);let c=applyCreative(s.creative,{kind:'editor-create',draftId:'export-draft',workId:'export-work',nodeId:'export-node-a',field:first,name:'Своя <b>работа</b>',seed:0},await hashText(editorFingerprintPayload(first)));
   const solve=c=>{const view=authorView(c),board=[...view.attempt.board];for(let i=0;i<board.length;i++)if(board[i]!==i){const j=board.indexOf(i);c=applyCreative(c,{kind:'author-swap',attemptId:view.attempt.attemptId,from:i,to:j});[board[i],board[j]]=[board[j],board[i]];}return c;};
   c=solve(applyCreative(c,{kind:'author-start',workId:'export-work',nodeId:'export-node-a',attemptId:'own-a'}));
-  const second=makeField(5,4);c=applyCreative(c,{kind:'editor-apply',workId:'export-work',nodeId:'export-node-b',baseNodeId:'export-node-a',editId:'fixture-edit',field:second,seed:0},await hashText(editorFingerprintPayload(second)));
+  const second=makeField(5,4,['#FBBB86','#ECB2C0','#665089','#182B4C']);c=applyCreative(c,{kind:'editor-apply',workId:'export-work',nodeId:'export-node-b',baseNodeId:'export-node-a',editId:'fixture-edit',field:second,seed:0},await hashText(editorFingerprintPayload(second)));
   c=solve(applyCreative(c,{kind:'author-start',workId:'export-work',nodeId:'export-node-b',attemptId:'own-b'}));c=applyCreative(c,{kind:'author-exit'});s={...s,creative:c};
   const store=await openIndexedDb(),old=await store.load('guest-local-v1');await store.commit(await prepareCommit({operationId:crypto.randomUUID(),vaultId:'guest-local-v1',expectedRevision:old.localRevision,nextSnapshotJson:JSON.stringify(s),facts:[]}));store.close();
  });
@@ -182,6 +182,38 @@ try {
  assert.equal(await button('Мои работы').getAttribute('aria-pressed'),'true');
  assert.equal(await page.evaluate(()=>document.activeElement?.dataset.draftId),'export-draft');
  passed.push('verified own work downloads its exact displayed revision and legacy rights expose no alternate export routes');
+
+ // Open and edit the pre-existing work, reload, then export its first verified revision.
+ await page.locator('[data-draft-id=export-draft]').click();
+ await page.getByLabel('Действия с работой').click();
+ await button('Редактировать').click();
+ const canvas=page.getByRole('img',{name:'Градиент работы'});
+ const pixels=()=>canvas.evaluate(node=>[...node.getContext('2d').getImageData(0,0,node.width,node.height).data]);
+ const previous=await pixels();
+ assert.equal(await button('Размер').count(),0);
+ await button('Слева вверху').click();
+ await button('Мятный').click();
+ const changed=await pixels();
+ assert.deepEqual(changed.slice(0,4),[172,224,209,255]);
+ assert.notDeepEqual(changed.slice(73800,73804),previous.slice(73800,73804));
+ assert.equal(Object.keys((await state()).state.creative.works['export-work'].nodes).length,2);
+ await button('Готово').click();
+ await button('Испытать').waitFor();
+ await page.reload();await page.waitForSelector('html[data-state=ready]');await page.keyboard.press('Escape');
+ await page.locator('#levels').click();await button('Альбом').click();await button('Мои работы').click();
+ await page.locator('[data-draft-id=export-draft]').click();
+ assert.deepEqual((await pixels()).slice(0,4),[172,224,209,255]);
+ assert.equal(Object.keys((await state()).state.creative.works['export-work'].nodes).length,3);
+ await page.getByLabel('Инструменты').click();
+ await button('История').click();
+ await button('Открыть версию 1').click();
+ await page.getByLabel('Инструменты').click();
+ await button('Сохранить обои').click();
+ assert.equal(await page.locator('.work-card').getAttribute('data-work-key'),'own:export-work:export-node-a');
+ const oldField=(await state()).state.creative.works['export-work'].nodes['export-node-a'].field;
+ assert.notEqual(oldField.cornerColorsTLTRBLBR[0],ownNode.field.cornerColorsTLTRBLBR[0]);
+ await downloadWallpaper(oldField,'own-history.png','Poluson-own.png');
+ passed.push('old work saves a live corner edit across reload and past author proof exports exactly that historical colour palette');
 
  await writeFile('.test-output/m4b/png/works.json',JSON.stringify(downloads,null,2));
  assert.deepEqual(errors,[]);

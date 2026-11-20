@@ -140,7 +140,11 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   function cancelRestart(): void { layer = restartReturn; render(); }
   function leaveAuthor(): void {
     const own = current().own; if (!own) return;
-    void run({ kind: 'author-exit' }, () => { metaHistory = [{ kind: 'album', tab: 'own' }]; metaRoute = { kind: 'draft', draftId: own.work.draftId }; layer = 'meta'; });
+    void run({ kind: 'author-exit' }, () => {
+      metaHistory = [{ kind: 'album', tab: 'own' }];
+      metaRoute = { kind: 'draft', draftId: own.work.draftId, nodeId: own.node.nodeId };
+      layer = 'meta';
+    });
   }
   function selectedWork(): string | null {
     return layer === 'meta' && metaRoute.kind === 'card' && session.state.completed.includes(metaRoute.levelId) ? metaRoute.levelId : null;
@@ -202,7 +206,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       const word = form === 'one' ? 'ход' : form === 'few' ? 'хода' : 'ходов';
       byId('dialog-copy').textContent = `${count} ${word}`;
       if (own) {
-        button('Вернуться в редактор', leaveAuthor);
+        button('В редактор', leaveAuthor);
       } else {
         const next = recommendedLevel(session.state, chapterIndexFor(level.id)) ?? recommendedLevel(session.state);
         const receipt = session.state.lastCompletion;
@@ -266,7 +270,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
           } : { edit: () => {
             const draftId = authorCard!.work.draftId, previous = metaHistory.at(-1);
             if (previous?.kind === 'draft' && previous.draftId === draftId) popMeta();
-            else showMeta({ kind: 'draft', draftId });
+            else showMeta({ kind: 'draft', draftId, nodeId: authorCard!.nodeId });
           } }),
         });
         workCard.update(busy || activity.isBlocked() || !!session.pending);
@@ -277,9 +281,10 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
           play: () => startLevel(session.state.activeLevelId) });
       } else if (work) {
         byId('dialog-title').textContent = work.name;
-        if (!editorView) editorView = new EditorView(actions, { work, disabled: busy || activity.isBlocked(), pending: !!session.pending, commit: action => run(action), recover: recoverEditor,
+        const nodeId = metaRoute.kind === 'draft' ? metaRoute.nodeId : undefined;
+        if (!editorView) editorView = new EditorView(actions, { work, ...(nodeId ? { nodeId } : {}), disabled: busy || activity.isBlocked(), pending: !!session.pending, commit: action => run(action), recover: recoverEditor,
           exportWork: (workId,nodeId) => showMeta({kind:'own-card',workId,nodeId}),
-          play: (workId, nodeId) => void run({ kind: 'author-start', workId, nodeId, attemptId: crypto.randomUUID() }, () => { metaHistory = []; layer = current().attempt?.completed ? 'result' : 'none'; }),
+          play: (workId, nodeId) => run({ kind: 'author-start', workId, nodeId, attemptId: crypto.randomUUID() }, () => { metaHistory = []; layer = current().attempt?.completed ? 'result' : 'none'; }),
           back: popMeta });
         editorView.update(work, busy || activity.isBlocked(), !!session.pending);
       } else {
@@ -387,7 +392,12 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   async function recoverEditor(): Promise<boolean> {
     if (busy || activity.isBlocked()) return false;
     busy = true; render(); let success = false;
-    try { if (session.pending) await session.resolvePending(); else await session.load(); success = true; }
+    try {
+      if (session.pending) await session.resolvePending();
+      else await session.load();
+      if (current().own) { metaHistory = []; layer = current().attempt?.completed ? 'result' : 'none'; }
+      success = true;
+    }
     catch { notice = 'Не удалось проверить сохранение. Попробуй ещё раз.'; }
     finally { busy = false; render(); }
     return success;
@@ -395,7 +405,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   const back = (): boolean => {
     if (busy || layer === 'recovery') return true;
     scene.cancel();
-    if (editorView && layer === 'meta') { void editorView.leave(); return true; }
+    if (editorView && layer === 'meta') { void editorView.back(); return true; }
     if (workCard?.handleBack()) return true;
     if (layer === 'meta') {
       if (metaRoute.kind === 'chapter' && metaRoute.chapterMenu !== undefined) {

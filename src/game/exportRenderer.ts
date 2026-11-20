@@ -66,10 +66,14 @@ export function gradientThumbnail(field: ExportField): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
   canvas.width = 96;
   canvas.height = 64;
-  const context = canvas.getContext('2d', { alpha: false, colorSpace: 'srgb' });
-  if (context) drawGradient(context, field, canvas);
+  paintGradientThumbnail(canvas, field);
   canvas.setAttribute('aria-hidden', 'true');
   return canvas;
+}
+
+export function paintGradientThumbnail(canvas: HTMLCanvasElement, field: ExportField): void {
+  const context = canvas.getContext('2d', { alpha: false, colorSpace: 'srgb' });
+  if (context) drawGradient(context, field, canvas);
 }
 
 export async function renderWallpaper(field: ExportField, size: WallpaperSize): Promise<Blob> {
