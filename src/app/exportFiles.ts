@@ -1,11 +1,12 @@
 import type { WallpaperSize } from '../domain/export';
 
-export type ExportResult='saved'|'download-requested'|'shared'|'opened'|'cancelled';
+export type ExportResult='saved'|'download-requested'|'shared'|'opened'|'cancelled'|'wallpaper-returned'|'wallpaper-unavailable';
 export interface ExportFiles {
   screenSize(): Promise<WallpaperSize>;
   canShare(file: File): boolean;
   save(file: File): Promise<ExportResult>;
   share(file: File): Promise<ExportResult>;
+  setWallpaper?(file: File): Promise<ExportResult>;
   destroy?(): void;
 }
 interface WritableFile { write(data:Blob):Promise<void>; close():Promise<void>; abort?():Promise<void> }
@@ -47,5 +48,6 @@ export function browserExportFiles():ExportFiles {
   };
 }
 export function exportResultMessage(result:ExportResult):string {
-  return {saved:'Изображение сохранено.', 'download-requested':'Загрузка PNG запрошена. Проверьте папку загрузок.',shared:'Изображение передано выбранному приложению.',opened:'Открыто окно отправки. Публикация зависит от выбранного приложения.',cancelled:'Действие отменено. Изображение осталось здесь.'}[result];
+  return {saved:'Изображение сохранено.', 'download-requested':'Загрузка PNG запрошена. Проверьте папку загрузок.',shared:'Изображение передано выбранному приложению.',opened:'Открыто окно отправки. Публикация зависит от выбранного приложения.',cancelled:'Действие отменено. Изображение осталось здесь.',
+    'wallpaper-returned':'Вы вернулись из системного окна обоев.', 'wallpaper-unavailable':'Установка обоев через систему недоступна. Можно сохранить PNG.'}[result];
 }

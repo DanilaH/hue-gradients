@@ -110,7 +110,7 @@ try {
   const before = await readState();
   await tap(0); await idle(); await tap(1); await tap(1); await idle();
   assert.equal((await readState()).attempts[before.activeLevelId].moves, 0); reports.push('pin and deselect no-op');
-  await page.locator('#help').click(); await page.waitForSelector('#hue-app[data-layer=help]');
+  await page.locator('#settings').click(); await page.getByRole('button',{name:'Помощь',exact:true}).click(); await page.getByRole('button',{name:'Показать готовое поле',exact:true}).click(); await page.waitForSelector('#hue-app[data-layer=help]');
   const helped = await readState(); assert.equal(helped.attempts[helped.activeLevelId].assistsUsed, 1);
   await page.reload(); await page.waitForSelector('html[data-state=ready]');
   assert.equal(await page.locator('#hue-app').getAttribute('data-layer'), 'none');
@@ -173,7 +173,7 @@ try {
   await page.evaluate(p => document.querySelector('#board-region canvas').dispatchEvent(new PointerEvent('pointerup', { pointerId: 1, clientX: p.x, clientY: p.y })), p2);
   await page.mouse.up(); await idle();
   assert.equal((await readState()).attempts['gradient-002'].moves, 1); reports.push('final pointerup coordinates and ignored second pointer');
-  await page.locator('#help').click(); await page.waitForSelector('#hue-app[data-layer=help]');
+  await page.locator('#settings').click(); await page.getByRole('button',{name:'Помощь',exact:true}).click(); await page.getByRole('button',{name:'Показать готовое поле',exact:true}).click(); await page.waitForSelector('#hue-app[data-layer=help]');
   await page.keyboard.press('Escape');
   const beforePicker = await readState();
   const saved = beforePicker.attempts[beforePicker.activeLevelId];

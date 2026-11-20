@@ -1,4 +1,4 @@
-import { CAMPAIGN_CONTENT_VERSION, CONTENT_VERSION, createAttempt, proposeHelp, proposeSwap, RULES_VERSION, validateAttempt, validateLevel, type Attempt, type ContentVersion, type LevelDefinition } from './puzzle';
+import { CAMPAIGN_CONTENT_VERSION, CONTENT_VERSION, createAttempt, proposeAssistance, proposeSwap, RULES_VERSION, validateAttempt, validateLevel, type Assistance, type Attempt, type ContentVersion, type LevelDefinition } from './puzzle';
 import { getLevel, levels } from './levels';
 import { earnedRights, isKnownRight, levelIsOpen, META_POLICY } from './progression';
 import { initialCreative, validateCreative, type CreativeState } from './creative';
@@ -18,7 +18,7 @@ export interface Workspace {
   contentVersion: ContentVersion;
   policyVersion: 'm1-local-1' | typeof META_POLICY.version;
   activeLevelId: string; attempts: Record<string, Attempt>; completed: string[]; bests: Record<string, Best>; rights: string[];
-  onboarding: { version: 1; firstSwapDone: boolean; pinExplained: boolean };
+  onboarding: { version: 1; firstSwapDone: boolean; pinExplained: boolean; earlyPinTaps?: number };
   quarantine: { levelId: string; rawAttempt: string }[];
   preferences: Preferences;
   albumCopies: Record<string, AlbumCopy>;
@@ -27,7 +27,7 @@ export interface Workspace {
   lastCompletion: { attemptId: string; levelId: string; newRights: string[] } | null;
 }
 export type Action = { kind: 'swap'; from: number; to: number; attemptId: string } |
-  { kind: 'help'; attemptId: string } | { kind: 'pin' } |
+  { kind: 'help'; attemptId: string; assistance?: Assistance } | { kind: 'pin' } |
   { kind: 'preferences'; key: keyof Preferences; value: boolean } |
   { kind: 'copy'; levelId: string; draftId: string; workId: string; nodeId: string; name: string } |
   { kind: 'open'; levelId: string; attemptId: string } | { kind: 'restart'; levelId: string; attemptId: string };
@@ -68,6 +68,8 @@ export function decodeWorkspace(json: string, fingerprints: ReadonlyMap<string, 
       !state.onboarding || state.onboarding.version !== 1 || typeof state.onboarding.firstSwapDone !== 'boolean' || typeof state.onboarding.pinExplained !== 'boolean' ||
       !Array.isArray(state.completed) || !Array.isArray(state.rights) || !Array.isArray(state.quarantine)) throw new Error('Unsupported or damaged profile');
   const legacy = state.policyVersion === 'm1-local-1';
+  if (state.onboarding.earlyPinTaps !== undefined &&
+      ![1, 2, 3].includes(state.onboarding.earlyPinTaps)) throw new Error('Invalid pin tutorial progress');
   getLevel(state.activeLevelId);
   if (!Object.hasOwn(state, 'preferences')) state.preferences = { ...DEFAULT_PREFERENCES };
   if (!state.preferences || Object.keys(DEFAULT_PREFERENCES).some(key => typeof state.preferences[key as keyof Preferences] !== 'boolean')) throw new Error('Invalid saved preferences');
@@ -148,11 +150,17 @@ export function applyAction(state: Workspace, action: Action, fingerprints: Read
     if (state.activeLevelId === target.id && next === attempt) return state;
     return { ...state, activeLevelId: target.id, attempts: { ...state.attempts, [target.id]: next } };
   }
-  if (action.kind === 'pin') return state.onboarding.pinExplained ? state : { ...state, onboarding: { ...state.onboarding, pinExplained: true } };
+  if (action.kind === 'pin') {
+    const taps = state.onboarding.earlyPinTaps ?? Number(state.onboarding.pinExplained);
+    if (level.ordinal > 10 || taps >= 3) {
+      return state.onboarding.pinExplained ? state : { ...state, onboarding: { ...state.onboarding, pinExplained: true } };
+    }
+    return { ...state, onboarding: { ...state.onboarding, pinExplained: true, earlyPinTaps: taps + 1 } };
+  }
   if (!attempt || attempt.attemptId !== action.attemptId) return state;
-  const next = action.kind === 'swap' ? proposeSwap(level, attempt, action.from, action.to) : proposeHelp(attempt);
+  const next = action.kind === 'swap' ? proposeSwap(level, attempt, action.from, action.to) : proposeAssistance(level, attempt, action.assistance);
   if (next === attempt) return state;
-  const result: Workspace = { ...state, attempts: { ...state.attempts, [level.id]: next }, onboarding: { ...state.onboarding, firstSwapDone: state.onboarding.firstSwapDone || action.kind === 'swap' } };
+  const result: Workspace = { ...state, attempts: { ...state.attempts, [level.id]: next }, onboarding: { ...state.onboarding, firstSwapDone: state.onboarding.firstSwapDone || next.moves !== attempt.moves } };
   if (next.completed) {
     const previous = state.bests[level.id] ?? { fingerprint: fingerprints.get(level.id)!, rulesVersion: RULES_VERSION, clean: null, assisted: null };
     const category = next.assisted ? 'assisted' : 'clean';

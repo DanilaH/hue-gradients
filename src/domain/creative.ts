@@ -1,4 +1,4 @@
-import { createAttempt, proposeHelp, proposeSwap, RULES_VERSION, validateAttempt, type Attempt } from './puzzle';
+import { createAttempt, proposeAssistance, proposeSwap, RULES_VERSION, validateAttempt, type Assistance, type Attempt } from './puzzle';
 import { editorFingerprintPayload, fieldFromLevel, inspectField, playableField, validName, type EditorField } from './editor';
 import type { AlbumCopy } from './workspace';
 
@@ -20,7 +20,7 @@ export type CreativeAction =
   { kind:'editor-select'; workId:string; nodeId:string } |
   { kind:'author-start'; workId:string; nodeId:string; attemptId:string; restart?:boolean } |
   { kind:'author-swap'; attemptId:string; from:number; to:number } |
-  { kind:'author-help'; attemptId:string } | { kind:'author-exit' };
+  { kind:'author-help'; attemptId:string; assistance?:Assistance } | { kind:'author-exit' };
 const safeId = (id:unknown): id is string => typeof id==='string' && /^[a-zA-Z0-9:._-]{1,160}$/.test(id) && !['__proto__','constructor','prototype'].includes(id);
 const object = (v:unknown): v is Record<string,unknown> => !!v && typeof v==='object' && !Array.isArray(v);
 const seedOK = (v:unknown): v is number => Number.isSafeInteger(v) && (v as number)>=0 && (v as number)<=0xffffffff;
@@ -92,7 +92,7 @@ export function applyCreative(state:CreativeState,action:CreativeAction,fingerpr
   if(action.kind==='author-swap' || action.kind==='author-help') {
     if(!state.playing)return state;
     const view=authorView(state);if(!view || view.attempt.attemptId!==action.attemptId)return state;
-    const next=action.kind==='author-swap'?proposeSwap(view.level,view.attempt,action.from,action.to):proposeHelp(view.attempt);
+    const next=action.kind==='author-swap'?proposeSwap(view.level,view.attempt,action.from,action.to):proposeAssistance(view.level,view.attempt,action.assistance);
     if(next===view.attempt)return state;
     const completion:AuthorCompletion={nodeId:view.node.nodeId,fingerprint:view.node.fingerprint,rulesVersion:RULES_VERSION,attemptId:next.attemptId,moves:next.moves,assisted:next.assisted};
     return {...state,activeTest:{...state.activeTest!,attempt:next},works:next.completed?{...state.works,[view.work.workId]:{...view.work,completions:[...view.work.completions,completion]}}:state.works};

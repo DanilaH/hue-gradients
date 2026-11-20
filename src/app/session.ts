@@ -2,6 +2,7 @@ import { applyAction, decodeWorkspace, newWorkspace, upgradeWorkspace, type Acti
 import { hashText, prepareCommit } from '../local-store/command';
 import { applyCreative, validateCreativeHashes, type CreativeAction } from '../domain/creative';
 import { editorFingerprintPayload } from '../domain/editor';
+import type { Assistance } from '../domain/puzzle';
 import { StoreError, type PreparedCommit, type TransactionalLocalStore } from '../local-store/contracts';
 
 export const GUEST_VAULT = 'guest-local-v1';
@@ -36,14 +37,14 @@ export class Session {
       await this.write(newWorkspace(crypto.randomUUID()), 'initialize');
     }
   }
-  private async write(next: Workspace, kind: string, backupSnapshot?: string, creativeAction?: CreativeAction): Promise<void> {
+  private async write(next: Workspace, kind: string, backupSnapshot?: string, creativeAction?: CreativeAction, assistance?: Assistance): Promise<void> {
     if (this.pending) throw new Error('Resolve pending operation first');
     const operationId = crypto.randomUUID();
     const attempt = next.attempts[next.activeLevelId];
     const fact = { id: operationId, destination: { kind: 'guest' as const, vaultId: GUEST_VAULT },
       payloadJson: JSON.stringify({ schemaVersion: 1, kind, contentVersion: next.contentVersion, policyVersion: next.policyVersion,
         levelId: next.activeLevelId, fingerprint: this.fingerprints.get(next.activeLevelId), attempt,
-        best: next.bests[next.activeLevelId], onboarding: next.onboarding,
+        best: next.bests[next.activeLevelId], onboarding: next.onboarding, assistance,
         creativeAction, authorTest: creativeAction?.kind.startsWith('author-') ? next.creative?.activeTest : undefined,
         newCopies: Object.values(next.albumCopies).filter(copy => !this.state?.albumCopies[copy.draftId]),
         newCompletions: next.completed.filter(id => !this.state?.completed.includes(id)),
@@ -89,6 +90,6 @@ export class Session {
       next = creative === this.state.creative ? this.state : { ...this.state, creative };
     } else next = applyAction(this.state, action as Action, this.fingerprints);
     if (next === this.state) return false;
-    await this.write(next, action.kind, undefined, creativeAction); return true;
+    await this.write(next, action.kind, undefined, creativeAction, action.kind === 'help' || action.kind === 'author-help' ? action.assistance : undefined); return true;
   }
 }
