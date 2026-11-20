@@ -11,7 +11,11 @@
       "currentImplementation": "Обмен, перетаскивание и отказ на опорах подтверждены тестом ядра. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/PuzzleScene.ts",
       "nextAction": "Проверить drag и отмену на физическом телефоне.",
       "deliveryPackage": "01",
-      "sourceNextCheck": "Проверить tap и drag одного обмена на Android."
+      "sourceNextCheck": "Проверить tap и drag одного обмена на Android.",
+      "audit0412": {
+        "observation": "На 001 касание ровно между подвижными плитками остаётся без хода, на 2 px внутри второй плитки засчитывается победа. Отдельный дефект UX-03; базовый swap сохраняет статус.",
+        "evidence": "AUDIT_0_4_12.md"
+      }
     },
     {
       "id": "h1-pins",
@@ -152,7 +156,11 @@
       "currentImplementation": "Веб-путь восстанавливает подтверждённое поле; физический Android открыт. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/workspace.ts",
       "nextAction": "Реализовать соответствующий пункт пакета 09 и проверить приёмку из FULL_ROADMAP.md. ",
       "deliveryPackage": "09",
-      "sourceNextCheck": "Убить процесс после хода на тестовом устройстве."
+      "sourceNextCheck": "Убить процесс после хода на тестовом устройстве.",
+      "audit0412": {
+        "observation": "Чистый запуск ресурсов подписанного APK в Chromium 92 показывает ошибку открытия сохранения. Chromium 141 доходит до игры; совместимость физического WebView требует проверки.",
+        "evidence": "AUDIT_0_4_12.md"
+      }
     },
     {
       "id": "h1-cloud",
@@ -223,7 +231,11 @@
       "currentImplementation": "Десять ступеней 2/5/10/20/50/100/150/200/250/300. Строгое сравнение и смена эталона проверены. Пока выборка отсутствует, ступени видны без начислений. | https://github.com/DanilaH/hue-gradients/blob/08a2162544b1eeb1cca403893078368d9e2c04ab/src/game/progressView.ts",
       "nextAction": "Проверить первую ступень по опубликованной выборке.",
       "deliveryPackage": "02",
-      "sourceNextCheck": "Проверить повтор одного уровня и показ достижения без сети; выбрать честный ориентир для своей шкалы."
+      "sourceNextCheck": "Проверить повтор одного уровня и показ достижения без сети; выбрать честный ориентир для своей шкалы.",
+      "audit0412": {
+        "observation": "Данные PUBLISHED_BENCHMARKS пусты. В поставленной сборке десять ступеней сравнительного мастерства пока недостижимы.",
+        "evidence": "AUDIT_0_4_12.md"
+      }
     },
     {
       "id": "h1-set-award",
@@ -283,7 +295,11 @@
       "currentImplementation": "Редактор формирует один цикл среди всех подвижных, кампания загружает заданный старт. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/editor.ts",
       "nextAction": "Реализовать соответствующий пункт пакета 04 и проверить приёмку из FULL_ROADMAP.md. ",
       "deliveryPackage": "04",
-      "sourceNextCheck": "Сверить минимумы однотипного и смешанного полей отдельно."
+      "sourceNextCheck": "Сверить минимумы однотипного и смешанного полей отдельно.",
+      "audit0412": {
+        "observation": "На всех 60 стартах Полусна найден один цикл. Для пакета 04 проверить новые поля из нескольких независимых циклов и смешанных форм, сохранить существующие попытки.",
+        "evidence": "AUDIT_0_4_12.md"
+      }
     },
     {
       "id": "h2-perfect",
@@ -373,7 +389,11 @@
       "currentImplementation": "Автообмен выбирает дальнюю неверную позицию и добавляет три хода одной транзакцией. Проверены победа, незавершённое поле и восстановление без дубля в Chromium. Физический счётчик оригинала ещё не записан. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/domain/puzzle.ts",
       "nextAction": "Подтвердить счётчик в оригинале и наш отклик на телефоне.",
       "deliveryPackage": "01",
-      "sourceNextCheck": "Сравнить автоматический правильный обмен с preview; решение владельца открыто."
+      "sourceNextCheck": "Сравнить автоматический правильный обмен с preview; решение владельца открыто.",
+      "audit0412": {
+        "observation": "654 автообмена довели все 60 официальных стартов до победы за 3×минимум ходов; счётчик оригинала на телефоне ждёт проверки.",
+        "evidence": "AUDIT_0_4_12.md"
+      }
     },
     {
       "id": "h2-daily-open",
@@ -473,7 +493,11 @@
       "currentImplementation": "Обычный replay нашего уровня начинает ту же расстановку. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/levels.ts",
       "nextAction": "Переиспользовать реализованное поведение и пройти регрессию пакета 03.",
       "deliveryPackage": "03",
-      "sourceNextCheck": "Сохранить fingerprint и replay первого уровня."
+      "sourceNextCheck": "Сохранить fingerprint и replay первого уровня.",
+      "audit0412": {
+        "observation": "60/60 фиксированных стартов кампании образуют один цикл; в Color Puzzle 6.13.0 это 38/740. Статус MATCH относится только к фиксированности.",
+        "evidence": "AUDIT_0_4_12.md"
+      }
     },
     {
       "id": "cp-exact-win",
@@ -503,7 +527,11 @@
       "currentImplementation": "Наш предел 6×5, кампания из 60. Удовольствие и удобство 13×13 не измерены. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/levels.ts",
       "nextAction": "Реализовать соответствующий пункт пакета 04 и проверить приёмку из FULL_ROADMAP.md. ",
       "deliveryPackage": "04",
-      "sourceNextCheck": "Пройти 6×5 и один крупный прототип на телефоне."
+      "sourceNextCheck": "Пройти 6×5 и один крупный прототип на телефоне.",
+      "audit0412": {
+        "observation": "Color Puzzle: 454 поля 13×13 из 740. Наш уровень 003 при 568×320 имеет высоту логической клетки 40,8 CSS px. Проверить адаптацию до расширения сеток.",
+        "evidence": "AUDIT_0_4_12.md"
+      }
     },
     {
       "id": "cp-preview",
@@ -523,7 +551,11 @@
       "currentImplementation": "После подтверждения циклический поиск выделяет одну неверную подвижную плитку. Ходы и перестановка прежние, при reduced motion контур статичен. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/mountGame.ts",
       "nextAction": "Проверить различимость контура на телефоне.",
       "deliveryPackage": "01",
-      "sourceNextCheck": "Проверить мягкую помощь без раскрытия назначения и без автоматического хода."
+      "sourceNextCheck": "Проверить мягкую помощь без раскрытия назначения и без автоматического хода.",
+      "audit0412": {
+        "observation": "На 60 стартах проверены все 1 220 индексов начала циклического поиска. Выбрана первая неверная подвижная позиция.",
+        "evidence": "AUDIT_0_4_12.md"
+      }
     },
     {
       "id": "cp-free-hint",
