@@ -1,6 +1,8 @@
 # hue-gradients — agent contract
 **mini-games-kit pinned commit:** 469928d03f4bae5053e23db26e82187bedbc252e
 
+For ongoing development, follow [the delivery queue](docs/porting/DELIVERY_QUEUE.md). Resume the first available unfinished slice, record evidence and continue to the next without waiting for a new owner message. Carry external blockers separately and preserve owner-only decisions.
+
 Use docs/porting/FULL_ROADMAP.md for the owner-ordered full transfer and the latest package status. Package 01 acceptance is in docs/porting/FIRST_PACKAGE.md. For audit wording about optional systems, apply the 20 November decision in docs/PROJECT_DECISIONS.md.
 
 Read docs/PROJECT_DECISIONS.md, docs/STATUS.md and docs/SESSION_HANDOFF.md, then relevant requirements in docs/spec/PRODUCT_SPEC_1_0.md and ROADMAP_1_0.md. Select 1–2 routes in docs/kit-guidance/TASK_ROUTER.md before material work. Reference work follows docs/kit-guidance/REFERENCE_PROTOCOL.md. Reusable work follows docs/kit-guidance/KIT_FEEDBACK_LOOP.md; report KIT IMPACT. Inspect the pinned kit docs/API.md before adding infrastructure. Runtime and guidance pins are separate; no silent upgrades.
