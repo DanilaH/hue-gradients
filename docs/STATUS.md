@@ -1,6 +1,6 @@
 # Status — 20 November 2026
 
-Signed Android preview **0.4.21/versionCode25** is based on `feat/m0-foundation`. That branch includes the full audit roadmap from PR #4 and package 01 from PR #5.
+Signed Android preview **0.4.22/versionCode26** is based on `feat/m0-foundation`. That branch includes the full audit roadmap from PR #4 and package 01 from PR #5.
 
 | Stage | Actual state |
 | --- | --- |
@@ -11,6 +11,7 @@ Signed Android preview **0.4.21/versionCode25** is based on `feat/m0-foundation`
 | M4a | LOCAL IMPLEMENTATION: full-screen live colour editor, immutable revisions, durable previews, recovery, and exact-revision author play |
 | M4b | LOCAL IMPLEMENTATION: one full-screen wallpaper per verified work, browser download/share and Android display metrics bridge. Device acceptance pending |
 | UI simplification | Editor ready for playtest. Three help actions, pin feedback and result details ready for playtest in 0.4.11 |
+| Queue D2 | Offline personal assignments, timer, future chapter preview and one completion mark per task. [Checks](evidence/queue-d2-2026-11-20.json) |
 | Queue D1 | Daily client, UTC rollover and archive tested with a dated fixture. Published feed and trusted clock pending. [Checks](evidence/queue-d1-2026-11-20.json) |
 | Queue C2 | 13×13 field, pinch, pan, visible edges and canceled drop verified in Chromium. [Checks](evidence/queue-c2-2026-11-20.json) |
 | Queue C1 | Four original shape boards, deterministic generated starts and exact RGB verified. [Checks](evidence/queue-c1-2026-11-20.json) |

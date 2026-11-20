@@ -1,6 +1,6 @@
 {
   "schema": "consumer-adoption-ledger-v1",
-  "consumerCommit": "7341192f984b0a4a7a75a6d78d5017349eb28d14",
+  "consumerCommit": "1f206af56b9cde90fe571d30faab0e868352b207",
   "asOf": "2026-11-20",
   "features": [
     {
@@ -397,31 +397,31 @@
     },
     {
       "id": "h2-daily-past",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
       "stage": "Пакет 05",
-      "currentImplementation": "Личные best есть; отдельных daily-целей нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md",
-      "nextAction": "Реализовать соответствующий пункт пакета 05 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Отдельная задача предлагает прежний уровень с достижимой целью на ход лучше. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs",
+      "nextAction": "Проверить смысл трёх целей и время на физическом телефоне (G1).",
       "deliveryPackage": "05",
       "sourceNextCheck": "Прототип из уже решённой работы, последний допустимый ход засчитывается."
     },
     {
       "id": "h2-daily-present",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
       "stage": "Пакет 05",
-      "currentImplementation": "В спроектированном UTC daily обычные правила без таймера. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md",
-      "nextAction": "Реализовать соответствующий пункт пакета 05 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Поле без помощи с локальным лимитом времени. Истечение проверено в Chromium. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs",
+      "nextAction": "Проверить смысл трёх целей и время на физическом телефоне (G1).",
       "deliveryPackage": "05",
       "sourceNextCheck": "Проверить границу таймера и возобновление после паузы."
     },
     {
       "id": "h2-daily-future",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
       "stage": "Пакет 05",
-      "currentImplementation": "Нынешняя кампания такого предложения не делает. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md",
-      "nextAction": "Реализовать соответствующий пункт пакета 05 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Первое поле будущей закрытой главы доступно отдельно; в кампании оно не открывается. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs",
+      "nextAction": "Проверить смысл трёх целей и время на физическом телефоне (G1).",
       "deliveryPackage": "05",
       "sourceNextCheck": "Проверить выдачу на профилях с разным прогрессом."
     },
@@ -430,8 +430,8 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 05",
-      "currentImplementation": "D1: фиксированный старт по доверенной дате, версия кеша, офлайн-архив и одна отметка о победе подтверждены на датированных фикстурах. | https://github.com/DanilaH/hue-gradients/blob/7341192f984b0a4a7a75a6d78d5017349eb28d14/tools/daily-browser-check.mjs",
-      "nextAction": "Подключить опубликованный версионированный календарь и доверенный источник UTC-времени, затем проверить реальный общий слот и архив.",
+      "currentImplementation": "История личных заданий сохраняет одну отметку на задание и дату, повтор не дублирует. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs",
+      "nextAction": "Проверить смысл трёх целей и время на физическом телефоне (G1).",
       "deliveryPackage": "05",
       "sourceNextCheck": "Проверить на двух разных профилях, если вводится личная подборка."
     },

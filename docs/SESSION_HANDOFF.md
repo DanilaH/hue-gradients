@@ -10,7 +10,9 @@ Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and
 
 ## Current slice
 
-D1 (0.4.21/versionCode25, 7341192) adds a daily client and immutable cache. Browser fixtures covered identical starts on two profiles, UTC midnight during a game, an immutable cached version and an offline replay with one first-win receipt. No production catalog or clock is configured. **Resume at D2**. [Evidence](evidence/queue-d1-2026-11-20.json)
+D2 (0.4.22/versionCode26, 1f206af) adds local personal tasks and history. Chromium touch saw two assignments on a clean profile and three after an assisted campaign win, beat a 3-move best in 1, replayed with one award, expired a 45-second test clock, and opened chapter 2 independently of campaign unlock. Format for sharing the triple remains UNKNOWN. **Resume at E1**. [Evidence](evidence/queue-d2-2026-11-20.json)
+
+D1 (0.4.21/versionCode25, 7341192) adds a daily client and immutable cache. Browser fixtures covered identical starts on two profiles, UTC midnight during a game, an immutable cached version and an offline replay with one first-win receipt. No production catalog or clock is configured. [Evidence](evidence/queue-d1-2026-11-20.json)
 
 C2 (0.4.20/versionCode24, a763853) adds a 13×13 board. A second touch cancels the pending swap, pinch and pan transform paint and hit geometry together, and drag near a visible edge scrolls only at zoom. Chromium hit pin 84, exchanged 83/85 and then rejected a captured drop outside the canvas. A1 seam and small landscape control still pass. [Evidence](evidence/queue-c2-2026-11-20.json)
 
