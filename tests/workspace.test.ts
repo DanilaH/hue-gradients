@@ -39,15 +39,21 @@ test('one corrupt attempt is retained separately without clearing earned progres
   expect(recovered.completed).toEqual(state.completed); expect(recovered.bests).toEqual(state.bests); expect(recovered.rights).toEqual(state.rights);
   expect(() => decodeWorkspace(JSON.stringify({ ...state, schemaVersion: 99 }), fingerprints)).toThrow();
 });
-test('render bounds and rounded hit testing share cell geometry, including seams and edges', () => {
+test('touch geometry covers rounded corners and seams but excludes the outside edge', () => {
   const board = boardGeometry(320, 374, 6, 5);
   for (let i = 0; i < 30; i++) {
     const c = cellAt(board, i);
     expect(hitTest(board, c.x + c.width / 2, c.y + c.height / 2)).toBe(i);
-    expect(hitTest(board, c.x, c.y)).toBeNull();
+    expect(hitTest(board, c.x, c.y)).toBe(i);
   }
   expect(hitTest(board, -1, 20)).toBeNull(); expect(hitTest(board, 320, 20)).toBeNull();
-  expect(hitTest(board, 320 / 6, 40)).toBeNull();
+  expect(hitTest(board, 320 / 6 - 0.1, 40)).toBe(0);
+  expect(hitTest(board, 320 / 6, 40)).toBe(1);
+  expect(hitTest(board, 320 / 6 + 0.1, 40)).toBe(1);
+  expect(hitTest(board, 0, 4)).toBe(0);
+  expect(hitTest(board, 0, 3.99)).toBeNull();
+  expect(hitTest(board, 0, 370)).toBeNull();
+  expect(hitTest(board, NaN, 20)).toBeNull();
 });
 
 test('preferences extend old saves without resetting attempts, progress or assistance', () => {

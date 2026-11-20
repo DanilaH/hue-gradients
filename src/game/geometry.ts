@@ -9,16 +9,11 @@ export function cellAt(board: BoardGeometry, position: number): Cell {
     y: board.y + Math.floor(position / board.columns) * h + board.gap / 2,
     width: w - board.gap, height: h - board.gap, radius: Math.min(board.radius, w / 4, h / 4) };
 }
-export function contains(cell: Cell, x: number, y: number): boolean {
-  if (x < cell.x || y < cell.y || x >= cell.x + cell.width || y >= cell.y + cell.height) return false;
-  const cx = Math.max(cell.x + cell.radius, Math.min(x, cell.x + cell.width - cell.radius));
-  const cy = Math.max(cell.y + cell.radius, Math.min(y, cell.y + cell.height - cell.radius));
-  return (x - cx) ** 2 + (y - cy) ** 2 <= cell.radius ** 2;
-}
 export function hitTest(board: BoardGeometry, x: number, y: number): number | null {
-  const col = Math.floor((x - board.x) / (board.width / board.columns));
-  const row = Math.floor((y - board.y) / (board.height / board.rows));
-  if (col < 0 || col >= board.columns || row < 0 || row >= board.rows) return null;
-  const position = row * board.columns + col;
-  return contains(cellAt(board, position), x, y) ? position : null;
+  const dx = x - board.x, dy = y - board.y;
+  if (!(dx >= 0 && dx < board.width && dy >= 0 && dy < board.height)) return null;
+  // Rounded paint leaves decorative seams. Logical cells are contiguous, with the seam owned by the right/lower cell.
+  const col = Math.min(board.columns - 1, Math.floor(dx / (board.width / board.columns)));
+  const row = Math.min(board.rows - 1, Math.floor(dy / (board.height / board.rows)));
+  return row * board.columns + col;
 }

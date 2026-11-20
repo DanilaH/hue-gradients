@@ -38,6 +38,15 @@ h1 { font-size: 1rem; font-weight: 550; text-align: center; margin: 0; max-width
 footer { min-height: 56px; padding: 2px 12px 6px; display: flex; gap: 10px; align-items: center; justify-content: center; background: linear-gradient(#160e273a,#160e27b2); }
 #guidance { margin: 0; max-width: 19em; font-size: .8125rem; line-height: 1.25; text-shadow: 0 1px 6px #100a1d; }
 #help { background: #21192d69; min-width: 108px; padding-inline: 12px; font-size: .875rem; }
+@media (orientation: landscape) and (max-height: 450px) {
+  #hue-app { grid-template: 'field hud' auto 'field actions' minmax(0,1fr) / minmax(0,1fr) clamp(116px,25vw,156px); }
+  #board-region { grid-area: field; margin-inline: 6px; }
+  #hue-app > .hud { grid-area: hud; grid-template-columns: 1fr; justify-items: center; gap: 0; padding: 4px 6px; }
+  #hue-app > .hud button { justify-self: stretch; min-width: 48px; }
+  #hue-app #title { max-width: 100%; }
+  #hue-app > footer { grid-area: actions; flex-direction: column-reverse; justify-content: flex-end; gap: 8px; padding: 4px 6px; text-align: center; }
+  #help { min-width: 48px; width: 100%; padding-inline: 4px; }
+}
 #game-dialog { color: #fff2de; background: #21192df5; border: 1px solid #e8d0bd70; border-radius: 20px; width: min(92%,420px); max-height: 86vh; max-height: 86dvh; padding: 24px; overflow: auto; }
 #game-dialog::backdrop { background: #0d081978; backdrop-filter: blur(6px); }
 #game-dialog:not([open]) { display: none !important; }
