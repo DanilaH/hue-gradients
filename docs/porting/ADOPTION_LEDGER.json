@@ -1,6 +1,6 @@
 {
   "schema": "consumer-adoption-ledger-v1",
-  "consumerCommit": "356c9576436d7b0f5378aee432add400fffcdeec",
+  "consumerCommit": "960c8304eb82ce4675d914296c3263d05f6674e9",
   "asOf": "2026-11-20",
   "features": [
     {
@@ -58,8 +58,8 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 02",
-      "currentImplementation": "Сравнение привязано к отпечатку и версии правил. Карточка знает версию, источник и размер выборки. Среднее показывается только при наличии опубликованной выборки. | https://github.com/DanilaH/hue-gradients/blob/08a2162544b1eeb1cca403893078368d9e2c04ab/src/domain/playerProgress.ts",
-      "nextAction": "Опубликовать выборку реальных прохождений с привязкой к определению.",
+      "currentImplementation": "Сравнение привязано к отпечатку и версии правил. Карточка знает версию, источник и размер выборки. Среднее показывается только при наличии опубликованной выборки. | https://github.com/DanilaH/hue-gradients/blob/08a2162544b1eeb1cca403893078368d9e2c04ab/src/domain/playerProgress.ts A3 вывел личный рекорд на карточку и повторно проверил сравнения на фикстурах. | https://github.com/DanilaH/hue-gradients/blob/960c8304eb82ce4675d914296c3263d05f6674e9/src/game/workCardView.ts",
+      "nextAction": "После публикации измеренных чистых проходов для точного отпечатка и правил записать источник, версию и размер; проверить сравнение и первую ступень.",
       "deliveryPackage": "02",
       "sourceNextCheck": "Для сравнения выбрать прозрачно названный ориентир и источник."
     },
@@ -220,8 +220,8 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 02",
-      "currentImplementation": "Десять ступеней 2/5/10/20/50/100/150/200/250/300. Строгое сравнение и смена эталона проверены. Пока выборка отсутствует, ступени видны без начислений. | https://github.com/DanilaH/hue-gradients/blob/08a2162544b1eeb1cca403893078368d9e2c04ab/src/game/progressView.ts",
-      "nextAction": "Проверить первую ступень по опубликованной выборке.",
+      "currentImplementation": "Десять ступеней 2/5/10/20/50/100/150/200/250/300. Строгое сравнение и смена эталона проверены. Пока выборка отсутствует, ступени видны без начислений. | https://github.com/DanilaH/hue-gradients/blob/08a2162544b1eeb1cca403893078368d9e2c04ab/src/game/progressView.ts A3 вывел личный рекорд на карточку и повторно проверил сравнения на фикстурах. | https://github.com/DanilaH/hue-gradients/blob/960c8304eb82ce4675d914296c3263d05f6674e9/src/game/workCardView.ts",
+      "nextAction": "После публикации измеренных чистых проходов для точного отпечатка и правил записать источник, версию и размер; проверить сравнение и первую ступень.",
       "deliveryPackage": "02",
       "sourceNextCheck": "Проверить повтор одного уровня и показ достижения без сети; выбрать честный ориентир для своей шкалы."
     },
@@ -690,8 +690,8 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 02",
-      "currentImplementation": "В карточке выделены личный результат и математический минимум. Среднее игроков доступно только из подтверждённой выборки. | https://github.com/DanilaH/hue-gradients/blob/08a2162544b1eeb1cca403893078368d9e2c04ab/src/game/workCardView.ts",
-      "nextAction": "Проверить подпись реального эталона после публикации данных.",
+      "currentImplementation": "В карточке выделены личный результат и математический минимум. Среднее игроков доступно только из подтверждённой выборки. | https://github.com/DanilaH/hue-gradients/blob/08a2162544b1eeb1cca403893078368d9e2c04ab/src/game/workCardView.ts A3 вывел личный рекорд на карточку и повторно проверил сравнения на фикстурах. | https://github.com/DanilaH/hue-gradients/blob/960c8304eb82ce4675d914296c3263d05f6674e9/src/game/workCardView.ts",
+      "nextAction": "После публикации измеренных чистых проходов для точного отпечатка и правил записать источник, версию и размер; проверить сравнение и первую ступень.",
       "deliveryPackage": "02",
       "sourceNextCheck": "Указывать происхождение сравнительной величины."
     },

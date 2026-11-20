@@ -10,7 +10,9 @@ Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and
 
 ## Current slice
 
-A2 (0.4.14/versionCode18, 356c957) restores startup and audio on Chromium 92. The picker preview opens or resumes a level by tap or keyboard. Canceled gestures and locked previews do not open a game. Existing 0.4.12 Chromium save bytes survived the update, including a failed capability probe. Capacitor uses a 92 minimum and the packaged error page; physical provider/SQLite tests wait for G1. **Resume at A3**. [Evidence](evidence/queue-a2-2026-11-20.json)
+A3 (0.4.15/versionCode19, 960c830) puts personal bests, minimum and the earned mastery mark directly on the work card. Fixture comparisons distinguish equal, better, replayed and assisted results. Live sample size 0. Return only after actual clean Poluson results for a versioned exact start can be published. **Resume at B1**. [Evidence](evidence/queue-a3-2026-11-20.json)
+
+A2 (0.4.14/versionCode18, 356c957) restores startup and audio on Chromium 92. The picker preview opens or resumes a level by tap or keyboard. Canceled gestures and locked previews do not open a game. Existing 0.4.12 Chromium save bytes survived the update, including a failed capability probe. Capacitor uses a 92 minimum and the packaged error page; physical provider/SQLite tests wait for G1. [Evidence](evidence/queue-a2-2026-11-20.json)
 
 A1 (0.4.13/versionCode17, 2e7c0b8) is in the game. Chromium touch hit the exact seam at (200,398) by tap and drop. In the 568×320 fixture with 24 px on each side and 150% text, 1×5 measured 366×52.8 and 6×5 cells 61×52.8 CSS px. Android debug, signed releaseCheck and exact APK inspection passed. Physical input waits for G1. [Evidence](evidence/queue-a1-2026-11-20.json)
 
