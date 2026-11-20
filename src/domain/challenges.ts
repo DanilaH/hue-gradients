@@ -1,4 +1,5 @@
 import { chapters, getLevel } from './levels';
+import { bookProgress, books, type Book, type BookProof } from './books';
 import { geometryLevels } from './shapeLevels';
 import { CHALLENGE_CONTENT_VERSION, createAttempt, minimumSwaps, proposeSwap, validateAttempt, validateLevel,
   type Attempt, type LevelDefinition } from './puzzle';
@@ -9,6 +10,7 @@ interface ChallengeDefinition {
   readonly moveLimit: number;
   readonly chapterIndex?: number;
   readonly afterFinaleId?: string;
+  readonly book?: Book;
 }
 
 // Original starts for Poluson. The first pair shares dimensions, pins, palette, minimum and limit.
@@ -72,10 +74,14 @@ export type ChallengeAction =
 
 export const geometryChallenges: readonly ChallengeDefinition[] = Object.freeze(geometryLevels.map(level =>
   Object.freeze({ level, requiredWorks: 0, moveLimit: level.minimumSwaps + 3 })));
-const allChallenges = [...challenges, ...chapterChallenges, ...geometryChallenges];
+const bookChallenges = books.map(book => Object.freeze({ level: book.level, requiredWorks: 0,
+  moveLimit: book.level.minimumSwaps + 3, book }));
+const allChallenges = [...challenges, ...chapterChallenges, ...geometryChallenges, ...bookChallenges];
 const entry = (id: string | null): ChallengeDefinition | undefined => allChallenges.find(item => item.level.id === id);
 
-export function challengeAvailable(definition: ChallengeDefinition, completed: readonly string[], progress?: ChallengeProgress): boolean {
+export function challengeAvailable(definition: ChallengeDefinition, proof: BookProof): boolean {
+  const { completed, challengeProgress: progress } = proof;
+  if (definition.book) return bookProgress(definition.book, proof).unlocked;
   if (definition.afterFinaleId) return progress?.best[definition.afterFinaleId] !== undefined;
   if (definition.chapterIndex !== undefined) return chapters[definition.chapterIndex]!.levelIds.every(id => completed.includes(id));
   return completed.length >= definition.requiredWorks;
@@ -95,7 +101,8 @@ export function activeChallenge(progress: ChallengeProgress | undefined) {
 
 const empty: ChallengeProgress = { active: null, attempts: {}, best: {} };
 
-export function applyChallenge(progress: ChallengeProgress | undefined, completed: readonly string[], action: ChallengeAction): ChallengeProgress | undefined {
+export function applyChallenge(proof: BookProof, action: ChallengeAction): ChallengeProgress | undefined {
+  const progress = proof.challengeProgress;
   const state = progress ?? empty;
   if (action.kind === 'challenge-leave') return state.active === null ? progress : { ...state, active: null };
   if (action.kind === 'challenge-swap') {
@@ -109,7 +116,7 @@ export function applyChallenge(progress: ChallengeProgress | undefined, complete
     return { ...state, attempts: { ...state.attempts, [level.id]: next }, best };
   }
   const definition = entry(action.id);
-  if (!definition || !challengeAvailable(definition, completed, progress)) return progress;
+  if (!definition || !challengeAvailable(definition, proof)) return progress;
   const saved = state.attempts[action.id];
   if (action.kind === 'challenge-open' && saved) {
     return state.active === action.id ? progress : { ...state, active: action.id };
@@ -119,7 +126,7 @@ export function applyChallenge(progress: ChallengeProgress | undefined, complete
   return { ...state, active: action.id, attempts: { ...state.attempts, [action.id]: attempt } };
 }
 
-export function validateChallengeProgress(progress: ChallengeProgress, completed: readonly string[]): void {
+export function validateChallengeProgress(progress: ChallengeProgress, proof: BookProof): void {
   if (!progress || !progress.attempts || typeof progress.attempts !== 'object' || Array.isArray(progress.attempts) ||
       !progress.best || typeof progress.best !== 'object' || Array.isArray(progress.best) ||
       (progress.active !== null && (!entry(progress.active) || !progress.attempts[progress.active]))) {
@@ -128,7 +135,7 @@ export function validateChallengeProgress(progress: ChallengeProgress, completed
   const attempts = new Set<string>();
   for (const [id, attempt] of Object.entries(progress.attempts)) {
     const definition = entry(id);
-    if (!definition || !challengeAvailable(definition, completed, progress) || !attempt || attempt.assisted ||
+    if (!definition || !challengeAvailable(definition, proof) || !attempt || attempt.assisted ||
         attempt.moves > definition.moveLimit || attempts.has(attempt.attemptId)) throw new Error('Invalid challenge attempt');
     validateAttempt(definition.level, attempt);
     if (attempt.completed && !(progress.best[id] !== undefined && progress.best[id]! <= attempt.moves)) {

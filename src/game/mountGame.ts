@@ -187,7 +187,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       if (!samePicker && JSON.stringify(route) !== JSON.stringify(metaRoute)) metaHistory.push(metaRoute);
     }
     metaRoute = route; layer = 'meta'; render();
-    if (route.kind === 'daily') void refreshDaily();
+    if (route.kind === 'daily' || route.kind === 'books') void refreshDaily();
     if (route.kind === 'personal') void issuePersonal();
   }
   function startLevel(id: string): void {
@@ -217,7 +217,13 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   function leaveChallenge(): void {
     const challenge = current().challenge;
     const group = challenge?.chapterIndex !== undefined ? 'chapter' : challenge?.level.id.startsWith('geometry-v1-') ? 'geometry' : undefined;
-    void run({ kind: 'challenge-leave' }, () => challengeLobby(group));
+    void run({ kind: 'challenge-leave' }, () => {
+      if (!challenge?.book) { challengeLobby(group); return; }
+      metaReturn = gameLayer();
+      metaHistory = [{ kind: 'album', tab: 'campaign' }];
+      metaRoute = { kind: 'books' };
+      layer = 'meta';
+    });
   }
   async function refreshDaily(): Promise<void> {
     if (!options.dailySource || dailyLoading || activity.isBlocked()) return;
@@ -228,7 +234,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       validateDailyFeed(feed);
       if (alive) await run({ kind: 'daily-cache', feed });
     } catch { /* An offline or unverified response never modifies the trusted archive. */ }
-    finally { dailyLoading = false; if (alive && layer === 'meta' && metaRoute.kind === 'daily') render(); }
+    finally { dailyLoading = false; if (alive && layer === 'meta' && (metaRoute.kind === 'daily' || metaRoute.kind === 'books')) render(); }
   }
   function playDaily(date: string, replay: boolean): void {
     void run({ kind: 'daily-open', date, replay, attemptId: crypto.randomUUID() }, () => {
@@ -237,10 +243,11 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     });
   }
   function leaveDaily(): void {
+    const feature = current().daily?.feature;
     void run({ kind: 'daily-leave' }, () => {
       metaReturn = gameLayer();
-      metaHistory = [{ kind: 'chapter', levelId: session.state.activeLevelId }];
-      metaRoute = { kind: 'daily' };
+      metaHistory = feature ? [{ kind: 'album', tab: 'campaign' }] : [{ kind: 'chapter', levelId: session.state.activeLevelId }];
+      metaRoute = feature ? { kind: 'books' } : { kind: 'daily' };
       layer = 'meta';
       queueMicrotask(() => void refreshDaily());
     });
@@ -375,7 +382,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       colourPrism(prism, level);
       byId('dialog-title').textContent = 'Задача собрана';
       byId('dialog-copy').textContent = dailyLabel(daily.date);
-      button('К календарю', leaveDaily);
+      button(daily.feature ? 'К книгам' : 'К календарю', leaveDaily);
     } else if (layer === 'result' && timed) {
       byId('dialog-title').textContent = 'Время вышло';
       byId('dialog-copy').textContent = `Собрано · ${timed.run.cleared} · Рекорд · ${timed.best}`;
@@ -385,7 +392,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       if (won) colourPrism(prism, level);
       byId('dialog-title').textContent = won ? 'Испытание пройдено' : 'Ходы закончились';
       byId('dialog-copy').textContent = `Ходы · ${challenge.attempt.moves} из ${challenge.moveLimit}`;
-      if (won) button('К испытаниям', leaveChallenge);
+      if (won) button(challenge.book ? 'К книгам' : 'К испытаниям', leaveChallenge);
       else {
         button('Повторить', () => playChallenge(level.id, true));
         button('К испытаниям', leaveChallenge, true);

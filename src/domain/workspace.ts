@@ -109,7 +109,7 @@ export function decodeWorkspace(json: string, fingerprints: ReadonlyMap<string, 
   if (state.personalProgress !== undefined) validatePersonal(state.personalProgress);
   if (state.dailyProgress !== undefined) validateDailyProgress(state.dailyProgress);
   if (state.timedProgress !== undefined) validateTimedProgress(state.timedProgress);
-  if (state.challengeProgress !== undefined) validateChallengeProgress(state.challengeProgress, state.completed);
+  if (state.challengeProgress !== undefined) validateChallengeProgress(state.challengeProgress, state);
   if (legacy) { state.albumCopies = {}; state.lastCompletion = null; }
   else {
     if (!record(state.albumCopies)) throw new Error('Invalid saved copies');
@@ -166,7 +166,7 @@ export function applyAction(state: Workspace, action: Action, fingerprints: Read
   if (action.kind === 'challenge-open' || action.kind === 'challenge-restart' ||
       action.kind === 'challenge-swap' || action.kind === 'challenge-leave') {
     if (state.timedProgress?.active || state.dailyProgress?.active || state.personalProgress?.active) return state;
-    const challengeProgress = applyChallenge(state.challengeProgress, state.completed, action);
+    const challengeProgress = applyChallenge(state, action);
     return !challengeProgress || challengeProgress === state.challengeProgress ? state : { ...state, challengeProgress };
   }
   if (action.kind === 'preferences') {

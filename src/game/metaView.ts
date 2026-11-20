@@ -4,12 +4,14 @@ import type { LevelDefinition } from '../domain/puzzle';
 import type { Workspace } from '../domain/workspace';
 import type { AlbumRoute } from './albumView';
 import { chapterChallenges, challengeAvailable, challenges, challengeStatus, geometryChallenges } from '../domain/challenges';
+import { bookProgress, books, goalLabel } from '../domain/books';
+import { gradientThumbnail } from './exportRenderer';
 import { TASK_KINDS, taskKey, taskNames, taskStatus } from '../domain/personal';
 import { renderProgress } from './progressView';
 
 type PickerRoute = { kind: 'chapter'; levelId: string; chapterMenu?: number };
 export type MetaRoute = PickerRoute | AlbumRoute | { kind: 'card' | 'copy'; levelId: string } |
-  { kind: 'own-card'; workId: string; nodeId: string } | { kind: 'draft'; draftId: string; nodeId?: string } | { kind: 'progress' | 'daily' | 'personal' } | { kind: 'challenges'; group?: 'chapter' | 'geometry' };
+  { kind: 'own-card'; workId: string; nodeId: string } | { kind: 'draft'; draftId: string; nodeId?: string } | { kind: 'progress' | 'daily' | 'personal' | 'books' | 'cycle-review' } | { kind: 'challenges'; group?: 'chapter' | 'geometry' };
 interface MetaView {
   route: MetaRoute; state: Workspace; disabled: boolean;
   title: HTMLElement; copy: HTMLElement; actions: HTMLElement;
@@ -234,6 +236,46 @@ export function renderMeta(v: MetaView): void {
   } else if (route.kind === 'progress') {
     v.title.textContent = 'Прогресс';
     renderProgress(actions, state, v.disabled, v.back);
+  } else if (route.kind === 'books') {
+    v.title.textContent = 'Книги';
+    button('‹ Назад', v.back).className = 'quiet challenge-back';
+    for (const book of books) {
+      const progress = bookProgress(book, state);
+      const panel = document.createElement('article');
+      panel.className = 'book';
+      panel.dataset.book = book.id;
+      panel.append(gradientThumbnail({ width: 2, height: 2,
+        solvedTileColors: book.palette.map((color, index) => progress.goals[index]?.completed ? color : '#392749') }));
+      const title = document.createElement('h3');
+      title.textContent = `${book.title} · ${progress.filled}/${book.goals.length}`;
+      panel.append(title);
+      const checklist = document.createElement('ul');
+      for (const goal of progress.goals) {
+        const row = document.createElement('li');
+        row.dataset.earned = String(goal.completed);
+        row.textContent = goalLabel(goal);
+        checklist.append(row);
+      }
+      panel.append(checklist);
+      if (progress.unlocked) {
+        button(progress.claimed ? 'Повторить особую задачу' : 'Особая задача',
+          () => v.playChallenge(book.id, progress.claimed), panel).dataset.bookChallenge = book.id;
+      }
+      actions.append(panel);
+    }
+    const featured = Object.values(state.dailyProgress?.slots ?? {}).filter(slot => slot.feature).sort((a,b) => b.date.localeCompare(a.date));
+    for (const slot of featured) {
+      const won = state.dailyProgress?.solved.includes(slot.date);
+      const card = button(`${slot.feature!.title} · ${dailyLabel(slot.date)}${won ? ' · Собрано' : ''}`,
+        () => v.playDaily(slot.date, state.dailyProgress?.attempts[slot.date]?.completed === true), actions);
+      card.className = 'quiet';
+      card.dataset.event = slot.feature!.id;
+    }
+    if (state.completed.length === levels.length) button('Новый цикл', () => v.navigate({ kind: 'cycle-review' })).className = 'quiet';
+  } else if (route.kind === 'cycle-review') {
+    v.title.textContent = 'Новый цикл';
+    label('Правила переноса прогресса в новый цикл ещё не утверждены. Коллекция и права сохраняются.');
+    button('Отмена', v.back);
   } else if (route.kind === 'personal') {
     v.title.textContent = 'Личные задания';
     button('‹ Назад', v.back).className = 'quiet challenge-back';
@@ -320,7 +362,7 @@ export function renderMeta(v: MetaView): void {
     actions.append(tabs, list);
     for (const definition of route.group === 'chapter' ? chapterChallenges : route.group === 'geometry' ? geometryChallenges : challenges) {
       const { level, requiredWorks, moveLimit } = definition;
-      const locked = !challengeAvailable(definition, state.completed, state.challengeProgress);
+      const locked = !challengeAvailable(definition, state);
       const attempt = state.challengeProgress?.attempts[level.id];
       const best = state.challengeProgress?.best[level.id];
       const restart = !!attempt && challengeStatus(definition, attempt) !== 'playing';

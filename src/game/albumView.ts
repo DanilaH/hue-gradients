@@ -96,6 +96,7 @@ export function renderAlbum(parent: HTMLElement, props: Props): void {
         print(prints, level, level.title, id, () => navigate({ kind: 'card', levelId: id })).dataset.albumLevel = id;
       }
     });
+    button(footer, 'Книги', () => navigate({ kind: 'books' })).dataset.albumFocus = 'books';
     if (!completed.size) {
       empty('Здесь появятся собранные градиенты.');
       button(footer, 'К игре', props.play);

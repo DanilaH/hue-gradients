@@ -210,6 +210,12 @@ button.level-preview.quiet { padding: 0; border: 0; border-radius: 0; background
 .challenge-back { justify-self: start; }
 .challenge-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
 .challenge-tabs [aria-pressed=true] { border-color: #fff2de; }
+.book { display: grid; gap: 8px; padding: 12px; background: #120d205c; border-radius: 10px; }
+.book canvas { width: 100%; max-height: 108px; border-radius: 5px; }
+.book h3, .book ul { margin: 0; }
+.book h3 { font-size: 1rem; font-weight: 550; }
+.book ul { padding-inline-start: 20px; font-size: .8rem; }
+.book li[data-earned=true] { color: #fff0c6; }
 .challenge-list { display: grid; gap: 6px; grid-template-columns: repeat(auto-fit,minmax(min(100%,180px),1fr)); }
 .challenge-card { display: grid; text-align: left; justify-items: start; }
 .challenge-card small { font-size: .75rem; }

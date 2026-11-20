@@ -2,9 +2,12 @@ import { isCalendarDay } from '@danilah/mini-games-kit/core';
 import { DAILY_CONTENT_VERSION, createAttempt, proposeSwap, validateAttempt, validateLevel,
   type Attempt, type LevelDefinition } from './puzzle';
 
-interface DailySlot {
+interface DailyEntry {
   readonly date: string;
   readonly level: LevelDefinition;
+  readonly feature?: { readonly id: string; readonly title: string };
+}
+interface DailySlot extends DailyEntry {
   readonly source: string;
   readonly version: string;
 }
@@ -13,7 +16,7 @@ export interface DailyFeed {
   readonly source: string;
   readonly version: string;
   readonly verifiedNowMs: number;
-  readonly days: readonly { readonly date: string; readonly level: LevelDefinition }[];
+  readonly days: readonly DailyEntry[];
 }
 export interface DailyProgress {
   readonly through: string;
@@ -29,6 +32,7 @@ export type DailyAction =
   | { kind: 'daily-leave' };
 
 const named = (value: unknown) => typeof value === 'string' && !!value.trim();
+const validFeature = (entry: DailyEntry) => entry.feature === undefined || !!entry.feature && named(entry.feature.id) && named(entry.feature.title);
 
 export function validateDailyFeed(feed: DailyFeed): string {
   if (!feed || !named(feed.source) || !named(feed.version) || !Number.isSafeInteger(feed.verifiedNowMs) ||
@@ -38,7 +42,7 @@ export function validateDailyFeed(feed: DailyFeed): string {
   const seen = new Set<string>();
   for (const day of feed.days) {
     if (!day || !isCalendarDay(day.date) || seen.has(day.date) || !day.level ||
-        day.level.contentVersion !== DAILY_CONTENT_VERSION) throw new Error('Invalid daily slot');
+        day.level.contentVersion !== DAILY_CONTENT_VERSION || !validFeature(day)) throw new Error('Invalid daily slot');
     validateLevel(day.level);
     seen.add(day.date);
   }
@@ -95,7 +99,7 @@ export function validateDailyProgress(progress: DailyProgress): void {
   }
   for (const [date, slot] of Object.entries(progress.slots)) {
     if (!slot || date !== slot.date || !isCalendarDay(date) || date > progress.through ||
-        !named(slot.source) || !named(slot.version) || slot.level.contentVersion !== DAILY_CONTENT_VERSION) throw new Error('Invalid cached daily slot');
+        !named(slot.source) || !named(slot.version) || slot.level.contentVersion !== DAILY_CONTENT_VERSION || !validFeature(slot)) throw new Error('Invalid cached daily slot');
     validateLevel(slot.level);
   }
   const attemptIds = new Set<string>();
