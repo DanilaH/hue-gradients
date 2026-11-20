@@ -10,7 +10,9 @@ Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and
 
 ## Current slice
 
-A3 (0.4.15/versionCode19, 960c830) puts personal bests, minimum and the earned mastery mark directly on the work card. Fixture comparisons distinguish equal, better, replayed and assisted results. Live sample size 0. Return only after actual clean Poluson results for a versioned exact start can be published. **Resume at B1**. [Evidence](evidence/queue-a3-2026-11-20.json)
+B1 (0.4.16/versionCode20, 8783519) is in the game. The 10 thresholds were reached through real campaign rules. Chromium touch opened the first challenge after five normal wins and committed a win and a loss on the sixth swap in separate runs. Replays use the same start, challenge saves do not touch campaign rewards or records, and a loss restores after reload. The paired 4×4 starts share four minimum swaps. **Resume at B2**. [Evidence](evidence/queue-b1-2026-11-20.json)
+
+A3 (0.4.15/versionCode19, 960c830) puts personal bests, minimum and the earned mastery mark directly on the work card. Fixture comparisons distinguish equal, better, replayed and assisted results. Live sample size 0. Return only after actual clean Poluson results for a versioned exact start can be published. [Evidence](evidence/queue-a3-2026-11-20.json)
 
 A2 (0.4.14/versionCode18, 356c957) restores startup and audio on Chromium 92. The picker preview opens or resumes a level by tap or keyboard. Canceled gestures and locked previews do not open a game. Existing 0.4.12 Chromium save bytes survived the update, including a failed capability probe. Capacitor uses a 92 minimum and the packaged error page; physical provider/SQLite tests wait for G1. [Evidence](evidence/queue-a2-2026-11-20.json)
 

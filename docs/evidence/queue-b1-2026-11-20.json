@@ -1,0 +1,78 @@
+{
+  "checks": [
+    "real first five campaign wins unlock one challenge",
+    "pin does not consume the limit",
+    "leaving and resuming preserves board and attempt ID",
+    "sixth move wins in one replay and loses in another",
+    "campaign board, history and rights remain identical",
+    "loss persists after reload and replay restores the fixed start"
+  ],
+  "browser": "158.0.8127.36",
+  "clipStartMillis": 5198,
+  "clipMillis": 6634,
+  "bankPair": [
+    [
+      5
+    ],
+    [
+      3,
+      3
+    ]
+  ],
+  "exactCamera": "CDP touch inside Chromium",
+  "unitThresholdProfiles": 10,
+  "source": "8783519e0488d5bbdc0d880013da3a851a4d831a",
+  "kitImpact": "REUSE",
+  "thresholdWorks": [
+    5,
+    10,
+    15,
+    20,
+    25,
+    30,
+    35,
+    40,
+    50,
+    60
+  ],
+  "bothPairMinimum": 4,
+  "bothPairLimit": 6,
+  "unitChecks": 165,
+  "coreChromiumRegression": 21,
+  "apk": {
+    "kind": "releasecheck",
+    "package": "com.danilah.huegradients.preview3",
+    "versionName": "0.4.16",
+    "versionCode": 20,
+    "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+    "source": "8783519e0488d5bbdc0d880013da3a851a4d831a",
+    "apkSha256": "b19252515968bd452afc9afa40d695653dd6fd6b55ad83a06a643a97e0477418",
+    "bytes": 1199760,
+    "certificateSha256": "3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85",
+    "productionSigner": false,
+    "v2": true,
+    "zipalign16k": true,
+    "debuggable": false,
+    "webViewDebuggingConfigured": false,
+    "nativeInsetOwner": "content-root",
+    "webPayload": {
+      "start-error.html": "22cc22f670fac501b781a7e27ee2b38842839e03f47bfb72c199768b5c709598",
+      "index.html": "0bfab3d4a4e64278db11aa8cb73370dfc69cc895ea40256acb54b5897ef25d98",
+      "native-build.json": "d6776c22b4d785acafac6f324de6e51d9700f8d00340e5638b59090fc0a0fc70",
+      "assets/index-Wosu6pb6.js": "28c57b5f3efa915280f78cf882ef97a05adfc387313a1640c417b2fa6af6e183",
+      "assets/index-Dvl8bDVn.css": "8ac54431da1233b5263c8383a4219e0cf5e23552afeaadc0c217f5b4332b71f5",
+      "assets/native-ttWVwMFk.js": "a77e2538e2c6cea787fc6d1ac82c4828eec2f8a3c3244eb1c14751fef8ea6102",
+      "assets/nativeFeedback-BdXlsEx8.js": "aa12bc0f39307f8a86d95c5b93e428317c5282ed05069350ea7ef8fd1ad69648",
+      "assets/web-BM7xF5pS.js": "874bbd026b2a3757b6c7bedc1bd163f0c735a3e0a943605c9853f660d828d658",
+      "assets/nativeExport-CqbPFgKE.js": "5810d391885079b04fe08fbd9075ad787560ad4f04d814f2b7faac850fb46b8b",
+      "assets/command-BzJMFn4z.js": "56f6750bc40b8fb2c1a76c2cfb70085b2719545adc9b46739cdf944861ab6655",
+      "assets/dist-CMedSjkm.js": "067d9ca66629f984cf538346471032b4b24f9acd1cb914834126e2b88d3250fe"
+    },
+    "nativeRuntime": "NOT RUN",
+    "liveServices": "NOT INSTALLED BY THIS HOST TEMPLATE"
+  },
+  "gif": {
+    "name": "Poluson-B1-last-move.gif",
+    "sha256": "94a7c4d156eba7084d43b336cb0e160b11c4fe398b28f7aadf5bd3bb7429bf61"
+  }
+}

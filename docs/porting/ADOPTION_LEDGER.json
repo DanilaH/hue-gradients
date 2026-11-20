@@ -1,6 +1,6 @@
 {
   "schema": "consumer-adoption-ledger-v1",
-  "consumerCommit": "960c8304eb82ce4675d914296c3263d05f6674e9",
+  "consumerCommit": "8783519e0488d5bbdc0d880013da3a851a4d831a",
   "asOf": "2026-11-20",
   "features": [
     {
@@ -277,11 +277,11 @@
     },
     {
       "id": "h2-cycles",
-      "status": "ROADMAPPED",
+      "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 04",
-      "currentImplementation": "Редактор формирует один цикл среди всех подвижных, кампания загружает заданный старт. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/editor.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 04 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "В банке B1 появились 4×4 старты с разложениями [5] и [3,3], общими RGB, опорами и минимумом 4. | https://github.com/DanilaH/hue-gradients/blob/8783519e0488d5bbdc0d880013da3a851a4d831a/src/domain/challenges.ts",
+      "nextAction": "Подключить режимы перемешивания по совместимым группам в C1.",
       "deliveryPackage": "04",
       "sourceNextCheck": "Сверить минимумы однотипного и смешанного полей отдельно."
     },
@@ -470,8 +470,8 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "MATCH",
       "stage": "Пакет 03",
-      "currentImplementation": "Обычный replay нашего уровня начинает ту же расстановку. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/levels.ts",
-      "nextAction": "Переиспользовать реализованное поведение и пройти регрессию пакета 03.",
+      "currentImplementation": "Банк B1 хранит при повторе ту же перестановку. Первые 15 не переразложены. | https://github.com/DanilaH/hue-gradients/blob/8783519e0488d5bbdc0d880013da3a851a4d831a/src/domain/challenges.ts",
+      "nextAction": "В C1 проверить различие между авторским стартом и генерируемой перестановкой.",
       "deliveryPackage": "03",
       "sourceNextCheck": "Сохранить fingerprint и replay первого уровня."
     },
@@ -547,21 +547,21 @@
     },
     {
       "id": "cp-challenge",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "MATCH",
       "stage": "Пакет 03",
-      "currentImplementation": "Есть математический минимум, проигрыша по лимиту нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/puzzle.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 03 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Отдельный банк B1; Chromium подтвердил, что на последнем разрешённом ходу проверяется решение перед исчерпанием лимита. | https://github.com/DanilaH/hue-gradients/blob/8783519e0488d5bbdc0d880013da3a851a4d831a/src/domain/challenges.ts",
+      "nextAction": "Проверить темп и отклик последнего хода на телефоне (G1).",
       "deliveryPackage": "03",
       "sourceNextCheck": "Прототип на собственном поле: победа последним ходом, проигрыш с нерешённым полем."
     },
     {
       "id": "cp-challenge-gate",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
       "stage": "Пакет 03",
-      "currentImplementation": "10/15 открывает следующую обычную главу. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/progression.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 03 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Все десять порогов от 5 до 60 проверены на достижимом прогрессе реального банка кампании. В проекте порог считает уникальные обычные работы. | https://github.com/DanilaH/hue-gradients/blob/8783519e0488d5bbdc0d880013da3a851a4d831a/src/domain/challenges.ts",
+      "nextAction": "Проверить понимание порогов при плейтесте; следующие виды открытий в B2.",
       "deliveryPackage": "03",
       "sourceNextCheck": "Отдельно решить чем открывается необязательное испытание."
     },
