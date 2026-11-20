@@ -10,7 +10,9 @@ Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and
 
 ## Current slice
 
-D2 (0.4.22/versionCode26, 1f206af) adds local personal tasks and history. Chromium touch saw two assignments on a clean profile and three after an assisted campaign win, beat a 3-move best in 1, replayed with one award, expired a 45-second test clock, and opened chapter 2 independently of campaign unlock. Format for sharing the triple remains UNKNOWN. **Resume at E1**. [Evidence](evidence/queue-d2-2026-11-20.json)
+E1 (0.4.23/versionCode27, 36df803) adds two themed books under Album. Chromium filled the last part, solved and replayed the special board with one receipt, completed a cached event offline, and canceled the cycle preview with the complete profile byte-identical. Live events need D1 publication. Cycle reset needs an owner decision. **Resume at E2**. [Evidence](evidence/queue-e1-2026-11-20.json)
+
+D2 (0.4.22/versionCode26, 1f206af) adds local personal tasks and history. Chromium touch saw two assignments on a clean profile and three after an assisted campaign win, beat a 3-move best in 1, replayed with one award, expired a 45-second test clock, and opened chapter 2 independently of campaign unlock. Format for sharing the triple remains UNKNOWN. [Evidence](evidence/queue-d2-2026-11-20.json)
 
 D1 (0.4.21/versionCode25, 7341192) adds a daily client and immutable cache. Browser fixtures covered identical starts on two profiles, UTC midnight during a game, an immutable cached version and an offline replay with one first-win receipt. No production catalog or clock is configured. [Evidence](evidence/queue-d1-2026-11-20.json)
 

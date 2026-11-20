@@ -1,6 +1,6 @@
 {
   "schema": "consumer-adoption-ledger-v1",
-  "consumerCommit": "1f206af56b9cde90fe571d30faab0e868352b207",
+  "consumerCommit": "36df8036981c4d91685ce133878b1719de318437",
   "asOf": "2026-11-20",
   "features": [
     {
@@ -727,11 +727,11 @@
     },
     {
       "id": "mt-m01",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
       "stage": "Пакет 06",
-      "currentImplementation": "Альбом отдельных работ; запрет коллажей в PNG не запрещает внутренний игровой прогресс. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/albumView.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 06 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Книга постепенно раскрывает четыре цвета непрерывной внутриигровой композиции. | https://github.com/DanilaH/hue-gradients/blob/36df8036981c4d91685ce133878b1719de318437/tools/books-browser-check.mjs",
+      "nextAction": "Проверить реальный каталог событий после D1 и показать книгу на телефоне (G1).",
       "deliveryPackage": "06",
       "sourceNextCheck": "Сравнить внутреннюю сборную картину и альбом на одном наборе, без смены экспорта."
     },
@@ -757,21 +757,21 @@
     },
     {
       "id": "mt-m04",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
       "stage": "Пакет 06",
-      "currentImplementation": "Нет цепочки целей с отдельной задачей. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/progression.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 06 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Разнородные цели открывают отдельную задачу; повтор сохраняет одну отметку. | https://github.com/DanilaH/hue-gradients/blob/36df8036981c4d91685ce133878b1719de318437/tools/books-browser-check.mjs",
+      "nextAction": "Проверить реальный каталог событий после D1 и показать книгу на телефоне (G1).",
       "deliveryPackage": "06",
       "sourceNextCheck": "Проверить интерес к двум разным действиям и конечной награде."
     },
     {
       "id": "mt-m05",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
       "stage": "Пакет 06",
-      "currentImplementation": "Архив daily запланирован, публикации тематических событий нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md",
-      "nextAction": "Реализовать соответствующий пункт пакета 06 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "На доверенной датированной фикстуре кешированное тематическое событие завершается офлайн и оставляет отметку. | https://github.com/DanilaH/hue-gradients/blob/36df8036981c4d91685ce133878b1719de318437/tools/books-browser-check.mjs",
+      "nextAction": "Проверить реальный каталог событий после D1 и показать книгу на телефоне (G1).",
       "deliveryPackage": "06",
       "sourceNextCheck": "Развести постоянный архив, ограниченную тему и сохранение права."
     },
@@ -820,8 +820,8 @@
       "status": "ROADMAPPED",
       "gap": "UNKNOWN",
       "stage": "Пакет 06",
-      "currentImplementation": "В Полусне повтор сохраняет прогресс, prestige отсутствует. Сегодняшняя работа цикла оригинала неизвестна. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/progression.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 06 и проверить приёмку из FULL_ROADMAP.md. Подтвердить границу источника: Получить полные release notes либо оригинальную запись того, что сбрасывается.",
+      "currentImplementation": "Есть безопасный просмотр нового цикла. Отмена сохраняет коллекцию, черновик и старое право побайтно. Сам сброс ждёт решения владельца. Источник остаётся UNKNOWN.",
+      "nextAction": "Уточнить у владельца, какие счётчики сбрасывать и как признавать проход; отдельно подтвердить исторический цикл оригинала.",
       "deliveryPackage": "06",
       "sourceNextCheck": "Получить полные release notes либо оригинальную запись того, что сбрасывается."
     },

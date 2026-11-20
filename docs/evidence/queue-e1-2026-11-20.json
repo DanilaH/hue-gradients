@@ -1,0 +1,54 @@
+{
+  "browser": "158.0.8127.36",
+  "lastGoalChangedFrom": "3/4",
+  "lastGoalChangedTo": "4/4",
+  "firstBookClaimsAfterReplay": 1,
+  "curatedOccasionOffline": true,
+  "cycleCancellationPreservedSnapshot": true,
+  "clipStartMillis": 7228,
+  "clipMillis": 3841,
+  "limits": "Actual book play. Event and 60-work legacy checkpoint are fixtures. Live dates and cycle reset are not enabled.",
+  "source": "36df8036981c4d91685ce133878b1719de318437",
+  "kitImpact": "REUSE",
+  "unitChecks": 178,
+  "apk": {
+    "kind": "releasecheck",
+    "package": "com.danilah.huegradients.preview3",
+    "versionName": "0.4.23",
+    "versionCode": 27,
+    "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+    "source": "36df8036981c4d91685ce133878b1719de318437",
+    "apkSha256": "3c80eca90052a34cc206b2b90e2be07388d6da4f6097c8a08b6cb2f834468be8",
+    "bytes": 1209784,
+    "certificateSha256": "3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85",
+    "productionSigner": false,
+    "v2": true,
+    "zipalign16k": true,
+    "debuggable": false,
+    "webViewDebuggingConfigured": false,
+    "nativeInsetOwner": "content-root",
+    "webPayload": {
+      "start-error.html": "22cc22f670fac501b781a7e27ee2b38842839e03f47bfb72c199768b5c709598",
+      "index.html": "b91246ae75a7d9e9fb881800b149e1054cbe1f7c0fc28c6914b2040edac5bc9c",
+      "native-build.json": "d6776c22b4d785acafac6f324de6e51d9700f8d00340e5638b59090fc0a0fc70",
+      "assets/index-CLvIHfud.css": "b215f87c8d35ec35b44fad06d6481b54a3a2c398ac10cda9f5128be45ddc34a9",
+      "assets/native-ttWVwMFk.js": "a77e2538e2c6cea787fc6d1ac82c4828eec2f8a3c3244eb1c14751fef8ea6102",
+      "assets/nativeFeedback-BdXlsEx8.js": "aa12bc0f39307f8a86d95c5b93e428317c5282ed05069350ea7ef8fd1ad69648",
+      "assets/web-BM7xF5pS.js": "874bbd026b2a3757b6c7bedc1bd163f0c735a3e0a943605c9853f660d828d658",
+      "assets/nativeExport-CqbPFgKE.js": "5810d391885079b04fe08fbd9075ad787560ad4f04d814f2b7faac850fb46b8b",
+      "assets/command-BzJMFn4z.js": "56f6750bc40b8fb2c1a76c2cfb70085b2719545adc9b46739cdf944861ab6655",
+      "assets/index-BgNnNBMd.js": "c27b9cf21097c49c56e13c1fb9506a44ed13c0f3279bb871eb5b889666faa9df",
+      "assets/dist-CMedSjkm.js": "067d9ca66629f984cf538346471032b4b24f9acd1cb914834126e2b88d3250fe"
+    },
+    "nativeRuntime": "NOT RUN",
+    "liveServices": "NOT INSTALLED BY THIS HOST TEMPLATE"
+  },
+  "gif": {
+    "name": "Poluson-E1-books.gif",
+    "sha256": "7d9a37d07adeccac395c9f7db14153ab8cf2778a02fa5c1e8664950154f89799"
+  },
+  "blocked": {
+    "liveEvents": "published D1 event catalog and trusted UTC",
+    "cycleReset": "owner decision on counters to reset and cycle recognition; earned works and rights are retained"
+  }
+}
