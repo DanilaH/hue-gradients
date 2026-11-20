@@ -1,0 +1,40 @@
+{
+  "sourceCommit": "00722bb3fbe730afbf8ff0ab1d313bf80762064b",
+  "baseline": "55279f4d6637c923abe635162f0aa9fa62cf5c5b",
+  "versionName": "0.4.9",
+  "versionCode": 13,
+  "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+  "kitImpact": "NONE",
+  "productDecision": "One wallpaper from the selected completed work or verified revision at the device display size.",
+  "sample": {
+    "file": "Poluson-1170x2532.png",
+    "dimensions": [
+      1170,
+      2532
+    ],
+    "sRGBIntent": 1,
+    "gamma": 45455,
+    "crc": "PASS",
+    "sha256": "807d6036d316a5e50f4a0098cef42e3760075bae1065ceb67bf785ad409963e1",
+    "allGradientPixelsAndAnchors": "PASS",
+    "workId": "gradient-005"
+  },
+  "checks": {
+    "unit": 146,
+    "browserMeta": 13,
+    "browserEditor": 19,
+    "browserExport": 5,
+    "decodedPngs": 7,
+    "builds": [
+      "web",
+      "release web",
+      "Yandex"
+    ],
+    "strictPinnedGuidance": "PASS",
+    "specSnapshot": "40 exact files"
+  },
+  "limits": {
+    "browser": "Chromium with emulated screen metrics. Save picker and share responses were fixtures. The downloaded PNGs were actual browser files.",
+    "android": "Capacitor release asset sync passed. Gradle 8.14.3 distribution download failed with Network is unreachable. No 0.4.9 APK or native runtime result."
+  }
+}

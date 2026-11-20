@@ -88,3 +88,9 @@ Selecting a collage uses the same grid and checks committed layout rights. Selec
 ## Continuous gradients in every export layout — 20 November 2026
 
 0.4.8 uses the same sRGB gradient in the album thumbnails and every PNG print region. The strip, grid, diptych, single-work layouts and chapter page fill each designated print region with the selected work's gradient. Each print runs from its own edge anchors and the template gutters separate the works. The original canvas sizes, regions, paper, caption and frame rules still define the templates. This replaces the tiled content within export regions. KIT IMPACT: NONE. The renderer reuses the game's existing interpolation.
+
+## One full-screen wallpaper — 20 November 2026
+
+The owner scoped export to the selected work as a single wallpaper, sized in pixels to the device display. The 1080×1920 in issue #3 was a playtest suggestion. The former collage, decorated formats and chapter sheet were separate legacy requirements. This decision supersedes them for all player-facing export. Older save data and earned rights remain readable.
+
+One prepared PNG covers the full image with the selected work’s solved sRGB gradient. Android uses maximum display window bounds, including the system-bar areas, and the real display size on API 24–29. Web uses browser-reported full screen dimensions multiplied by the device pixel ratio. If those metrics change while the card is open, it rebuilds the wallpaper before allowing another save. KIT IMPACT: NONE. The existing delivery bridge and interpolation supply the wallpaper.

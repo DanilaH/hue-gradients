@@ -2,27 +2,19 @@
 
 Internal preview0.4.1/versionCode5 completes the local export implementation alongside M4a. M4 production/native acceptance is still open. No account, cloud or daily schedule was introduced.
 
-## Rendering and ownership
+## Wallpaper rendering and ownership
 
-The six earned formats and the separate 15-work chapter page use the regions and canvas sizes in SCREEN_STATE_SPEC_0_1.md. Since 0.4.8, each region fills with its own continuous sRGB gradient. The resolved palette anchors span the print region regardless of puzzle dimensions. Frames and captions live outside the print. Chapter page is available at 15/15 and uses chapter order.
+The owner scoped 0.4.9 to a single wallpaper from the displayed verified work. The old templates and chapter sheet are documented in the versioned evidence below. The album shows individual work cards. Legacy format rights remain readable in saves.
 
-Since 0.4.6, [issue #3](https://github.com/DanilaH/hue-gradients/issues/3) defines the clean format as a full-bleed 1080×1920 portrait gradient. It samples the solved palette of the displayed campaign work or selected verified own revision. Outer anchors fall on the edge pixel centres. A single row blends horizontally, a single column vertically, and a two-dimensional field blends the four surrounding anchors bilinearly. The export uses opaque sRGB components and includes only the gradient. Preview, `Сохранить PNG` and the work-card share action use the same prepared file.
+The image spans the full display size in pixels. On Android the existing export bridge supplies maximum window bounds and falls back to real display size on API 24–29. On the web the renderer uses the browser’s screen dimensions in CSS pixels multiplied by the current device pixel ratio. A display size change while the card is open replaces the prepared PNG. [Android display metrics](https://developer.android.com/reference/android/view/WindowManager#getMaximumWindowMetrics())
 
-ExportPlan derives eligible work from completed official definitions and author-verified own nodes. Unfinished campaign targets and unverified drafts are excluded. Own revisions retain one logical work identity: choosing another version replaces that work's selected version; domain validation also rejects duplicates. Works from different sections may be mixed. Missing selection has an explicit remaining count.
+The work card resolves a completed campaign field or an author-verified revision. A row blends horizontally, a column vertically, and a two-dimensional field blends the four surrounding solved anchors bilinearly. Each outer anchor falls on the edge of the opaque sRGB image. The same file backs preview, save and share, and exporting leaves the workspace untouched.
 
-A real campaign or author victory allows basic clean rendering. An author victory does not add campaign rights or count toward campaign/daily layout thresholds. The three daily-earned layouts are implemented and tested using explicitly synthetic renderer-only rights, but stay locked in the current game until M6 supplies actual daily completion. No synthetic right is persisted by the export tests or UI.
-
-The same prepared PNG File backs preview, download and share. Format/selection/caption changes invalidate the previous prepared file immediately. Preparation is debounced and versioned so a late callback cannot replace newer input or act after leaving. Save/share never starts automatically, and exports never mutate workspace/progress/rights/proofs.
-
-## Text and colour
-
-PNG canvas is explicitly sRGB. Its pixel data is not re-encoded when adding a relative-colorimetric sRGB chunk and gamma45455. Incompatible profiles are removed and chunk CRCs are calculated. An independent Pillow/zlib oracle checks gradient pixels and anchors in every print, alpha, canvas dimensions, allowed decoration and text bounds, and PNG CRC and colour chunks.
-
-Typography remains provisional M2:52px system-ui/sans-serif,64px line height, cream#FFF2DE and ink#261E32. Text uses actual Canvas advance/ink bounds and ascent/descent, including left overhang, with no automatic font shrink, truncation or ellipsis. Caption max80/2 lines and postcard max140/4 lines are enforced. Errors preserve the original editable text and prevent export of the old preview. System font glyphs can differ across platforms; no owner-approved font or identical glyph rasterization is claimed.
+PNG canvas is explicitly sRGB. The output adds a relative-colorimetric sRGB chunk and gamma45455 and recalculates CRCs for the added chunks. An independent Pillow/zlib oracle checks the wallpaper dimensions, all gradient pixels, edge anchors, alpha and metadata. [Current verification](evidence/wallpaper-export-2026-11-20.json)
 
 ## Platform actions
 
-Browser file-picker support is invoked directly from the explicit click with the cached file. Success requires writer.close; failure aborts the writer when available. Without an available top-level picker, an object-URL download is requested and the UI says requested, not saved: browsers do not expose a final OS write receipt for that path. Embedded Yandex uses the download fallback. File sharing uses canShare and the same File, retaining transient click activation. Abort, denied policy/access and other errors retain preview/caption and allow retry or save. Local API response fixtures do not prove real OS/browser permission behaviour on every target.
+Browser file-picker support is invoked directly from the explicit click with the cached file. Success requires writer.close; failure aborts the writer when available. Without an available top-level picker, an object-URL download is requested and the UI says requested, not saved: browsers do not expose a final OS write receipt for that path. Embedded Yandex uses the download fallback. File sharing uses canShare and the same File, retaining transient click activation. Abort, denied policy/access and other errors retain the wallpaper and allow retry or save. Local API response fixtures do not prove real OS/browser permission behaviour on every target.
 
 Android HueExport uses ACTION_CREATE_DOCUMENT for an explicit destination and a non-exported FileProvider limited to cache/hue-exports for ACTION_SEND. It requests no broad read/write storage permission. Provider authority follows the installed package including .preview3. Temporary file names are generated by the bridge. PNG signature/dimensions/size are bounded; cache writes and the completed document stream close precede saved status. Document output runs off the UI thread; system launches run on the UI thread. Save cancel/IO error preserves game state and the JavaScript file for retry.
 
@@ -30,7 +22,7 @@ The large base64 input is removed from the saved Capacitor call after the privat
 
 Android chooser launch resolves only opened. Later cancellation/delivery/publication is not observable from that launch and is not claimed. Shared cache files remain available for recipients; stale exports are cleaned after24h on the next export. No database/workspace directory is exposed. No publication or message to another person is performed by this development task.
 
-## Evidence and remaining gates
+## Historical layout evidence and remaining gates
 
 149 unit tests;75 browser scenarios (20 core,9 presentation,12 meta,19 editor,9 export,6 local SDK). Export evidence includes a real Chromium download identical to preview, all eight Canvas renderers with independent pixel decoding, actual text overflow, distinct logical work selection and unchanged physical workspace revision. Save-picker/share responses are explicitly modelled fixtures. All30 campaign completions and two own versions in that export suite are imported reducer checkpoints, not user/phone playthroughs.
 

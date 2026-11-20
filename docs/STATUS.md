@@ -1,19 +1,21 @@
 # Status — 20 November 2026
 
-Current source version **0.4.8/versionCode12** on feat/m0-foundation, draft PR #1. Most recent signed Android preview is 0.4.7/versionCode11.
+Current source version **0.4.9/versionCode13** on feat/m0-foundation, draft PR #1. Most recent signed Android preview is 0.4.7/versionCode11.
 
 | Stage | Actual state |
 | --- | --- |
 | M0 | PARTIAL: reproducible platform builds; external gates in M0_GATES.md remain |
 | M1 | LOCAL IMPLEMENTATION: shared input/play, SQLite/IndexedDB transaction seam, CAS/ledger/recovery; native runtime acceptance pending |
 | M2 | EXECUTABLE REVIEW CANDIDATE: brighter low-resolution atmosphere, light trails and committed waves for gameplay, result and picker |
-| M3 | LOCAL IMPLEMENTATION: 60 campaign candidates, chapters, album, rights/mastery, page, separate copies and migration |
+| M3 | LOCAL IMPLEMENTATION: 60 campaign candidates, chapters, album, rights/mastery, separate copies and migration |
 | M4a | LOCAL IMPLEMENTATION: editor, immutable revisions, durable previews, recovery/branches, validator/fingerprint and author play |
-| M4b | LOCAL IMPLEMENTATION: continuous gradients in clean PNG, six layouts and chapter page, distinct works, measured text, browser download/share and native bridge. Android device acceptance pending |
-| UI simplification | PR #2 album package ready for playtest: two full-screen tabs, one-tap wallpapers and collage selection in the collection |
+| M4b | LOCAL IMPLEMENTATION: one full-screen wallpaper per verified work, browser download/share and Android display metrics bridge. Android build and device acceptance pending |
+| UI simplification | PR #2 album package ready for playtest: two full-screen album tabs and one-tap wallpaper export |
 | M5 | ON HOLD by owner19 Nov: cloud/account/synchronization deferred from the current local milestone |
 | M6 | NEXT CLIENT WORK: local daily/archive state/cache; live shared calendar/catalog/trusted time remain unconfigured |
 | M7–M8 | NOT STARTED |
+
+0.4.9 saves one verified work as a full-screen wallpaper at the device display dimensions. [Wallpaper export checks](evidence/wallpaper-export-2026-11-20.json)
 
 0.4.8 fills each collage slot with a continuous gradient from that work. The same look applies to the full chapter and the single-work layouts. [0.4.8 export verification](evidence/gradient-collage-2026-11-20.json)
 
@@ -31,6 +33,6 @@ TypeScript, standard/release web, Yandex audit, strict pinned guidance doctor, s
 
 Native SQLite/process death/storage pressure/touch/haptics, hosted Yandex, identity/cloud/live ads and owner art remain unverified. Production signer and store publication remain unconfigured. Actions host installation still needs its separate KIT_READ_TOKEN; connected access does not supply an Actions secret.
 
-All60 remain editorial candidates; colour decisions027/037/053/060 and two-font Cyrillic comparison are open. Daily-earned layouts stay locked until actual M6 facts. M4 local implementation is present; production/native acceptance register71 NOT RUN. KIT IMPACT: REUSE.
+All60 remain editorial candidates; colour decisions027/037/053/060 and two-font Cyrillic comparison are open. M4 local implementation is present; production/native acceptance register71 NOT RUN. KIT IMPACT: REUSE.
 
 The picker opens on the current saved board. Swipe or the number rail changes only the selection. Chromium checks cover 320×568 at 150% CSS text, 844×390 landscape, locked previews, keyboard navigation, and the same saved attempt after Back and Continue.
