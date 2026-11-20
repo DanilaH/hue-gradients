@@ -1,6 +1,6 @@
-# Status — 19 November 2026
+# Status — 20 November 2026
 
-Current internal build: **0.4.7/versionCode11**, branch feat/m0-foundation, draft PR #1. Implementation checkpoints are on GitHub.
+Current source version **0.4.8/versionCode12** on feat/m0-foundation, draft PR #1. Most recent signed Android preview is 0.4.7/versionCode11.
 
 | Stage | Actual state |
 | --- | --- |
@@ -9,11 +9,13 @@ Current internal build: **0.4.7/versionCode11**, branch feat/m0-foundation, draf
 | M2 | EXECUTABLE REVIEW CANDIDATE: brighter low-resolution atmosphere, light trails and committed waves for gameplay, result and picker |
 | M3 | LOCAL IMPLEMENTATION: 60 campaign candidates, chapters, album, rights/mastery, page, separate copies and migration |
 | M4a | LOCAL IMPLEMENTATION: editor, immutable revisions, durable previews, recovery/branches, validator/fingerprint and author play |
-| M4b | LOCAL IMPLEMENTATION: continuous clean PNG, six tiled layouts and chapter page, distinct works, measured text, browser download/share and native bridge. Android device acceptance pending |
+| M4b | LOCAL IMPLEMENTATION: continuous gradients in clean PNG, six layouts and chapter page, distinct works, measured text, browser download/share and native bridge. Android device acceptance pending |
 | UI simplification | PR #2 album package ready for playtest: two full-screen tabs, one-tap wallpapers and collage selection in the collection |
 | M5 | ON HOLD by owner19 Nov: cloud/account/synchronization deferred from the current local milestone |
 | M6 | NEXT CLIENT WORK: local daily/archive state/cache; live shared calendar/catalog/trusted time remain unconfigured |
 | M7–M8 | NOT STARTED |
+
+0.4.8 fills each collage slot with a continuous gradient from that work. The same look applies to the full chapter and the single-work layouts. [0.4.8 export verification](evidence/gradient-collage-2026-11-20.json)
 
 0.4.7 opens a full-screen album of smooth colour prints. Back restores the tab, scroll and source focus. A verified author revision has its own work card. Select distinct works across the two tabs for a collage and save its exact preview. The full chapter has the same direct save path. [0.4.7 build and verification](evidence/album-2026-11-19.json)
 

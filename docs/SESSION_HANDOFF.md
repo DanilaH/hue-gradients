@@ -1,8 +1,10 @@
-# Resume — 19 November 2026
+# Resume — 20 November 2026
 
 Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and M4_EXPORT_IMPLEMENTATION.md. Owner authorized roadmap continuation. Bound file reads/output; no blobs/base64 or whole-archive re-reads. Commit checkpoints and preserve newer remote work. Branch feat/m0-foundation, draft PR #1; main still contains the original README.
 
 ## Current slice
+
+0.4.8/versionCode12 removes the puzzle cell seams from every PNG print. Each collage slot fills with its own continuous gradient, using the same renderer as the album thumbnails and the one-work wallpaper. Browser evidence includes the strip downloaded from the album. The latest signed Android preview is 0.4.7. [Export verification](evidence/gradient-collage-2026-11-20.json)
 
 0.4.7/versionCode11 implements the album package from [PR #2](https://github.com/DanilaH/hue-gradients/pull/2). Two full-screen tabs show colour prints, and the victory card links to its print in the collection. Back restores the tab, scroll and source focus. The collection uses its colour grid for collage selection with earned layouts and distinct logical work slots. The focused preview saves the exact PNG. The 15/15 chapter uses the same save path. Verified own works open the currently displayed revision and draft prints open the editor. [Evidence and captures](evidence/album-2026-11-19.json).
 
@@ -16,7 +18,7 @@ Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and
 
 0.4.3/versionCode7 implements step 1 of [the UI refinement plan](UI_REFINEMENT_PLAN.md). The picker opens on the current level. Unfinished tasks show their start or saved permutation. A completed task with no active replay shows the solved colors. Explicit Replay starts a fresh attempt and preserves earned rights and bests. Chapters open through the chapter-progress button. Locked selections show their opening condition. Back closes chapter selection, then returns to the same board. The recorded Chromium touch route preserves the complete IndexedDB snapshot and revision.
 
-Export derives verified work from official completion or author proof. Multiple revisions share one logical work ID and cannot fill multiple composition slots. First real author victory enables basic clean locally without adding official rights. Campaign formats use committed rights; daily formats stay closed until M6. The six composition formats and chapter page retain exact square integer sRGB tiles. Canvas text metrics reject overflow without truncation or shrink. The provisional 52px system font and 64px line height await M2 approval. Export leaves workspace, progress and rights intact.
+Export derives verified work from official completion or author proof. Multiple revisions share one logical work ID and cannot fill multiple composition slots. First real author victory enables basic clean locally without adding official rights. Campaign formats use committed rights and daily formats stay closed until M6. All formats place continuous sRGB gradients in the designated print regions. Canvas text metrics reject overflow without truncation or shrink. The provisional 52px system font and 64px line height await M2 approval. Export leaves workspace, progress and rights intact.
 
 Web browserExportFiles invokes cached-file share/picker directly from the click. Fallback download is only requested, never falsely called saved. Errors/cancel keep preview/caption. Android nativeExport.ts is imported only by src/main.ts; web/Yandex bundle stays separate. HueExportPlugin uses document picker and package-specific non-exported FileProvider limited to cache/hue-exports. It drops base64 after private file preparation so large PNGs do not enter saved activity Bundles; UI launches/main thread, document IO/background writer. Keep its private ActivityCallback method/name through R8. verify-apk.py checks bridge/callback, installed authority, compiled narrow resource paths and no broad storage permissions. Chooser-open is not delivery/publication proof. Real native action runtime remains NOT RUN.
 
@@ -52,4 +54,4 @@ Runtime/guidance469928d03f4bae5053e23db26e82187bedbc252e, kit archive SHA256ba90
 
 Read SIGNING_PREVIEW.md. Keep .preview3 and reuse the privately saved TEST key HUE-test-preview-signing.keystore via ANDROID_PREVIEW_KEYSTORE. Never regenerate/commit it or use it as production. Old0.2 .releasecheck signer was lost; never ask owner to uninstall that app and lose data. 0.4.1 certificate matches0.3/0.4.0; actual Android update is untested. Production base appId/certificate policy unchanged, signer null.
 
-Poluson-0.4.7-preview.apk uses package com.danilah.huegradients.preview3 and versionCode11. [Build hash, signer and runtime coverage](evidence/album-2026-11-19.json). Increment versionCode for the next test update.
+The latest signed Poluson-0.4.7-preview.apk uses package com.danilah.huegradients.preview3 and versionCode11. Source version 0.4.8 sets versionCode12 for the next preview from this source. [Previous build hash, signer and runtime coverage](evidence/album-2026-11-19.json)

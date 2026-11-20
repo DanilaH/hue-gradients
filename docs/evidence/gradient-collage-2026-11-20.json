@@ -1,0 +1,67 @@
+{
+  "sourceCommit": "7092d2ace0baef3c8dc80ea4f80d1589513e976f",
+  "baseline": "6353cf70506787748edb45bed60d1c2a3103d372",
+  "versionName": "0.4.8",
+  "versionCode": 12,
+  "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+  "kitImpact": "NONE",
+  "albumDownload": {
+    "format": "export-strip",
+    "file": "Poluson-0.4.8-collage.png",
+    "dimensions": [
+      2400,
+      960
+    ],
+    "sRGBIntent": 1,
+    "gamma": 45455,
+    "crc": "PASS",
+    "sha256": "b6b72380fef7b4c2cd109699770adbebc5a5dbc41de9df16dc9b579e13fb9152",
+    "fields": [
+      [
+        96,
+        144,
+        672,
+        672
+      ],
+      [
+        864,
+        144,
+        672,
+        672
+      ],
+      [
+        1632,
+        144,
+        672,
+        672
+      ]
+    ],
+    "allGradientPixelsAndAnchors": "PASS",
+    "outsideFieldsAndText": "PASS",
+    "workIdsInTapOrder": [
+      "gradient-002",
+      "gradient-005",
+      "gradient-008"
+    ],
+    "previewAndDownload": "Byte-identical in both browser scenarios"
+  },
+  "checks": {
+    "unit": 148,
+    "browserMeta": 14,
+    "browserExport": 13,
+    "decodedPngs": 16,
+    "decodedGradientRegions": 38,
+    "builds": [
+      "web",
+      "release web",
+      "Yandex"
+    ],
+    "strictPinnedGuidance": "PASS",
+    "specSnapshot": "40 exact files"
+  },
+  "limits": [
+    "The album route was exercised in Chromium. The browser harness supplies Object.hasOwn and crypto.randomUUID for headless Chromium 92.",
+    "Daily-earned formats are renderer fixtures.",
+    "Android build and on-device save are pending for 0.4.8."
+  ]
+}

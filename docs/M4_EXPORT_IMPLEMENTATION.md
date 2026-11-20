@@ -4,7 +4,7 @@ Internal preview0.4.1/versionCode5 completes the local export implementation alo
 
 ## Rendering and ownership
 
-The six earned formats and the separate 15-work chapter page follow the geometry in SCREEN_STATE_SPEC_0_1.md. Square integer tiles fit and centre inside the prescribed regions. Frame decoration stays outside its field. Chapter page is available at 15/15 and uses chapter order.
+The six earned formats and the separate 15-work chapter page use the regions and canvas sizes in SCREEN_STATE_SPEC_0_1.md. Since 0.4.8, each region fills with its own continuous sRGB gradient. The resolved palette anchors span the print region regardless of puzzle dimensions. Frames and captions live outside the print. Chapter page is available at 15/15 and uses chapter order.
 
 Since 0.4.6, [issue #3](https://github.com/DanilaH/hue-gradients/issues/3) defines the clean format as a full-bleed 1080×1920 portrait gradient. It samples the solved palette of the displayed campaign work or selected verified own revision. Outer anchors fall on the edge pixel centres. A single row blends horizontally, a single column vertically, and a two-dimensional field blends the four surrounding anchors bilinearly. The export uses opaque sRGB components and includes only the gradient. Preview, `Сохранить PNG` and the work-card share action use the same prepared file.
 
@@ -16,7 +16,7 @@ The same prepared PNG File backs preview, download and share. Format/selection/c
 
 ## Text and colour
 
-PNG canvas is explicitly sRGB. Its pixel data is not re-encoded when adding a relative-colorimetric sRGB chunk and gamma45455. Incompatible profiles are removed; chunk CRCs are calculated. An independent Pillow/zlib oracle checks clean gradient pixels and anchors, exact tiles and seams in other layouts, alpha, canvas dimensions, allowed decoration and text bounds, and PNG CRC/colour chunks.
+PNG canvas is explicitly sRGB. Its pixel data is not re-encoded when adding a relative-colorimetric sRGB chunk and gamma45455. Incompatible profiles are removed and chunk CRCs are calculated. An independent Pillow/zlib oracle checks gradient pixels and anchors in every print, alpha, canvas dimensions, allowed decoration and text bounds, and PNG CRC and colour chunks.
 
 Typography remains provisional M2:52px system-ui/sans-serif,64px line height, cream#FFF2DE and ink#261E32. Text uses actual Canvas advance/ink bounds and ascent/descent, including left overhang, with no automatic font shrink, truncation or ellipsis. Caption max80/2 lines and postcard max140/4 lines are enforced. Errors preserve the original editable text and prevent export of the old preview. System font glyphs can differ across platforms; no owner-approved font or identical glyph rasterization is claimed.
 
