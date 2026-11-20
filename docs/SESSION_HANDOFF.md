@@ -10,7 +10,9 @@ Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and
 
 ## Current slice
 
-C1 (0.4.19/versionCode23, 493b241) ships four boards via Levels → Challenges → Shapes. Browser touch accepted a compatible swap on all four, rejected pins and cross-shape exchanges, and matched actual PNG RGB and saved replay starts. The campaign bank remains byte-exact. **Resume at C2**. [Evidence](evidence/queue-c1-2026-11-20.json)
+C2 (0.4.20/versionCode24, a763853) adds a 13×13 board. A second touch cancels the pending swap, pinch and pan transform paint and hit geometry together, and drag near a visible edge scrolls only at zoom. Chromium hit pin 84, exchanged 83/85 and then rejected a captured drop outside the canvas. A1 seam and small landscape control still pass. **Resume at D1**. [Evidence](evidence/queue-c2-2026-11-20.json)
+
+C1 (0.4.19/versionCode23, 493b241) ships four boards via Levels → Challenges → Shapes. Browser touch accepted a compatible swap on all four, rejected pins and cross-shape exchanges, and matched actual PNG RGB and saved replay starts. The campaign bank remains byte-exact. [Evidence](evidence/queue-c1-2026-11-20.json)
 
 B3 (0.4.18/versionCode22, ed67542) adds a ten-minute timed series, durable pause/resume and a separate record. Browser touch solved the first board. Injected clock and blur/focus preserved 589 seconds after a simulated minute away, then expiry, reload and repeat kept exactly one finish receipt. Native lifecycle remains pending. [Evidence](evidence/queue-b3-2026-11-20.json)
 
