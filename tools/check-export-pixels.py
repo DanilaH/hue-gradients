@@ -2,20 +2,9 @@
 import hashlib,json,struct,zlib
 from bisect import bisect_right
 from pathlib import Path
-from PIL import Image,ImageChops,ImageDraw
+from PIL import Image
 
 root=Path('.test-output/m4b/png')
-square=lambda x,y,s:(x,y,s,s)
-layouts={
- 'export-caption':((1800,2000),[square(96,96,1608)],(96,1752,1608,152)),
- 'export-strip':((2400,960),[square(x,144,672) for x in (96,864,1632)],None),
- 'export-grid':((2000,2000),[square(x,y,856) for y in (96,1048) for x in (96,1048)],None),
- 'export-frame':((2000,2000),[square(200,200,1600)],None),
- 'export-diptych':((2400,1400),[square(x,172,1056) for x in (96,1248)],None),
- 'export-postcard':((1800,2200),[square(96,96,1608)],(96,1792,1608,312)),
- 'chapter-page':((1800,3000),[square(x,y,496) for y in (208,752,1296,1840,2384) for x in (108,652,1196)],(108,32,1584,128)),
-}
-
 def axis_weights(size,count):
  if count==1:
   return [(0,0,1,0,1)]*size
@@ -50,7 +39,7 @@ def expected_gradient(field,size):
 
 report=[]
 for row in json.loads((root/'works.json').read_text()):
- name=row['format'];path=root/row['file'];raw=path.read_bytes();assert raw[:8]==b'\x89PNG\r\n\x1a\n'
+ path=root/row['file'];name=path.name;raw=path.read_bytes();assert raw[:8]==b'\x89PNG\r\n\x1a\n'
  chunks={};offset=8
  while offset<len(raw):
   n=struct.unpack_from('>I',raw,offset)[0];kind=raw[offset+4:offset+8];data=raw[offset+8:offset+8+n]
@@ -60,26 +49,11 @@ for row in json.loads((root/'works.json').read_text()):
  assert not ({b'iCCP',b'cICP'} & chunks.keys())
  image=Image.open(path).convert('RGBA')
  assert image.getchannel('A').getextrema()==(255,255),(name,'Non-opaque pixels')
- proof={'format':name,'file':path.name,'dimensions':list(image.size),'sRGBIntent':1,'gamma':45455,'crc':'PASS','sha256':hashlib.sha256(raw).hexdigest()}
- if name=='clean':
-  size,regions,text=(1080,1920),[(0,0,1080,1920)],None
- else:
-  size,regions,text=layouts[name]
+ proof={'file':path.name,'dimensions':list(image.size),'sRGBIntent':1,'gamma':45455,'crc':'PASS','sha256':hashlib.sha256(raw).hexdigest()}
+ size=tuple(row['size'])
  assert image.size==size,(name,image.size,size)
- assert len(regions)==len(row['works'])
- image=image.convert('RGB')
- expected=Image.new('RGB',size,(255,242,222));mask=Image.new('L',size,0);md=ImageDraw.Draw(mask)
- for index,((x,y,width,height),field) in enumerate(zip(regions,row['works'])):
-  box=(x,y,x+width,y+height)
-  gradient=expected_gradient(field,(width,height))
-  assert image.crop(box).tobytes()==gradient,(path.name,'interpolation or anchor mismatch',index)
-  expected.paste(Image.frombytes('RGB',(width,height),bytes(gradient)),(x,y))
- if text:
-  x,y,w,h=text;md.rectangle((x,y,x+w-1,y+h-1),fill=255)
- if name=='export-frame':md.rectangle((94,94,1906,1906),outline=255,width=8)
- difference=ImageChops.difference(image,expected);difference.paste((0,0,0),(0,0),mask)
- assert difference.getbbox() is None,(path.name,'tint/extra decoration outside allowed regions')
- report.append({**proof,'fields':regions,'allGradientPixelsAndAnchors':'PASS','outsideFieldsAndText':'PASS'})
-Path('.test-output/m4b/pixels.json').write_text(json.dumps({'scope':'Real Canvas PNGs decoded independently with Pillow; future daily rights are synthetic renderer fixtures','results':report},indent=2)+'\n')
-gradients=sum(len(row['fields']) for row in report)
-print(f'PASS: {len(report)} PNGs with {gradients} gradient regions; all pixels, dimensions and sRGB chunks checked independently.')
+ gradient=expected_gradient(row['field'],size)
+ assert image.convert('RGB').tobytes()==gradient,(path.name,'interpolation, edge anchors or background mismatch')
+ report.append({**proof,'allGradientPixelsAndAnchors':'PASS'})
+Path('.test-output/m4b/pixels.json').write_text(json.dumps({'scope':'Actual browser wallpaper downloads decoded independently with Pillow','results':report},indent=2)+'\n')
+print(f'PASS: {len(report)} full-screen wallpaper PNGs; all pixels, dimensions, alpha and sRGB chunks checked independently.')

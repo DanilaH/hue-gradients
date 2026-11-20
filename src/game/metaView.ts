@@ -3,11 +3,10 @@ import { chapterCount, chapterIndexFor, chapterIsOpen, levelIsOpen, META_POLICY,
 import type { LevelDefinition } from '../domain/puzzle';
 import type { Workspace } from '../domain/workspace';
 import type { AlbumRoute } from './albumView';
-import type { ExportRoute } from './exportView';
 
 type PickerRoute = { kind: 'chapter'; levelId: string; chapterMenu?: number };
 export type MetaRoute = PickerRoute | AlbumRoute | { kind: 'card' | 'copy'; levelId: string } |
-  { kind: 'own-card'; workId: string; nodeId: string } | { kind: 'draft'; draftId: string } | ExportRoute;
+  { kind: 'own-card'; workId: string; nodeId: string } | { kind: 'draft'; draftId: string };
 interface MetaView {
   route: MetaRoute; state: Workspace; disabled: boolean;
   title: HTMLElement; copy: HTMLElement; actions: HTMLElement;

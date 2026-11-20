@@ -1,7 +1,6 @@
 // Real UI progression plus separately labelled imported-checkpoint/migration fixtures.
 import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';
-import {createHash} from 'node:crypto';
 import {createRequire} from 'node:module';
 import {mkdir,readFile,writeFile} from 'node:fs/promises';
 let pw;try{pw=await import('playwright');}catch{pw=createRequire(`${process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES}/package.json`)('playwright');}
@@ -11,7 +10,7 @@ const base='http://127.0.0.1:4177';let browser;const passed=[];
 try{
  for(let i=0;i<100;i++){try{if((await fetch(base)).ok)break;}catch{}if(i===99)throw Error('Vite unavailable');await new Promise(r=>setTimeout(r,100));}
  browser=await pw.chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true,args:['--no-sandbox','--enable-unsafe-swiftshader']});
- const context=await browser.newContext({viewport:{width:390,height:844},acceptDownloads:true}),page=await context.newPage(),errors=[];
+ const context=await browser.newContext({viewport:{width:390,height:844},screen:{width:390,height:844},deviceScaleFactor:2,acceptDownloads:true}),page=await context.newPage(),errors=[];
  await context.addInitScript(()=>Object.defineProperty(window,'showSaveFilePicker',{configurable:true,value:undefined}));
  page.on('pageerror',e=>errors.push(e.message));await page.goto(base);await page.waitForSelector('html[data-state=ready]');
  const defs=JSON.parse(await readFile('docs/spec/candidates/levels-0.1.json','utf8')).campaign;
@@ -96,7 +95,7 @@ try{
  await restored.scrollIntoViewIfNeeded();
  const position=await albumScroll.evaluate(el=>el.scrollTop);
  assert(position>0);
- await restored.click();await page.waitForFunction(()=>document.querySelector('.work-card-preview')?.naturalWidth===1080);
+ await restored.click();await page.waitForFunction(()=>document.querySelector('.work-card-preview')?.naturalWidth===780);
  await albumButton('‹ Назад').click();
  assert.equal(await albumScroll.evaluate(el=>el.scrollTop),position);
  assert.equal(await page.evaluate(()=>document.activeElement?.dataset.albumLevel),'gradient-014');
@@ -106,35 +105,17 @@ try{
  await albumButton('Собранное').click();assert.equal(await albumScroll.evaluate(el=>el.scrollTop),position);
  passed.push('full-screen album preserves each tab, scroll and focused print through card/editor Back');
 
- await albumButton('Коллаж').click();
- for(const id of ['002','005','008'])await page.locator(`[data-album-level=gradient-${id}]`).click();
- assert.deepEqual(await page.locator('.album-print[aria-pressed=true]').evaluateAll(nodes=>nodes.map(node=>node.dataset.albumLevel)),['gradient-002','gradient-005','gradient-008']);
- const selectionScroll=await albumScroll.evaluate(el=>el.scrollTop);
- await albumButton('Посмотреть коллаж').click();
- await page.waitForFunction(()=>document.querySelector('.export-preview')?.naturalWidth===2400);
- assert.equal(await page.locator('.export-work-list').count(),0);
- const expected=await page.locator('.export-preview').evaluate(async img=>{
-  const bytes=await(await fetch(img.src)).arrayBuffer();
-  return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),byte=>byte.toString(16).padStart(2,'0')).join('');
- });
+ assert.equal(await albumButton('Коллаж').count(),0);
+ assert.equal(await albumButton('Полная страница главы 1').count(),0);
+ await restored.click();
+ await page.waitForFunction(()=>document.querySelector('.work-card-preview')?.naturalHeight===1688);
  const pending=page.waitForEvent('download');await albumButton('Сохранить PNG').click();
- const file=await pending;
- await file.saveAs('.test-output/m3/album-strip.png');
- assert.equal(createHash('sha256').update(await readFile('.test-output/m3/album-strip.png')).digest('hex'),expected);
- await albumButton('Назад').click();assert.equal(await page.locator('.album-print[aria-pressed=true]').count(),3);
- assert.equal(await albumScroll.evaluate(el=>el.scrollTop),selectionScroll);
- await albumButton('‹ Назад').click();assert.equal(await albumScroll.evaluate(el=>el.scrollTop),position);
+ assert.equal((await pending).suggestedFilename(),'Poluson-014.png');
+ await albumButton('‹ Назад').click();
+ assert.equal(await albumScroll.evaluate(el=>el.scrollTop),position);
  assert.deepEqual(await state(),current);
- passed.push('collection taps make an exact sRGB strip, with matching preview/download and stable selection and scroll after Back');
-
  await page.screenshot({path:'.test-output/m3/album.png'});
- await albumButton('Полная страница главы 1').click();
- await page.waitForFunction(()=>document.querySelector('.export-preview')?.naturalHeight===3000);
- assert(await albumButton('Сохранить PNG').isEnabled());
- const chapterDownload=page.waitForEvent('download');await albumButton('Сохранить PNG').click();
- assert.equal((await chapterDownload).suggestedFilename(),'Poluson-chapter-page.png');
- await page.screenshot({path:'.test-output/m3/chapter-page.png'});
- passed.push('14→15 stores the full chapter and strip rights together and offers the exact chapter PNG in one tap');
+ passed.push('a completed chapter opens individual full-screen wallpapers and preserves scroll, progress and prior rights');
  for(const viewport of[{width:320,height:568},{width:844,height:390}]){
   await page.setViewportSize(viewport);await page.waitForTimeout(80);const bounds=await page.locator('#game-dialog').boundingBox();assert(bounds.x>=0&&bounds.x+bounds.width<=viewport.width+1);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
  }
@@ -175,7 +156,7 @@ try{
  await p.reload();await p.waitForSelector('#hue-app[data-layer=result]');assert.equal(await p.getByRole('button',{name:'Дальше',exact:true}).count(),0);
  assert((await p.locator('#dialog-copy').innerText()).includes('Кампания собрана'));await p.getByRole('button',{name:'В альбом',exact:true}).click();
  assert.equal(await p.locator('.work-card').getAttribute('data-level-id'),'gradient-060');await allWorks(p);assert.equal(await p.locator('[data-album-level]').count(),60);
- await p.getByRole('button',{name:'Коллаж',exact:true}).click();assert.deepEqual(await p.getByRole('combobox',{name:'Макет коллажа'}).locator('option').allTextContents(),['Лента из трёх','Сетка из четырёх']);
+ assert.equal(await p.getByRole('button',{name:'Коллаж',exact:true}).count(),0);
  passed.push('all-60 imported checkpoint shows 60 cards, finite six formats and no fake next chapter');await all.close();
  await writeFile('.test-output/m3/browser.json',JSON.stringify({passed,pageErrors:errors,actualUiCompleted:'Chapter 1: all 15; non-linear selection after tutorial',fixtureCases:'14-completion v0.2 snapshots, with/without transaction fault',limits:['Physical Android and hosted services NOT RUN','Human acceptance of candidate content NOT RUN']},null,2));
  console.log(`PASS: ${passed.length} M3 browser scenarios.`);

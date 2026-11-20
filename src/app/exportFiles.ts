@@ -1,11 +1,25 @@
+import type { WallpaperSize } from '../domain/export';
+
 export type ExportResult='saved'|'download-requested'|'shared'|'opened'|'cancelled';
-export interface ExportFiles { canShare(file:File):boolean; save(file:File):Promise<ExportResult>; share(file:File):Promise<ExportResult>; destroy?():void }
+export interface ExportFiles {
+  screenSize(): Promise<WallpaperSize>;
+  canShare(file: File): boolean;
+  save(file: File): Promise<ExportResult>;
+  share(file: File): Promise<ExportResult>;
+  destroy?(): void;
+}
 interface WritableFile { write(data:Blob):Promise<void>; close():Promise<void>; abort?():Promise<void> }
 interface SaveWindow extends Window { showSaveFilePicker?: (options:unknown)=>Promise<{createWritable():Promise<WritableFile>}> }
 
 export function browserExportFiles():ExportFiles {
   const urls=new Set<string>(),timers=new Set<ReturnType<typeof setTimeout>>();
   return {
+    async screenSize() {
+      return {
+        width: Math.round(window.screen.width * window.devicePixelRatio),
+        height: Math.round(window.screen.height * window.devicePixelRatio),
+      };
+    },
     canShare:file=>{try{return typeof navigator.share==='function' && typeof navigator.canShare==='function' && navigator.canShare({files:[file]});}catch{return false;}},
     async save(file) {
       const picker=(window as SaveWindow).showSaveFilePicker;

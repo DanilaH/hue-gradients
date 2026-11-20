@@ -16,8 +16,7 @@ import { chapterIndexFor, recommendedLevel, rewardTitle } from '../domain/progre
 import { authorBests, authorView, findDraft, hasAuthorProof, type CreativeAction } from '../domain/creative';
 import { makeField } from '../domain/editor';
 import { EditorView } from './editorView';
-import { ExportView, exportScreenTitle, isFocusedExport } from './exportView';
-import { albumPositionKey, renderAlbum, type AlbumPosition, type AlbumRoute } from './albumView';
+import { renderAlbum, type AlbumPosition, type AlbumRoute } from './albumView';
 import { WorkCardView } from './workCardView';
 import { colourPrism, flashPrismEdge, victoryPrism } from './victoryPrism';
 import { browserExportFiles, type ExportFiles } from '../app/exportFiles';
@@ -55,10 +54,9 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   let layer: Layer = current().attempt?.completed ? 'result' : 'none';
   if (!current().attempt) layer = 'recovery';
   let editorView: EditorView | null = null, editorDraftId: string | null = null;
-  let exportView: ExportView | null = null, exportRouteKey: string | null = null;
   let workCard: WorkCardView | null = null, workCardId: string | null = null;
   let shownAlbum: AlbumRoute | null = null;
-  const albumPositions = new Map<string, AlbumPosition>();
+  const albumPositions = new Map<AlbumRoute['tab'], AlbumPosition>();
   const prism = byId('victory-prism');
   let prismGlint: Animation | null = null;
   let lastFocus: HTMLElement | null = null;
@@ -122,7 +120,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (layer !== 'meta') { metaReturn = layer; metaHistory = []; }
     else {
       const samePicker = route.kind === 'chapter' && metaRoute.kind === 'chapter'
-        || route.kind === 'album' && metaRoute.kind === 'album' && !!route.selection === !!metaRoute.selection;
+        || route.kind === 'album' && metaRoute.kind === 'album' ;
       if (!samePicker && JSON.stringify(route) !== JSON.stringify(metaRoute)) metaHistory.push(metaRoute);
     }
     metaRoute = route; layer = 'meta'; render();
@@ -167,7 +165,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (!shownAlbum) return;
     const scroller = actions.querySelector('.album-scroll');
     if (!scroller) return;
-    const key = albumPositionKey(shownAlbum);
+    const key = shownAlbum.tab;
     const active = document.activeElement instanceof HTMLElement && actions.contains(document.activeElement)
       ? document.activeElement.dataset.albumFocus : undefined;
     const focus = active ?? albumPositions.get(key)?.focus;
@@ -182,14 +180,10 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     delete actions.dataset.meta;
     dialog.dataset.layer = layer;
     if (editorView && !(layer === 'meta' && metaRoute.kind === 'draft')) { editorView.destroy(); editorView = null; editorDraftId = null; }
-    const exportKey = layer === 'meta' && metaRoute.kind === 'export' ? JSON.stringify(metaRoute) : null;
-    if (exportKey !== exportRouteKey) { exportView?.destroy(); exportView = null; exportRouteKey = exportKey; }
     const cardId = selectedWork(), authorCard = selectedAuthorWork();
     const cardKey = cardId ? `campaign:${cardId}` : authorCard ? `own:${authorCard.work.workId}:${authorCard.nodeId}` : null;
     if (cardKey !== workCardId) { workCard?.destroy(); workCard = null; workCardId = cardKey; }
     dialog.dataset.workCard = String(cardKey !== null);
-    dialog.dataset.export = String(!!exportKey);
-    dialog.dataset.exportFocus = String(layer === 'meta' && metaRoute.kind === 'export' && isFocusedExport(metaRoute));
     dialog.dataset.picker = String(layer === 'meta' && metaRoute.kind === 'chapter');
     dialog.dataset.chapterMenu = String(layer === 'meta' && metaRoute.kind === 'chapter' && metaRoute.chapterMenu !== undefined);
     if (layer !== 'result' || !motionAllowed()) { prismGlint?.cancel(); prismGlint = null; }
@@ -198,7 +192,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     const draftId = layer === 'meta' && metaRoute.kind === 'draft' ? metaRoute.draftId : null;
     if (editorDraftId !== draftId) { editorView?.destroy(); editorView = null; editorDraftId = draftId; }
     dialog.dataset.editor = String(!!draftId);
-    byId('dialog-copy').textContent = ''; if (!editorView && !exportView && !workCard) actions.replaceChildren();
+    byId('dialog-copy').textContent = ''; if (!editorView && !workCard) actions.replaceChildren();
     prism.hidden = layer !== 'result';
     const { level, attempt, own } = current();
     if (layer === 'result') {
@@ -258,14 +252,13 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
           }),
         }, exportFiles, {
           back: popMeta,
-          layouts: () => showMeta({ kind: 'export', initialKey: cardKey }),
           ...(finished ? {
             replay: () => askRestart(finished.id),
             copy: () => showMeta({ kind: 'copy', levelId: finished.id }),
             ...(metaHistory.length === 0 && metaReturn === 'result' ? {
               collection: () => {
                 const route = { kind: 'album', tab: 'campaign' } as const;
-                const key = albumPositionKey(route);
+                const key = route.tab;
                 albumPositions.set(key, { scroll: albumPositions.get(key)?.scroll ?? 0, focus: finished.id, reveal: true });
                 showMeta(route);
               },
@@ -277,14 +270,10 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
           } }),
         });
         workCard.update(busy || activity.isBlocked() || !!session.pending);
-      } else if (metaRoute.kind === 'export') {
-        byId('dialog-title').textContent = exportScreenTitle(metaRoute);
-        if (!exportView) exportView = new ExportView(actions, { state: session.state, disabled: busy || activity.isBlocked(), route: metaRoute, files: exportFiles, back: popMeta });
-        exportView.update(session.state,busy || activity.isBlocked());
       } else if (shownAlbum) {
-        byId('dialog-title').textContent = shownAlbum.selection ? 'Коллаж' : 'Альбом';
+        byId('dialog-title').textContent = 'Альбом';
         renderAlbum(actions, { state: session.state, disabled: busy || activity.isBlocked() || !!session.pending, route: shownAlbum,
-          position: albumPositions.get(albumPositionKey(shownAlbum)), navigate: showMeta, back: popMeta, createWork,
+          position: albumPositions.get(shownAlbum.tab), navigate: showMeta, back: popMeta, createWork,
           play: () => startLevel(session.state.activeLevelId) });
       } else if (work) {
         byId('dialog-title').textContent = work.name;
@@ -335,7 +324,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     else scene.setView(level, initialAttempt, false, false);
     const picker = layer === 'meta' && metaRoute.kind === 'chapter' ? metaRoute : null;
     const cardId = selectedWork(), authorCard = selectedAuthorWork();
-    const gallery = layer === 'meta' && (metaRoute.kind === 'album' || metaRoute.kind === 'export' && isFocusedExport(metaRoute));
+    const gallery = layer === 'meta' && metaRoute.kind === 'album';
     atmosphere.placeInside(picker || cardId || authorCard || gallery ? dialog : root);
     if (picker) {
       const model = picker.chapterMenu === undefined ? levelPreview(session.state, picker.levelId) : null;
@@ -406,7 +395,6 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   const back = (): boolean => {
     if (busy || layer === 'recovery') return true;
     scene.cancel();
-    if (exportView && layer === 'meta') { exportView.leave(); return true; }
     if (editorView && layer === 'meta') { void editorView.leave(); return true; }
     if (workCard?.handleBack()) return true;
     if (layer === 'meta') {
@@ -452,5 +440,5 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     render();
   });
   await frame; ready = true; render(); resize();
-  return { back, destroy() { alive = false; editorView?.destroy(); exportView?.destroy(); workCard?.destroy(); prismGlint?.cancel(); exportFiles.destroy?.(); listeners.abort(); observer.disconnect(); unblock(); atmosphere.destroy(); feedback.destroy(); activity.setGameplayDesired(false); store.close(); destroyRenderer(game); } };
+  return { back, destroy() { alive = false; editorView?.destroy(); workCard?.destroy(); prismGlint?.cancel(); exportFiles.destroy?.(); listeners.abort(); observer.disconnect(); unblock(); atmosphere.destroy(); feedback.destroy(); activity.setGameplayDesired(false); store.close(); destroyRenderer(game); } };
 }

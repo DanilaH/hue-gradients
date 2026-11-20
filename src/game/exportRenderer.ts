@@ -1,7 +1,4 @@
-import { ExportError, measuredLines, type ExportField, type ExportPlan, type Rect } from '../domain/export';
-
-// Provisional existing UI tokens; font approval is still an M2 owner-review gate.
-export const EXPORT_STYLE={paper:'#FFF2DE',ink:'#261E32',font:'52px system-ui, sans-serif',lineHeight:64};
+import type { ExportField, WallpaperSize } from '../domain/export';
 function crc32(bytes:Uint8Array):number {
   let crc=0xffffffff;
   for(const byte of bytes){crc^=byte;for(let i=0;i<8;i++)crc=(crc>>>1)^((crc&1)?0xedb88320:0);}
@@ -13,17 +10,17 @@ function chunk(type:string,data:Uint8Array):Uint8Array<ArrayBuffer> {
 /** Annotate an sRGB Canvas PNG without re-encoding its IDAT/pixels. W3C PNG3 §11.3.2.5. */
 export async function srgbPng(blob:Blob):Promise<Blob> {
   const bytes=new Uint8Array(await blob.arrayBuffer()),signature=[137,80,78,71,13,10,26,10];
-  if(signature.some((v,i)=>bytes[i]!==v))throw new ExportError('UNAVAILABLE','Не удалось подготовить PNG.');
+  if(signature.some((v,i)=>bytes[i]!==v))throw new Error('Не удалось подготовить PNG.');
   const parts:BlobPart[]=[bytes.slice(0,8)],view=new DataView(bytes.buffer);let offset=8,ended=false,header=false;
   while(offset+12<=bytes.length) {
-    const size=view.getUint32(offset),end=offset+size+12;if(end>bytes.length)throw new ExportError('UNAVAILABLE','Повреждён PNG.');
+    const size=view.getUint32(offset),end=offset+size+12;if(end>bytes.length)throw new Error('Повреждён PNG.');
     const type=new TextDecoder().decode(bytes.subarray(offset+4,offset+8));
-    if(!header&&type!=='IHDR')throw new ExportError('UNAVAILABLE','Повреждён заголовок PNG.');
+    if(!header&&type!=='IHDR')throw new Error('Повреждён заголовок PNG.');
     if(!['sRGB','gAMA','cHRM','iCCP','cICP'].includes(type))parts.push(bytes.slice(offset,end));
-    if(type==='IHDR') {if(header||size!==13)throw new ExportError('UNAVAILABLE','Повреждён заголовок PNG.');header=true;parts.push(chunk('sRGB',new Uint8Array([1])));const gamma=new Uint8Array(4);new DataView(gamma.buffer).setUint32(0,45455);parts.push(chunk('gAMA',gamma));}
+    if(type==='IHDR') {if(header||size!==13)throw new Error('Повреждён заголовок PNG.');header=true;parts.push(chunk('sRGB',new Uint8Array([1])));const gamma=new Uint8Array(4);new DataView(gamma.buffer).setUint32(0,45455);parts.push(chunk('gAMA',gamma));}
     offset=end;if(type==='IEND'){ended=true;break;}
   }
-  if(!ended||offset!==bytes.length)throw new ExportError('UNAVAILABLE','Повреждён PNG.');
+  if(!ended||offset!==bytes.length)throw new Error('Повреждён PNG.');
   return new Blob(parts,{type:'image/png'});
 }
 function samplesOnAxis(pixels: number, nodes: number) {
@@ -38,8 +35,7 @@ function samplesOnAxis(pixels: number, nodes: number) {
   });
 }
 
-function drawGradient(ctx: CanvasRenderingContext2D, field: ExportField, region: Rect): void {
-  const { width, height } = region;
+function drawGradient(ctx: CanvasRenderingContext2D, field: ExportField, { width, height }: WallpaperSize): void {
   const image = ctx.createImageData(width, height);
   const { data } = image;
   const colours = field.solvedTileColors.map(colour => {
@@ -63,7 +59,7 @@ function drawGradient(ctx: CanvasRenderingContext2D, field: ExportField, region:
       data[index++] = 255;
     }
   }
-  ctx.putImageData(image, region.x, region.y);
+  ctx.putImageData(image, 0, 0);
 }
 
 export function gradientThumbnail(field: ExportField): HTMLCanvasElement {
@@ -71,35 +67,34 @@ export function gradientThumbnail(field: ExportField): HTMLCanvasElement {
   canvas.width = 96;
   canvas.height = 64;
   const context = canvas.getContext('2d', { alpha: false, colorSpace: 'srgb' });
-  if (context) drawGradient(context, field, { x: 0, y: 0, width: canvas.width, height: canvas.height });
+  if (context) drawGradient(context, field, canvas);
   canvas.setAttribute('aria-hidden', 'true');
   return canvas;
 }
 
-function drawLayout(ctx: CanvasRenderingContext2D, plan: ExportPlan): void {
-    const { width, height } = plan.layout;
-    if (plan.format !== 'clean') {
-      ctx.fillStyle=EXPORT_STYLE.paper;ctx.fillRect(0,0,width,height);
-      if(plan.format==='export-frame'){ctx.strokeStyle=EXPORT_STYLE.ink;ctx.lineWidth=4;ctx.strokeRect(96,96,1808,1808);}
-    }
-    plan.works.forEach((work,index)=>drawGradient(ctx,work.field,plan.layout.fields[index]!));
-    const text=plan.layout.text;
-    if(text) {
-      ctx.font=EXPORT_STYLE.font;ctx.textAlign='left';ctx.textBaseline='alphabetic';ctx.fillStyle=EXPORT_STYLE.ink;
-      const measure=(s:string)=>{const m=ctx.measureText(s),left=Math.max(0,m.actualBoundingBoxLeft);return Math.ceil(Math.max(m.width,left+m.actualBoundingBoxRight));};
-      const lines=measuredLines(plan.caption,text.width,plan.layout.maxLines!,measure);
-      const metrics=lines.map(line=>ctx.measureText(line||'М')),ascent=Math.ceil(Math.max(0,...metrics.map(m=>m.actualBoundingBoxAscent))),descent=Math.ceil(Math.max(0,...metrics.map(m=>m.actualBoundingBoxDescent)));
-      if(ascent+descent+(lines.length-1)*EXPORT_STYLE.lineHeight>text.height)throw new ExportError('TEXT_OVERFLOW','Сократите подпись.');
-      lines.forEach((line,i)=>{const m=ctx.measureText(line);if(measure(line)>text.width)throw new ExportError('TEXT_OVERFLOW','Сократите подпись.');ctx.fillText(line,text.x+Math.ceil(Math.max(0,m.actualBoundingBoxLeft)),text.y+ascent+i*EXPORT_STYLE.lineHeight);});
-    }
-}
+export async function renderWallpaper(field: ExportField, size: WallpaperSize): Promise<Blob> {
+  const { width, height } = size;
+  if (!Number.isSafeInteger(width) || !Number.isSafeInteger(height) || width < field.width || height < field.height
+      || width < 2 || height < 2 || width > 8192 || height > 8192 || width * height > 16_777_216) {
+    throw new Error('Размер экрана недоступен для сохранения PNG.');
+  }
 
-export async function renderExport(plan:ExportPlan):Promise<Blob> {
-  const canvas=document.createElement('canvas');canvas.width=plan.layout.width;canvas.height=plan.layout.height;
-  const ctx=canvas.getContext('2d',{alpha:false,colorSpace:'srgb'});if(!ctx)throw new ExportError('UNAVAILABLE','Не удалось подготовить изображение. Попробуйте ещё раз.');
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
   try {
-    drawLayout(ctx, plan);
-    const raw=await new Promise<Blob>((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(new ExportError('UNAVAILABLE','Не удалось подготовить PNG. Проверьте свободную память.')),'image/png'));
+    const context = canvas.getContext('2d', { alpha: false, colorSpace: 'srgb' });
+    if (!context) throw new Error('Не удалось подготовить PNG. Попробуйте ещё раз.');
+    drawGradient(context, field, size);
+    const raw = await new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob(blob => {
+        if (blob) resolve(blob);
+        else reject(new Error('Не удалось подготовить PNG. Проверьте свободную память.'));
+      }, 'image/png');
+    });
     return await srgbPng(raw);
-  } finally {canvas.width=1;canvas.height=1;}
+  } finally {
+    canvas.width = 1;
+    canvas.height = 1;
+  }
 }

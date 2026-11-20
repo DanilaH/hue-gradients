@@ -5,64 +5,48 @@ import { levels } from '../src/domain/levels';
 import { hashText } from '../src/local-store/command';
 import { applyCreative,initialCreative } from '../src/domain/creative';
 import { editorFingerprintPayload,makeField } from '../src/domain/editor';
-import { canExport,eligibleExportWorks,exportPlan,EXPORT_LAYOUTS,measuredLines,type ExportFormat } from '../src/domain/export';
-import { srgbPng } from '../src/game/exportRenderer';
+import { wallpaperField } from '../src/domain/export';
+import { renderWallpaper, srgbPng } from '../src/game/exportRenderer';
 import witnesses from '../docs/spec/candidates/validation-0.1.json';
 const fp=new Map(await Promise.all(levels.map(async l=>[l.id,await hashText(fingerprintPayload(l))]as const)));
 function completed(count:number):Workspace {
   let state=newWorkspace('first');for(const l of levels.slice(0,count)){state=applyAction(state,{kind:'open',levelId:l.id,attemptId:`a-${l.ordinal}`},fp);for(const[from,to]of witnesses.rows.find(r=>r.id===l.id)!.legalOptimalWitness)state=applyAction(state,{kind:'swap',attemptId:state.attempts[l.id]!.attemptId,from:from!,to:to!},fp);}return state;
 }
-test('export catalog excludes unfinished official work and unverified drafts; clean needs a real victory',async()=>{
-  const state=newWorkspace('first');expect(eligibleExportWorks(state)).toEqual([]);expect(canExport(state,'clean')).toBe(false);
-  const field=makeField();state.creative=applyCreative(initialCreative({}),{kind:'editor-create',draftId:'d',workId:'w',nodeId:'n',field,seed:0,name:'Своя'},await hashText(editorFingerprintPayload(field)));
-  expect(eligibleExportWorks(state)).toEqual([]);expect(()=>exportPlan(state,{format:'clean',keys:['campaign:gradient-001'],caption:''})).toThrow();
-  const won=completed(1);expect(eligibleExportWorks(won).map(w=>w.key)).toEqual(['campaign:gradient-001']);expect(canExport(won,'export-caption')).toBe(false);
+test('a finished campaign work supplies its exact palette and legacy rights do not expose unfinished work', () => {
+  const state = completed(1);
+  expect(wallpaperField(state, 'campaign:gradient-001')).toBe(levels[0]);
+  state.rights.push('export-strip', 'clean-export:gradient-002');
+  expect(() => wallpaperField(state, 'campaign:gradient-002')).toThrow('нужна собранная работа');
+  expect(() => wallpaperField(state, 'chapter-page')).toThrow('нужна собранная работа');
 });
-test('format thresholds and chapter page use committed ownership, with no export mutation or rewards',()=>{
-  const four=completed(4),five=completed(5),fourteen=completed(14),fifteen=completed(15),thirty=completed(30);
-  expect(canExport(four,'export-caption')).toBe(false);expect(canExport(five,'export-caption')).toBe(true);
-  expect(canExport(fourteen,'export-strip')).toBe(false);expect(canExport(fifteen,'export-strip')).toBe(true);expect(canExport(thirty,'export-grid')).toBe(true);
-  expect(canExport(fourteen,'chapter-page',0)).toBe(false);expect(canExport(fifteen,'chapter-page',0)).toBe(true);expect(canExport(fifteen,'chapter-page',8)).toBe(false);
-  const before=JSON.stringify(fifteen);const page=exportPlan(fifteen,{format:'chapter-page',keys:[],caption:'ignored',chapterIndex:0});
-  expect(page.works.map(w=>w.key)).toEqual(levels.slice(0,15).map(l=>`campaign:${l.id}`));expect(page.caption).toBe('Глава 1');expect(JSON.stringify(fifteen)).toBe(before);
-});
-test('seven templates define print regions and clean fills the portrait wallpaper',()=>{
-  const expected:Record<string,[number,number,number[]]>= {
-    'export-caption':[1800,2000,[96,96,1608]],'export-strip':[2400,960,[96,144,672,864,144,672,1632,144,672]],
-    'export-grid':[2000,2000,[96,96,856,1048,96,856,96,1048,856,1048,1048,856]],'export-frame':[2000,2000,[200,200,1600]],
-    'export-diptych':[2400,1400,[96,172,1056,1248,172,1056]],'export-postcard':[1800,2200,[96,96,1608]],
-    'chapter-page':[1800,3000,[208,752,1296,1840,2384].flatMap(y=>[108,652,1196].flatMap(x=>[x,y,496]))],
+
+test('a verified own revision supplies its palette independently of other revisions', async () => {
+  const first = makeField(6, 1), second = makeField(5, 4);
+  const fingerprint = await hashText(editorFingerprintPayload(first));
+  const c = applyCreative(initialCreative({}), {
+    kind: 'editor-create', draftId: 'd', workId: 'w', nodeId: 'n', field: first, seed: 0, name: 'Своя',
+  }, fingerprint);
+  const state = { ...newWorkspace('a'), creative: c };
+  expect(() => wallpaperField(state, 'own:w:n')).toThrow('нужна собранная работа');
+  c.works.w!.nodes.second = {
+    ...c.works.w!.nodes.n!, nodeId: 'second', parentNodeIds: ['n'],
+    field: second, fingerprint: await hashText(editorFingerprintPayload(second)),
   };
-  for(const[id,[width,height,regions]]of Object.entries(expected)){const l=EXPORT_LAYOUTS[id as Exclude<ExportFormat,'clean'>];expect([l.width,l.height]).toEqual([width,height]);expect(l.fields.flatMap(r=>[r.x,r.y,r.width])).toEqual(regions);expect(l.fields.every(r=>r.width===r.height)).toBe(true);}
-  const state=completed(15);
-  for(const level of levels.slice(0,15)){
-    const plan=exportPlan(state,{format:'clean',keys:[`campaign:${level.id}`],caption:'not rendered'});
-    expect(plan.layout).toEqual({width:1080,height:1920,fields:[{x:0,y:0,width:1080,height:1920}]});
-    expect(plan.works[0]?.field).toBe(level);
+  c.works.w!.completions = [{ nodeId: 'n', fingerprint, rulesVersion: 'gradient-rules-1', attemptId: 'won', moves: 11, assisted: true }];
+  expect(wallpaperField(state, 'own:w:n')).toBe(first);
+  expect(() => wallpaperField(state, 'own:w:second')).toThrow('нужна собранная работа');
+  c.works.w!.nodes.n!.field = { ...first, solvedTileColors: first.solvedTileColors.map((colour, i) => i === 0 ? 'red' : colour) };
+  expect(() => wallpaperField(state, 'own:w:n')).toThrow('Не удалось прочитать цвета работы');
+  expect(state.rights).toEqual(['chapter-open:chapter-01']);
+});
+
+test('invalid display dimensions are rejected before allocating a canvas', async () => {
+  const field = makeField(6, 1);
+  for (const size of [{ width: 0, height: 2400 }, { width: 4, height: 2400 }, { width: 5000, height: 4000 }, { width: 1080.5, height: 2400 }]) {
+    await expect(renderWallpaper(field, size)).rejects.toThrow('Размер экрана недоступен');
   }
 });
-test('selection must be complete and different logical works, not two revisions of one work',async()=>{
-  const state=completed(15),keys=eligibleExportWorks(state).slice(0,2).map(w=>w.key);
-  expect(()=>exportPlan(state,{format:'export-strip',keys,caption:''})).toThrow('Выберите ещё 1');
-  expect(()=>exportPlan(state,{format:'export-strip',keys:[keys[0]!,keys[0]!,keys[1]!],caption:''})).toThrow('разные работы');
-  const field=makeField(),fingerprint=await hashText(editorFingerprintPayload(field));let c=applyCreative(initialCreative({}),{kind:'editor-create',draftId:'d',workId:'w',nodeId:'n',field,seed:0,name:'Своя'},fingerprint);
-  c.works.w!.nodes.second={...c.works.w!.nodes.n!,nodeId:'second',parentNodeIds:['n']};c.works.w!.completions=[{nodeId:'n',fingerprint,rulesVersion:'gradient-rules-1',attemptId:'won',moves:11,assisted:true}];
-  const own={...newWorkspace('a'),creative:c};expect(canExport(own,'clean')).toBe(true);expect(own.rights).toEqual(['chapter-open:chapter-01']);
-  expect(eligibleExportWorks(own)).toHaveLength(2);const all={...state,creative:c};
-  expect(()=>exportPlan(all,{format:'export-strip',keys:['own:w:n','own:w:second',keys[0]!],caption:''})).toThrow('разные работы');
-  c.works.w!.nodes.n!.field={...field,solvedTileColors:field.solvedTileColors.map((colour,i)=>i===0?'red':colour)};
-  expect(()=>exportPlan(own,{format:'clean',keys:['own:w:n'],caption:''})).toThrow('Не удалось прочитать цвета работы');
-  expect(()=>exportPlan(all,{format:'export-strip',keys:['own:w:n',...keys],caption:''})).toThrow('Не удалось прочитать цвета работы');
-});
-test('text limits count Unicode code points, preserve text on error, and wrap by measured width',()=>{
-  const state=completed(5),key='campaign:gradient-001';
-  expect(exportPlan(state,{format:'export-caption',keys:[key],caption:'🌈'.repeat(80)}).caption).toHaveLength(160);
-  expect(()=>exportPlan(state,{format:'export-caption',keys:[key],caption:'🌈'.repeat(81)})).toThrow('Сократите');
-  expect(measuredLines('один два\nтри',8,3,s=>[...s].length)).toEqual(['один два','три']);
-  expect(measuredLines('АБВГДЕ',3,2,s=>s.length)).toEqual(['АБВ','ГДЕ']);
-  expect(()=>measuredLines('Ш'.repeat(80),1608,2,s=>s.length*52)).toThrow('Сократите');
-  expect(()=>measuredLines('а\nб\nв',100,2,s=>s.length)).toThrow('Сократите');
-});
+
 test('sRGB annotation preserves compressed pixels and emits independently verified PNG CRC/gamma',async()=>{
   const ch=(type:string,data:Buffer)=>{const name=Buffer.from(type),length=Buffer.alloc(4),crc=Buffer.alloc(4);length.writeUInt32BE(data.length);crc.writeUInt32BE(crc32(Buffer.concat([name,data])));return Buffer.concat([length,name,data,crc]);};
   const ihdr=Buffer.alloc(13);ihdr.writeUInt32BE(1);ihdr.writeUInt32BE(1,4);ihdr[8]=8;ihdr[9]=6;

@@ -3,8 +3,12 @@ package com.danilah.huegradients;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.Intent;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Base64;
+import android.view.WindowManager;
 import androidx.activity.result.ActivityResult;
 import androidx.core.content.FileProvider;
 import com.getcapacitor.JSObject;
@@ -26,6 +30,8 @@ import java.util.concurrent.Executors;
 @CapacitorPlugin(name="HueExport")
 public class HueExportPlugin extends Plugin {
   private static final ExecutorService WRITER=Executors.newSingleThreadExecutor();
+  private static final int MAX_WALLPAPER_SIDE = 8192;
+  private static final long MAX_WALLPAPER_PIXELS = 16_777_216L;
   private boolean active=false;
   private synchronized boolean claim(){if(active)return false;active=true;return true;}
   private synchronized void release(){active=false;}
@@ -36,13 +42,42 @@ public class HueExportPlugin extends Plugin {
     byte[] bytes=Base64.decode(value,Base64.DEFAULT);byte[] signature={(byte)137,80,78,71,13,10,26,10};
     if(bytes.length<33)throw new IllegalArgumentException("PNG header");for(int i=0;i<8;i++)if(bytes[i]!=signature[i])throw new IllegalArgumentException("PNG signature");
     ByteBuffer header=ByteBuffer.wrap(bytes);if(header.getInt(8)!=13||header.getInt(12)!=0x49484452)throw new IllegalArgumentException("PNG IHDR");
-    int width=header.getInt(16),height=header.getInt(20);if(width<1||height<1||width>3000||height>3000)throw new IllegalArgumentException("PNG dimensions");
+    int width = header.getInt(16), height = header.getInt(20);
+    if (width < 2 || height < 2 || width > MAX_WALLPAPER_SIDE || height > MAX_WALLPAPER_SIDE
+        || (long) width * height > MAX_WALLPAPER_PIXELS) {
+      throw new IllegalArgumentException("PNG dimensions");
+    }
     File directory=new File(getContext().getCacheDir(),"hue-exports");if(!directory.isDirectory()&&!directory.mkdirs())throw new java.io.IOException("Cache unavailable");
     File[] old=directory.listFiles();if(old!=null)for(File file:old)if(file.lastModified()<System.currentTimeMillis()-24*60*60*1000L)file.delete();
     File file=new File(directory,UUID.randomUUID()+".png");try(FileOutputStream out=new FileOutputStream(file)){out.write(bytes);out.getFD().sync();}
     call.getData().put("exportCacheFile",file.getName());call.getData().remove("base64");return file;
   }
   private String filename(PluginCall call){String name=call.getString("filename","Poluson.png");return name.matches("[A-Za-z0-9._-]{1,100}\\.png")?name:"Poluson.png";}
+  @PluginMethod public void screenSize(PluginCall call) {
+    Activity activity = getActivity();
+    if (activity == null) {
+      call.reject("Размер экрана недоступен.", "DISPLAY_UNAVAILABLE");
+      return;
+    }
+    activity.runOnUiThread(() -> {
+      try {
+        WindowManager windows = activity.getWindowManager();
+        Point pixels = new Point();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+          Rect bounds = windows.getMaximumWindowMetrics().getBounds();
+          pixels.set(bounds.width(), bounds.height());
+        } else {
+          windows.getDefaultDisplay().getRealSize(pixels);
+        }
+        JSObject result = new JSObject();
+        result.put("width", pixels.x);
+        result.put("height", pixels.y);
+        call.resolve(result);
+      } catch (RuntimeException error) {
+        call.reject("Размер экрана недоступен.", "DISPLAY_UNAVAILABLE", error);
+      }
+    });
+  }
   @PluginMethod public void save(PluginCall call){
     if(!claim()){call.reject("Экспорт уже открыт.","EXPORT_BUSY");return;}
     try{prepare(call);Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT);intent.addCategory(Intent.CATEGORY_OPENABLE);intent.setType("image/png");intent.putExtra(Intent.EXTRA_TITLE,filename(call));getActivity().runOnUiThread(()->{try{startActivityForResult(call,intent,"savedDocument");}catch(Exception error){reject(call,error);}});}
