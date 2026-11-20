@@ -10,7 +10,9 @@ Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and
 
 ## Current slice
 
-A1 (0.4.13/versionCode17, 2e7c0b8) is in the game. Chromium touch hit the exact seam at (200,398) by tap and drop. In the 568×320 fixture with 24 px on each side and 150% text, 1×5 measured 366×52.8 and 6×5 cells 61×52.8 CSS px. Android debug, signed releaseCheck and exact APK inspection passed. Physical input waits for G1. **Resume at A2**. [Evidence](evidence/queue-a1-2026-11-20.json)
+A2 (0.4.14/versionCode18, 356c957) restores startup and audio on Chromium 92. The picker preview opens or resumes a level by tap or keyboard. Canceled gestures and locked previews do not open a game. Existing 0.4.12 Chromium save bytes survived the update, including a failed capability probe. Capacitor uses a 92 minimum and the packaged error page; physical provider/SQLite tests wait for G1. **Resume at A3**. [Evidence](evidence/queue-a2-2026-11-20.json)
+
+A1 (0.4.13/versionCode17, 2e7c0b8) is in the game. Chromium touch hit the exact seam at (200,398) by tap and drop. In the 568×320 fixture with 24 px on each side and 150% text, 1×5 measured 366×52.8 and 6×5 cells 61×52.8 CSS px. Android debug, signed releaseCheck and exact APK inspection passed. Physical input waits for G1. [Evidence](evidence/queue-a1-2026-11-20.json)
 
 0.4.12/versionCode16 adds the offline progress route, first-win XP and one atomic history row per completed campaign attempt. Older snapshots seed history from saved completed attempts. A live comparison requires a published versioned sample for the exact fingerprint and rules. In fixture tests ties do not qualify, and version changes preserve already recorded comparisons. The level statistics preference defaults to visible and can be turned off in pause. [Progress and APK checks](evidence/player-progress-2026-11-20.json)
 

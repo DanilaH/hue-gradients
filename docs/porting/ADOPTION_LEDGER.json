@@ -1,6 +1,6 @@
 {
   "schema": "consumer-adoption-ledger-v1",
-  "consumerCommit": "2e7c0b8546403b640167f11b691f143e164b5553",
+  "consumerCommit": "356c9576436d7b0f5378aee432add400fffcdeec",
   "asOf": "2026-11-20",
   "features": [
     {
@@ -149,8 +149,8 @@
       "status": "ROADMAPPED",
       "gap": "PARTIAL",
       "stage": "Пакет 09",
-      "currentImplementation": "Веб-путь восстанавливает подтверждённое поле; физический Android открыт. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/workspace.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 09 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Веб-путь восстанавливает подтверждённое поле; физический Android открыт. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/workspace.ts A2: ресурсы 0.4.14 из APK открывают ту же попытку на Chromium 92/158. Обновление и несовместимость сохраняют байты локальной партии Chromium 0.4.12. | https://github.com/DanilaH/hue-gradients/blob/356c9576436d7b0f5378aee432add400fffcdeec/tools/first-launch-apk-check.mjs",
+      "nextAction": "Обновить preview на физическом Android и проверить штатный WebView/SQLite на минимальном и современном провайдере (G1).",
       "deliveryPackage": "09",
       "sourceNextCheck": "Убить процесс после хода на тестовом устройстве."
     },
@@ -700,8 +700,8 @@
       "status": "ROADMAPPED",
       "gap": "PARTIAL",
       "stage": "Пакет 09",
-      "currentImplementation": "У нас контракт сильнее: фиксируем каждый ход; device kill ещё открыт. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/workspace.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 09 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "У нас контракт сильнее: фиксируем каждый ход; device kill ещё открыт. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/workspace.ts A2: ресурсы 0.4.14 из APK открывают ту же попытку на Chromium 92/158. Обновление и несовместимость сохраняют байты локальной партии Chromium 0.4.12. | https://github.com/DanilaH/hue-gradients/blob/356c9576436d7b0f5378aee432add400fffcdeec/tools/first-launch-apk-check.mjs",
+      "nextAction": "Обновить preview на физическом Android и проверить штатный WebView/SQLite на минимальном и современном провайдере (G1).",
       "deliveryPackage": "09",
       "sourceNextCheck": "Проверить HOME→kill, force-stop→launcher и сохранение последнего хода."
     },
