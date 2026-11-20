@@ -3,12 +3,12 @@ import { chapterCount, chapterIndexFor, chapterIsOpen, levelIsOpen, META_POLICY,
 import type { LevelDefinition } from '../domain/puzzle';
 import type { Workspace } from '../domain/workspace';
 import type { AlbumRoute } from './albumView';
-import { challenges, challengeStatus } from '../domain/challenges';
+import { chapterChallenges, challengeAvailable, challenges, challengeStatus } from '../domain/challenges';
 import { renderProgress } from './progressView';
 
 type PickerRoute = { kind: 'chapter'; levelId: string; chapterMenu?: number };
 export type MetaRoute = PickerRoute | AlbumRoute | { kind: 'card' | 'copy'; levelId: string } |
-  { kind: 'own-card'; workId: string; nodeId: string } | { kind: 'draft'; draftId: string; nodeId?: string } | { kind: 'progress' | 'challenges' };
+  { kind: 'own-card'; workId: string; nodeId: string } | { kind: 'draft'; draftId: string; nodeId?: string } | { kind: 'progress' } | { kind: 'challenges'; chapterTests?: boolean };
 interface MetaView {
   route: MetaRoute; state: Workspace; disabled: boolean;
   title: HTMLElement; copy: HTMLElement; actions: HTMLElement;
@@ -220,12 +220,19 @@ export function renderMeta(v: MetaView): void {
   } else if (route.kind === 'challenges') {
     v.title.textContent = 'Испытания';
     button('‹ Назад', v.back).className = 'quiet challenge-back';
+    const tabs = document.createElement('div');
+    tabs.className = 'challenge-tabs';
+    for (const [chapterTests, name] of [[false, 'Лимит ходов'], [true, 'Финалы глав']] as const) {
+      const tab = button(name, () => v.navigate({ kind: 'challenges', chapterTests }), tabs);
+      tab.className = 'quiet';
+      tab.setAttribute('aria-pressed', String(!!route.chapterTests === chapterTests));
+    }
     const list = document.createElement('div');
     list.className = 'challenge-list';
-    actions.append(list);
-    for (const definition of challenges) {
+    actions.append(tabs, list);
+    for (const definition of route.chapterTests ? chapterChallenges : challenges) {
       const { level, requiredWorks, moveLimit } = definition;
-      const locked = state.completed.length < requiredWorks;
+      const locked = !challengeAvailable(definition, state.completed, state.challengeProgress);
       const attempt = state.challengeProgress?.attempts[level.id];
       const best = state.challengeProgress?.best[level.id];
       const restart = !!attempt && challengeStatus(definition, attempt) !== 'playing';
@@ -235,7 +242,9 @@ export function renderMeta(v: MetaView): void {
       const title = document.createElement('span');
       title.textContent = level.title;
       const note = document.createElement('small');
-      note.textContent = locked ? `Откроется за ${requiredWorks} работ` : [
+      note.textContent = locked ? definition.afterFinaleId ? 'Пройди финал главы'
+        : definition.chapterIndex !== undefined ? 'Собери все работы главы'
+        : `Откроется за ${requiredWorks} работ` : [
         `Лимит · ${moveLimit}`,
         restart ? 'Повторить' : attempt ? 'Продолжить' : '',
         best === undefined ? '' : `Рекорд · ${best}`,

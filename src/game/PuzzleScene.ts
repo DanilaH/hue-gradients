@@ -11,6 +11,7 @@ export class PuzzleScene extends Phaser.Scene {
   private level: LevelDefinition;
   private attempt: Attempt;
   private preview = false;
+  private concealed = false;
   private enabled = true;
   private selected: number | null = null;
   private focused: number | null = null;
@@ -38,10 +39,11 @@ export class PuzzleScene extends Phaser.Scene {
     this.draw();
     this.game.events.once(Phaser.Core.Events.POST_RENDER, () => this.game.events.emit(GAME_PRESENTABLE));
   }
-  setView(level: LevelDefinition, attempt: Attempt, preview: boolean, enabled: boolean): void {
+  setView(level: LevelDefinition, attempt: Attempt, preview: boolean, enabled: boolean, concealed = false): void {
     if (this.level !== level) this.focused = null;
-    if (this.level !== level || this.attempt !== attempt || preview !== this.preview || !enabled) this.cancel();
-    this.level = level; this.attempt = attempt; this.preview = preview; this.enabled = enabled && !attempt.completed && !preview;
+    if (this.level !== level || this.attempt !== attempt || preview !== this.preview || concealed !== this.concealed || !enabled) this.cancel();
+    this.level = level; this.attempt = attempt; this.preview = preview; this.concealed = concealed;
+    this.enabled = enabled && !attempt.completed && !preview && !concealed;
     if (this.art) this.draw();
   }
   presentSwap(previous: Attempt, next: Attempt, from: number, to: number, motion: boolean, cost = 1): void {
@@ -171,9 +173,11 @@ export class PuzzleScene extends Phaser.Scene {
     const tile = (position: number, dx = 0, dy = 0, lifted = false): void => {
       const cell = cellAt(this.geometry, position), tileId = this.preview ? position : this.attempt.board[position]!;
       if (lifted) this.art.fillStyle(0x100e1c, .65).fillRoundedRect(cell.x + dx + 3, cell.y + dy + 5, cell.width, cell.height, cell.radius);
-      this.art.fillStyle(Number.parseInt(this.level.solvedTileColors[tileId]!.slice(1), 16));
+      const pinned = this.level.pinnedPositions.includes(position);
+      const color = this.concealed && !pinned ? 0x2f263d : Number.parseInt(this.level.solvedTileColors[tileId]!.slice(1), 16);
+      this.art.fillStyle(color);
       this.art.fillRoundedRect(cell.x + dx, cell.y + dy, cell.width, cell.height, cell.radius);
-      if (this.level.pinnedPositions.includes(position)) {
+      if (pinned) {
         const cx = cell.x + cell.width / 2, cy = cell.y + cell.height / 2;
         this.art.fillStyle(0x101019).fillCircle(cx, cy, 5).fillStyle(0xffffff).fillCircle(cx, cy, 2.5);
       }

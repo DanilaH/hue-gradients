@@ -45,8 +45,9 @@ export function renderProgress(parent: HTMLElement, state: Workspace, disabled: 
   sets.className = 'progress-list';
   sets.setAttribute('aria-label', 'Главы');
   for (const set of progress.sets) {
-    const caption = set.complete ? 'Собрана' : !set.open ? 'Закрыта' : set.finale ? 'Финал пройден' : '';
-    text(sets, 'li', [`${set.title} · ${set.count}/${set.total}`, caption].filter(Boolean).join(' · '));
+    const caption = set.complete ? 'Собрана' : !set.open ? 'Закрыта' : set.lastOrdinary ? 'Последний обычный уровень пройден' : '';
+    const finale = set.finale ? 'Финал пройден' : set.complete ? 'Финал открыт' : '';
+    text(sets, 'li', [`${set.title} · ${set.count}/${set.total}`, caption, finale].filter(Boolean).join(' · '));
   }
   parent.append(sets);
 

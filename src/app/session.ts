@@ -42,14 +42,18 @@ export class Session {
     if (this.pending) throw new Error('Resolve pending operation first');
     const operationId = crypto.randomUUID();
     const attempt = next.attempts[next.activeLevelId];
-    const challenge = kind.startsWith('challenge-') ? activeChallenge(next.challengeProgress ?? this.state?.challengeProgress) : null;
+    const challenge = kind.startsWith('challenge-') ? activeChallenge(kind === 'challenge-leave'
+      ? this.state?.challengeProgress : next.challengeProgress) : null;
+    const firstChallengeWin = challenge?.status === 'won' &&
+      next.challengeProgress?.best[challenge.level.id] !== undefined &&
+      this.state?.challengeProgress?.best[challenge.level.id] === undefined;
     const lastVictory = next.victories?.at(-1);
     const victory = lastVictory?.attemptId === this.state?.victories?.at(-1)?.attemptId ? undefined : lastVictory;
     const fact = { id: operationId, destination: { kind: 'guest' as const, vaultId: GUEST_VAULT },
       payloadJson: JSON.stringify({ schemaVersion: 1, kind, contentVersion: next.contentVersion, policyVersion: next.policyVersion,
         levelId: next.activeLevelId, fingerprint: this.fingerprints.get(next.activeLevelId), attempt,
         best: next.bests[next.activeLevelId], onboarding: next.onboarding, assistance, victory,
-        ...(challenge ? { challengeId: challenge.level.id, challengeAttempt: challenge.attempt, challengeStatus: challenge.status } : {}),
+        ...(challenge ? { challengeId: challenge.level.id, challengeAttempt: challenge.attempt, challengeStatus: challenge.status, ...(firstChallengeWin ? { firstChallengeWin: true } : {}) } : {}),
         creativeAction, authorTest: creativeAction?.kind.startsWith('author-') ? next.creative?.activeTest : undefined,
         newCopies: Object.values(next.albumCopies).filter(copy => !this.state?.albumCopies[copy.draftId]),
         newCompletions: next.completed.filter(id => !this.state?.completed.includes(id)),

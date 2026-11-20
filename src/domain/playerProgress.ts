@@ -94,7 +94,8 @@ export function campaignProgress(state: Workspace) {
     return {
       title: `Глава ${index + 1}`, count: chapterCount(state, index), total: chapter.levelIds.length,
       open: chapterIsOpen(state, index), complete,
-      finale: state.completed.includes(chapter.levelIds.at(-1)!),
+      lastOrdinary: state.completed.includes(chapter.levelIds.at(-1)!),
+      finale: state.challengeProgress?.best[`finale-v1-${index + 1}`] !== undefined,
     };
   });
   const perfect = levels.filter(level => state.bests[level.id]?.clean === level.minimumSwaps).length;

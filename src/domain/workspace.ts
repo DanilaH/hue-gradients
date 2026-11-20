@@ -100,7 +100,7 @@ export function decodeWorkspace(json: string, fingerprints: ReadonlyMap<string, 
   }
   if (!Object.hasOwn(state, 'victories')) state.victories = campaignVictories(state);
   validateCampaignVictories(state, fingerprints);
-  if (state.challengeProgress !== undefined) validateChallengeProgress(state.challengeProgress, state.completed.length);
+  if (state.challengeProgress !== undefined) validateChallengeProgress(state.challengeProgress, state.completed);
   if (legacy) { state.albumCopies = {}; state.lastCompletion = null; }
   else {
     if (!record(state.albumCopies)) throw new Error('Invalid saved copies');
@@ -136,7 +136,7 @@ export function applyAction(state: Workspace, action: Action, fingerprints: Read
   benchmarks?: readonly PublishedBenchmark[]): Workspace {
   if (action.kind === 'challenge-open' || action.kind === 'challenge-restart' ||
       action.kind === 'challenge-swap' || action.kind === 'challenge-leave') {
-    const challengeProgress = applyChallenge(state.challengeProgress, state.completed.length, action);
+    const challengeProgress = applyChallenge(state.challengeProgress, state.completed, action);
     return !challengeProgress || challengeProgress === state.challengeProgress ? state : { ...state, challengeProgress };
   }
   if (action.kind === 'preferences') {

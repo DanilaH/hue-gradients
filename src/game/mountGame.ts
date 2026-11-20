@@ -25,7 +25,7 @@ import { colourPrism, flashPrismEdge, victoryPrism } from './victoryPrism';
 import { browserExportFiles, type ExportFiles } from '../app/exportFiles';
 import './game.css';
 
-type Layer = 'none' | 'help' | 'help-menu' | 'pin-guide' | 'result' | 'meta' | 'restart' | 'recovery' | 'settings';
+type Layer = 'none' | 'secret' | 'help' | 'help-menu' | 'pin-guide' | 'result' | 'meta' | 'restart' | 'recovery' | 'settings';
 interface Activity extends Pick<GameplayActivityCoordinator, 'isBlocked' | 'onBlockedChange' | 'setGameplayDesired'> {}
 
 export async function mountGame(parent: HTMLElement, store: TransactionalLocalStore, activity: Activity, options: { haptic?: Haptic; exportFiles?: ExportFiles } = {}): Promise<{ back(): boolean; destroy(): void }> {
@@ -169,7 +169,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (layer !== 'meta') { metaReturn = layer; metaHistory = []; }
     else {
       const samePicker = route.kind === 'chapter' && metaRoute.kind === 'chapter'
-        || route.kind === 'album' && metaRoute.kind === 'album' ;
+        || route.kind === 'album' && metaRoute.kind === 'album'
+        || route.kind === 'challenges' && metaRoute.kind === 'challenges';
       if (!samePicker && JSON.stringify(route) !== JSON.stringify(metaRoute)) metaHistory.push(metaRoute);
     }
     metaRoute = route; layer = 'meta'; render();
@@ -186,16 +187,18 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     });
   }
   function playChallenge(id: string, restart: boolean): void {
+    const firstOpen = !session.state.challengeProgress?.attempts[id];
     void run({ kind: restart ? 'challenge-restart' : 'challenge-open', id, attemptId: crypto.randomUUID() }, () => {
       metaHistory = [];
-      layer = gameLayer();
+      layer = firstOpen && current().challenge?.afterFinaleId ? 'secret' : gameLayer();
     });
   }
   function leaveChallenge(): void {
+    const chapterTests = current().challenge?.chapterIndex !== undefined;
     void run({ kind: 'challenge-leave' }, () => {
       metaReturn = gameLayer();
       metaHistory = [{ kind: 'chapter', levelId: session.state.activeLevelId }];
-      metaRoute = { kind: 'challenges' };
+      metaRoute = { kind: 'challenges', chapterTests };
       layer = 'meta';
     });
   }
@@ -254,7 +257,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     dialog.dataset.picker = String(layer === 'meta' && metaRoute.kind === 'chapter');
     dialog.dataset.chapterMenu = String(layer === 'meta' && metaRoute.kind === 'chapter' && metaRoute.chapterMenu !== undefined);
     if (layer !== 'result' || !motionAllowed()) { prismGlint?.cancel(); prismGlint = null; }
-    const open = layer !== 'none' && layer !== 'help';
+    const open = layer !== 'none' && layer !== 'help' && layer !== 'secret';
     if (!open) { if (dialog.open) { dialog.close(); lastFocus?.focus(); } return; }
     const draftId = layer === 'meta' && metaRoute.kind === 'draft' ? metaRoute.draftId : null;
     if (editorDraftId !== draftId) { editorView?.destroy(); editorView = null; editorDraftId = draftId; }
@@ -417,13 +420,13 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     byId('levels').textContent = challenge ? '‹ Испытания' : own ? '‹ Редактор' : '‹ Уровни';
     byId('title').textContent = own || challenge ? level.title : `Уровень ${level.ordinal}`;
     const guidance = byId('guidance');
-    guidance.textContent = challenge ? `Ходов осталось · ${challenge.moveLimit - challenge.attempt.moves}` : layer === 'help' ? 'Готовое поле' : notice || (!own && !session.state.onboarding.firstSwapDone ? 'Поменяй две плитки местами' : '');
+    guidance.textContent = layer === 'secret' ? '' : challenge ? `Ходов осталось · ${challenge.moveLimit - challenge.attempt.moves}` : layer === 'help' ? 'Готовое поле' : notice || (!own && !session.state.onboarding.firstSwapDone ? 'Поменяй две плитки местами' : '');
     guidance.hidden = !guidance.textContent;
     const footerAction = byId<HTMLButtonElement>('help');
-    footerAction.hidden = layer !== 'help' && !attempt?.completed;
-    footerAction.textContent = layer === 'help' ? 'К игре' : 'Результат';
+    footerAction.hidden = layer !== 'help' && layer !== 'secret' && !attempt?.completed;
+    footerAction.textContent = layer === 'secret' ? 'Открыть поле' : layer === 'help' ? 'К игре' : 'Результат';
     for (const node of root.querySelectorAll<HTMLButtonElement>('.hud button,footer button')) node.disabled = busy || activity.isBlocked() || !!session.pending;
-    if (attempt) scene.setView(level, attempt, layer === 'help', ready && !busy && !activity.isBlocked() && layer === 'none' && !session.pending);
+    if (attempt) scene.setView(level, attempt, layer === 'help', ready && !busy && !activity.isBlocked() && layer === 'none' && !session.pending, layer === 'secret');
     else scene.setView(level, initialAttempt, false, false);
     const picker = layer === 'meta' && metaRoute.kind === 'chapter' ? metaRoute : null;
     const cardId = selectedWork(), authorCard = selectedAuthorWork();
@@ -439,7 +442,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     } else if (gallery) {
       atmosphere.setModel(null, null);
     } else {
-      atmosphere.setModel(level, layer === 'help' ? null : attempt?.board ?? initialAttempt.board);
+      atmosphere.setModel(layer === 'secret' ? null : level, layer === 'help' || layer === 'secret' ? null : attempt?.board ?? initialAttempt.board);
     }
     atmosphere.configure(ready && !activity.isBlocked() && (picker !== null || cardId !== null || authorCard !== null || gallery || ['none', 'help', 'result'].includes(layer)), motionAllowed());
     feedback.configure(session.state.preferences, !ready || activity.isBlocked());
@@ -550,7 +553,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     return false;
   };
   byId('help').addEventListener('click', () => {
-    if (layer === 'help') { layer = 'none'; render(); return; }
+    if (layer === 'help' || layer === 'secret') { layer = 'none'; render(); return; }
     if (current().attempt?.completed) { layer = 'result'; render(); }
   }, { signal: listeners.signal });
   byId('levels').addEventListener('click', () => {

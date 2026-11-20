@@ -43,7 +43,7 @@ test('first five stay sequential, then the remaining chapter is freely selectabl
   expect(locked).toBe(state);
   state = complete(state,15); expect(recommendedLevel(state,0)).toBe('gradient-006');
   expect(campaignProgress(state)).toMatchObject({ xp: 6, complete: false,
-    sets: [expect.objectContaining({ open: true, finale: true, complete: false, count: 6 }),
+    sets: [expect.objectContaining({ open: true, lastOrdinary: true, finale: false, complete: false, count: 6 }),
       expect.objectContaining({ open: false }), expect.objectContaining({ open: false }), expect.objectContaining({ open: false })] });
 });
 test('9→10 and 14→15 are atomic milestones; replays do not farm progress; final chapter has no phantom successor', () => {
