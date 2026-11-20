@@ -2,6 +2,7 @@ import { CAMPAIGN_CONTENT_VERSION, CONTENT_VERSION, createAttempt, proposeAssist
 import { getLevel, levels } from './levels';
 import { earnedRights, isKnownRight, levelIsOpen, META_POLICY } from './progression';
 import { initialCreative, validateCreative, type CreativeState } from './creative';
+import { applyChallenge, validateChallengeProgress, type ChallengeAction, type ChallengeProgress } from './challenges';
 import { campaignVictories, campaignVictory, publishedBenchmark, validateCampaignVictories, type CampaignVictory, type PublishedBenchmark } from './playerProgress';
 
 export interface Best { fingerprint: string; rulesVersion: typeof RULES_VERSION; clean: number | null; assisted: number | null }
@@ -24,12 +25,13 @@ export interface Workspace {
   preferences: Preferences;
   /** Absent in snapshots saved before campaign history. */
   victories?: readonly CampaignVictory[];
+  challengeProgress?: ChallengeProgress;
   albumCopies: Record<string, AlbumCopy>;
   /** Absent only in pre-editor saves; Session backs up and migrates before use. */
   creative?: CreativeState;
   lastCompletion: { attemptId: string; levelId: string; newRights: string[] } | null;
 }
-export type Action = { kind: 'swap'; from: number; to: number; attemptId: string } |
+export type Action = ChallengeAction | { kind: 'swap'; from: number; to: number; attemptId: string } |
   { kind: 'help'; attemptId: string; assistance?: Assistance } | { kind: 'pin' } |
   { kind: 'preferences'; key: keyof Preferences; value: boolean } |
   { kind: 'copy'; levelId: string; draftId: string; workId: string; nodeId: string; name: string } |
@@ -98,6 +100,7 @@ export function decodeWorkspace(json: string, fingerprints: ReadonlyMap<string, 
   }
   if (!Object.hasOwn(state, 'victories')) state.victories = campaignVictories(state);
   validateCampaignVictories(state, fingerprints);
+  if (state.challengeProgress !== undefined) validateChallengeProgress(state.challengeProgress, state.completed.length);
   if (legacy) { state.albumCopies = {}; state.lastCompletion = null; }
   else {
     if (!record(state.albumCopies)) throw new Error('Invalid saved copies');
@@ -131,6 +134,11 @@ export function decodeWorkspace(json: string, fingerprints: ReadonlyMap<string, 
 
 export function applyAction(state: Workspace, action: Action, fingerprints: ReadonlyMap<string, string>,
   benchmarks?: readonly PublishedBenchmark[]): Workspace {
+  if (action.kind === 'challenge-open' || action.kind === 'challenge-restart' ||
+      action.kind === 'challenge-swap' || action.kind === 'challenge-leave') {
+    const challengeProgress = applyChallenge(state.challengeProgress, state.completed.length, action);
+    return !challengeProgress || challengeProgress === state.challengeProgress ? state : { ...state, challengeProgress };
+  }
   if (action.kind === 'preferences') {
     if (!Object.hasOwn(DEFAULT_PREFERENCES, action.key) || typeof action.value !== 'boolean' || state.preferences[action.key] === action.value) return state;
     return { ...state, preferences: { ...state.preferences, [action.key]: action.value } };

@@ -3,17 +3,19 @@ import { chapterCount, chapterIndexFor, chapterIsOpen, levelIsOpen, META_POLICY,
 import type { LevelDefinition } from '../domain/puzzle';
 import type { Workspace } from '../domain/workspace';
 import type { AlbumRoute } from './albumView';
+import { challenges, challengeStatus } from '../domain/challenges';
 import { renderProgress } from './progressView';
 
 type PickerRoute = { kind: 'chapter'; levelId: string; chapterMenu?: number };
 export type MetaRoute = PickerRoute | AlbumRoute | { kind: 'card' | 'copy'; levelId: string } |
-  { kind: 'own-card'; workId: string; nodeId: string } | { kind: 'draft'; draftId: string; nodeId?: string } | { kind: 'progress' };
+  { kind: 'own-card'; workId: string; nodeId: string } | { kind: 'draft'; draftId: string; nodeId?: string } | { kind: 'progress' | 'challenges' };
 interface MetaView {
   route: MetaRoute; state: Workspace; disabled: boolean;
   title: HTMLElement; copy: HTMLElement; actions: HTMLElement;
   navigate(route: MetaRoute): void; back(): void;
   play(id: string): void; saveCopy(id: string, name: string): void;
   repeat(id: string): void;
+  playChallenge(id: string, restart: boolean): void;
 }
 function actionButton(parent: HTMLElement, text: string, invoke: () => void, disabled: boolean): HTMLButtonElement {
   const button = document.createElement('button');
@@ -192,8 +194,15 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
     const active = rail.querySelector<HTMLElement>('[aria-current=true]')!;
     rail.scrollLeft += active.getBoundingClientRect().left - rail.getBoundingClientRect().left - (rail.clientWidth - active.offsetWidth) / 2;
   });
-  const chapterLink = button(pickChapter(index), () => moveTo({ ...route, chapterMenu: index }, '[aria-current=true][data-chapter]'), actions);
-  chapterLink.className = 'quiet level-chapter-link'; chapterLink.dataset.openChapters = '';
+  const links = document.createElement('div');
+  links.className = 'level-picker-links';
+  actions.append(links);
+  const chapterLink = button(pickChapter(index), () => moveTo({ ...route, chapterMenu: index }, '[aria-current=true][data-chapter]'), links);
+  chapterLink.className = 'quiet level-chapter-link';
+  chapterLink.dataset.openChapters = '';
+  const challengesLink = button('Испытания', () => v.navigate({ kind: 'challenges' }), links);
+  challengesLink.className = 'quiet level-chapter-link';
+  challengesLink.setAttribute('aria-label', 'Испытания');
 }
 
 export function renderMeta(v: MetaView): void {
@@ -208,6 +217,31 @@ export function renderMeta(v: MetaView): void {
   } else if (route.kind === 'progress') {
     v.title.textContent = 'Прогресс';
     renderProgress(actions, state, v.disabled, v.back);
+  } else if (route.kind === 'challenges') {
+    v.title.textContent = 'Испытания';
+    button('‹ Назад', v.back).className = 'quiet challenge-back';
+    const list = document.createElement('div');
+    list.className = 'challenge-list';
+    actions.append(list);
+    for (const definition of challenges) {
+      const { level, requiredWorks, moveLimit } = definition;
+      const locked = state.completed.length < requiredWorks;
+      const attempt = state.challengeProgress?.attempts[level.id];
+      const best = state.challengeProgress?.best[level.id];
+      const restart = !!attempt && challengeStatus(definition, attempt) !== 'playing';
+      const card = button('', () => v.playChallenge(level.id, restart), list, locked);
+      card.className = 'quiet challenge-card';
+      card.dataset.challengeId = level.id;
+      const title = document.createElement('span');
+      title.textContent = level.title;
+      const note = document.createElement('small');
+      note.textContent = locked ? `Откроется за ${requiredWorks} работ` : [
+        `Лимит · ${moveLimit}`,
+        restart ? 'Повторить' : attempt ? 'Продолжить' : '',
+        best === undefined ? '' : `Рекорд · ${best}`,
+      ].filter(Boolean).join(' · ');
+      card.append(title, note);
+    }
   } else if (route.kind === 'card' || route.kind === 'copy') {
     const level = getLevel(route.levelId);
     v.title.textContent = level.title;

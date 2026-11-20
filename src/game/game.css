@@ -206,7 +206,13 @@ button.level-preview.quiet { padding: 0; border: 0; border-radius: 0; background
 .level-rail button[data-status=Собран] { color: #eabed4; }
 .level-rail button[aria-current=true] { box-shadow: inset 0 -2px #fff2de; color: #fff2de; font-weight: 700; }
 .level-rail button:focus-visible { outline-offset: -4px; }
-.level-chapter-link { justify-self: center; }
+.level-picker-links { display: flex; justify-content: center; flex-wrap: wrap; }
+.challenge-back { justify-self: start; }
+.challenge-list { display: grid; gap: 6px; grid-template-columns: repeat(auto-fit,minmax(min(100%,180px),1fr)); }
+.challenge-card { display: grid; text-align: left; justify-items: start; }
+.challenge-card small { font-size: .75rem; }
+#game-dialog[data-layer=result][data-challenge-lost=true] { display: flex; }
+#game-dialog[data-challenge-lost=true] #dialog-title { font-size: clamp(1.4rem,6vw,2.5rem); }
 .level-chapter-link::after { content: '›'; margin-left: .45em; }
 #game-dialog[data-chapter-menu=true] #dialog-actions {
   --picker-bottom: 10px; grid-template-rows: auto minmax(0,1fr) auto minmax(48px,1fr); gap: 8px;
@@ -240,7 +246,7 @@ button.level-preview.quiet { padding: 0; border: 0; border-radius: 0; background
   .level-preview, .level-peek { top: 5%; height: 90%; }
   .level-actions { grid-area: action; }
   .level-rail { grid-area: rail; }
-  .level-chapter-link { grid-area: chapters; }
+  .level-picker-links { grid-area: chapters; }
   #game-dialog[data-chapter-menu=true] .level-picker-nav { grid-area: auto; }
   .chapter-picker { grid-template-columns: repeat(2,minmax(0,1fr)); }
 }

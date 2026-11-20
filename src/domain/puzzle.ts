@@ -2,7 +2,8 @@
 export const RULES_VERSION = 'gradient-rules-1';
 export const CONTENT_VERSION = 'gradient-prototype-0.1';
 export const CAMPAIGN_CONTENT_VERSION = 'gradient-campaign-candidates-0.1';
-export type ContentVersion = typeof CONTENT_VERSION | typeof CAMPAIGN_CONTENT_VERSION;
+export const CHALLENGE_CONTENT_VERSION = 'gradient-challenges-1';
+export type ContentVersion = typeof CONTENT_VERSION | typeof CAMPAIGN_CONTENT_VERSION | typeof CHALLENGE_CONTENT_VERSION;
 
 export interface LevelDefinition {
   readonly contentVersion?: ContentVersion;
