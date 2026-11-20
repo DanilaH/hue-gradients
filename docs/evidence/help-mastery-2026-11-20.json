@@ -1,0 +1,75 @@
+{
+  "sourceCommit": "19e0410be30b80b50ced1168cd4aa4ef8b71ecc3",
+  "pullRequest": "https://github.com/DanilaH/hue-gradients/pull/5",
+  "auditBase": "0dff2d1794aafa53fd76b7589559950749c4694d",
+  "kitImpact": "REUSE",
+  "verification": {
+    "unit": 159,
+    "coreChromium": 21,
+    "presentationChromium": 12,
+    "metaChromium": 13,
+    "editorChromium": 19,
+    "exportChromium": 6,
+    "pngIndependentPixelChecks": 8,
+    "yandexLocalSDKFixtures": 6,
+    "specFilesPreserved": 40,
+    "gradleDebug": true,
+    "gradleReleaseCheck": true
+  },
+  "assistanceChromium": {
+    "passed": [
+      "cancel keeps the exact workspace and bounds; a one-move clean win and its mastery survive reload",
+      "one full preview costs one assist, keeps the board and does not replace clean best or perfection",
+      "soft help reveals one misplaced source cell; auto help wins 001 and leaves 002 playable at exactly three moves",
+      "320×568 at enlarged text, Back, static outlines, repeat pin feedback and dismissible tutorial",
+      "failed auto-help write is invisible; receipt retry commits one assisted win",
+      "background during the accepted operation preserves one win and suppresses stale swap presentation",
+      "wallpaper host refusal/cancel fixtures keep the same preview and identical PNG for Save"
+    ],
+    "frames": {
+      "clean": 60,
+      "assisted": 55
+    },
+    "pageErrors": [],
+    "limits": "Chromium production routes. IndexedDB error and background timing are injected. Wallpaper host statuses are fixtures; no actual Android handler or device touch was exercised."
+  },
+  "apk": {
+    "kind": "releasecheck",
+    "package": "com.danilah.huegradients.preview3",
+    "versionName": "0.4.11",
+    "versionCode": 15,
+    "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+    "source": "19e0410be30b80b50ced1168cd4aa4ef8b71ecc3",
+    "apkSha256": "a8ec93fe8fd3209919abd392a4e84871816c0747a991d33e76c1e1db0a6091c2",
+    "bytes": 1193848,
+    "certificateSha256": "3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85",
+    "productionSigner": false,
+    "v2": true,
+    "zipalign16k": true,
+    "debuggable": false,
+    "webViewDebuggingConfigured": false,
+    "nativeInsetOwner": "content-root",
+    "nativeRuntime": "NOT RUN",
+    "liveServices": "NOT INSTALLED BY THIS HOST TEMPLATE"
+  },
+  "files": [
+    {
+      "file": "Poluson-0.4.11-preview.apk",
+      "libraryFileId": "libfile_fde3_f-79f3726153bc8191a30632c26550f0e3_2841ca9da26c8191b7a266fa9b41a810",
+      "bytes": 1193848,
+      "sha256": "a8ec93fe8fd3209919abd392a4e84871816c0747a991d33e76c1e1db0a6091c2"
+    },
+    {
+      "file": "Poluson-Help-clean.gif",
+      "libraryFileId": "libfile_fde3_f-586afde10bd481918dc3d55a17738d42_2841ca9da26c8191b7a266fa9b41a810",
+      "bytes": 1445104,
+      "sha256": "7bfde9993acae3900925ee9f17f690f8ab6e313f6d0f73e58bc743811f9445f8"
+    },
+    {
+      "file": "Poluson-Help-assisted.gif",
+      "libraryFileId": "libfile_fde3_f-1ee131a496f481919e48b3a1cceaaeda_2841ca9da26c8191b7a266fa9b41a810",
+      "bytes": 1399479,
+      "sha256": "3a48a0ea4575476f0c7ea351891581514ef63faa9750d1f0a47c743b9fee2eb9"
+    }
+  ]
+}

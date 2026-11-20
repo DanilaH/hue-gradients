@@ -1,6 +1,6 @@
 {
   "schema": "consumer-adoption-ledger-v1",
-  "consumerCommit": "7e18212668d613cafbb1ff24be8a9e6ae779caa7",
+  "consumerCommit": "19e0410be30b80b50ced1168cd4aa4ef8b71ecc3",
   "asOf": "2026-11-20",
   "features": [
     {
@@ -8,8 +8,8 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "MATCH",
       "stage": "Пакет 01",
-      "currentImplementation": "Два подвижных ID меняют места, +1 ход. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/puzzle.ts",
-      "nextAction": "Переиспользовать реализованное поведение и пройти регрессию пакета 01.",
+      "currentImplementation": "Обмен, перетаскивание и отказ на опорах подтверждены тестом ядра. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/PuzzleScene.ts",
+      "nextAction": "Проверить drag и отмену на физическом телефоне.",
       "deliveryPackage": "01",
       "sourceNextCheck": "Проверить tap и drag одного обмена на Android."
     },
@@ -18,8 +18,8 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "MATCH",
       "stage": "Пакет 01",
-      "currentImplementation": "Закреплённые позиции защищены доменной проверкой. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/puzzle.ts",
-      "nextAction": "Переиспользовать реализованное поведение и пройти регрессию пакета 01.",
+      "currentImplementation": "Опоры защищены перестановкой и доменными правилами. В Chromium тап по опоре не меняет ходы. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/domain/puzzle.ts",
+      "nextAction": "Проверить тап и попытку перетащить опору на телефоне.",
       "deliveryPackage": "01",
       "sourceNextCheck": "Попытаться уронить плитку на опору."
     },
@@ -167,21 +167,21 @@
     },
     {
       "id": "h1-share",
-      "status": "ROADMAPPED",
+      "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 01",
-      "currentImplementation": "В оригинале поле на шаблоне. У нас одно плавное изображение под дисплей. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/export.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 01 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Открытая работа передаётся как полноэкранные обои Полусна. В браузерной регрессии проверены тот же файл в предпросмотре и выдаче. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/workCardView.ts",
+      "nextAction": "Проверить реальный Android chooser для PNG.",
       "deliveryPackage": "01",
       "sourceNextCheck": "Сохранить и отправить одну и ту же проверенную версию."
     },
     {
       "id": "h1-pin-feedback",
-      "status": "ROADMAPPED",
+      "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 01",
-      "currentImplementation": "У нас при первом тапе текст, для кампании последующие тапы не запускают отдельного покачивания опоры. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/mountGame.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 01 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Повторный тап даёт локальный контур опоры. В Chromium проверены неподвижный контур и неизменный счёт. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/mountGame.ts",
+      "nextAction": "Принять читаемость контура на телефоне.",
       "deliveryPackage": "01",
       "sourceNextCheck": "Нажать ту же опору дважды, с движением и без него."
     },
@@ -257,11 +257,11 @@
     },
     {
       "id": "h1-pin-dialog",
-      "status": "ROADMAPPED",
+      "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 01",
-      "currentImplementation": "У нас объяснение сразу при первом тапе. Значение 3 само по себе не подтверждает показ на третьем. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/mountGame.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 01 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Первое обращение даёт короткий текст. На третьем тапе по опоре в первых десяти уровнях открывается закрываемое объяснение. Проверено в Chromium. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/mountGame.ts",
+      "nextAction": "Сверить с физическим оригиналом и принять нашу подсказку на телефоне.",
       "deliveryPackage": "01",
       "sourceNextCheck": "Сравнить первый и третий тап в игре на новом профиле. Проверить, доступно ли объяснение игроку после перезапуска."
     },
@@ -287,11 +287,11 @@
     },
     {
       "id": "h2-perfect",
-      "status": "ROADMAPPED",
-      "gap": "PARTIAL",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "MATCH",
       "stage": "Пакет 01",
-      "currentImplementation": "Минимум и право perfect вычисляются; в подробностях карточки указаны только два best. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/workCardView.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 01 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Карточка показывает математический минимум, два личных рекорда и отметку идеальной чистой победы. Метка переживает перезапуск и новую победу с помощью. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/workCardView.ts",
+      "nextAction": "Проверить читаемость карточки на Android.",
       "deliveryPackage": "01",
       "sourceNextCheck": "Довести знак и минимум до карточки и проверить после replay."
     },
@@ -367,11 +367,11 @@
     },
     {
       "id": "h2-auto-hint",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
       "stage": "Пакет 01",
-      "currentImplementation": "Наша подсказка открывает решение и отмечает assisted, ходов не добавляет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/puzzle.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 01 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Автообмен выбирает дальнюю неверную позицию и добавляет три хода одной транзакцией. Проверены победа, незавершённое поле и восстановление без дубля в Chromium. Физический счётчик оригинала ещё не записан. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/domain/puzzle.ts",
+      "nextAction": "Подтвердить счётчик в оригинале и наш отклик на телефоне.",
       "deliveryPackage": "01",
       "sourceNextCheck": "Сравнить автоматический правильный обмен с preview; решение владельца открыто."
     },
@@ -480,8 +480,8 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "MATCH",
       "stage": "Пакет 01",
-      "currentImplementation": "Сверяются ID на целевых позициях. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/puzzle.ts",
-      "nextAction": "Переиспользовать реализованное поведение и пройти регрессию пакета 01.",
+      "currentImplementation": "Победа сверяет каждую позицию. В Chromium последний обмен закрыл 001, а первый на 002 оставил задачу открытой. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/domain/puzzle.ts",
+      "nextAction": "Проверить последний обмен на телефоне.",
       "deliveryPackage": "01",
       "sourceNextCheck": "Поменять две похожие, но неверные плитки."
     },
@@ -510,28 +510,28 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "MATCH",
       "stage": "Пакет 01",
-      "currentImplementation": "Готовое поле видно до закрытия; раскладка и ходы сохраняются. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/mountGame.ts",
-      "nextAction": "Переиспользовать реализованное поведение и пройти регрессию пакета 01.",
+      "currentImplementation": "Готовое поле показывается после явного выбора. Открытие учитывается один раз. Возврат сохраняет доску и ходы. Проверено в Chromium. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/mountGame.ts",
+      "nextAction": "Проверить показ и системный Back на телефоне.",
       "deliveryPackage": "01",
       "sourceNextCheck": "Открыть/закрыть preview в незавершённой партии."
     },
     {
       "id": "cp-pulse-hint",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "MATCH",
       "stage": "Пакет 01",
-      "currentImplementation": "У нас только полный просмотр. Пульсация выбранной игроком плитки не равна такой подсказке. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/mountGame.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 01 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "После подтверждения циклический поиск выделяет одну неверную подвижную плитку. Ходы и перестановка прежние, при reduced motion контур статичен. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/mountGame.ts",
+      "nextAction": "Проверить различимость контура на телефоне.",
       "deliveryPackage": "01",
       "sourceNextCheck": "Проверить мягкую помощь без раскрытия назначения и без автоматического хода."
     },
     {
       "id": "cp-free-hint",
-      "status": "ROADMAPPED",
+      "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 01",
-      "currentImplementation": "Помощь всегда бесплатна, флаг относится к конкретной попытке. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/mountGame.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 01 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Открытие и отмена бесплатны. Принятая помощь помечает попытку, автообмен добавляет три хода. В Полусне действуют правила владельца для бесплатных попыток. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/mountGame.ts",
+      "nextAction": "Принять подсказку в плейтесте.",
       "deliveryPackage": "01",
       "sourceNextCheck": "Проверить первый и повторный запрос обеих кнопок в оригинале."
     },
@@ -707,21 +707,21 @@
     },
     {
       "id": "cp-share",
-      "status": "ROADMAPPED",
+      "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 01",
-      "currentImplementation": "У нас плавные обои по цветам решения, собственного размера экрана. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/export.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 01 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "В нашей карточке передаётся тот же PNG, что при сохранении. У оригинала формат снимка поля. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/workCardView.ts",
+      "nextAction": "Проверить получение PNG в приложении-получателе на телефоне.",
       "deliveryPackage": "01",
       "sourceNextCheck": "Проверить фактические байты Preview/Save/Share."
     },
     {
       "id": "cp-wallpaper",
-      "status": "ROADMAPPED",
+      "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 01",
-      "currentImplementation": "Экспортируем PNG, прямой установки системных обоев этот путь не делает. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/export.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 01 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Подписанный APK включает системное действие для того же PNG. В Chromium заглушки отказа и отмены сохраняют путь «Сохранить PNG». | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/native/android/app/src/main/java/com/danilah/huegradients/HueExportPlugin.java",
+      "nextAction": "Открыть настоящий обработчик Android и проверить отказ, отмену и возврат в карточку.",
       "deliveryPackage": "01",
       "sourceNextCheck": "Различать сохранить файл и установить обои в ОС."
     },
@@ -897,6 +897,6 @@
     }
   ],
   "sourceInventory": "https://github.com/DanilaH/mini-games-kit/blob/0353273fb37b329611951e4500dd6d7cba6690ac/research/games/hue/porting/SOURCE_FEATURES.json",
-  "method": "gap — наблюдение на 0.4.10. delivery — порядок работы после решения владельца. status ROADMAPPED означает наличие поручения, а не готовность. Проверка точного поведения в оригинале ведётся независимо от готовности собственной реализации.",
+  "method": "Пункты пакета 01 обновлены по 0.4.11 и PR #5. Остальные расхождения отражают срез 0.4.10. IMPLEMENTED_UNVERIFIED в пакете 01 означает, что проверка на телефоне остаётся открытой. Уровень доказательств исходной игры оценивается отдельно.",
   "ownerScope": "20.11.2026, после аудита 0.4.10: «это всё делать надо». Весь реестр включён в программу разработки. Более конкретные решения: бесплатные попытки, одни плавные обои на работу, cloud M5 на паузе. Формулировки прежнего аудита «кандидат» отражают предыдущий статус."
 }
