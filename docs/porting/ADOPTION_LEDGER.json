@@ -1,6 +1,6 @@
 {
   "schema": "consumer-adoption-ledger-v1",
-  "consumerCommit": "ed67542ba6c76a198c487600a296c27fd6c838f4",
+  "consumerCommit": "493b2415967e77f7c61bdb471e8db06677f63eb8",
   "asOf": "2026-11-20",
   "features": [
     {
@@ -25,21 +25,21 @@
     },
     {
       "id": "h1-geometry",
-      "status": "ROADMAPPED",
+      "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 04",
-      "currentImplementation": "Наш банк использует прямоугольные клетки. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/levels.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 04 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Четыре тестовых собственных поля, включая треугольники и шестиугольники. | https://github.com/DanilaH/hue-gradients/blob/493b2415967e77f7c61bdb471e8db06677f63eb8/tools/shape-browser-check.mjs",
+      "nextAction": "Перепроверить взаимодействие, форму, отклик и различимость RGB на физическом телефоне (G1).",
       "deliveryPackage": "04",
       "sourceNextCheck": "Сравнить по одной собственной задаче одинаковой длины с разной геометрией."
     },
     {
       "id": "h1-shuffle",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
       "stage": "Пакет 04",
-      "currentImplementation": "Кампания воспроизводит один авторский старт на уровень. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/levels.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 04 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Seeded shuffle устраняет неподвижные позиции в перемещаемой группе размером от двух. | https://github.com/DanilaH/hue-gradients/blob/493b2415967e77f7c61bdb471e8db06677f63eb8/tools/shape-browser-check.mjs",
+      "nextAction": "Перепроверить взаимодействие, форму, отклик и различимость RGB на физическом телефоне (G1).",
       "deliveryPackage": "04",
       "sourceNextCheck": "Для отдельного варианта измерить разброс оптимума при replay."
     },
@@ -267,11 +267,11 @@
     },
     {
       "id": "h2-shape-swap",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
       "stage": "Пакет 04",
-      "currentImplementation": "Поддерживается единый тип прямоугольной плитки. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/puzzle.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 04 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Треугольники разной ориентации и разные формы не обмениваются; совместимые обмены проверены. | https://github.com/DanilaH/hue-gradients/blob/493b2415967e77f7c61bdb471e8db06677f63eb8/tools/shape-browser-check.mjs",
+      "nextAction": "Перепроверить взаимодействие, форму, отклик и различимость RGB на физическом телефоне (G1).",
       "deliveryPackage": "04",
       "sourceNextCheck": "На прототипе проверить, как игрок видит допустимые пары разных форм."
     },
@@ -280,8 +280,8 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 04",
-      "currentImplementation": "В банке B1 появились 4×4 старты с разложениями [5] и [3,3], общими RGB, опорами и минимумом 4. | https://github.com/DanilaH/hue-gradients/blob/8783519e0488d5bbdc0d880013da3a851a4d831a/src/domain/challenges.ts",
-      "nextAction": "Подключить режимы перемешивания по совместимым группам в C1.",
+      "currentImplementation": "Для треугольного и смешанного поля у каждой совместимой группы один цикл. | https://github.com/DanilaH/hue-gradients/blob/493b2415967e77f7c61bdb471e8db06677f63eb8/tools/shape-browser-check.mjs",
+      "nextAction": "Перепроверить взаимодействие, форму, отклик и различимость RGB на физическом телефоне (G1).",
       "deliveryPackage": "04",
       "sourceNextCheck": "Сверить минимумы однотипного и смешанного полей отдельно."
     },
@@ -327,11 +327,11 @@
     },
     {
       "id": "h2-rgb",
-      "status": "ROADMAPPED",
-      "gap": "PARTIAL",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "MATCH",
       "stage": "Пакет 04",
-      "currentImplementation": "Собственный прямоугольный RGB-путь и округление. Полный визуальный паритет не проверен. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/editor.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 04 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Независимое чтение пикселей в Chromium дало исходные RGB на всех четырёх полях. | https://github.com/DanilaH/hue-gradients/blob/493b2415967e77f7c61bdb471e8db06677f63eb8/tools/shape-browser-check.mjs",
+      "nextAction": "Перепроверить взаимодействие, форму, отклик и различимость RGB на физическом телефоне (G1).",
       "deliveryPackage": "04",
       "sourceNextCheck": "Сравнить известные углы на одном измеряемом поле."
     },

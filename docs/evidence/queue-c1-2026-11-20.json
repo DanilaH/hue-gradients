@@ -1,0 +1,83 @@
+{
+  "browser": "158.0.8127.36",
+  "results": [
+    {
+      "id": "geometry-v1-rect",
+      "moveCount": 1,
+      "incompatibleFieldPair": false,
+      "rejectedPin": true,
+      "renderedRgb": "#738cac",
+      "fixedReplay": true,
+      "generated": "authored"
+    },
+    {
+      "id": "geometry-v1-triangles",
+      "moveCount": 1,
+      "incompatibleFieldPair": true,
+      "rejectedPin": true,
+      "renderedRgb": "#c2cbed",
+      "fixedReplay": true,
+      "generated": "group-cycle"
+    },
+    {
+      "id": "geometry-v1-hexagons",
+      "moveCount": 1,
+      "incompatibleFieldPair": false,
+      "rejectedPin": true,
+      "renderedRgb": "#8f75b9",
+      "fixedReplay": true,
+      "generated": "repair-fixed"
+    },
+    {
+      "id": "geometry-v1-mixed",
+      "moveCount": 1,
+      "incompatibleFieldPair": true,
+      "rejectedPin": true,
+      "renderedRgb": "#d6d29f",
+      "fixedReplay": true,
+      "generated": "group-cycle"
+    }
+  ],
+  "method": "Chromium touch and Pillow pixel samples",
+  "source": "493b2415967e77f7c61bdb471e8db06677f63eb8",
+  "kitImpact": "REUSE",
+  "unitChecks": 172,
+  "priorA1BrowserRegression": true,
+  "exactSpecFiles": 40,
+  "apk": {
+    "kind": "releasecheck",
+    "package": "com.danilah.huegradients.preview3",
+    "versionName": "0.4.19",
+    "versionCode": 23,
+    "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+    "source": "493b2415967e77f7c61bdb471e8db06677f63eb8",
+    "apkSha256": "a78b23254840d888ba0392f46d11d99d08805781ca7ca4db83391ba707b80ca8",
+    "bytes": 1203524,
+    "certificateSha256": "3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85",
+    "productionSigner": false,
+    "v2": true,
+    "zipalign16k": true,
+    "debuggable": false,
+    "webViewDebuggingConfigured": false,
+    "nativeInsetOwner": "content-root",
+    "webPayload": {
+      "start-error.html": "22cc22f670fac501b781a7e27ee2b38842839e03f47bfb72c199768b5c709598",
+      "index.html": "19d76094d7972d39ab05c0477ba5450179296a62c05055a888f1a3a1fa1ba325",
+      "native-build.json": "d6776c22b4d785acafac6f324de6e51d9700f8d00340e5638b59090fc0a0fc70",
+      "assets/native-ttWVwMFk.js": "a77e2538e2c6cea787fc6d1ac82c4828eec2f8a3c3244eb1c14751fef8ea6102",
+      "assets/nativeFeedback-BdXlsEx8.js": "aa12bc0f39307f8a86d95c5b93e428317c5282ed05069350ea7ef8fd1ad69648",
+      "assets/web-BM7xF5pS.js": "874bbd026b2a3757b6c7bedc1bd163f0c735a3e0a943605c9853f660d828d658",
+      "assets/index-Q2wAHdDX.css": "df7b0f397eee53929bf8904961e47b403e72ee84dd00107843e9eeb11eb740ef",
+      "assets/index-B8dUGkro.js": "08964a53f9864da82d587f7e6f178002130a09f154444004d27fa5595631c5d3",
+      "assets/nativeExport-CqbPFgKE.js": "5810d391885079b04fe08fbd9075ad787560ad4f04d814f2b7faac850fb46b8b",
+      "assets/command-BzJMFn4z.js": "56f6750bc40b8fb2c1a76c2cfb70085b2719545adc9b46739cdf944861ab6655",
+      "assets/dist-CMedSjkm.js": "067d9ca66629f984cf538346471032b4b24f9acd1cb914834126e2b88d3250fe"
+    },
+    "nativeRuntime": "NOT RUN",
+    "liveServices": "NOT INSTALLED BY THIS HOST TEMPLATE"
+  },
+  "gif": {
+    "name": "Poluson-C1-shapes.gif",
+    "sha256": "5fc3e19f61b4998931c0a063a613252e5216ebc72a6fd13674cd07fed7d8ce14"
+  }
+}
