@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { getRenderPixelRatio } from '@danilah/mini-games-kit/core';
+import { localCalendarDay, getRenderPixelRatio } from '@danilah/mini-games-kit/core';
 import { destroyRenderer } from '@danilah/mini-games-kit/phaser';
 import type { GameplayActivityCoordinator } from '@danilah/mini-games-kit/platform';
 import { levels, getLevel } from '../domain/levels';
@@ -16,6 +16,7 @@ import { chapterIndexFor, recommendedLevel, rewardTitle } from '../domain/progre
 import { authorBests, authorView, findDraft, hasAuthorProof, type CreativeAction } from '../domain/creative';
 import { makeField, playableField } from '../domain/editor';
 import { AUTO_HELP_COST, autoHelpSwap, pulsePosition, type Assistance } from '../domain/puzzle';
+import { activePersonal, taskNames } from '../domain/personal';
 import { activeDaily, validateDailyFeed, type DailyFeed } from '../domain/daily';
 import { activeTimed, timedRemaining } from '../domain/timeTrial';
 import { activeChallenge } from '../domain/challenges';
@@ -36,17 +37,18 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   await session.load();
   const exportFiles = options.exportFiles ?? browserExportFiles();
   const current = () => {
+    const personal = activePersonal(session.state.personalProgress);
     const daily = activeDaily(session.state.dailyProgress);
     const timed = activeTimed(session.state.timedProgress);
     const challenge = activeChallenge(session.state.challengeProgress);
-    const own = !daily && !timed && !challenge && session.state.creative?.playing ? authorView(session.state.creative) : null;
-    const level = daily?.level ?? timed?.level ?? challenge?.level ?? own?.level ?? getLevel(session.state.activeLevelId);
-    return { own, challenge, timed, daily, level, attempt: daily?.attempt ?? timed?.run.attempt ?? challenge?.attempt ?? own?.attempt ?? session.state.attempts[level.id] };
+    const own = !personal && !daily && !timed && !challenge && session.state.creative?.playing ? authorView(session.state.creative) : null;
+    const level = personal?.level ?? daily?.level ?? timed?.level ?? challenge?.level ?? own?.level ?? getLevel(session.state.activeLevelId);
+    return { own, challenge, timed, daily, personal, level, attempt: personal?.attempt ?? daily?.attempt ?? timed?.run.attempt ?? challenge?.attempt ?? own?.attempt ?? session.state.attempts[level.id] };
   };
   const gameLayer = (): Layer => {
-    const { attempt, challenge, timed } = current();
+    const { attempt, challenge, timed, personal } = current();
     if (!attempt) return 'recovery';
-    return attempt.completed || challenge?.status === 'lost' || timed?.run.remainingMs === 0 ? 'result' : 'none';
+    return attempt.completed || challenge?.status === 'lost' || personal?.status === 'lost' || timed?.run.remainingMs === 0 ? 'result' : 'none';
   };
   parent.innerHTML = `<section id="hue-app" aria-label="Полусон">
     <header class="hud"><button id="levels" class="quiet">‹ Уровни</button><h1 id="title"></h1><button id="settings" class="quiet" aria-label="Пауза">⋯</button></header>
@@ -98,15 +100,16 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   }
   const scene = new PuzzleScene(initialLevel, initialAttempt, {
     paint, swap: (from, to) => {
-      const { own, attempt, challenge, timed, daily } = current();
+      const { own, attempt, challenge, timed, daily, personal } = current();
       if (!attempt) return;
-      if (timed) void run({ kind: 'timed-swap', from, to, attemptId: attempt.attemptId, now: Date.now() });
+      if (personal) void run({ kind: 'personal-swap', from, to, attemptId: attempt.attemptId, now: Date.now() });
+      else if (timed) void run({ kind: 'timed-swap', from, to, attemptId: attempt.attemptId, now: Date.now() });
       else void run({ kind: daily ? 'daily-swap' : challenge ? 'challenge-swap' : own ? 'author-swap' : 'swap', from, to, attemptId: attempt.attemptId });
     },
     pin: position => {
       showMark(position, 'pin');
-      const { own, level, challenge, timed, daily } = current();
-      if (challenge || timed || daily) return;
+      const { own, level, challenge, timed, daily, personal } = current();
+      if (challenge || timed || daily || personal) return;
       const onboarding = session.state.onboarding;
       if (own) { notice = 'Плитки с точкой закреплены'; render(); }
       else if (!onboarding.pinExplained || level.ordinal <= 10 && (onboarding.earlyPinTaps ?? 1) < 3) {
@@ -185,6 +188,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     }
     metaRoute = route; layer = 'meta'; render();
     if (route.kind === 'daily') void refreshDaily();
+    if (route.kind === 'personal') void issuePersonal();
   }
   function startLevel(id: string): void {
     if (current().own) { void run({ kind: 'author-exit' }, () => queueMicrotask(() => startLevel(id))); return; }
@@ -241,6 +245,24 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       queueMicrotask(() => void refreshDaily());
     });
   }
+  function issuePersonal(): Promise<boolean> {
+    return run({ kind: 'personal-issue', day: localCalendarDay() });
+  }
+  function playPersonal(key: string, restart: boolean): void {
+    void run({ kind: 'personal-open', key, restart, attemptId: crypto.randomUUID(), now: Date.now() }, () => {
+      metaHistory = [];
+      layer = gameLayer();
+    });
+  }
+  function leavePersonal(): void {
+    void run({ kind: 'personal-leave', now: Date.now() }, () => {
+      metaReturn = gameLayer();
+      metaHistory = [{ kind: 'chapter', levelId: session.state.activeLevelId }];
+      metaRoute = { kind: 'personal' };
+      layer = 'meta';
+      queueMicrotask(() => void issuePersonal());
+    });
+  }
   function playTimed(): void {
     void run({ kind: 'timed-open', id: crypto.randomUUID(), now: Date.now() }, () => {
       metaHistory = [];
@@ -251,27 +273,32 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     void run({ kind: 'timed-leave', now: Date.now() }, () => challengeLobby());
   }
   function updateTimedClock(): void {
-    const timed = session.state.timedProgress;
-    if (!alive || !timed?.active || timed.run.remainingMs === 0) return;
+    if (!alive) return;
+    const timed = session.state.timedProgress?.active ? session.state.timedProgress : undefined;
+    const personal = activePersonal(session.state.personalProgress);
+    const timer = timed?.run ?? (personal?.status === 'playing' ? personal.clock : undefined);
+    if (!timer || timer.remainingMs === 0) return;
+    const mode = timed ? 'timed' : 'personal';
     const now = Date.now();
     const wantRunning = layer === 'none' && !activity.isBlocked() && !session.pending;
     if (wantRunning) pauseRequestedAt = null;
     else pauseRequestedAt ??= now;
-    const clock = timedRemaining(timed.run, pauseRequestedAt ?? now);
+    const remaining = timedRemaining(timer, pauseRequestedAt ?? now);
     if (layer === 'none') {
       const guidance = byId('guidance');
-      const label = `${timeCaption(Math.ceil(clock / 1000))} · Собрано ${timed.run.cleared}`;
+      const time = timeCaption(Math.ceil(remaining / 1000));
+      const label = timed ? `${time} · Собрано ${timed.run.cleared}` : time;
       if (guidance.textContent !== label) guidance.textContent = label;
     }
     if (!ready || busy || queuedClock || session.pending) return;
-    const kind = !wantRunning && timed.run.startedAt !== null ? 'timed-pause'
-      : wantRunning && timed.run.startedAt === null ? 'timed-resume'
-      : wantRunning && clock === 0 ? 'timed-expire' : null;
-    if (!kind) return;
+    const next = !wantRunning && timer.startedAt !== null ? 'pause'
+      : wantRunning && timer.startedAt === null ? 'resume'
+      : wantRunning && remaining === 0 ? 'expire' : null;
+    if (!next) return;
     queuedClock = true;
     queueMicrotask(() => {
       queuedClock = false;
-      if (alive) void run({ kind, now: pauseRequestedAt ?? Date.now() });
+      if (alive) void run({ kind: `${mode}-${next}`, now: pauseRequestedAt ?? Date.now() });
     });
   }
   function askRestart(id: string): void { restartLevelId = id; restartReturn = layer; scene.cancel(); layer = 'restart'; render(); }
@@ -335,10 +362,16 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (editorDraftId !== draftId) { editorView?.destroy(); editorView = null; editorDraftId = draftId; }
     dialog.dataset.editor = String(!!draftId);
     byId('dialog-copy').textContent = ''; if (!editorView && !workCard) actions.replaceChildren();
-    const { level, attempt, own, challenge, timed, daily } = current();
-    dialog.dataset.challengeLost = String(challenge?.status === 'lost' || !!timed);
-    prism.hidden = layer !== 'result' || challenge?.status === 'lost' || !!timed;
-    if (layer === 'result' && daily) {
+    const { level, attempt, own, challenge, timed, daily, personal } = current();
+    dialog.dataset.challengeLost = String(challenge?.status === 'lost' || !!timed || personal?.status === 'lost');
+    prism.hidden = layer !== 'result' || challenge?.status === 'lost' || !!timed || personal?.status === 'lost';
+    if (layer === 'result' && personal) {
+      const won = personal.status === 'won';
+      if (won) colourPrism(prism, level);
+      byId('dialog-title').textContent = won ? 'Задание выполнено' : personal.clock ? 'Время вышло' : 'Рекорд не улучшен';
+      byId('dialog-copy').textContent = taskNames[personal.kind];
+      button('К заданиям', leavePersonal);
+    } else if (layer === 'result' && daily) {
       colourPrism(prism, level);
       byId('dialog-title').textContent = 'Задача собрана';
       byId('dialog-copy').textContent = dailyLabel(daily.date);
@@ -381,9 +414,10 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       }
     } else if (layer === 'restart') {
       byId('dialog-title').textContent = 'Начать заново?';
-      byId('dialog-copy').textContent = `«${own || challenge || timed || daily ? level.title : getLevel(restartLevelId ?? level.id).title}» начнётся с исходного поля.`;
+      byId('dialog-copy').textContent = `«${own || challenge || timed || daily || personal ? level.title : getLevel(restartLevelId ?? level.id).title}» начнётся с исходного поля.`;
       button('Начать заново', () => {
         if (challenge) { playChallenge(level.id, true); return; }
+        if (personal) { playPersonal(personal.key, true); return; }
         if (daily) { playDaily(daily.date, true); return; }
         void run(own ? { kind: 'author-start', workId: own.work.workId, nodeId: own.node.nodeId, attemptId: crypto.randomUUID(), restart: true } : { kind: 'restart', levelId: restartLevelId ?? level.id, attemptId: crypto.randomUUID() }, () => { metaHistory = []; layer = 'none'; });
       });
@@ -394,7 +428,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       close.className = 'quiet settings-close';
       close.setAttribute('aria-label', 'Вернуться к игре');
       close.autofocus = true;
-      if (attempt && !attempt.completed && !challenge && !timed && !daily) button('Помощь', () => { layer = 'help-menu'; render(); }, true);
+      if (attempt && !attempt.completed && !challenge && !timed && !daily && !personal) button('Помощь', () => { layer = 'help-menu'; render(); }, true);
       if (timed) button('К испытаниям', leaveTimed, true);
       else button('Заново', () => askRestart(session.state.activeLevelId), true).id = 'restart';
       for (const [key, label] of [['sound', 'Звуки'], ['haptics', 'Вибрация'], ['motion', 'Движение фона'], ['statistics', 'Статистика уровня']] as const) {
@@ -471,7 +505,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       } else {
       renderMeta({ route: metaRoute, state: session.state, disabled: busy || activity.isBlocked() || !!session.pending,
         title: byId('dialog-title'), copy: byId('dialog-copy'), actions, navigate: showMeta, back: () => { back(); },
-        play: startLevel, repeat: repeatLevel, playChallenge, playTimed, playDaily,
+        play: startLevel, repeat: repeatLevel, playChallenge, playTimed, playDaily, playPersonal,
         dailyAvailable: !!options.dailySource || !!session.state.dailyProgress,
         dailyLoading,
         saveCopy: (levelId, name) => {
@@ -495,19 +529,19 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   }
   function render(): void {
     if (!alive) return;
-    const { level, attempt, own, challenge, timed, daily } = current();
+    const { level, attempt, own, challenge, timed, daily, personal } = current();
     if (!attempt && !session.pending) layer = 'recovery';
-    if (layer === 'none' && (challenge && challenge.status !== 'playing' || timed?.run.remainingMs === 0)) layer = 'result';
+    if (layer === 'none' && (challenge && challenge.status !== 'playing' || timed?.run.remainingMs === 0 || personal && personal.status !== 'playing')) layer = 'result';
     root.dataset.level = level.id; root.dataset.moves = String(attempt?.moves ?? 0); root.dataset.busy = String(busy); root.dataset.layer = layer;
-    root.dataset.mode = daily ? 'daily' : timed ? 'timed' : challenge ? 'challenge' : own ? 'author' : 'campaign';
+    root.dataset.mode = personal ? 'personal' : daily ? 'daily' : timed ? 'timed' : challenge ? 'challenge' : own ? 'author' : 'campaign';
     root.dataset.motion = String(motionAllowed());
     root.style.setProperty('--color-a', level.solvedTileColors[0]!); root.style.setProperty('--color-b', level.solvedTileColors.at(-1)!);
-    byId('levels').textContent = daily ? '‹ Календарь' : timed || challenge ? '‹ Испытания' : own ? '‹ Редактор' : '‹ Уровни';
-    byId('title').textContent = daily ? dailyLabel(daily.date) : own || challenge || timed ? level.title : `Уровень ${level.ordinal}`;
+    byId('levels').textContent = personal ? '‹ Задания' : daily ? '‹ Календарь' : timed || challenge ? '‹ Испытания' : own ? '‹ Редактор' : '‹ Уровни';
+    byId('title').textContent = personal ? taskNames[personal.kind] : daily ? dailyLabel(daily.date) : own || challenge || timed ? level.title : `Уровень ${level.ordinal}`;
     const guidance = byId('guidance');
-    guidance.textContent = layer === 'secret' ? '' : challenge ? `Ходов осталось · ${challenge.moveLimit - challenge.attempt.moves}` : layer === 'help' ? 'Готовое поле' : notice || (!own && !session.state.onboarding.firstSwapDone ? 'Поменяй две плитки местами' : '');
-    guidance.setAttribute('aria-live', timed ? 'off' : 'polite');
-    guidance.hidden = !timed && !guidance.textContent;
+    guidance.textContent = layer === 'secret' ? '' : personal?.limit !== undefined ? `Ходов осталось · ${personal.limit - personal.attempt.moves}` : challenge ? `Ходов осталось · ${challenge.moveLimit - challenge.attempt.moves}` : layer === 'help' ? 'Готовое поле' : notice || (!own && !session.state.onboarding.firstSwapDone ? 'Поменяй две плитки местами' : '');
+    guidance.setAttribute('aria-live', timed || personal?.clock ? 'off' : 'polite');
+    guidance.hidden = !timed && !personal?.clock && !guidance.textContent;
     const footerAction = byId<HTMLButtonElement>('help');
     footerAction.hidden = layer !== 'help' && layer !== 'secret' && !attempt?.completed;
     footerAction.textContent = layer === 'secret' ? 'Открыть поле' : layer === 'help' ? 'К игре' : 'Результат';
@@ -556,9 +590,9 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     }).then(() => { if (!session.pending) pendingHelp = null; });
   }
   async function run(action: Action | CreativeAction, after?: () => void): Promise<boolean> {
-    if (busy || session.pending || activity.isBlocked() && action.kind !== 'timed-pause') return false;
+    if (busy || session.pending || activity.isBlocked() && action.kind !== 'timed-pause' && action.kind !== 'personal-pause') return false;
     const { attempt: previous, level: previousLevel, timed: timedBefore } = current();
-    const ordinarySwap = action.kind === 'swap' || action.kind === 'author-swap' || action.kind === 'challenge-swap' || action.kind === 'timed-swap' || action.kind === 'daily-swap';
+    const ordinarySwap = action.kind === 'swap' || action.kind === 'author-swap' || action.kind === 'challenge-swap' || action.kind === 'timed-swap' || action.kind === 'daily-swap' || action.kind === 'personal-swap';
     const autoSwap = (action.kind === 'help' || action.kind === 'author-help') && action.assistance?.kind === 'auto';
     const pair = ordinarySwap ? action : autoSwap && previous ? autoHelpSwap(previousLevel, previous) : null;
     const cost = autoSwap ? AUTO_HELP_COST : 1;
@@ -573,7 +607,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
         notice = '';
         if (pair) clearMark();
         after?.();
-        if ((pair || action.kind === 'timed-expire' || action.kind === 'timed-pause') && gameLayer() === 'result') layer = 'result';
+        if ((pair || action.kind === 'timed-expire' || action.kind === 'timed-pause' || action.kind === 'personal-expire' || action.kind === 'personal-pause') && gameLayer() === 'result') layer = 'result';
         swapAccepted = pair !== null;
       }
     } catch {
@@ -634,6 +668,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     }
     if (layer === 'restart') { cancelRestart(); return true; }
     if (layer === 'help-menu') { layer = 'settings'; render(); return true; }
+    if ((layer === 'result' || layer === 'none') && current().personal) { leavePersonal(); return true; }
     if ((layer === 'result' || layer === 'none') && current().daily) { leaveDaily(); return true; }
     if ((layer === 'result' || layer === 'none') && current().timed) { leaveTimed(); return true; }
     if ((layer === 'result' || layer === 'none') && current().challenge) { leaveChallenge(); return true; }
@@ -646,7 +681,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (current().attempt?.completed) { layer = 'result'; render(); }
   }, { signal: listeners.signal });
   byId('levels').addEventListener('click', () => {
-    if (current().daily) leaveDaily();
+    if (current().personal) leavePersonal();
+    else if (current().daily) leaveDaily();
     else if (current().timed) leaveTimed();
     else if (current().challenge) leaveChallenge();
     else if (current().own) leaveAuthor();

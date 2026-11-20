@@ -2,6 +2,7 @@ import { applyAction, decodeWorkspace, newWorkspace, upgradeWorkspace, type Acti
 import { hashText, prepareCommit } from '../local-store/command';
 import { applyCreative, validateCreativeHashes, type CreativeAction } from '../domain/creative';
 import { editorFingerprintPayload } from '../domain/editor';
+import { activePersonal } from '../domain/personal';
 import { activeDaily } from '../domain/daily';
 import { activeChallenge } from '../domain/challenges';
 import type { Assistance } from '../domain/puzzle';
@@ -52,6 +53,8 @@ export class Session {
     const timedFinished = !!timed && timed.finished > (this.state?.timedProgress?.finished ?? 0);
     const daily = kind.startsWith('daily-') ? activeDaily(kind === 'daily-leave' ? this.state?.dailyProgress : next.dailyProgress) : null;
     const firstDailyWin = daily?.attempt.completed && !this.state?.dailyProgress?.solved.includes(daily.date);
+    const personal = kind.startsWith('personal-') ? activePersonal(kind === 'personal-leave' ? this.state?.personalProgress : next.personalProgress) : null;
+    const personalAward = personal?.status === 'won' && !this.state?.personalProgress?.earned.includes(personal.key);
     const lastVictory = next.victories?.at(-1);
     const victory = lastVictory?.attemptId === this.state?.victories?.at(-1)?.attemptId ? undefined : lastVictory;
     const fact = { id: operationId, destination: { kind: 'guest' as const, vaultId: GUEST_VAULT },
@@ -62,6 +65,7 @@ export class Session {
         ...(timed ? { timed, ...(timedFinished ? { timedFinished: true } : {}) } : {}),
         ...(daily ? { dailyDate: daily.date, dailyCatalog: daily.version, dailyAttempt: daily.attempt,
           ...(firstDailyWin ? { firstDailyWin: true } : {}) } : {}),
+        ...(personal ? { personalKey: personal.key, personalAttempt: personal.attempt, ...(personalAward ? { personalAward: true } : {}) } : {}),
         creativeAction, authorTest: creativeAction?.kind.startsWith('author-') ? next.creative?.activeTest : undefined,
         newCopies: Object.values(next.albumCopies).filter(copy => !this.state?.albumCopies[copy.draftId]),
         newCompletions: next.completed.filter(id => !this.state?.completed.includes(id)),

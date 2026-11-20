@@ -31,7 +31,7 @@ export type TimedAction =
 
 const safeCounter = (n: number) => Number.isSafeInteger(n) && n >= 0;
 
-export function timedRemaining(run: TimedRun, now: number): number {
+export function timedRemaining(run: Pick<TimedRun, 'remainingMs' | 'startedAt'>, now: number): number {
   return Math.max(0, run.remainingMs - (run.startedAt === null ? 0 : Math.max(0, now - run.startedAt)));
 }
 export function activeTimed(progress?: TimedProgress) {

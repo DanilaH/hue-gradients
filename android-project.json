@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "appId": "com.danilah.huegradients",
-  "versionName": "0.4.21",
-  "versionCode": 25,
+  "versionName": "0.4.22",
+  "versionCode": 26,
   "orientation": "responsive",
   "certificateSha256": null,
   "releaseExcludedPaths": [

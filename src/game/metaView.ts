@@ -4,11 +4,12 @@ import type { LevelDefinition } from '../domain/puzzle';
 import type { Workspace } from '../domain/workspace';
 import type { AlbumRoute } from './albumView';
 import { chapterChallenges, challengeAvailable, challenges, challengeStatus, geometryChallenges } from '../domain/challenges';
+import { TASK_KINDS, taskKey, taskNames, taskStatus } from '../domain/personal';
 import { renderProgress } from './progressView';
 
 type PickerRoute = { kind: 'chapter'; levelId: string; chapterMenu?: number };
 export type MetaRoute = PickerRoute | AlbumRoute | { kind: 'card' | 'copy'; levelId: string } |
-  { kind: 'own-card'; workId: string; nodeId: string } | { kind: 'draft'; draftId: string; nodeId?: string } | { kind: 'progress' | 'daily' } | { kind: 'challenges'; group?: 'chapter' | 'geometry' };
+  { kind: 'own-card'; workId: string; nodeId: string } | { kind: 'draft'; draftId: string; nodeId?: string } | { kind: 'progress' | 'daily' | 'personal' } | { kind: 'challenges'; group?: 'chapter' | 'geometry' };
 interface MetaView {
   route: MetaRoute; state: Workspace; disabled: boolean;
   title: HTMLElement; copy: HTMLElement; actions: HTMLElement;
@@ -20,6 +21,7 @@ interface MetaView {
   dailyAvailable: boolean;
   dailyLoading: boolean;
   playDaily(date: string, replay: boolean): void;
+  playPersonal(key: string, restart: boolean): void;
 }
 function actionButton(parent: HTMLElement, text: string, invoke: () => void, disabled: boolean): HTMLButtonElement {
   const button = document.createElement('button');
@@ -207,6 +209,9 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
   const challengesLink = button('Испытания', () => v.navigate({ kind: 'challenges' }), links);
   challengesLink.className = 'quiet level-chapter-link';
   challengesLink.setAttribute('aria-label', 'Испытания');
+  const personalLink = button('Задания', () => v.navigate({ kind: 'personal' }), links);
+  personalLink.className = 'quiet level-chapter-link';
+  personalLink.setAttribute('aria-label', 'Задания');
   if (v.dailyAvailable) {
     const dailyLink = button('Задача дня', () => v.navigate({ kind: 'daily' }), links);
     dailyLink.className = 'quiet level-chapter-link';
@@ -229,6 +234,46 @@ export function renderMeta(v: MetaView): void {
   } else if (route.kind === 'progress') {
     v.title.textContent = 'Прогресс';
     renderProgress(actions, state, v.disabled, v.back);
+  } else if (route.kind === 'personal') {
+    v.title.textContent = 'Личные задания';
+    button('‹ Назад', v.back).className = 'quiet challenge-back';
+    const progress = state.personalProgress;
+    if (!progress) return;
+    const list = document.createElement('div');
+    list.className = 'challenge-list';
+    actions.append(list);
+    for (const kind of TASK_KINDS) {
+      const key = taskKey(progress.day, kind);
+      const task = progress.tasks[key];
+      if (!task) continue;
+      const finished = taskStatus(task) !== 'playing';
+      const card = button('', () => v.playPersonal(key, finished), list);
+      card.className = 'quiet challenge-card';
+      card.dataset.personal = kind;
+      const name = document.createElement('span');
+      name.textContent = taskNames[kind];
+      const info = document.createElement('small');
+      info.textContent = [
+        getLevel(task.levelId).title,
+        task.limit !== undefined ? `До ${task.limit} ходов` : task.durationMs ? `${task.durationMs / 1000} с` : '',
+        progress.earned.includes(key) ? 'Выполнено' : task.attempt && !finished ? 'Продолжить' : '',
+      ].filter(Boolean).join(' · ');
+      card.append(name, info);
+    }
+    if (progress.earned.length) {
+      const history = document.createElement('details');
+      const title = document.createElement('summary');
+      title.textContent = `Выполненные задания · ${progress.earned.length}`;
+      const list = document.createElement('ul');
+      for (const key of [...progress.earned].reverse()) {
+        const task = progress.tasks[key]!;
+        const row = document.createElement('li');
+        row.textContent = `${dailyLabel(task.date)} · ${taskNames[task.kind]}`;
+        list.append(row);
+      }
+      history.append(title, list);
+      actions.append(history);
+    }
   } else if (route.kind === 'daily') {
     v.title.textContent = 'Задача дня';
     button('‹ Назад', v.back).className = 'quiet challenge-back';
