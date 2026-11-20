@@ -48,7 +48,8 @@ with zipfile.ZipFile(a.apk) as z:
     assert any(re.search(r"name\s*:\s*'pulse'",b) for b in feedback),'Haptic method removed by R8'
     descriptor='L'+cfg['appId'].replace('.','/')+'/HueExportPlugin;'
     exporter=[b for b in blocks if re.search(r"Class descriptor\s*:\s*'"+re.escape(descriptor)+"'",b)];assert exporter,'Export bridge removed by R8'
-    for method in ['screenSize','save','share','savedDocument']:assert any(re.search(r"name\s*:\s*'"+method+"'",b) for b in exporter),method
+    for method in ['screenSize','save','share','savedDocument','setWallpaper','finishedWallpaper']:assert any(re.search(r"name\s*:\s*'"+method+"'",b) for b in exporter),method
+    assert 'android.service.wallpaper.CROP_AND_SET_WALLPAPER' in manifest
     assert package+'.hue-export' in manifest,'Export provider authority does not follow the installed package'
     assert 'android.permission.WRITE_EXTERNAL_STORAGE' not in manifest and 'android.permission.READ_EXTERNAL_STORAGE' not in manifest
     provider=[b for b in re.split(r'(?=^      E: )',manifest,flags=re.M) if package+'.hue-export' in b];assert len(provider)==1

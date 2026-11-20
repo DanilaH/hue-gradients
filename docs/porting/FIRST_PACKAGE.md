@@ -1,5 +1,7 @@
 # Пакет 01 · помощь, карточка результата и устаревшие награды
 
+**Реализовано в 0.4.11.** [PR #5](https://github.com/DanilaH/hue-gradients/pull/5) и [проверки](../evidence/help-mastery-2026-11-20.json). На физическом устройстве ещё нужно пройти системный Back, касания, отмену установки обоев и возврат в карточку.
+
 База проверки — `feat/m0-foundation`, 0.4.10, `7e18212668d613cafbb1ff24be8a9e6ae779caa7`. Сверить свежий HEAD [PR #1](https://github.com/DanilaH/hue-gradients/pull/1) перед правками. Контекст — [два чистых профиля и результат в 0.4.10](RUNTIME_CHECKS.json), [ТЗ по полю и паузе](https://github.com/DanilaH/hue-gradients/pull/2) и [проверочные примеры](HELP_FIXTURES.json). Дальнейшие пакеты указаны в [полной программе](FULL_ROADMAP.md).
 
 ## Один эпизод для игрока

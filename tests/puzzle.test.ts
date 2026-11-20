@@ -3,7 +3,31 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import baseline from '../docs/spec/prototype/levels-0.1.json';
 import validation from '../docs/spec/prototype/validation-0.1.json';
-import { createAttempt, minimumSwaps, proposeHelp, proposeSwap, validateAttempt, validateLevel } from '../src/domain/puzzle';
+import { autoHelpSwap, createAttempt, minimumSwaps, proposeAssistance, proposeHelp, proposeSwap, pulsePosition, validateAttempt, validateLevel } from '../src/domain/puzzle';
+import { getLevel } from '../src/domain/levels';
+import fixtures from '../docs/porting/HELP_FIXTURES.json';
+
+for (const row of fixtures.cases) test(`${row.level} ${row.action} from ${row.scanFrom ?? 'auto'} matches the audit fixture`, () => {
+  const level = getLevel(row.level), attempt = createAttempt(level, 'assistance-fixture');
+  if (row.action === 'pulse') expect(pulsePosition(level, attempt, row.scanFrom!)).toBe(row.expectedPosition);
+  else expect(autoHelpSwap(level, attempt)).toEqual({ from: row.expectedSwap![0], to: row.expectedSwap![1] });
+  const result = proposeAssistance(level, attempt, row.action === 'pulse' ? { kind: 'pulse', scanFrom: row.scanFrom! } : { kind: 'auto' });
+  expect(result.board).toEqual(row.expectedBoard);
+  expect(result.moves).toBe(row.expectedMoves);
+  expect(result.assistsUsed).toBe(row.expectedAssistsUsed);
+  expect(result.completed).toBe(row.expectedCompleted ?? false);
+  expect(result.assisted).toBe(true);
+  validateAttempt(level, result);
+  expect(attempt.board).toEqual(level.startTileAtPosition);
+});
+
+test('auto assistance rejects counter overflow and leaves completion untouched', () => {
+  const level = getLevel('gradient-001'), original = createAttempt(level, 'auto');
+  const win = proposeAssistance(level, original, { kind: 'auto' });
+  expect(proposeAssistance(level, win, { kind: 'auto' })).toBe(win);
+  expect(() => proposeAssistance(level, { ...original, moves: Number.MAX_SAFE_INTEGER - 2 }, { kind: 'auto' })).toThrow('Move counter overflow');
+  expect(() => proposeAssistance(level, { ...original, assisted: true, assistsUsed: Number.MAX_SAFE_INTEGER })).toThrow('Assist counter overflow');
+});
 
 describe('frozen first 15', () => {
   test('uses the exact delivered bytes', () => {

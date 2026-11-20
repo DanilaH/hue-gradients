@@ -1,6 +1,8 @@
 package com.danilah.huegradients;
 
 import android.app.Activity;
+import android.app.WallpaperManager;
+import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.Intent;
 import android.graphics.Point;
@@ -102,5 +104,41 @@ public class HueExportPlugin extends Plugin {
         // Starting a chooser cannot establish delivery/publication or distinguish later cancellation.
         resolve(call,"opened");}catch(Exception error){reject(call,error);}});
     }catch(Exception error){reject(call,error);}
+  }
+  @PluginMethod public void setWallpaper(PluginCall call) {
+    if (!claim()) {
+      call.reject("Экспорт уже открыт.", "EXPORT_BUSY");
+      return;
+    }
+    try {
+      WallpaperManager manager = WallpaperManager.getInstance(getContext());
+      if (!manager.isWallpaperSupported() || !manager.isSetWallpaperAllowed()) {
+        resolve(call, "wallpaper-unavailable");
+        return;
+      }
+      File file = prepare(call);
+      Uri uri = FileProvider.getUriForFile(getContext(), getContext().getPackageName() + ".hue-export", file);
+      getActivity().runOnUiThread(() -> {
+        try {
+          Intent intent = manager.getCropAndSetWallpaperIntent(uri);
+          intent.setClipData(ClipData.newRawUri("PNG", uri));
+          intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+          startActivityForResult(call, intent, "finishedWallpaper");
+        } catch (ActivityNotFoundException | IllegalArgumentException | SecurityException error) {
+          file.delete();
+          resolve(call, "wallpaper-unavailable");
+        } catch (RuntimeException error) {
+          file.delete();
+          reject(call, error);
+        }
+      });
+    } catch (Exception error) {
+      reject(call, error);
+    }
+  }
+  @ActivityCallback private void finishedWallpaper(PluginCall call, ActivityResult result) {
+    if (call == null) { release(); return; }
+    new File(new File(getContext().getCacheDir(), "hue-exports"), call.getString("exportCacheFile", "missing")).delete();
+    resolve(call, result.getResultCode() == Activity.RESULT_OK ? "wallpaper-returned" : "cancelled");
   }
 }

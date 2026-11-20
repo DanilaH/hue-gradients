@@ -3,7 +3,7 @@ import type { Attempt, LevelDefinition } from '../domain/puzzle';
 import { boardGeometry, cellAt, hitTest, type BoardGeometry, type Cell } from './geometry';
 
 export const GAME_PRESENTABLE = 'hue:presentable';
-interface Hooks { swap(from: number, to: number): void; pin(): void; paint(): void; interaction?(value: { x: number; y: number; color: string } | null): void }
+interface Hooks { swap(from: number, to: number): void; pin(position: number): void; paint(): void; interaction?(value: { x: number; y: number; color: string } | null): void }
 interface Gesture { id: number; from: number | null; x: number; y: number; latestX: number; latestY: number; drag: boolean; layout: string }
 
 export class PuzzleScene extends Phaser.Scene {
@@ -44,9 +44,9 @@ export class PuzzleScene extends Phaser.Scene {
     this.level = level; this.attempt = attempt; this.preview = preview; this.enabled = enabled && !attempt.completed && !preview;
     if (this.art) this.draw();
   }
-  presentSwap(previous: Attempt, next: Attempt, from: number, to: number, motion: boolean): void {
+  presentSwap(previous: Attempt, next: Attempt, from: number, to: number, motion: boolean, cost = 1): void {
     const release = this.released; this.released = null;
-    if (!motion || previous.attemptId !== next.attemptId || next.moves !== previous.moves + 1 ||
+    if (!motion || previous.attemptId !== next.attemptId || next.moves !== previous.moves + cost ||
         previous.board[from] !== next.board[to] || previous.board[to] !== next.board[from]) return;
     this.settle = { from, to, dx: release?.from === from && release.to === to ? release.dx : 0,
       dy: release?.from === from && release.to === to ? release.dy : 0, started: performance.now() };
@@ -105,7 +105,7 @@ export class PuzzleScene extends Phaser.Scene {
   };
   private tap(position: number | null): void {
     if (position === null || this.level.pinnedPositions.includes(position)) {
-      this.selected = null; if (position !== null) this.hooks.pin(); return;
+      this.selected = null; if (position !== null) this.hooks.pin(position); return;
     }
     if (this.selected === null) this.selected = position;
     else {

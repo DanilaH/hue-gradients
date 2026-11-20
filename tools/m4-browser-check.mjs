@@ -42,7 +42,7 @@ try {
  await tool('История');await page.getByRole('button',{name:'Открыть версию 2',exact:true}).click();await idle();
  assert.equal((await work()).headNodeId,Object.keys((await work()).nodes)[1]);
  const before=await state();await button('Испытать').click();await page.waitForSelector('#hue-app[data-mode=author][data-layer=none]');
- await page.locator('#help').click();await page.waitForSelector('#hue-app[data-layer=help]');await page.reload();await page.waitForSelector('html[data-state=ready]');
+ await page.locator('#settings').click(); await page.getByRole('button',{name:'Помощь',exact:true}).click(); await page.getByRole('button',{name:'Показать готовое поле',exact:true}).click();await page.waitForSelector('#hue-app[data-layer=help]');await page.reload();await page.waitForSelector('html[data-state=ready]');
  assert.equal((await state()).creative.activeTest.attempt.assisted,true);assert.equal(await page.locator('#hue-app').getAttribute('data-mode'),'author');
  passed.push('author attempt and assistance survive reload on the exact saved snapshot');
  let test=(await state()).creative.activeTest,board=[...test.attempt.board];

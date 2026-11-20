@@ -35,23 +35,23 @@ try {
   assert.equal(await page.evaluate(() => window.__sdk.ready), 0);
   await page.evaluate(() => window.__resolveSdk());
   await page.waitForFunction(() => window.__sdk.ready === 1 && window.__sdk.starts === 1);
-  await page.locator('#help').click(); await page.waitForSelector('#hue-app[data-layer=help]');
+  await page.locator('#settings').click(); await page.getByRole('button',{name:'Помощь',exact:true}).click(); await page.getByRole('button',{name:'Показать готовое поле',exact:true}).click(); await page.waitForSelector('#hue-app[data-layer=help]');
   await page.evaluate(() => window.__sdk.listeners.game_api_pause());
   assert.equal(await page.locator('#hue-app').getAttribute('data-layer'), 'none');
-  assert.equal(await page.locator('#help').isDisabled(), true);
+  assert.equal(await page.locator('#settings').isDisabled(), true);
   await page.evaluate(() => {
     Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'hidden' });
     Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
     document.dispatchEvent(new Event('visibilitychange'));
     window.__sdk.listeners.game_api_resume();
   });
-  assert.equal(await page.locator('#help').isDisabled(), true);
+  assert.equal(await page.locator('#settings').isDisabled(), true);
   await page.evaluate(() => {
     Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'visible' });
     Object.defineProperty(document, 'hidden', { configurable: true, get: () => false });
     document.dispatchEvent(new Event('visibilitychange'));
   });
-  assert.equal(await page.locator('#help').isEnabled(), true);
+  assert.equal(await page.locator('#settings').isEnabled(), true);
   assert.equal(await page.evaluate(() => window.__sdk.ready), 1); assert.deepEqual(errors, []);
   await page.close();
   const offline = await browser.newPage(); await offline.route('**/sdk.js', route => route.abort());

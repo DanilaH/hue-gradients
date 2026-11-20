@@ -30,6 +30,9 @@ export interface Attempt {
   readonly completed: boolean;
 }
 
+export const AUTO_HELP_COST = 3;
+export type Assistance = { kind: 'preview' } | { kind: 'pulse'; scanFrom: number } | { kind: 'auto' };
+
 const integer = (value: number, min: number, max: number): boolean =>
   Number.isSafeInteger(value) && value >= min && value <= max;
 
@@ -114,4 +117,36 @@ export function proposeHelp(attempt: Attempt): Attempt {
   if (attempt.completed) return attempt;
   if (!integer(attempt.assistsUsed, 0, Number.MAX_SAFE_INTEGER - 1)) throw new Error('Assist counter overflow');
   return { ...attempt, assisted: true, assistsUsed: attempt.assistsUsed + 1 };
+}
+
+export function pulsePosition(level: LevelDefinition, attempt: Attempt, scanFrom: number): number | null {
+  if (!integer(scanFrom, 0, attempt.board.length - 1)) throw new Error('Invalid hint start');
+  for (let offset = 0; offset < attempt.board.length; offset++) {
+    const index = (scanFrom + offset) % attempt.board.length;
+    if (attempt.board[index] !== index && !level.pinnedPositions.includes(index)) return index;
+  }
+  return null;
+}
+
+export function autoHelpSwap(level: LevelDefinition, attempt: Attempt): { from: number; to: number } | null {
+  let to = -1, greatestDistance = -1;
+  for (let index = 0; index < attempt.board.length; index++) {
+    if (attempt.board[index] === index || level.pinnedPositions.includes(index)) continue;
+    const distance = (2 * (index % level.width) - level.width + 1) ** 2
+      + (2 * Math.floor(index / level.width) - level.height + 1) ** 2;
+    if (distance > greatestDistance) { greatestDistance = distance; to = index; }
+  }
+  return to === -1 ? null : { from: to, to: attempt.board.indexOf(to) };
+}
+
+export function proposeAssistance(level: LevelDefinition, attempt: Attempt, request: Assistance = { kind: 'preview' }): Attempt {
+  validateAttempt(level, attempt);
+  if (attempt.completed) return attempt;
+  if (request.kind === 'pulse' && pulsePosition(level, attempt, request.scanFrom) === null) return attempt;
+  if (request.kind !== 'auto') return proposeHelp(attempt);
+  const pair = autoHelpSwap(level, attempt);
+  if (!pair) return attempt;
+  if (attempt.moves > Number.MAX_SAFE_INTEGER - AUTO_HELP_COST) throw new Error('Move counter overflow');
+  const swapped = proposeSwap(level, attempt, pair.from, pair.to);
+  return { ...proposeHelp(attempt), board: swapped.board, completed: swapped.completed, moves: attempt.moves + AUTO_HELP_COST };
 }

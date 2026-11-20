@@ -17,7 +17,9 @@ export interface WorkCard {
   levelId?: string;
   filename: string;
   detail?: string;
-  best?: { clean: number | null; assisted: number | null };
+  best: { clean: number | null; assisted: number | null };
+  minimum: number;
+  perfect: boolean;
 }
 
 export class WorkCardView {
@@ -26,6 +28,7 @@ export class WorkCardView {
   private readonly note = document.createElement('p');
   private readonly saveButton = document.createElement('button');
   private readonly shareButton: HTMLButtonElement;
+  private readonly wallpaperButton: HTMLButtonElement | undefined;
   private readonly options = document.createElement('details');
   private readonly summary = document.createElement('summary');
   private readonly field: ExportField;
@@ -67,10 +70,21 @@ export class WorkCardView {
     const choices = document.createElement('div');
     choices.className = 'work-card-menu';
     const best = work.best;
-    const records = [work.detail, best?.clean == null ? '' : `Без помощи — ${best.clean}`, best?.assisted == null ? '' : `С помощью — ${best.assisted}`].filter(Boolean);
-    if (records.length) {
-      const stats = document.createElement('p'); stats.textContent = records.join(' · '); choices.append(stats);
+    const records = [
+      work.detail, `Минимум — ${work.minimum}`,
+      best.clean === null ? null : `Без помощи — ${best.clean}`,
+      best.assisted === null ? null : `С помощью — ${best.assisted}`,
+    ];
+    const stats = document.createElement('p');
+    stats.textContent = records.filter(Boolean).join(' · ');
+    choices.append(stats);
+    if (work.perfect) {
+      const mastery = document.createElement('p');
+      mastery.className = 'work-card-mastery';
+      mastery.textContent = 'Идеально без помощи';
+      choices.append(mastery);
     }
+    if (files.setWallpaper) this.wallpaperButton = add(choices, 'Установить обои', () => void this.send('setWallpaper'));
     this.shareButton = add(choices, 'Поделиться PNG', () => void this.send('share'));
     if (actions.replay) add(choices, 'Повторить работу', actions.replay);
     if (actions.copy) add(choices, 'Сохранить копию', actions.copy);
@@ -98,6 +112,7 @@ export class WorkCardView {
     this.saveButton.disabled = blocked || this.preparing || this.sending;
     this.panel.querySelectorAll<HTMLButtonElement>('button.quiet').forEach(button => { button.disabled = blocked || this.sending; });
     this.shareButton.hidden = !this.file || !this.files.canShare(this.file);
+    if (this.wallpaperButton) this.wallpaperButton.disabled = blocked || this.sending || this.preparing || !this.file;
   }
 
   handleBack(): boolean {
@@ -134,16 +149,21 @@ export class WorkCardView {
     }
   }
 
-  private async send(action: 'save' | 'share'): Promise<void> {
+  private async send(action: 'save' | 'share' | 'setWallpaper'): Promise<void> {
     if (!this.file || this.blocked || this.sending || (action === 'share' && this.shareButton.hidden)) return;
+    const deliver = this.files[action];
+    if (!deliver) return;
     this.sending = true; this.update(this.blocked);
     try {
-      const result = await this.files[action](this.file);
+      const result = await deliver(this.file);
       if (!this.disposed) this.note.textContent = exportResultMessage(result);
     } catch {
-      if (!this.disposed) this.note.textContent = action === 'save'
-        ? 'Не удалось сохранить PNG. Попробуйте ещё раз.'
-        : 'Не удалось отправить PNG. Попробуйте ещё раз.';
+      const failure = {
+        save: 'Не удалось сохранить PNG. Попробуйте ещё раз.',
+        share: 'Не удалось отправить PNG. Попробуйте ещё раз.',
+        setWallpaper: 'Не удалось открыть установку обоев. Можно сохранить PNG.',
+      };
+      if (!this.disposed) this.note.textContent = failure[action];
     } finally {
       this.sending = false;
       this.finish();

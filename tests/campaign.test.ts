@@ -5,7 +5,7 @@ import prototype from '../docs/spec/prototype/levels-0.1.json';
 import { chapters, getLevel, levels } from '../src/domain/levels';
 import { createAttempt, proposeSwap, validateAttempt } from '../src/domain/puzzle';
 import { applyAction, decodeWorkspace, fingerprintPayload, newWorkspace, upgradeWorkspace, type Workspace } from '../src/domain/workspace';
-import { chapterCount, chapterIsOpen, earnedRights, levelIsOpen, META_POLICY, recommendedLevel } from '../src/domain/progression';
+import { chapterCount, chapterIsOpen, earnedRights, levelIsOpen, recommendedLevel, visibleRewards } from '../src/domain/progression';
 import { hashText } from '../src/local-store/command';
 
 const fingerprints = new Map(await Promise.all(levels.map(async level => [level.id, await hashText(fingerprintPayload(level))] as const)));
@@ -52,8 +52,8 @@ test('9→10 and 14→15 are atomic milestones; replays do not farm progress; fi
       for(let ordinal=16;ordinal<=30;ordinal++) expect(levelIsOpen(state,levels[ordinal-1]!.id)).toBe(true);
     }
     if(n===14) expect(state.rights).not.toContain('chapter-complete:chapter-01');
-    if(n===15) { expect(state.rights).toContain('chapter-complete:chapter-01'); expect(state.rights).toContain('export-strip'); }
-    if(n===30) expect(state.rights).toContain('export-grid');
+    if(n===15) expect(state.rights).toContain('chapter-complete:chapter-01');
+    if ([4, 5, 14, 15, 29, 30].includes(n)) expect(state.rights.filter(id => id.startsWith('export-'))).toEqual(['export-clean']);
   }
   expect(state.completed).toHaveLength(60); expect(recommendedLevel(state)).toBeNull();
   expect(state.rights).not.toContain('chapter-open:chapter-05');
@@ -66,13 +66,17 @@ test('9→10 and 14→15 are atomic milestones; replays do not farm progress; fi
 });
 test('policy raises retain earned chapter/format rights and do not count daily/personal work as campaign', () => {
   let state = newWorkspace('first'); for(let n=1;n<=10;n++)state=complete(state,n);
-  const next = earnedRights(state,fingerprints,{chapterAt:12,campaignFormatsAt:[15,30,40]});
-  expect(next).toContain('chapter-open:chapter-02'); expect(next).toContain('export-caption');
+  const layouts = ['export-caption','export-strip','export-grid','export-frame','export-diptych','export-postcard'];
+  const old = decodeWorkspace(JSON.stringify({...state,rights:[...state.rights,...layouts]}),fingerprints);
+  const next = earnedRights(old,fingerprints,{chapterAt:12});
+  expect(next).toContain('chapter-open:chapter-02');
+  expect(next).toEqual(old.rights);
+  expect(visibleRewards(layouts)).toEqual([]);
+  expect(complete(old,11).rights).toEqual(expect.arrayContaining(layouts));
+  expect(earnedRights(state, fingerprints)).not.toEqual(expect.arrayContaining(layouts));
   const mixed = {...state,completed:[...state.completed,'own-work','gradient-daily-001',...state.completed]};
   expect(chapterCount(mixed,0)).toBe(10);
   expect(earnedRights(mixed,fingerprints)).not.toContain('export-strip');
-  const allSix = earnedRights(state,fingerprints,META_POLICY,Array.from({length:14},(_,i)=>`published-slot-${i}`));
-  expect(allSix).toContain('export-postcard'); expect(earnedRights(state,fingerprints,META_POLICY,['slot','slot'])).not.toContain('export-frame');
 });
 test('legacy upgrade preserves active attempt, separate bests, rights and adds no reward ceremony', () => {
   let state=newWorkspace('old');for(let n=1;n<=10;n++)state=complete(state,n);

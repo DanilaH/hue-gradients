@@ -1,6 +1,6 @@
 # Status — 20 November 2026
 
-Current source and signed Android preview **0.4.10/versionCode14** on feat/m0-foundation, draft PR #1.
+Signed Android preview **0.4.11/versionCode15** is available in [PR #5](https://github.com/DanilaH/hue-gradients/pull/5) on `feat/help-mastery-0.4.11`, based on the PR #4 audit. The base game branch is 0.4.10.
 
 | Stage | Actual state |
 | --- | --- |
@@ -10,10 +10,12 @@ Current source and signed Android preview **0.4.10/versionCode14** on feat/m0-fo
 | M3 | LOCAL IMPLEMENTATION: 60 campaign candidates, chapters, album, rights/mastery, separate copies and migration |
 | M4a | LOCAL IMPLEMENTATION: full-screen live colour editor, immutable revisions, durable previews, recovery, and exact-revision author play |
 | M4b | LOCAL IMPLEMENTATION: one full-screen wallpaper per verified work, browser download/share and Android display metrics bridge. Device acceptance pending |
-| UI simplification | PR #2 editor package ready for playtest. Gameplay, pause and result polish follow owner feedback |
+| UI simplification | Editor ready for playtest. Three help actions, pin feedback and result details ready for playtest in 0.4.11 |
 | M5 | ON HOLD by owner19 Nov: cloud/account/synchronization deferred from the current local milestone |
 | M6 | NEXT CLIENT WORK: local daily/archive state/cache; live shared calendar/catalog/trusted time remain unconfigured |
 | M7–M8 | NOT STARTED |
+
+0.4.11 adds deliberate help from pause, atomic auto-swap at +3 moves and visible mastery on the work card. Retired layout rights remain valid in existing saves. Android build and APK inspection passed. Refusal and cancellation of the system wallpaper path were tested with host fixtures. [Package evidence and captures](evidence/help-mastery-2026-11-20.json)
 
 0.4.10 opens the gradient directly from «Мои работы» → «Создать». Corner taps show colours that update the whole field. The menu contains size, pins, fixed start and history. Author play returns to its exact revision. A previously verified revision produces its own wallpaper. [Editor evidence and captures](evidence/editor-ui-2026-11-20.json)
 

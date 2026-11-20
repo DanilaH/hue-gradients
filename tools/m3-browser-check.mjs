@@ -32,7 +32,7 @@ try{
  for(let n=1;n<=4;n++){await solve(n);await page.getByRole('button',{name:'Дальше',exact:true}).click();await idle();}
  await chapter(1);await selectLevel(15);assert.equal(await page.locator('[data-level-action]').count(),0);assert.equal(await page.locator('.level-preview .composition-grid').count(),0);
  await selectLevel(5);await playSelected();await solve(5);
- assert((await state()).rights.includes('export-caption'));passed.push('first five remain sequential; fifth grants caption rights');
+ assert(!(await state()).rights.includes('export-caption'));passed.push('first five remain sequential; fifth leaves retired layouts unearned');
  assert.equal(await page.locator('#dialog-actions button').count(),2);
  await page.getByRole('button',{name:'В альбом',exact:true}).click();
  assert.equal(await page.locator('.work-card').getAttribute('data-level-id'),'gradient-005');
@@ -75,7 +75,7 @@ try{
  passed.push('all 15 levels of an opened later chapter are available');
  await chapter(1);await selectLevel(10);await playSelected();
  for(let n=10;n<=14;n++){await solve(n);if(n<14){await page.getByRole('button',{name:'Дальше',exact:true}).click();await idle();}}
- let current=await state();assert.equal(current.completed.length,15);assert(current.rights.includes('chapter-complete:chapter-01')&&current.rights.includes('export-strip'));
+ let current=await state();assert.equal(current.completed.length,15);assert(current.rights.includes('chapter-complete:chapter-01')&&!current.rights.includes('export-strip'));
  assert.equal(await page.locator('#dialog-actions button').count(),2);
  await page.getByRole('button',{name:'В альбом',exact:true}).click();await allWorks(page);
  const albumScroll=page.locator('.album-scroll');
