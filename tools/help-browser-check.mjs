@@ -44,10 +44,12 @@ async function solveFirst(page) {
 }
 async function cardDetails(page) {
   await button(page, 'В альбом').click();
-  await page.getByLabel('Действия с работой').click();
-  return page.locator('.work-card-menu');
+  const records = page.locator('.work-card-records');
+  assert(await records.isVisible());
+  return records;
 }
 async function replay(page) {
+  await page.getByLabel('Действия с работой').click();
   await button(page, 'Повторить работу').click();
   await button(page, 'Начать заново').click();
   await layer(page, 'none');
@@ -101,7 +103,7 @@ try {
   assert(await button(page, 'Дальше').isEnabled());
   await record(page, 'clean', 11);
   const details = await cardDetails(page);
-  assert.match(await details.innerText(), /Минимум — 1.*Без помощи — 1/s);
+  assert.match(await details.innerText(), /Минимум — 1.*Рекорд без помощи — 1/s);
   assert(await details.getByText('Идеально без помощи', { exact: true }).isVisible());
   await record(page, 'clean', 17);
   assert.equal(attempt(await state(page)).assistsUsed, 0);
@@ -122,7 +124,7 @@ try {
   assert.deepEqual(await state(page), preview);
   await solveFirst(page);
   const mixed = await cardDetails(page);
-  assert.match(await mixed.innerText(), /Без помощи — 1.*С помощью — 1/s);
+  assert.match(await mixed.innerText(), /Рекорд без помощи — 1.*Рекорд с помощью — 1/s);
   assert(await mixed.getByText('Идеально без помощи', { exact: true }).isVisible());
   passed.push('one full preview costs one assist, keeps the board and does not replace clean best or perfection');
   await clean.context.close();
@@ -155,10 +157,9 @@ try {
   assert.equal(auto.bests['gradient-001'].assisted, 3);
   await record(soft, 'assisted', 12);
   const helpedCard = await cardDetails(soft);
-  assert.match(await helpedCard.innerText(), /Минимум — 1.*С помощью — 3/s);
+  assert.match(await helpedCard.innerText(), /Минимум — 1.*Рекорд с помощью — 3/s);
   assert.equal(await helpedCard.getByText('Идеально без помощи').count(), 0);
   await record(soft, 'assisted', 17);
-  await soft.keyboard.press('Escape');
   await button(soft, '‹ Назад').click();
   await button(soft, 'Дальше').click();
   await idle(soft);
@@ -201,7 +202,7 @@ try {
   assert.equal(await staticSpot.evaluate(e => getComputedStyle(e, '::after').animationName), 'none');
   await solveFirst(small);
   await cardDetails(small);
-  assert.match(await small.locator('.work-card-menu').innerText(), /С помощью — 1/);
+  assert.match(await small.locator('.work-card-records').innerText(), /Рекорд с помощью — 1/);
   passed.push('320×568 at enlarged text, Back, static outlines, repeat pin feedback and dismissible tutorial');
 
   const fault = await newProfile();

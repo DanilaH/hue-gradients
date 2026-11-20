@@ -71,17 +71,21 @@ export class WorkCardView {
     this.summary.setAttribute('aria-label', 'Действия с работой');
     const choices = document.createElement('div');
     choices.className = 'work-card-menu';
-    const best = work.best;
-    const records = [work.detail];
-    if (state.preferences.statistics) {
-      records.push(`Минимум — ${work.minimum}`);
-      if (best.clean !== null) records.push(`Без помощи — ${best.clean}`);
-      if (best.assisted !== null) records.push(`С помощью — ${best.assisted}`);
+    if (work.detail) {
+      const detail = document.createElement('p');
+      detail.textContent = work.detail;
+      choices.append(detail);
     }
-    if (records.some(Boolean)) {
-      const stats = document.createElement('p');
-      stats.textContent = records.filter(Boolean).join(' · ');
-      choices.append(stats);
+    const records = document.createElement('div');
+    records.className = 'work-card-records';
+    if (state.preferences.statistics) {
+      const { clean, assisted } = work.best;
+      const values = [`Минимум — ${work.minimum}`];
+      if (clean !== null) values.push(`Рекорд без помощи — ${clean}`);
+      if (assisted !== null) values.push(`Рекорд с помощью — ${assisted}`);
+      const line = document.createElement('p');
+      line.textContent = values.join(' · ');
+      records.append(line);
     }
     if (state.preferences.statistics && work.reference) {
       const row = document.createElement('p');
@@ -93,7 +97,7 @@ export class WorkCardView {
       const mastery = document.createElement('p');
       mastery.className = 'work-card-mastery';
       mastery.textContent = 'Идеально без помощи';
-      choices.append(mastery);
+      records.append(mastery);
     }
     if (files.setWallpaper) this.wallpaperButton = add(choices, 'Установить обои', () => void this.send('setWallpaper'));
     this.shareButton = add(choices, 'Поделиться PNG', () => void this.send('share'));
@@ -112,7 +116,12 @@ export class WorkCardView {
     const art = document.createElement('div');
     art.className = 'work-card-art';
     art.append(this.image);
-    this.panel.append(nav, art, footer, this.note);
+    this.panel.append(nav, art);
+    if (records.childElementCount) {
+      this.panel.classList.add('with-records');
+      this.panel.append(records);
+    }
+    this.panel.append(footer, this.note);
     parent.append(this.panel);
     window.addEventListener('resize', this.refresh);
     void this.prepare();
