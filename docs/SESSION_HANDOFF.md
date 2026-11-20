@@ -4,6 +4,8 @@ Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and
 
 ## Current slice
 
+0.4.10/versionCode14 opens a full-screen editor with the name, continuous gradient and «Испытать». Tapping a corner shows a palette and custom colour with live preview. «Готово» commits a single revision. Resize, pins, fixed start and history sit under ⋯. Returning from author play opens the exact played node, and the wallpaper action always points at the selected verified node. A draft created and partially verified in 0.4.9 survives a new colour edit and reload. [Editor evidence and captures](evidence/editor-ui-2026-11-20.json)
+
 0.4.9/versionCode13 narrows export to one full-screen wallpaper from the selected solved work or exact verified own revision. Android asks the existing HueExport bridge for full display bounds. Web multiplies the browser-reported screen dimensions by device pixel ratio. A display size change refreshes the cached PNG. Wallpaper bytes are shared by preview, save and share. The album opens individual works. Old saved rights remain valid as metadata. [Wallpaper export checks](evidence/wallpaper-export-2026-11-20.json)
 
 0.4.8/versionCode12 removes the puzzle cell seams from every PNG print. Each collage slot fills with its own continuous gradient, using the same renderer as the album thumbnails and the one-work wallpaper. Browser evidence includes the strip downloaded from the album. The latest signed Android preview is 0.4.7. [Export verification](evidence/gradient-collage-2026-11-20.json)
@@ -36,9 +38,9 @@ Author activeTest persists work/node/frozen Attempt; creative.playing controls c
 
 ## Next work
 
-1. **After owner playtest: the PR #2 editor package.** Follow [the UI refinement plan](UI_REFINEMENT_PLAN.md) alongside the PR’s screen designs. Verify older drafts, saved branches and the exact selected revision through the editor and album routes. Field, pause and result polish follows. M5 remains on hold. A shared daily requires a published catalog and trusted time.
+1. **After owner playtest: field, pause and result polish.** Follow [the UI refinement plan](UI_REFINEMENT_PLAN.md) and the PR #2 screen designs. Preserve the editor’s exact revision routes and the one-work wallpaper. M5 remains on hold. A shared daily requires a published catalog and trusted time.
 2. Keep M2 tokens and read M2_ART_BIBLE before visual changes. Two licensed Cyrillic fonts, native150% text and owner review remain pending. Editor browser computed-font enlargement is smoke evidence only. No mass styling or new A/B/C contest.
-3. Native SQLite/haptic/process-death/storage-pressure/touch remains NOT RUN; no runtime/ADB was available. Hosted Yandex, identity/cloud/ads are external gates. Production register71 NOT RUN; full release unfinished.
+3. Native SQLite, haptics, process death, storage pressure and touch remain NOT RUN. No Android device was attached. Hosted Yandex, identity/cloud/ads are external gates. Production register71 NOT RUN; full release unfinished.
 
 ## Campaign contracts retained
 
@@ -56,4 +58,4 @@ Runtime/guidance469928d03f4bae5053e23db26e82187bedbc252e, kit archive SHA256ba90
 
 Read SIGNING_PREVIEW.md. Keep .preview3 and reuse the privately saved TEST key HUE-test-preview-signing.keystore via ANDROID_PREVIEW_KEYSTORE. Never regenerate/commit it or use it as production. Old0.2 .releasecheck signer was lost; never ask owner to uninstall that app and lose data. 0.4.1 certificate matches0.3/0.4.0; actual Android update is untested. Production base appId/certificate policy unchanged, signer null.
 
-The latest signed Poluson-0.4.7-preview.apk uses package com.danilah.huegradients.preview3 and versionCode11. Source version 0.4.9 sets versionCode13 for the next preview. The Gradle distribution download was blocked in this workspace. [Previous build hash, signer and runtime coverage](evidence/album-2026-11-19.json)
+The latest signed Poluson-0.4.10-preview.apk uses package com.danilah.huegradients.preview3 and versionCode14. Its certificate matches 0.4.7. Gradle 8.14.3, full JDK 21, Android API 36 and Build Tools 35.0.0 for AGP plus 36.0.0 for APK inspection were used. Debug and optimized releaseCheck built successfully. The exact APK passed verification. Native installation and runtime are pending device playtest. [Build hash, signer and capture evidence](evidence/editor-ui-2026-11-20.json)

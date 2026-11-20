@@ -1,6 +1,6 @@
 # Status — 20 November 2026
 
-Current source version **0.4.9/versionCode13** on feat/m0-foundation, draft PR #1. Most recent signed Android preview is 0.4.7/versionCode11.
+Current source and signed Android preview **0.4.10/versionCode14** on feat/m0-foundation, draft PR #1.
 
 | Stage | Actual state |
 | --- | --- |
@@ -8,12 +8,14 @@ Current source version **0.4.9/versionCode13** on feat/m0-foundation, draft PR #
 | M1 | LOCAL IMPLEMENTATION: shared input/play, SQLite/IndexedDB transaction seam, CAS/ledger/recovery; native runtime acceptance pending |
 | M2 | EXECUTABLE REVIEW CANDIDATE: brighter low-resolution atmosphere, light trails and committed waves for gameplay, result and picker |
 | M3 | LOCAL IMPLEMENTATION: 60 campaign candidates, chapters, album, rights/mastery, separate copies and migration |
-| M4a | LOCAL IMPLEMENTATION: editor, immutable revisions, durable previews, recovery/branches, validator/fingerprint and author play |
-| M4b | LOCAL IMPLEMENTATION: one full-screen wallpaper per verified work, browser download/share and Android display metrics bridge. Android build and device acceptance pending |
-| UI simplification | PR #2 album package ready for playtest: two full-screen album tabs and one-tap wallpaper export |
+| M4a | LOCAL IMPLEMENTATION: full-screen live colour editor, immutable revisions, durable previews, recovery, and exact-revision author play |
+| M4b | LOCAL IMPLEMENTATION: one full-screen wallpaper per verified work, browser download/share and Android display metrics bridge. Device acceptance pending |
+| UI simplification | PR #2 editor package ready for playtest. Gameplay, pause and result polish follow owner feedback |
 | M5 | ON HOLD by owner19 Nov: cloud/account/synchronization deferred from the current local milestone |
 | M6 | NEXT CLIENT WORK: local daily/archive state/cache; live shared calendar/catalog/trusted time remain unconfigured |
 | M7–M8 | NOT STARTED |
+
+0.4.10 opens the gradient directly from «Мои работы» → «Создать». Corner taps show colours that update the whole field. The menu contains size, pins, fixed start and history. Author play returns to its exact revision. A previously verified revision produces its own wallpaper. [Editor evidence and captures](evidence/editor-ui-2026-11-20.json)
 
 0.4.9 saves one verified work as a full-screen wallpaper at the device display dimensions. [Wallpaper export checks](evidence/wallpaper-export-2026-11-20.json)
 
