@@ -10,7 +10,9 @@ Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and
 
 ## Current slice
 
-E1 (0.4.23/versionCode27, 36df803) adds two themed books under Album. Chromium filled the last part, solved and replayed the special board with one receipt, completed a cached event offline, and canceled the cycle preview with the complete profile byte-identical. Live events need D1 publication. Cycle reset needs an owner decision. **Resume at E2**. [Evidence](evidence/queue-e1-2026-11-20.json)
+E2 (0.4.24/versionCode28, 2540d4f) shares one verified revision as Poluson JSON. Chromium downloaded it, edited the donor, rejected a broken fingerprint, imported and solved the exact old field, and wrote a single 390×740 PNG in its palette. The Android private share method survived R8; device chooser and file picker are pending. **Resume at E3**. [Evidence](evidence/queue-e2-2026-11-20.json)
+
+E1 (0.4.23/versionCode27, 36df803) adds two themed books under Album. Chromium filled the last part, solved and replayed the special board with one receipt, completed a cached event offline, and canceled the cycle preview with the complete profile byte-identical. Live events need D1 publication. Cycle reset needs an owner decision. [Evidence](evidence/queue-e1-2026-11-20.json)
 
 D2 (0.4.22/versionCode26, 1f206af) adds local personal tasks and history. Chromium touch saw two assignments on a clean profile and three after an assisted campaign win, beat a 3-move best in 1, replayed with one award, expired a 45-second test clock, and opened chapter 2 independently of campaign unlock. Format for sharing the triple remains UNKNOWN. [Evidence](evidence/queue-d2-2026-11-20.json)
 

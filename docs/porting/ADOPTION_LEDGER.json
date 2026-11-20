@@ -1,6 +1,6 @@
 {
   "schema": "consumer-adoption-ledger-v1",
-  "consumerCommit": "36df8036981c4d91685ce133878b1719de318437",
+  "consumerCommit": "2540d4f2e448e1727bd3a3b389fbc88acd07000e",
   "asOf": "2026-11-20",
   "features": [
     {
@@ -590,8 +590,8 @@
       "status": "ROADMAPPED",
       "gap": "PARTIAL",
       "stage": "Пакет 07",
-      "currentImplementation": "У нас 1–6 × 1–5, собственные проверки и живое редактирование углов. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/editor.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 07 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "У нас 1–6 × 1–5, собственные проверки и живое редактирование углов. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/editor.ts E2: принята передача точной проверенной ревизии, безопасный отказ импорта и повторное решение без кампанийного кредита. | https://github.com/DanilaH/hue-gradients/blob/2540d4f2e448e1727bd3a3b389fbc88acd07000e/tools/transfer-browser-check.mjs",
+      "nextAction": "Проверить Android отправку, системный выбор JSON и обои на телефоне (G1).",
       "deliveryPackage": "07",
       "sourceNextCheck": "Сравнить редактор на старом черновике и одномерной работе."
     },
@@ -610,8 +610,8 @@
       "status": "ROADMAPPED",
       "gap": "PARTIAL",
       "stage": "Пакет 07",
-      "currentImplementation": "Старая подтверждённая версия у нас хранится и остаётся экспортируемой. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/creative.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 07 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Старая подтверждённая версия у нас хранится и остаётся экспортируемой. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/creative.ts E2: принята передача точной проверенной ревизии, безопасный отказ импорта и повторное решение без кампанийного кредита. | https://github.com/DanilaH/hue-gradients/blob/2540d4f2e448e1727bd3a3b389fbc88acd07000e/tools/transfer-browser-check.mjs",
+      "nextAction": "Проверить Android отправку, системный выбор JSON и обои на телефоне (G1).",
       "deliveryPackage": "07",
       "sourceNextCheck": "Проверить выбор старой версии после цветовой правки."
     },
@@ -800,8 +800,8 @@
       "status": "ROADMAPPED",
       "gap": "MISSING",
       "stage": "Пакет 07",
-      "currentImplementation": "Опубликованного каталога и отбора у нас нет. Серверная модерация оригинала неизвестна. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/creative.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 07 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Опубликованного каталога и отбора у нас нет. Серверная модерация оригинала неизвестна. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/creative.ts E2: принята передача точной проверенной ревизии, безопасный отказ импорта и повторное решение без кампанийного кредита. | https://github.com/DanilaH/hue-gradients/blob/2540d4f2e448e1727bd3a3b389fbc88acd07000e/tools/transfer-browser-check.mjs",
+      "nextAction": "Проверить Android отправку, системный выбор JSON и обои на телефоне (G1).",
       "deliveryPackage": "07",
       "sourceNextCheck": "Проверить выход в каталог независимо от успешной отправки."
     },
@@ -850,8 +850,8 @@
       "status": "ROADMAPPED",
       "gap": "PARTIAL",
       "stage": "Пакет 07",
-      "currentImplementation": "Собственный редактор проверяет разрешимость и цвет. Валидация публичной подачи отсутствует. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/editor.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 07 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Собственный редактор проверяет разрешимость и цвет. Валидация публичной подачи отсутствует. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/editor.ts E2: принята передача точной проверенной ревизии, безопасный отказ импорта и повторное решение без кампанийного кредита. | https://github.com/DanilaH/hue-gradients/blob/2540d4f2e448e1727bd3a3b389fbc88acd07000e/tools/transfer-browser-check.mjs",
+      "nextAction": "Проверить Android отправку, системный выбор JSON и обои на телефоне (G1).",
       "deliveryPackage": "07",
       "sourceNextCheck": "Развести сохранить черновик, играть, отправить и получить публикацию четырьмя тестами."
     },
