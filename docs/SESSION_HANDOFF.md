@@ -10,7 +10,9 @@ Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and
 
 ## Current slice
 
-E2 (0.4.24/versionCode28, 2540d4f) shares one verified revision as Poluson JSON. Chromium downloaded it, edited the donor, rejected a broken fingerprint, imported and solved the exact old field, and wrote a single 390×740 PNG in its palette. The Android private share method survived R8; device chooser and file picker are pending. **Resume at E3**. [Evidence](evidence/queue-e2-2026-11-20.json)
+E3 durable publication model passed lost response, quota, approved feed filtering, withdrawal and complaint fixtures. Public service/identity/date remain unconfigured, so the preview has no live submission or feed. **Resume at F1**. [Evidence](evidence/queue-e3-2026-11-20.json)
+
+E2 (0.4.24/versionCode28, 2540d4f) shares one verified revision as Poluson JSON. Chromium downloaded it, edited the donor, rejected a broken fingerprint, imported and solved the exact old field, and wrote a single 390×740 PNG in its palette. The Android private share method survived R8; device chooser and file picker are pending. [Evidence](evidence/queue-e2-2026-11-20.json)
 
 E1 (0.4.23/versionCode27, 36df803) adds two themed books under Album. Chromium filled the last part, solved and replayed the special board with one receipt, completed a cached event offline, and canceled the cycle preview with the complete profile byte-identical. Live events need D1 publication. Cycle reset needs an owner decision. [Evidence](evidence/queue-e1-2026-11-20.json)
 

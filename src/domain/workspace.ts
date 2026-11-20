@@ -3,6 +3,7 @@ import { getLevel, levels } from './levels';
 import { earnedRights, isKnownRight, levelIsOpen, META_POLICY } from './progression';
 import { initialCreative, validateCreative, type CreativeState } from './creative';
 import { applyChallenge, validateChallengeProgress, type ChallengeAction, type ChallengeProgress } from './challenges';
+import { applyPublication, validatePublication, type PublicationCommand, type PublicationState } from './publication';
 import { applyPersonal, validatePersonal, type PersonalAction, type PersonalProgress } from './personal';
 import { applyDaily, validateDailyProgress, type DailyAction, type DailyProgress } from './daily';
 import { applyTimed, validateTimedProgress, type TimedAction, type TimedProgress } from './timeTrial';
@@ -32,12 +33,13 @@ export interface Workspace {
   timedProgress?: TimedProgress;
   dailyProgress?: DailyProgress;
   personalProgress?: PersonalProgress;
+  publication?: PublicationState;
   albumCopies: Record<string, AlbumCopy>;
   /** Absent only in pre-editor saves; Session backs up and migrates before use. */
   creative?: CreativeState;
   lastCompletion: { attemptId: string; levelId: string; newRights: string[] } | null;
 }
-export type Action = ChallengeAction | DailyAction | TimedAction | PersonalAction | { kind: 'swap'; from: number; to: number; attemptId: string } |
+export type Action = { kind: 'publication'; command: PublicationCommand } | ChallengeAction | DailyAction | TimedAction | PersonalAction | { kind: 'swap'; from: number; to: number; attemptId: string } |
   { kind: 'help'; attemptId: string; assistance?: Assistance } | { kind: 'pin' } |
   { kind: 'preferences'; key: keyof Preferences; value: boolean } |
   { kind: 'copy'; levelId: string; draftId: string; workId: string; nodeId: string; name: string } |
@@ -138,6 +140,7 @@ export function decodeWorkspace(json: string, fingerprints: ReadonlyMap<string, 
           fingerprintPayload({ ...node.field, id: work.workId, ordinal: 0, title: work.name, minimumSwaps: copy.snapshot.minimumSwaps }) !== fingerprintPayload({ ...copy.snapshot, id: work.workId, ordinal: 0, title: copy.name })) throw new Error('Missing original copied revision');
     }
   }
+  if (state.publication !== undefined) validatePublication(state.publication, state.creative);
   const modes = [state.timedProgress?.active, state.challengeProgress?.active, state.creative?.playing, state.dailyProgress?.active, state.personalProgress?.active];
   if (modes.filter(Boolean).length > 1) throw new Error('Conflicting active game modes');
   return state;
@@ -145,6 +148,10 @@ export function decodeWorkspace(json: string, fingerprints: ReadonlyMap<string, 
 
 export function applyAction(state: Workspace, action: Action, fingerprints: ReadonlyMap<string, string>,
   benchmarks?: readonly PublishedBenchmark[]): Workspace {
+  if (action.kind === 'publication') {
+    const publication = applyPublication(state.publication, state.creative, action.command);
+    return !publication || publication === state.publication ? state : { ...state, publication };
+  }
   if (action.kind === 'personal-issue' || action.kind === 'personal-open' || action.kind === 'personal-swap' ||
       action.kind === 'personal-pause' || action.kind === 'personal-resume' || action.kind === 'personal-expire' || action.kind === 'personal-leave') {
     if (action.kind === 'personal-open' && (state.dailyProgress?.active || state.challengeProgress?.active ||
