@@ -11,6 +11,7 @@ Signed Android preview **0.4.24/versionCode28** is based on `feat/m0-foundation`
 | M4a | LOCAL IMPLEMENTATION: full-screen live colour editor, immutable revisions, durable previews, recovery, and exact-revision author play |
 | M4b | LOCAL IMPLEMENTATION: one full-screen wallpaper per verified work, browser download/share and Android display metrics bridge. Device acceptance pending |
 | UI simplification | Editor ready for playtest. Three help actions, pin feedback and result details ready for playtest in 0.4.11 |
+| Queue F1 | Local monetization policy and provider fixtures. Live SDK and commerce unconfigured. [Checks](evidence/queue-f1-2026-11-20.json) |
 | Queue E3 | Local publication protocol and retry fixtures pass. Public entry waits for a service. [Checks](evidence/queue-e3-2026-11-20.json) |
 | Queue E2 | Exact verified editor revision file, import and its original wallpaper tested in Chromium. [Checks](evidence/queue-e2-2026-11-20.json) |
 | Queue E1 | Themed books, event cache fixture and cycle cancellation. Live dates and reset policy pending. [Checks](evidence/queue-e1-2026-11-20.json) |
