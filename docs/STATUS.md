@@ -1,6 +1,6 @@
 # Status — 20 November 2026
 
-Signed Android preview **0.4.16/versionCode20** is based on `feat/m0-foundation`. That branch includes the full audit roadmap from PR #4 and package 01 from PR #5.
+Signed Android preview **0.4.17/versionCode21** is based on `feat/m0-foundation`. That branch includes the full audit roadmap from PR #4 and package 01 from PR #5.
 
 | Stage | Actual state |
 | --- | --- |
@@ -11,6 +11,7 @@ Signed Android preview **0.4.16/versionCode20** is based on `feat/m0-foundation`
 | M4a | LOCAL IMPLEMENTATION: full-screen live colour editor, immutable revisions, durable previews, recovery, and exact-revision author play |
 | M4b | LOCAL IMPLEMENTATION: one full-screen wallpaper per verified work, browser download/share and Android display metrics bridge. Device acceptance pending |
 | UI simplification | Editor ready for playtest. Three help actions, pin feedback and result details ready for playtest in 0.4.11 |
+| Queue B2 | Chapter finales and one-time secret reveal. First chapter and replay checked in Chromium. [Checks](evidence/queue-b2-2026-11-20.json) |
 | Queue B1 | Ten local move-limit challenges, fixed replay and last-move win/loss verified. [Checks](evidence/queue-b1-2026-11-20.json) |
 | Queue A3 | Personal best visible on the work card. Comparison awaits a measured published sample. [Checks](evidence/queue-a3-2026-11-20.json) |
 | Queue A2 | Exact APK assets on Chromium 92 and 158. Tappable central picker and verified resumption. [Checks](evidence/queue-a2-2026-11-20.json) |

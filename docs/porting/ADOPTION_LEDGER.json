@@ -1,6 +1,6 @@
 {
   "schema": "consumer-adoption-ledger-v1",
-  "consumerCommit": "8783519e0488d5bbdc0d880013da3a851a4d831a",
+  "consumerCommit": "a976384455eeb503df89fb45898727d6f35e9808",
   "asOf": "2026-11-20",
   "features": [
     {
@@ -347,21 +347,21 @@
     },
     {
       "id": "h2-boss",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "MATCH",
       "stage": "Пакет 03",
-      "currentImplementation": "В главе открывается следующая; отдельного испытания главы нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/levels.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 03 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Финал главы открыт только после всех обычных задач своего набора; проверены 14/15, 15/15 и повтор с одной разблокировкой. | https://github.com/DanilaH/hue-gradients/blob/a976384455eeb503df89fb45898727d6f35e9808/tools/chapter-challenge-browser-check.mjs",
+      "nextAction": "Повторить первое открытие, reload, Back и отображение цветов на телефоне (G1).",
       "deliveryPackage": "03",
       "sourceNextCheck": "Сравнить одно испытание главы с обычной новой главой."
     },
     {
       "id": "h2-secret",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
       "stage": "Пакет 03",
-      "currentImplementation": "Нет отдельной вступительной фазы; закрытая карточка уровня — другое состояние. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/PuzzleScene.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 03 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Первое открытие скрывает подвижные цвета, опоры остаются открытыми. Полусон раскрывает поле явным нажатием или при возврате в сохранение. | https://github.com/DanilaH/hue-gradients/blob/a976384455eeb503df89fb45898727d6f35e9808/tools/chapter-challenge-browser-check.mjs",
+      "nextAction": "Повторить первое открытие, reload, Back и отображение цветов на телефоне (G1).",
       "deliveryPackage": "03",
       "sourceNextCheck": "Снять свежий вход и resume в оригинале, отдельно от закрытого уровня."
     },
@@ -867,11 +867,11 @@
     },
     {
       "id": "h2-show-secret-on-resume",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "MATCH",
       "stage": "Пакет 03",
-      "currentImplementation": "У нас восстанавливается раскладка; вступительного secret-эффекта нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/PuzzleScene.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 03 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Перезапуск до раскрытия сохраняет тот же старт и сразу показывает RGB всех плиток; подтверждено снимками и байтами попытки. | https://github.com/DanilaH/hue-gradients/blob/a976384455eeb503df89fb45898727d6f35e9808/tools/chapter-challenge-browser-check.mjs",
+      "nextAction": "Повторить первое открытие, reload, Back и отображение цветов на телефоне (G1).",
       "deliveryPackage": "03",
       "sourceNextCheck": "Если добавлять скрытие, проверить resume без повторного спойлера."
     },
