@@ -62,31 +62,24 @@ for row in json.loads((root/'works.json').read_text()):
  assert image.getchannel('A').getextrema()==(255,255),(name,'Non-opaque pixels')
  proof={'format':name,'file':path.name,'dimensions':list(image.size),'sRGBIntent':1,'gamma':45455,'crc':'PASS','sha256':hashlib.sha256(raw).hexdigest()}
  if name=='clean':
-  size=(1080,1920)
-  assert image.size==size,(path.name,image.size,size)
-  assert len(row['works'])==1
-  field=row['works'][0]
-  assert image.convert('RGB').tobytes()==expected_gradient(field,size),(path.name,'interpolation or anchor mismatch')
-  report.append({**proof,'sourceGrid':[field['width'],field['height']],'allGradientPixelsAndAnchors':'PASS'})
-  continue
- size,regions,text=layouts[name]
+  size,regions,text=(1080,1920),[(0,0,1080,1920)],None
+ else:
+  size,regions,text=layouts[name]
  assert image.size==size,(name,image.size,size)
  assert len(regions)==len(row['works'])
- expected=Image.new('RGBA',size,(255,242,222,255));mask=Image.new('L',size,0);md=ImageDraw.Draw(mask);tile_count=0;field_rects=[]
- for region,field in zip(regions,row['works']):
-  x,y,rw,rh=region;cols,rows=field['width'],field['height'];s=min(rw//cols,rh//rows);fw,fh=cols*s,rows*s;left=x+(rw-fw)//2;top=y+(rh-fh)//2
-  field_rects.append([left,top,fw,fh,s]);assert s>0
-  for i,color in enumerate(field['solvedTileColors']):
-   xx,yy=left+(i%cols)*s,top+(i//cols)*s;box=(xx,yy,xx+s,yy+s)
-   tile=Image.new('RGBA',(s,s),color)
-   assert ImageChops.difference(image.crop(box),tile).convert('RGB').getbbox() is None,(name,'RGB/seam/overlay mismatch',i)
-   expected.paste(tile,(xx,yy));tile_count+=1
+ image=image.convert('RGB')
+ expected=Image.new('RGB',size,(255,242,222));mask=Image.new('L',size,0);md=ImageDraw.Draw(mask)
+ for index,((x,y,width,height),field) in enumerate(zip(regions,row['works'])):
+  box=(x,y,x+width,y+height)
+  gradient=expected_gradient(field,(width,height))
+  assert image.crop(box).tobytes()==gradient,(path.name,'interpolation or anchor mismatch',index)
+  expected.paste(Image.frombytes('RGB',(width,height),bytes(gradient)),(x,y))
  if text:
   x,y,w,h=text;md.rectangle((x,y,x+w-1,y+h-1),fill=255)
  if name=='export-frame':md.rectangle((94,94,1906,1906),outline=255,width=8)
- difference=ImageChops.difference(image,expected);difference.paste((0,0,0,0),(0,0),mask)
- assert difference.convert('RGB').getbbox() is None,(name,'tint/extra decoration outside allowed regions')
- report.append({**proof,'fields':field_rects,'exactOpaqueTiles':tile_count,'allTilePixelsAndSeams':'PASS','outsideFieldsAndText':'PASS'})
+ difference=ImageChops.difference(image,expected);difference.paste((0,0,0),(0,0),mask)
+ assert difference.getbbox() is None,(path.name,'tint/extra decoration outside allowed regions')
+ report.append({**proof,'fields':regions,'allGradientPixelsAndAnchors':'PASS','outsideFieldsAndText':'PASS'})
 Path('.test-output/m4b/pixels.json').write_text(json.dumps({'scope':'Real Canvas PNGs decoded independently with Pillow; future daily rights are synthetic renderer fixtures','results':report},indent=2)+'\n')
-gradients=sum(row['format']=='clean' for row in report)
-print(f'PASS: {gradients} continuous gradients and {len(report)-gradients} tiled layouts; all pixels, dimensions and sRGB chunks checked independently.')
+gradients=sum(len(row['fields']) for row in report)
+print(f'PASS: {len(report)} PNGs with {gradients} gradient regions; all pixels, dimensions and sRGB chunks checked independently.')

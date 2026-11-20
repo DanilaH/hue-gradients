@@ -48,13 +48,6 @@ export function selectExportWork(keys: readonly string[], work: ExportWork, cata
 function validateExportField(field:ExportField):void {
   if(!Number.isInteger(field.width)||field.width<1||field.width>6||!Number.isInteger(field.height)||field.height<1||field.height>5||field.solvedTileColors.length!==field.width*field.height||field.solvedTileColors.some(c=>!/^#[0-9a-f]{6}$/i.test(c)))throw new ExportError('INVALID_FIELD','Не удалось прочитать цвета работы.');
 }
-export function fitField(field:ExportField,region:Rect):Rect & {tileSize:number} {
-  validateExportField(field);
-  const tileSize=Math.floor(Math.min(region.width/field.width,region.height/field.height));
-  if(tileSize<1)throw new ExportError('INVALID_FIELD','Поле не помещается в макет.');
-  const width=tileSize*field.width,height=tileSize*field.height;
-  return{x:region.x+Math.floor((region.width-width)/2),y:region.y+Math.floor((region.height-height)/2),width,height,tileSize};
-}
 export function exportPlan(state:Workspace,request:ExportRequest):ExportPlan {
   if(!canExport(state,request.format,request.chapterIndex))throw new ExportError('LOCKED','Этот макет ещё закрыт. Условие открытия указано в списке.');
   const catalog=eligibleExportWorks(state),map=new Map(catalog.map(w=>[w.key,w]));
@@ -64,13 +57,12 @@ export function exportPlan(state:Workspace,request:ExportRequest):ExportPlan {
   if(works.length!==required||works.some(w=>!w)){const missing=required-works.filter(Boolean).length;throw new ExportError('MISSING_WORKS',`Выберите ещё ${missing} ${missing===1?'работу':missing<5?'работы':'работ'}.`);}
   const selected=works as ExportWork[];
   if(new Set(selected.map(w=>w.workId)).size!==selected.length)throw new ExportError('DUPLICATE_WORK','Выберите разные работы. Версии одной работы занимают одно место.');
+  selected.forEach(work=>validateExportField(work.field));
   if(request.format==='clean') {
-    validateExportField(selected[0]!.field);
     const width=1080,height=1920;
     return {format:'clean',layout:{width,height,fields:[{x:0,y:0,width,height}]},works:selected,caption:request.caption};
   }
   const layout=EXPORT_LAYOUTS[request.format];
-  selected.forEach((w,i)=>fitField(w.field,layout.fields[i]!));
   const caption=request.format==='chapter-page'?`Глава ${request.chapterIndex!+1}`:request.caption;
   if(layout.text && [...caption].length>layout.maxCodePoints!)throw new ExportError('TEXT_OVERFLOW','Сократите подпись.');
   return{format:request.format,layout,works:selected,caption};

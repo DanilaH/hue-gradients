@@ -92,7 +92,7 @@ try {
  await page.getByRole('button',{name:'‹ Назад',exact:true}).click();await page.locator('#hue-app[data-layer=result]').waitFor();
  await page.setViewportSize({width:390,height:844});await page.evaluate(()=>document.documentElement.style.fontSize='');
  passed.push('first real victory uses the same PNG bytes in preview, download and share; cancellation permits retry and Back restores the result');
- const wallpapers=[{format:'clean',file:'first-work.png',works:[levels[0]]}];
+ const downloads=[{format:'clean',file:'first-work.png',works:[levels[0]]}];
  for(const level of levels.slice(1,8)){
   await button('Дальше').click();
   await page.waitForFunction(id=>document.querySelector('#hue-app')?.dataset.level===id,level.id);
@@ -101,7 +101,7 @@ try {
   await button('В альбом').click();
   const file=`Poluson-${level.id.slice(-3)}.png`;
   await downloadClean(level,file);
-  wallpapers.push({format:'clean',file,works:[level]});
+  downloads.push({format:'clean',file,works:[level]});
   await button('‹ Назад').click();
  }
  passed.push('played through levels 2–8 and downloaded exact horizontal, vertical and two-dimensional gradient previews from their cards');
@@ -129,7 +129,7 @@ try {
  await (await ownSave).saveAs('.test-output/m4b/png/own-card.png');
  assert.equal(createHash('sha256').update(await readFile('.test-output/m4b/png/own-card.png')).digest('hex'),ownHash);
  const ownNode=(await state()).state.creative.works['export-work'].nodes['export-node-b'];
- wallpapers.push({format:'clean',file:'own-card.png',works:[ownNode.field]});
+ downloads.push({format:'clean',file:'own-card.png',works:[ownNode.field]});
  await button('‹ Назад').click();assert.equal(await button('Мои работы').getAttribute('aria-pressed'),'true');
  assert.equal(await page.evaluate(()=>document.activeElement?.dataset.draftId),'export-draft');
 
@@ -141,6 +141,20 @@ try {
  assert.match(await page.locator('.album-selection p').innerText(),/2 из 3/);
  await button('‹ Назад').click();await button('Собранное').click();
  passed.push('verified own gallery card downloads the displayed revision and mixed collage replaces earlier revisions in one slot');
+
+ await button('Коллаж').click();
+ const stripWorks=[levels[1],levels[4],levels[7]];
+ for(const work of stripWorks)await page.locator(`[data-album-level="${work.id}"]`).click();
+ await button('Посмотреть коллаж').click();await ready();
+ const stripHash=await imageHash(page.locator('.export-preview'));
+ const stripDownload=page.waitForEvent('download');await button('Сохранить PNG').click();
+ const strip=await stripDownload;
+ assert.equal(strip.suggestedFilename(),'Poluson-export-strip.png');
+ await strip.saveAs('.test-output/m4b/png/album-strip.png');
+ assert.equal(createHash('sha256').update(await readFile('.test-output/m4b/png/album-strip.png')).digest('hex'),stripHash);
+ downloads.push({format:'export-strip',file:'album-strip.png',works:stripWorks});
+ await button('Назад').click();await button('‹ Назад').click();
+ passed.push('three album prints download in tap order as continuous gradients and match the actual PNG preview');
 
  await page.locator('[data-album-level=gradient-001]').click();await page.getByLabel('Действия с работой').click();await button('Другие макеты').click();await ready();
  const before=await state(),previewHash=await page.locator('.export-preview').evaluate(async img=>{const b=await(await fetch(img.src)).arrayBuffer();return [...new Uint8Array(await crypto.subtle.digest('SHA-256',b))].map(v=>v.toString(16).padStart(2,'0')).join('');});
@@ -191,8 +205,8 @@ try {
   return results;
  });
  for(const png of pngs)await writeFile(`.test-output/m4b/png/${png.file}`,Buffer.from(png.bytes));
- await writeFile('.test-output/m4b/png/works.json',JSON.stringify([...wallpapers,...pngs.map(({format,file,works})=>({format,file,works}))],null,2));
+ await writeFile('.test-output/m4b/png/works.json',JSON.stringify([...downloads,...pngs.map(({format,file,works})=>({format,file,works}))],null,2));
  passed.push('all eight renderers execute in real Canvas; future daily rights are fixture-only, never awarded or persisted');
  assert.deepEqual(errors,[]);await writeFile('.test-output/m4b/browser.json',JSON.stringify({passed,pageErrors:errors,actual:'Chromium PNG render/download, UI selection, text metrics, geometry/lifecycle',fixtures:'30 completed campaign + verified own revisions imported with reducers; share/save-picker responses modelled; daily rights renderer-only',nativeRuntime:'NOT RUN',publication:'NOT ATTEMPTED'},null,2));
- console.log(`PASS: ${passed.length} M4 export browser scenarios; ${wallpapers.length+pngs.length} PNG files for independent pixel checks.`);await context.close();
+ console.log(`PASS: ${passed.length} M4 export browser scenarios; ${downloads.length+pngs.length} PNG files for independent pixel checks.`);await context.close();
 }finally{await browser?.close();server.kill();}

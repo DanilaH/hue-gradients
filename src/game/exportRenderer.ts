@@ -1,4 +1,4 @@
-import { ExportError, fitField, measuredLines, type ExportField, type ExportPlan } from '../domain/export';
+import { ExportError, measuredLines, type ExportField, type ExportPlan, type Rect } from '../domain/export';
 
 // Provisional existing UI tokens; font approval is still an M2 owner-review gate.
 export const EXPORT_STYLE={paper:'#FFF2DE',ink:'#261E32',font:'52px system-ui, sans-serif',lineHeight:64};
@@ -38,7 +38,8 @@ function samplesOnAxis(pixels: number, nodes: number) {
   });
 }
 
-function drawGradient(ctx: CanvasRenderingContext2D, field: ExportField, width: number, height: number): void {
+function drawGradient(ctx: CanvasRenderingContext2D, field: ExportField, region: Rect): void {
+  const { width, height } = region;
   const image = ctx.createImageData(width, height);
   const { data } = image;
   const colours = field.solvedTileColors.map(colour => {
@@ -62,7 +63,7 @@ function drawGradient(ctx: CanvasRenderingContext2D, field: ExportField, width: 
       data[index++] = 255;
     }
   }
-  ctx.putImageData(image, 0, 0);
+  ctx.putImageData(image, region.x, region.y);
 }
 
 export function gradientThumbnail(field: ExportField): HTMLCanvasElement {
@@ -70,19 +71,18 @@ export function gradientThumbnail(field: ExportField): HTMLCanvasElement {
   canvas.width = 96;
   canvas.height = 64;
   const context = canvas.getContext('2d', { alpha: false, colorSpace: 'srgb' });
-  if (context) drawGradient(context, field, canvas.width, canvas.height);
+  if (context) drawGradient(context, field, { x: 0, y: 0, width: canvas.width, height: canvas.height });
   canvas.setAttribute('aria-hidden', 'true');
   return canvas;
 }
 
 function drawLayout(ctx: CanvasRenderingContext2D, plan: ExportPlan): void {
     const { width, height } = plan.layout;
-    ctx.imageSmoothingEnabled=false;ctx.fillStyle=EXPORT_STYLE.paper;ctx.fillRect(0,0,width,height);
-    if(plan.format==='export-frame'){ctx.strokeStyle=EXPORT_STYLE.ink;ctx.lineWidth=4;ctx.strokeRect(96,96,1808,1808);}
-    plan.works.forEach((work,index)=>{
-      const f=work.field,fit=fitField(f,plan.layout.fields[index]!);
-      f.solvedTileColors.forEach((color,i)=>{ctx.fillStyle=color;ctx.fillRect(fit.x+(i%f.width)*fit.tileSize,fit.y+Math.floor(i/f.width)*fit.tileSize,fit.tileSize,fit.tileSize);});
-    });
+    if (plan.format !== 'clean') {
+      ctx.fillStyle=EXPORT_STYLE.paper;ctx.fillRect(0,0,width,height);
+      if(plan.format==='export-frame'){ctx.strokeStyle=EXPORT_STYLE.ink;ctx.lineWidth=4;ctx.strokeRect(96,96,1808,1808);}
+    }
+    plan.works.forEach((work,index)=>drawGradient(ctx,work.field,plan.layout.fields[index]!));
     const text=plan.layout.text;
     if(text) {
       ctx.font=EXPORT_STYLE.font;ctx.textAlign='left';ctx.textBaseline='alphabetic';ctx.fillStyle=EXPORT_STYLE.ink;
@@ -98,8 +98,7 @@ export async function renderExport(plan:ExportPlan):Promise<Blob> {
   const canvas=document.createElement('canvas');canvas.width=plan.layout.width;canvas.height=plan.layout.height;
   const ctx=canvas.getContext('2d',{alpha:false,colorSpace:'srgb'});if(!ctx)throw new ExportError('UNAVAILABLE','Не удалось подготовить изображение. Попробуйте ещё раз.');
   try {
-    if (plan.format === 'clean') drawGradient(ctx, plan.works[0]!.field, canvas.width, canvas.height);
-    else drawLayout(ctx, plan);
+    drawLayout(ctx, plan);
     const raw=await new Promise<Blob>((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(new ExportError('UNAVAILABLE','Не удалось подготовить PNG. Проверьте свободную память.')),'image/png'));
     return await srgbPng(raw);
   } finally {canvas.width=1;canvas.height=1;}

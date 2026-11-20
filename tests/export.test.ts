@@ -5,7 +5,7 @@ import { levels } from '../src/domain/levels';
 import { hashText } from '../src/local-store/command';
 import { applyCreative,initialCreative } from '../src/domain/creative';
 import { editorFingerprintPayload,makeField } from '../src/domain/editor';
-import { canExport,eligibleExportWorks,exportPlan,EXPORT_LAYOUTS,fitField,measuredLines,type ExportFormat } from '../src/domain/export';
+import { canExport,eligibleExportWorks,exportPlan,EXPORT_LAYOUTS,measuredLines,type ExportFormat } from '../src/domain/export';
 import { srgbPng } from '../src/game/exportRenderer';
 import witnesses from '../docs/spec/candidates/validation-0.1.json';
 const fp=new Map(await Promise.all(levels.map(async l=>[l.id,await hashText(fingerprintPayload(l))]as const)));
@@ -26,7 +26,7 @@ test('format thresholds and chapter page use committed ownership, with no export
   const before=JSON.stringify(fifteen);const page=exportPlan(fifteen,{format:'chapter-page',keys:[],caption:'ignored',chapterIndex:0});
   expect(page.works.map(w=>w.key)).toEqual(levels.slice(0,15).map(l=>`campaign:${l.id}`));expect(page.caption).toBe('Глава 1');expect(JSON.stringify(fifteen)).toBe(before);
 });
-test('seven template geometries fit square tiles and clean fills the portrait wallpaper',()=>{
+test('seven templates define print regions and clean fills the portrait wallpaper',()=>{
   const expected:Record<string,[number,number,number[]]>= {
     'export-caption':[1800,2000,[96,96,1608]],'export-strip':[2400,960,[96,144,672,864,144,672,1632,144,672]],
     'export-grid':[2000,2000,[96,96,856,1048,96,856,96,1048,856,1048,1048,856]],'export-frame':[2000,2000,[200,200,1600]],
@@ -40,7 +40,6 @@ test('seven template geometries fit square tiles and clean fills the portrait wa
     expect(plan.layout).toEqual({width:1080,height:1920,fields:[{x:0,y:0,width:1080,height:1920}]});
     expect(plan.works[0]?.field).toBe(level);
   }
-  expect(fitField({width:6,height:1,solvedTileColors:Array(6).fill('#123456')},{x:96,y:96,width:1608,height:1608})).toEqual({x:96,y:766,width:1608,height:268,tileSize:268});
 });
 test('selection must be complete and different logical works, not two revisions of one work',async()=>{
   const state=completed(15),keys=eligibleExportWorks(state).slice(0,2).map(w=>w.key);
@@ -51,6 +50,9 @@ test('selection must be complete and different logical works, not two revisions 
   const own={...newWorkspace('a'),creative:c};expect(canExport(own,'clean')).toBe(true);expect(own.rights).toEqual(['chapter-open:chapter-01']);
   expect(eligibleExportWorks(own)).toHaveLength(2);const all={...state,creative:c};
   expect(()=>exportPlan(all,{format:'export-strip',keys:['own:w:n','own:w:second',keys[0]!],caption:''})).toThrow('разные работы');
+  c.works.w!.nodes.n!.field={...field,solvedTileColors:field.solvedTileColors.map((colour,i)=>i===0?'red':colour)};
+  expect(()=>exportPlan(own,{format:'clean',keys:['own:w:n'],caption:''})).toThrow('Не удалось прочитать цвета работы');
+  expect(()=>exportPlan(all,{format:'export-strip',keys:['own:w:n',...keys],caption:''})).toThrow('Не удалось прочитать цвета работы');
 });
 test('text limits count Unicode code points, preserve text on error, and wrap by measured width',()=>{
   const state=completed(5),key='campaign:gradient-001';
@@ -60,13 +62,6 @@ test('text limits count Unicode code points, preserve text on error, and wrap by
   expect(measuredLines('АБВГДЕ',3,2,s=>s.length)).toEqual(['АБВ','ГДЕ']);
   expect(()=>measuredLines('Ш'.repeat(80),1608,2,s=>s.length*52)).toThrow('Сократите');
   expect(()=>measuredLines('а\nб\nв',100,2,s=>s.length)).toThrow('Сократите');
-});
-test('bad RGB cannot become an export; fit does not stretch or clip any legal editor dimension',()=>{
-  for(let width=1;width<=6;width++)for(let height=1;height<=5;height++){
-    const fit=fitField({width,height,solvedTileColors:Array(width*height).fill('#010203')},{x:96,y:144,width:672,height:672});
-    expect(fit.width/width).toBe(fit.height/height);expect(fit.x>=96&&fit.y>=144&&fit.x+fit.width<=768&&fit.y+fit.height<=816).toBe(true);
-  }
-  expect(()=>fitField({width:2,height:1,solvedTileColors:['#001122','red']},{x:0,y:0,width:100,height:100})).toThrow();
 });
 test('sRGB annotation preserves compressed pixels and emits independently verified PNG CRC/gamma',async()=>{
   const ch=(type:string,data:Buffer)=>{const name=Buffer.from(type),length=Buffer.alloc(4),crc=Buffer.alloc(4);length.writeUInt32BE(data.length);crc.writeUInt32BE(crc32(Buffer.concat([name,data])));return Buffer.concat([length,name,data,crc]);};
