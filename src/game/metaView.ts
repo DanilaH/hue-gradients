@@ -108,49 +108,69 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
     if (levelId && next !== position && !v.disabled) moveTo({ kind: 'chapter', levelId }, '[aria-current=true][data-level-id]');
   };
   const stage = document.createElement('div'); stage.className = 'level-stage'; actions.append(stage);
-  function boardAt(id: string, style: string): void {
-    const slot = document.createElement('div'); slot.className = style; stage.append(slot);
-    slot.setAttribute('aria-hidden', 'true');
+  const label = selectedState === 'Собран' ? 'Повторить' : selectedState === 'Начат' ? 'Продолжить' : 'Играть';
+  const activate = () => (selectedState === 'Собран' ? v.repeat : v.play)(route.levelId);
+  let center: HTMLButtonElement | undefined;
+  function boardAt(id: string, style: string, selected = false): void {
     const model = levelPreview(state, id);
+    const slot = document.createElement(selected && model ? 'button' : 'div');
+    slot.className = style;
+    if (slot instanceof HTMLButtonElement) {
+      center = slot;
+      slot.classList.add('quiet');
+      slot.type = 'button';
+      slot.disabled = v.disabled;
+      slot.setAttribute('aria-label', `${label} уровень ${getLevel(id).ordinal}`);
+      // Pointer taps are resolved on release by the stage. Keyboard and assistive clicks use the button.
+      slot.onclick = event => { if (event.detail === 0) activate(); };
+    } else slot.setAttribute('aria-hidden', 'true');
+    stage.append(slot);
     if (!model) { slot.classList.add('level-locked'); return; }
     const { level, board } = model;
-    slot.append(preview(level, false, board ?? undefined, board && style === 'level-preview' ? level.pinnedPositions : []));
+    slot.append(preview(level, false, board ?? undefined, selected && board ? level.pinnedPositions : []));
   }
   const previous = chapter.levelIds[position - 1], next = chapter.levelIds[position + 1];
   if (previous) boardAt(previous, 'level-peek level-peek-prev');
-  boardAt(route.levelId, 'level-preview');
+  boardAt(route.levelId, 'level-preview', true);
   if (next) boardAt(next, 'level-peek level-peek-next');
-  let drag: { id: number; x: number; y: number } | undefined;
+  let drag: { id: number; x: number; y: number; moved: boolean; fromCenter: boolean } | undefined;
   stage.onpointerdown = event => {
     if (!v.disabled && !drag && event.isPrimary && event.button === 0) {
-      drag = { id: event.pointerId, x: event.clientX, y: event.clientY };
+      drag = { id: event.pointerId, x: event.clientX, y: event.clientY, moved: false,
+        fromCenter: !!center?.contains(event.target as Node) };
       stage.setPointerCapture(event.pointerId);
     }
   };
-  const cancelDrag = () => { drag = undefined; stage.style.removeProperty('--picker-drag'); };
+  const cancelDrag = (event: PointerEvent) => {
+    if (drag?.id !== event.pointerId) return;
+    drag = undefined;
+    stage.style.removeProperty('--picker-drag');
+  };
   stage.onpointermove = event => {
     if (drag?.id !== event.pointerId) return;
-    const dx = event.clientX - drag.x;
-    if (Math.abs(dx) > Math.abs(event.clientY - drag.y)) {
+    const dx = event.clientX - drag.x, dy = event.clientY - drag.y;
+    if (Math.hypot(dx, dy) > 10) drag.moved = true;
+    if (Math.abs(dx) > Math.abs(dy)) {
       stage.style.setProperty('--picker-drag', `${Math.max(-96, Math.min(96, dx))}px`);
     }
   };
-  stage.onlostpointercapture = cancelDrag;
+  stage.onpointercancel = cancelDrag;
+  stage.onlostpointercapture = event => { if (event.target === stage) cancelDrag(event); };
   stage.onpointerup = event => {
-    if (drag?.id !== event.pointerId) return;
-    const dx = event.clientX - drag.x, dy = event.clientY - drag.y;
-    cancelDrag();
+    const gesture = drag;
+    if (gesture?.id !== event.pointerId) return;
+    const dx = event.clientX - gesture.x, dy = event.clientY - gesture.y;
+    cancelDrag(event);
     if (Math.abs(dx) >= 34 && Math.abs(dx) > Math.abs(dy)) select(position + (dx < 0 ? 1 : -1));
+    else if (gesture.fromCenter && !gesture.moved && Math.hypot(dx, dy) <= 10 &&
+      center?.contains(document.elementFromPoint(event.clientX, event.clientY))) activate();
   };
   const details = document.createElement('div'); details.className = 'level-actions'; actions.append(details);
   if (selectedState === 'Закрыт') {
     const requirement = document.createElement('p'); requirement.className = 'chapter-note';
     const ordinal = getLevel(route.levelId).ordinal;
     requirement.textContent = `Соберите уровень ${ordinal <= 5 ? ordinal - 1 : 5}`; details.append(requirement);
-  } else {
-    const label = selectedState === 'Собран' ? 'Повторить' : selectedState === 'Начат' ? 'Продолжить' : 'Играть';
-    button(label, () => (selectedState === 'Собран' ? v.repeat : v.play)(route.levelId), details).dataset.levelAction = '';
-  }
+  } else button(label, activate, details).dataset.levelAction = '';
   actions.append(rail);
   chapter.levelIds.forEach((id, number) => {
     const ordinal = getLevel(id).ordinal;
