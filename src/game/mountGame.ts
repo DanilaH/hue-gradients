@@ -11,11 +11,12 @@ import { PuzzleScene, GAME_PRESENTABLE } from './PuzzleScene';
 import { Atmosphere, type ColourPointer } from './atmosphere';
 import { cellCenter } from './geometry';
 import { GameFeedback, type Haptic } from './feedback';
-import { levelPreview, renderMeta, type MetaRoute } from './metaView';
+import { dailyLabel, levelPreview, renderMeta, type MetaRoute } from './metaView';
 import { chapterIndexFor, recommendedLevel, rewardTitle } from '../domain/progression';
 import { authorBests, authorView, findDraft, hasAuthorProof, type CreativeAction } from '../domain/creative';
 import { makeField, playableField } from '../domain/editor';
 import { AUTO_HELP_COST, autoHelpSwap, pulsePosition, type Assistance } from '../domain/puzzle';
+import { activeDaily, validateDailyFeed, type DailyFeed } from '../domain/daily';
 import { activeTimed, timedRemaining } from '../domain/timeTrial';
 import { activeChallenge } from '../domain/challenges';
 import { publishedBenchmark } from '../domain/playerProgress';
@@ -29,17 +30,18 @@ import './game.css';
 type Layer = 'none' | 'secret' | 'help' | 'help-menu' | 'pin-guide' | 'result' | 'meta' | 'restart' | 'recovery' | 'settings';
 interface Activity extends Pick<GameplayActivityCoordinator, 'isBlocked' | 'onBlockedChange' | 'setGameplayDesired'> {}
 
-export async function mountGame(parent: HTMLElement, store: TransactionalLocalStore, activity: Activity, options: { haptic?: Haptic; exportFiles?: ExportFiles } = {}): Promise<{ back(): boolean; destroy(): void }> {
+export async function mountGame(parent: HTMLElement, store: TransactionalLocalStore, activity: Activity, options: { haptic?: Haptic; exportFiles?: ExportFiles; dailySource?: () => Promise<DailyFeed> } = {}): Promise<{ back(): boolean; destroy(): void }> {
   const fingerprints = new Map(await Promise.all(levels.map(async level => [level.id, await hashText(fingerprintPayload(level))] as const)));
   const session = new Session(store, fingerprints);
   await session.load();
   const exportFiles = options.exportFiles ?? browserExportFiles();
   const current = () => {
+    const daily = activeDaily(session.state.dailyProgress);
     const timed = activeTimed(session.state.timedProgress);
     const challenge = activeChallenge(session.state.challengeProgress);
-    const own = !timed && !challenge && session.state.creative?.playing ? authorView(session.state.creative) : null;
-    const level = timed?.level ?? challenge?.level ?? own?.level ?? getLevel(session.state.activeLevelId);
-    return { own, challenge, timed, level, attempt: timed?.run.attempt ?? challenge?.attempt ?? own?.attempt ?? session.state.attempts[level.id] };
+    const own = !daily && !timed && !challenge && session.state.creative?.playing ? authorView(session.state.creative) : null;
+    const level = daily?.level ?? timed?.level ?? challenge?.level ?? own?.level ?? getLevel(session.state.activeLevelId);
+    return { own, challenge, timed, daily, level, attempt: daily?.attempt ?? timed?.run.attempt ?? challenge?.attempt ?? own?.attempt ?? session.state.attempts[level.id] };
   };
   const gameLayer = (): Layer => {
     const { attempt, challenge, timed } = current();
@@ -71,6 +73,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   let pendingHelp: (() => void) | null = null;
   let foregroundEpoch = 0;
   let queuedClock = false;
+  let dailyLoading = false;
   let pauseRequestedAt: number | null = null;
   const timeCaption = (seconds: number) => `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
   let layer = gameLayer();
@@ -95,15 +98,15 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   }
   const scene = new PuzzleScene(initialLevel, initialAttempt, {
     paint, swap: (from, to) => {
-      const { own, attempt, challenge, timed } = current();
+      const { own, attempt, challenge, timed, daily } = current();
       if (!attempt) return;
       if (timed) void run({ kind: 'timed-swap', from, to, attemptId: attempt.attemptId, now: Date.now() });
-      else void run({ kind: challenge ? 'challenge-swap' : own ? 'author-swap' : 'swap', from, to, attemptId: attempt.attemptId });
+      else void run({ kind: daily ? 'daily-swap' : challenge ? 'challenge-swap' : own ? 'author-swap' : 'swap', from, to, attemptId: attempt.attemptId });
     },
     pin: position => {
       showMark(position, 'pin');
-      const { own, level, challenge, timed } = current();
-      if (challenge || timed) return;
+      const { own, level, challenge, timed, daily } = current();
+      if (challenge || timed || daily) return;
       const onboarding = session.state.onboarding;
       if (own) { notice = 'Плитки с точкой закреплены'; render(); }
       else if (!onboarding.pinExplained || level.ordinal <= 10 && (onboarding.earlyPinTaps ?? 1) < 3) {
@@ -181,6 +184,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       if (!samePicker && JSON.stringify(route) !== JSON.stringify(metaRoute)) metaHistory.push(metaRoute);
     }
     metaRoute = route; layer = 'meta'; render();
+    if (route.kind === 'daily') void refreshDaily();
   }
   function startLevel(id: string): void {
     if (current().own) { void run({ kind: 'author-exit' }, () => queueMicrotask(() => startLevel(id))); return; }
@@ -210,6 +214,32 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     const challenge = current().challenge;
     const group = challenge?.chapterIndex !== undefined ? 'chapter' : challenge?.level.id.startsWith('geometry-v1-') ? 'geometry' : undefined;
     void run({ kind: 'challenge-leave' }, () => challengeLobby(group));
+  }
+  async function refreshDaily(): Promise<void> {
+    if (!options.dailySource || dailyLoading || activity.isBlocked()) return;
+    dailyLoading = true;
+    render();
+    try {
+      const feed = await options.dailySource();
+      validateDailyFeed(feed);
+      if (alive) await run({ kind: 'daily-cache', feed });
+    } catch { /* An offline or unverified response never modifies the trusted archive. */ }
+    finally { dailyLoading = false; if (alive && layer === 'meta' && metaRoute.kind === 'daily') render(); }
+  }
+  function playDaily(date: string, replay: boolean): void {
+    void run({ kind: 'daily-open', date, replay, attemptId: crypto.randomUUID() }, () => {
+      metaHistory = [];
+      layer = gameLayer();
+    });
+  }
+  function leaveDaily(): void {
+    void run({ kind: 'daily-leave' }, () => {
+      metaReturn = gameLayer();
+      metaHistory = [{ kind: 'chapter', levelId: session.state.activeLevelId }];
+      metaRoute = { kind: 'daily' };
+      layer = 'meta';
+      queueMicrotask(() => void refreshDaily());
+    });
   }
   function playTimed(): void {
     void run({ kind: 'timed-open', id: crypto.randomUUID(), now: Date.now() }, () => {
@@ -305,10 +335,15 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (editorDraftId !== draftId) { editorView?.destroy(); editorView = null; editorDraftId = draftId; }
     dialog.dataset.editor = String(!!draftId);
     byId('dialog-copy').textContent = ''; if (!editorView && !workCard) actions.replaceChildren();
-    const { level, attempt, own, challenge, timed } = current();
+    const { level, attempt, own, challenge, timed, daily } = current();
     dialog.dataset.challengeLost = String(challenge?.status === 'lost' || !!timed);
     prism.hidden = layer !== 'result' || challenge?.status === 'lost' || !!timed;
-    if (layer === 'result' && timed) {
+    if (layer === 'result' && daily) {
+      colourPrism(prism, level);
+      byId('dialog-title').textContent = 'Задача собрана';
+      byId('dialog-copy').textContent = dailyLabel(daily.date);
+      button('К календарю', leaveDaily);
+    } else if (layer === 'result' && timed) {
       byId('dialog-title').textContent = 'Время вышло';
       byId('dialog-copy').textContent = `Собрано · ${timed.run.cleared} · Рекорд · ${timed.best}`;
       button('К испытаниям', leaveTimed);
@@ -346,9 +381,10 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       }
     } else if (layer === 'restart') {
       byId('dialog-title').textContent = 'Начать заново?';
-      byId('dialog-copy').textContent = `«${own || challenge || timed ? level.title : getLevel(restartLevelId ?? level.id).title}» начнётся с исходного поля.`;
+      byId('dialog-copy').textContent = `«${own || challenge || timed || daily ? level.title : getLevel(restartLevelId ?? level.id).title}» начнётся с исходного поля.`;
       button('Начать заново', () => {
         if (challenge) { playChallenge(level.id, true); return; }
+        if (daily) { playDaily(daily.date, true); return; }
         void run(own ? { kind: 'author-start', workId: own.work.workId, nodeId: own.node.nodeId, attemptId: crypto.randomUUID(), restart: true } : { kind: 'restart', levelId: restartLevelId ?? level.id, attemptId: crypto.randomUUID() }, () => { metaHistory = []; layer = 'none'; });
       });
       button('Отмена', cancelRestart, true);
@@ -358,7 +394,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       close.className = 'quiet settings-close';
       close.setAttribute('aria-label', 'Вернуться к игре');
       close.autofocus = true;
-      if (attempt && !attempt.completed && !challenge && !timed) button('Помощь', () => { layer = 'help-menu'; render(); }, true);
+      if (attempt && !attempt.completed && !challenge && !timed && !daily) button('Помощь', () => { layer = 'help-menu'; render(); }, true);
       if (timed) button('К испытаниям', leaveTimed, true);
       else button('Заново', () => askRestart(session.state.activeLevelId), true).id = 'restart';
       for (const [key, label] of [['sound', 'Звуки'], ['haptics', 'Вибрация'], ['motion', 'Движение фона'], ['statistics', 'Статистика уровня']] as const) {
@@ -435,7 +471,9 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       } else {
       renderMeta({ route: metaRoute, state: session.state, disabled: busy || activity.isBlocked() || !!session.pending,
         title: byId('dialog-title'), copy: byId('dialog-copy'), actions, navigate: showMeta, back: () => { back(); },
-        play: startLevel, repeat: repeatLevel, playChallenge, playTimed,
+        play: startLevel, repeat: repeatLevel, playChallenge, playTimed, playDaily,
+        dailyAvailable: !!options.dailySource || !!session.state.dailyProgress,
+        dailyLoading,
         saveCopy: (levelId, name) => {
           const draftId = crypto.randomUUID();
           void run({ kind: 'copy', levelId, name, draftId, workId: crypto.randomUUID(), nodeId: crypto.randomUUID() }, () => {
@@ -457,15 +495,15 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   }
   function render(): void {
     if (!alive) return;
-    const { level, attempt, own, challenge, timed } = current();
+    const { level, attempt, own, challenge, timed, daily } = current();
     if (!attempt && !session.pending) layer = 'recovery';
     if (layer === 'none' && (challenge && challenge.status !== 'playing' || timed?.run.remainingMs === 0)) layer = 'result';
     root.dataset.level = level.id; root.dataset.moves = String(attempt?.moves ?? 0); root.dataset.busy = String(busy); root.dataset.layer = layer;
-    root.dataset.mode = timed ? 'timed' : challenge ? 'challenge' : own ? 'author' : 'campaign';
+    root.dataset.mode = daily ? 'daily' : timed ? 'timed' : challenge ? 'challenge' : own ? 'author' : 'campaign';
     root.dataset.motion = String(motionAllowed());
     root.style.setProperty('--color-a', level.solvedTileColors[0]!); root.style.setProperty('--color-b', level.solvedTileColors.at(-1)!);
-    byId('levels').textContent = timed || challenge ? '‹ Испытания' : own ? '‹ Редактор' : '‹ Уровни';
-    byId('title').textContent = own || challenge || timed ? level.title : `Уровень ${level.ordinal}`;
+    byId('levels').textContent = daily ? '‹ Календарь' : timed || challenge ? '‹ Испытания' : own ? '‹ Редактор' : '‹ Уровни';
+    byId('title').textContent = daily ? dailyLabel(daily.date) : own || challenge || timed ? level.title : `Уровень ${level.ordinal}`;
     const guidance = byId('guidance');
     guidance.textContent = layer === 'secret' ? '' : challenge ? `Ходов осталось · ${challenge.moveLimit - challenge.attempt.moves}` : layer === 'help' ? 'Готовое поле' : notice || (!own && !session.state.onboarding.firstSwapDone ? 'Поменяй две плитки местами' : '');
     guidance.setAttribute('aria-live', timed ? 'off' : 'polite');
@@ -520,7 +558,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   async function run(action: Action | CreativeAction, after?: () => void): Promise<boolean> {
     if (busy || session.pending || activity.isBlocked() && action.kind !== 'timed-pause') return false;
     const { attempt: previous, level: previousLevel, timed: timedBefore } = current();
-    const ordinarySwap = action.kind === 'swap' || action.kind === 'author-swap' || action.kind === 'challenge-swap' || action.kind === 'timed-swap';
+    const ordinarySwap = action.kind === 'swap' || action.kind === 'author-swap' || action.kind === 'challenge-swap' || action.kind === 'timed-swap' || action.kind === 'daily-swap';
     const autoSwap = (action.kind === 'help' || action.kind === 'author-help') && action.assistance?.kind === 'auto';
     const pair = ordinarySwap ? action : autoSwap && previous ? autoHelpSwap(previousLevel, previous) : null;
     const cost = autoSwap ? AUTO_HELP_COST : 1;
@@ -596,6 +634,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     }
     if (layer === 'restart') { cancelRestart(); return true; }
     if (layer === 'help-menu') { layer = 'settings'; render(); return true; }
+    if ((layer === 'result' || layer === 'none') && current().daily) { leaveDaily(); return true; }
     if ((layer === 'result' || layer === 'none') && current().timed) { leaveTimed(); return true; }
     if ((layer === 'result' || layer === 'none') && current().challenge) { leaveChallenge(); return true; }
     if (layer !== 'none') { layer = 'none'; render(); return true; }
@@ -607,7 +646,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (current().attempt?.completed) { layer = 'result'; render(); }
   }, { signal: listeners.signal });
   byId('levels').addEventListener('click', () => {
-    if (current().timed) leaveTimed();
+    if (current().daily) leaveDaily();
+    else if (current().timed) leaveTimed();
     else if (current().challenge) leaveChallenge();
     else if (current().own) leaveAuthor();
     else showMeta({ kind: 'chapter', levelId: session.state.activeLevelId });

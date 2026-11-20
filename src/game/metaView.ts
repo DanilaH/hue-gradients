@@ -8,7 +8,7 @@ import { renderProgress } from './progressView';
 
 type PickerRoute = { kind: 'chapter'; levelId: string; chapterMenu?: number };
 export type MetaRoute = PickerRoute | AlbumRoute | { kind: 'card' | 'copy'; levelId: string } |
-  { kind: 'own-card'; workId: string; nodeId: string } | { kind: 'draft'; draftId: string; nodeId?: string } | { kind: 'progress' } | { kind: 'challenges'; group?: 'chapter' | 'geometry' };
+  { kind: 'own-card'; workId: string; nodeId: string } | { kind: 'draft'; draftId: string; nodeId?: string } | { kind: 'progress' | 'daily' } | { kind: 'challenges'; group?: 'chapter' | 'geometry' };
 interface MetaView {
   route: MetaRoute; state: Workspace; disabled: boolean;
   title: HTMLElement; copy: HTMLElement; actions: HTMLElement;
@@ -17,6 +17,9 @@ interface MetaView {
   repeat(id: string): void;
   playChallenge(id: string, restart: boolean): void;
   playTimed(): void;
+  dailyAvailable: boolean;
+  dailyLoading: boolean;
+  playDaily(date: string, replay: boolean): void;
 }
 function actionButton(parent: HTMLElement, text: string, invoke: () => void, disabled: boolean): HTMLButtonElement {
   const button = document.createElement('button');
@@ -204,7 +207,15 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
   const challengesLink = button('Испытания', () => v.navigate({ kind: 'challenges' }), links);
   challengesLink.className = 'quiet level-chapter-link';
   challengesLink.setAttribute('aria-label', 'Испытания');
+  if (v.dailyAvailable) {
+    const dailyLink = button('Задача дня', () => v.navigate({ kind: 'daily' }), links);
+    dailyLink.className = 'quiet level-chapter-link';
+    dailyLink.setAttribute('aria-label', 'Задача дня');
+  }
 }
+
+const russianDate = new Intl.DateTimeFormat('ru', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+export const dailyLabel = (date: string): string => russianDate.format(new Date(`${date}T00:00:00Z`));
 
 export function renderMeta(v: MetaView): void {
   const { state, route, actions } = v;
@@ -218,6 +229,31 @@ export function renderMeta(v: MetaView): void {
   } else if (route.kind === 'progress') {
     v.title.textContent = 'Прогресс';
     renderProgress(actions, state, v.disabled, v.back);
+  } else if (route.kind === 'daily') {
+    v.title.textContent = 'Задача дня';
+    button('‹ Назад', v.back).className = 'quiet challenge-back';
+    const catalog = state.dailyProgress;
+    const dates = Object.keys(catalog?.slots ?? {}).sort().reverse();
+    if (!dates.length) {
+      label(v.dailyLoading ? 'Проверяем календарь…' : 'Календарь пока недоступен.');
+      return;
+    }
+    const list = document.createElement('div');
+    list.className = 'challenge-list';
+    actions.append(list);
+    for (const date of dates) {
+      const attempt = catalog!.attempts[date];
+      const replay = attempt?.completed === true;
+      const card = button('', () => v.playDaily(date, replay), list);
+      card.className = 'quiet challenge-card';
+      card.dataset.dailyDate = date;
+      const title = document.createElement('span');
+      title.textContent = dailyLabel(date);
+      const info = document.createElement('small');
+      info.textContent = [date === catalog!.through ? 'Общая задача' : 'Архив',
+        replay ? 'Собрано · Повторить' : attempt ? 'Продолжить' : ''].filter(Boolean).join(' · ');
+      card.append(title, info);
+    }
   } else if (route.kind === 'challenges') {
     v.title.textContent = 'Испытания';
     button('‹ Назад', v.back).className = 'quiet challenge-back';

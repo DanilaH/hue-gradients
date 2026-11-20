@@ -2,6 +2,7 @@ import { applyAction, decodeWorkspace, newWorkspace, upgradeWorkspace, type Acti
 import { hashText, prepareCommit } from '../local-store/command';
 import { applyCreative, validateCreativeHashes, type CreativeAction } from '../domain/creative';
 import { editorFingerprintPayload } from '../domain/editor';
+import { activeDaily } from '../domain/daily';
 import { activeChallenge } from '../domain/challenges';
 import type { Assistance } from '../domain/puzzle';
 import { StoreError, type PreparedCommit, type TransactionalLocalStore } from '../local-store/contracts';
@@ -49,6 +50,8 @@ export class Session {
       this.state?.challengeProgress?.best[challenge.level.id] === undefined;
     const timed = kind.startsWith('timed-') ? next.timedProgress : undefined;
     const timedFinished = !!timed && timed.finished > (this.state?.timedProgress?.finished ?? 0);
+    const daily = kind.startsWith('daily-') ? activeDaily(kind === 'daily-leave' ? this.state?.dailyProgress : next.dailyProgress) : null;
+    const firstDailyWin = daily?.attempt.completed && !this.state?.dailyProgress?.solved.includes(daily.date);
     const lastVictory = next.victories?.at(-1);
     const victory = lastVictory?.attemptId === this.state?.victories?.at(-1)?.attemptId ? undefined : lastVictory;
     const fact = { id: operationId, destination: { kind: 'guest' as const, vaultId: GUEST_VAULT },
@@ -57,6 +60,8 @@ export class Session {
         best: next.bests[next.activeLevelId], onboarding: next.onboarding, assistance, victory,
         ...(challenge ? { challengeId: challenge.level.id, challengeAttempt: challenge.attempt, challengeStatus: challenge.status, ...(firstChallengeWin ? { firstChallengeWin: true } : {}) } : {}),
         ...(timed ? { timed, ...(timedFinished ? { timedFinished: true } : {}) } : {}),
+        ...(daily ? { dailyDate: daily.date, dailyCatalog: daily.version, dailyAttempt: daily.attempt,
+          ...(firstDailyWin ? { firstDailyWin: true } : {}) } : {}),
         creativeAction, authorTest: creativeAction?.kind.startsWith('author-') ? next.creative?.activeTest : undefined,
         newCopies: Object.values(next.albumCopies).filter(copy => !this.state?.albumCopies[copy.draftId]),
         newCompletions: next.completed.filter(id => !this.state?.completed.includes(id)),
