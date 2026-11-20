@@ -10,7 +10,9 @@ Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and
 
 ## Current slice
 
-B2 (0.4.17/versionCode21, a976384) adds four chapter finales and four secret fields. In Chromium the first finale was locked at 14 normal works, opened at 15, and unlocked its secret exactly once through two completions. The preserved attempt reopened with exact RGB, without reapplying the first reveal. **Resume at B3**. [Evidence](evidence/queue-b2-2026-11-20.json)
+B3 (0.4.18/versionCode22, ed67542) adds a ten-minute timed series, durable pause/resume and a separate record. Browser touch solved the first board. Injected clock and blur/focus preserved 589 seconds after a simulated minute away, then expiry, reload and repeat kept exactly one finish receipt. Native lifecycle remains pending. **Resume at C1**. [Evidence](evidence/queue-b3-2026-11-20.json)
+
+B2 (0.4.17/versionCode21, a976384) adds four chapter finales and four secret fields. In Chromium the first finale was locked at 14 normal works, opened at 15, and unlocked its secret exactly once through two completions. The preserved attempt reopened with exact RGB, without reapplying the first reveal. [Evidence](evidence/queue-b2-2026-11-20.json)
 
 B1 (0.4.16/versionCode20, 8783519) is in the game. The 10 thresholds were reached through real campaign rules. Chromium touch opened the first challenge after five normal wins and committed a win and a loss on the sixth swap in separate runs. Replays use the same start, challenge saves do not touch campaign rewards or records, and a loss restores after reload. The paired 4×4 starts share four minimum swaps. [Evidence](evidence/queue-b1-2026-11-20.json)
 

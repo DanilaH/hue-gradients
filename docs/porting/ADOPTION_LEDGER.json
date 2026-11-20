@@ -1,6 +1,6 @@
 {
   "schema": "consumer-adoption-ledger-v1",
-  "consumerCommit": "a976384455eeb503df89fb45898727d6f35e9808",
+  "consumerCommit": "ed67542ba6c76a198c487600a296c27fd6c838f4",
   "asOf": "2026-11-20",
   "features": [
     {
@@ -567,11 +567,11 @@
     },
     {
       "id": "cp-timed",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
       "stage": "Пакет 03",
-      "currentImplementation": "Отсутствует timed/score режим; никакого основания считать его daily. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md",
-      "nextAction": "Реализовать соответствующий пункт пакета 03 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Полусон использует 10 минут и считает собранные поля. Игра сохраняет остаток и отдельный рекорд. Проверены второе поле, фон, истечение и повтор. Банк своих полей до 6×5. | https://github.com/DanilaH/hue-gradients/blob/ed67542ba6c76a198c487600a296c27fd6c838f4/tools/timed-trial-browser-check.mjs",
+      "nextAction": "Проверить при реальном сворачивании на Android (G1). Оригинальная геометрия 7×7 относится к более крупным полям.",
       "deliveryPackage": "03",
       "sourceNextCheck": "Зафиксировать паузу/таймер/новое поле до оценки."
     },
