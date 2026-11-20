@@ -1,6 +1,6 @@
 {
   "schema": "consumer-adoption-ledger-v1",
-  "consumerCommit": "19e0410be30b80b50ced1168cd4aa4ef8b71ecc3",
+  "consumerCommit": "08a2162544b1eeb1cca403893078368d9e2c04ab",
   "asOf": "2026-11-20",
   "features": [
     {
@@ -45,21 +45,21 @@
     },
     {
       "id": "h1-unlock",
-      "status": "ROADMAPPED",
+      "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 02",
-      "currentImplementation": "10 разных побед в предыдущей главе; новая глава содержит 15 задач. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/progression.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 02 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Экран показывает открытые главы. Следующая глава открывается на 10 разных победах предыдущей по действующим правилам Полусна. | https://github.com/DanilaH/hue-gradients/blob/08a2162544b1eeb1cca403893078368d9e2c04ab/src/domain/progression.ts",
+      "nextAction": "Принять переход по главам на телефоне.",
       "deliveryPackage": "02",
       "sourceNextCheck": "Сопоставить открытие и заполнение всей главы."
     },
     {
       "id": "h1-world-average",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
       "stage": "Пакет 02",
-      "currentImplementation": "Показываются личные результаты. История происхождения среднего оригинала неизвестна. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/workCardView.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 02 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Сравнение привязано к отпечатку и версии правил. Карточка знает версию, источник и размер выборки. Среднее показывается только при наличии опубликованной выборки. | https://github.com/DanilaH/hue-gradients/blob/08a2162544b1eeb1cca403893078368d9e2c04ab/src/domain/playerProgress.ts",
+      "nextAction": "Опубликовать выборку реальных прохождений с привязкой к определению.",
       "deliveryPackage": "02",
       "sourceNextCheck": "Для сравнения выбрать прозрачно названный ориентир и источник."
     },
@@ -207,41 +207,41 @@
     },
     {
       "id": "h1-score-toggle",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "MATCH",
       "stage": "Пакет 02",
-      "currentImplementation": "В паузе есть звук, вибрация и движение. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/mountGame.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 02 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Переключатель в паузе убирает статистику уровня и сравнение. Настройка сохраняется после перезапуска. Локальная история открывается отдельно. | https://github.com/DanilaH/hue-gradients/blob/08a2162544b1eeb1cca403893078368d9e2c04ab/src/game/mountGame.ts",
+      "nextAction": "Проверить переключатель на Android и в увеличенном тексте.",
       "deliveryPackage": "02",
       "sourceNextCheck": "Проверить спрос на спокойный режим без счётчика."
     },
     {
       "id": "h1-belts",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
       "stage": "Пакет 02",
-      "currentImplementation": "Мастерство хранится по задаче; долгосрочного счётчика этой цели нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/progression.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 02 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Десять ступеней 2/5/10/20/50/100/150/200/250/300. Строгое сравнение и смена эталона проверены. Пока выборка отсутствует, ступени видны без начислений. | https://github.com/DanilaH/hue-gradients/blob/08a2162544b1eeb1cca403893078368d9e2c04ab/src/game/progressView.ts",
+      "nextAction": "Проверить первую ступень по опубликованной выборке.",
       "deliveryPackage": "02",
       "sourceNextCheck": "Проверить повтор одного уровня и показ достижения без сети; выбрать честный ориентир для своей шкалы."
     },
     {
       "id": "h1-set-award",
-      "status": "ROADMAPPED",
+      "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 02",
-      "currentImplementation": "Отметка открытой/полной главы отличается по условию от финального этапа. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/progression.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 02 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Отдельно показаны завершение последнего уровня главы и заполнение всей главы. Право полной главы хранится по 15/15. | https://github.com/DanilaH/hue-gradients/blob/08a2162544b1eeb1cca403893078368d9e2c04ab/src/game/progressView.ts",
+      "nextAction": "Принять два состояния главы на телефоне.",
       "deliveryPackage": "02",
       "sourceNextCheck": "Проверить завершение финального этапа с пропусками и без них."
     },
     {
       "id": "h1-category-award",
-      "status": "ROADMAPPED",
+      "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 02",
-      "currentImplementation": "Есть закрытие отдельной главы 15/15; общей категории из наборов нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/progression.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 02 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Одна категория Полусна — Кампания. Полный сбор требует всех четырёх глав. Граница 60/60 проверена. | https://github.com/DanilaH/hue-gradients/blob/08a2162544b1eeb1cca403893078368d9e2c04ab/src/game/progressView.ts",
+      "nextAction": "Принять вид полного сбора на телефоне.",
       "deliveryPackage": "02",
       "sourceNextCheck": "Отделить полную главу от полного набора глав."
     },
@@ -337,11 +337,11 @@
     },
     {
       "id": "h2-xp",
-      "status": "ROADMAPPED",
-      "gap": "PARTIAL",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "MATCH",
       "stage": "Пакет 02",
-      "currentImplementation": "Новая победа продвигает главу один раз, общей валюты XP нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/progression.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 02 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Первое завершение официального уровня даёт +1 XP, повторная победа только пополняет историю. Экран работает без сети. | https://github.com/DanilaH/hue-gradients/blob/08a2162544b1eeb1cca403893078368d9e2c04ab/src/domain/playerProgress.ts",
+      "nextAction": "Принять показ первого опыта на телефоне.",
       "deliveryPackage": "02",
       "sourceNextCheck": "Проверить повтор идеального решения."
     },
@@ -687,11 +687,11 @@
     },
     {
       "id": "cp-average",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
       "stage": "Пакет 02",
-      "currentImplementation": "Есть личный результат; опубликованного среднего нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/workCardView.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 02 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "В карточке выделены личный результат и математический минимум. Среднее игроков доступно только из подтверждённой выборки. | https://github.com/DanilaH/hue-gradients/blob/08a2162544b1eeb1cca403893078368d9e2c04ab/src/game/workCardView.ts",
+      "nextAction": "Проверить подпись реального эталона после публикации данных.",
       "deliveryPackage": "02",
       "sourceNextCheck": "Указывать происхождение сравнительной величины."
     },
@@ -777,11 +777,11 @@
     },
     {
       "id": "mt-m06",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
       "stage": "Пакет 02",
-      "currentImplementation": "Отметки за конкретную задачу не образуют шкалу рангов. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/progression.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 02 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Сумма XP и десять ступеней мастерства имеют отдельные условия. Сравнение ждёт выборки. | https://github.com/DanilaH/hue-gradients/blob/08a2162544b1eeb1cca403893078368d9e2c04ab/src/game/progressView.ts",
+      "nextAction": "Принять шкалу после появления реальных сравнений.",
       "deliveryPackage": "02",
       "sourceNextCheck": "Проверить, есть ли у ранга новая понятная цель."
     },
@@ -887,16 +887,16 @@
     },
     {
       "id": "h1-share-scores",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
       "stage": "Пакет 02",
-      "currentImplementation": "Личная отметка perfect зависит от математического минимума и использования помощи. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/progression.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 02 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Новая сопоставимая победа учитывается один раз при включённой статистике. Повтор доставки и смена эталона не меняют прошлое сравнение. | https://github.com/DanilaH/hue-gradients/blob/08a2162544b1eeb1cca403893078368d9e2c04ab/src/domain/playerProgress.ts",
+      "nextAction": "Включить сравнение после публикации выборки.",
       "deliveryPackage": "02",
       "sourceNextCheck": "На выборе своей механики определить допустимые попытки и отдельно проверить равенство ориентиру."
     }
   ],
   "sourceInventory": "https://github.com/DanilaH/mini-games-kit/blob/0353273fb37b329611951e4500dd6d7cba6690ac/research/games/hue/porting/SOURCE_FEATURES.json",
-  "method": "Пункты пакета 01 обновлены по 0.4.11 и PR #5. Остальные расхождения отражают срез 0.4.10. IMPLEMENTED_UNVERIFIED в пакете 01 означает, что проверка на телефоне остаётся открытой. Уровень доказательств исходной игры оценивается отдельно.",
+  "method": "Пакет 01 проверен на 0.4.11 и перенесён в feat/m0-foundation. Пакет 02 обновлён по 0.4.12. Остальные расхождения отражают срез 0.4.10. IMPLEMENTED_UNVERIFIED оставляет приёмку на телефоне открытой.",
   "ownerScope": "20.11.2026, после аудита 0.4.10: «это всё делать надо». Весь реестр включён в программу разработки. Более конкретные решения: бесплатные попытки, одни плавные обои на работу, cloud M5 на паузе. Формулировки прежнего аудита «кандидат» отражают предыдущий статус."
 }

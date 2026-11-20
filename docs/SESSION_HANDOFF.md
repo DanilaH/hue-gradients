@@ -1,16 +1,18 @@
 # Resume — 20 November 2026
 
-**Owner scope update, 20 Nov.** All 89 audited rows now have delivery packages. Start with [help, mastery and legacy rewards](porting/FIRST_PACKAGE.md); continue through the [full porting roadmap](porting/FULL_ROADMAP.md). Earlier “candidates pending owner choice” in the historical audit is superseded for inclusion. Specific owner decisions on energy, single wallpaper and the M5 hold still govern.
+**Owner scope update, 20 Nov.** All 89 audited rows have delivery packages in the [full porting roadmap](porting/FULL_ROADMAP.md). Package 01 was brought into `feat/m0-foundation` before package 02. Specific owner decisions on energy, single wallpaper and the M5 hold still govern.
 
 Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and M4_EXPORT_IMPLEMENTATION.md. Owner authorized roadmap continuation. Bound file reads/output; no blobs/base64 or whole-archive re-reads. Commit checkpoints and preserve newer remote work. Branch feat/m0-foundation, draft PR #1; main still contains the original README.
 
 ## Research revision — 20 November 2026
 
-[Reference-to-product audit and next packages](porting/README.md) · [Adoption ledger](porting/ADOPTION_LEDGER.json) · [71-requirement review](porting/REQUIREMENTS_REVIEW.md). Use this overlay with current owner decisions when consulting the frozen 1.0 roadmap. Current export is a single continuous device-sized wallpaper. The old collage milestones are historical; the current code still grants legacy format IDs at thresholds. The next field/pause/result slice has observed assist/mastery differences and a two-run browser acceptance case. Soft hints and challenge modes are assigned to packages 01 and 03.
+[Reference-to-product audit and next packages](porting/README.md) · [Adoption ledger](porting/ADOPTION_LEDGER.json) · [71-requirement review](porting/REQUIREMENTS_REVIEW.md). Use this overlay with current owner decisions when consulting the frozen 1.0 roadmap. Export prepares a single continuous device-sized wallpaper. Legacy format IDs in existing saves are preserved by package 01. Challenge modes are assigned to package 03.
 
 ## Current slice
 
-0.4.11/versionCode15 is the first audit package in [PR #5](https://github.com/DanilaH/hue-gradients/pull/5) over the PR #4 audit branch. The pause menu offers a single-tile highlight, full preview and a +3-move auto-swap. Cancellation leaves an identical workspace. An accepted request is committed before presentation. The card displays minimum and separate bests with the earned perfect mark. Six retired layout rights are valid in old saves. Android can request the system wallpaper flow with the same prepared PNG. Actual Android interaction remains pending. [Package evidence and captures](evidence/help-mastery-2026-11-20.json)
+0.4.12/versionCode16 adds the offline progress route, first-win XP and one atomic history row per completed campaign attempt. Older snapshots seed history from saved completed attempts. A live comparison requires a published versioned sample for the exact fingerprint and rules. In fixture tests ties do not qualify, and version changes preserve already recorded comparisons. The level statistics preference defaults to visible and can be turned off in pause. [Progress and APK checks](evidence/player-progress-2026-11-20.json)
+
+0.4.11/versionCode15 was the first audit package in [PR #5](https://github.com/DanilaH/hue-gradients/pull/5) and is included in `feat/m0-foundation`. The pause menu offers a single-tile highlight, full preview and a +3-move auto-swap. Cancellation leaves an identical workspace. An accepted request is committed before presentation. The card displays minimum and separate bests with the earned perfect mark. Six retired layout rights are valid in old saves. Android can request the system wallpaper flow with the same prepared PNG. Actual Android interaction remains pending. [Package evidence and captures](evidence/help-mastery-2026-11-20.json)
 
 0.4.10/versionCode14 opens a full-screen editor with the name, continuous gradient and «Испытать». Tapping a corner shows a palette and custom colour with live preview. «Готово» commits a single revision. Resize, pins, fixed start and history sit under ⋯. Returning from author play opens the exact played node, and the wallpaper action always points at the selected verified node. A draft created and partially verified in 0.4.9 survives a new colour edit and reload. [Editor evidence and captures](evidence/editor-ui-2026-11-20.json)
 
@@ -46,7 +48,7 @@ Author activeTest persists work/node/frozen Attempt; creative.playing controls c
 
 ## Next work
 
-1. **After package 01 playtest: progress and visible achievements.** Follow [the audit roadmap](porting/FULL_ROADMAP.md). Device checks for package 01 cover Back, touch and the real wallpaper crop handler. Preserve the editor’s exact revision routes and the one-work wallpaper. M5 remains on hold. A shared daily requires a published catalog and trusted time.
+1. **Follow package 03 in the [audit roadmap](porting/FULL_ROADMAP.md).** Package 02 waits for a published comparison sample. Device checks cover Back, touch, progress and the wallpaper crop handler. Preserve the editor’s exact revision routes and the one-work wallpaper. M5 remains on hold. A shared daily requires a published catalog and trusted time.
 2. Keep M2 tokens and read M2_ART_BIBLE before visual changes. Two licensed Cyrillic fonts, native150% text and owner review remain pending. Editor browser computed-font enlargement is smoke evidence only. No mass styling or new A/B/C contest.
 3. Native SQLite, haptics, process death, storage pressure and touch remain NOT RUN. No Android device was attached. Hosted Yandex, identity/cloud/ads are external gates. Production register71 NOT RUN; full release unfinished.
 
@@ -66,4 +68,4 @@ Runtime/guidance469928d03f4bae5053e23db26e82187bedbc252e, kit archive SHA256ba90
 
 Read SIGNING_PREVIEW.md. Keep .preview3 and reuse the privately saved TEST key HUE-test-preview-signing.keystore via ANDROID_PREVIEW_KEYSTORE. Never regenerate/commit it or use it as production. Old0.2 .releasecheck signer was lost; never ask owner to uninstall that app and lose data. 0.4.1 certificate matches0.3/0.4.0; actual Android update is untested. Production base appId/certificate policy unchanged, signer null.
 
-The latest signed Poluson-0.4.11-preview.apk uses package com.danilah.huegradients.preview3 and versionCode15. Its certificate matches 0.4.10. Gradle 8.14.3, full JDK 21, Android API 36 and Build Tools 35.0.0 for AGP plus 36.0.0 for APK inspection were used. Debug and optimized releaseCheck built successfully. The exact APK passed verification. Native installation and runtime are pending device playtest. [Build hash, signer and capture evidence](evidence/help-mastery-2026-11-20.json)
+The latest signed Poluson-0.4.12-preview.apk uses package com.danilah.huegradients.preview3 and versionCode16. Its certificate matches 0.4.11. Gradle 8.14.3, full JDK 21, Android API 36 and Build Tools 35.0.0 for AGP plus 36.0.0 for APK inspection were used. Debug and optimized releaseCheck built successfully. The exact APK passed verification. Native installation and runtime are pending device playtest. [Build hash and signer](evidence/player-progress-2026-11-20.json)
