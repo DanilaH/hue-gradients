@@ -2,10 +2,11 @@ import { CAMPAIGN_CONTENT_VERSION, CONTENT_VERSION, createAttempt, proposeAssist
 import { getLevel, levels } from './levels';
 import { earnedRights, isKnownRight, levelIsOpen, META_POLICY } from './progression';
 import { initialCreative, validateCreative, type CreativeState } from './creative';
+import { campaignVictories, campaignVictory, publishedBenchmark, validateCampaignVictories, type CampaignVictory, type PublishedBenchmark } from './playerProgress';
 
 export interface Best { fingerprint: string; rulesVersion: typeof RULES_VERSION; clean: number | null; assisted: number | null }
-export interface Preferences { sound: boolean; haptics: boolean; motion: boolean }
-export const DEFAULT_PREFERENCES: Readonly<Preferences> = { sound: true, haptics: true, motion: true };
+export interface Preferences { sound: boolean; haptics: boolean; motion: boolean; statistics: boolean }
+export const DEFAULT_PREFERENCES: Readonly<Preferences> = { sound: true, haptics: true, motion: true, statistics: true };
 export interface AlbumCopy {
   schemaVersion: 1; draftId: string; workId: string; nodeId: string; parentNodeIds: readonly string[];
   name: string; fingerprint: string; rulesVersion: typeof RULES_VERSION;
@@ -21,6 +22,8 @@ export interface Workspace {
   onboarding: { version: 1; firstSwapDone: boolean; pinExplained: boolean; earlyPinTaps?: number };
   quarantine: { levelId: string; rawAttempt: string }[];
   preferences: Preferences;
+  /** Absent in snapshots saved before campaign history. */
+  victories?: readonly CampaignVictory[];
   albumCopies: Record<string, AlbumCopy>;
   /** Absent only in pre-editor saves; Session backs up and migrates before use. */
   creative?: CreativeState;
@@ -36,7 +39,7 @@ export function newWorkspace(attemptId: string): Workspace {
   const level = levels[0]!;
   return { schemaVersion: 1, contentVersion: CAMPAIGN_CONTENT_VERSION, policyVersion: META_POLICY.version, activeLevelId: level.id,
     attempts: { [level.id]: createAttempt(level, attemptId) }, completed: [], bests: {}, rights: ['chapter-open:chapter-01'],
-    onboarding: { version: 1, firstSwapDone: false, pinExplained: false }, quarantine: [], preferences: { ...DEFAULT_PREFERENCES }, albumCopies: {}, creative: initialCreative({}), lastCompletion: null };
+    onboarding: { version: 1, firstSwapDone: false, pinExplained: false }, quarantine: [], preferences: { ...DEFAULT_PREFERENCES }, victories: [], albumCopies: {}, creative: initialCreative({}), lastCompletion: null };
 }
 export function canonicalJson(value: unknown): string {
   if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
@@ -72,7 +75,9 @@ export function decodeWorkspace(json: string, fingerprints: ReadonlyMap<string, 
       ![1, 2, 3].includes(state.onboarding.earlyPinTaps)) throw new Error('Invalid pin tutorial progress');
   getLevel(state.activeLevelId);
   if (!Object.hasOwn(state, 'preferences')) state.preferences = { ...DEFAULT_PREFERENCES };
-  if (!state.preferences || Object.keys(DEFAULT_PREFERENCES).some(key => typeof state.preferences[key as keyof Preferences] !== 'boolean')) throw new Error('Invalid saved preferences');
+  if (!record(state.preferences)) throw new Error('Invalid saved preferences');
+  if (!Object.hasOwn(state.preferences, 'statistics')) state.preferences.statistics = DEFAULT_PREFERENCES.statistics;
+  if (Object.keys(DEFAULT_PREFERENCES).some(key => typeof state.preferences[key as keyof Preferences] !== 'boolean')) throw new Error('Invalid saved preferences');
   for (const list of [state.completed, state.rights]) if (new Set(list).size !== list.length || list.some(id => typeof id !== 'string')) throw new Error('Invalid saved progress');
   for (const id of state.completed) getLevel(id);
   if (state.rights.some(id => !isKnownRight(id)) || state.completed.some(id => !state.rights.includes(`clean-export:${id}`))) throw new Error('Invalid earned rights');
@@ -91,6 +96,8 @@ export function decodeWorkspace(json: string, fingerprints: ReadonlyMap<string, 
     try { validateAttempt(level, attempt); if (attempt.completed && !state.completed.includes(id)) throw new Error('Completion facts missing'); }
     catch { state.quarantine.push({ levelId: id, rawAttempt: JSON.stringify(attempt) }); delete state.attempts[id]; }
   }
+  if (!Object.hasOwn(state, 'victories')) state.victories = campaignVictories(state);
+  validateCampaignVictories(state, fingerprints);
   if (legacy) { state.albumCopies = {}; state.lastCompletion = null; }
   else {
     if (!record(state.albumCopies)) throw new Error('Invalid saved copies');
@@ -122,7 +129,8 @@ export function decodeWorkspace(json: string, fingerprints: ReadonlyMap<string, 
   return state;
 }
 
-export function applyAction(state: Workspace, action: Action, fingerprints: ReadonlyMap<string, string>): Workspace {
+export function applyAction(state: Workspace, action: Action, fingerprints: ReadonlyMap<string, string>,
+  benchmarks?: readonly PublishedBenchmark[]): Workspace {
   if (action.kind === 'preferences') {
     if (!Object.hasOwn(DEFAULT_PREFERENCES, action.key) || typeof action.value !== 'boolean' || state.preferences[action.key] === action.value) return state;
     return { ...state, preferences: { ...state.preferences, [action.key]: action.value } };
@@ -146,9 +154,12 @@ export function applyAction(state: Workspace, action: Action, fingerprints: Read
   if (action.kind === 'open' || action.kind === 'restart') {
     const target = getLevel(action.levelId);
     if (!levelIsOpen(state, target.id)) return state;
-    const next = action.kind === 'restart' || !state.attempts[target.id] ? createAttempt(target, action.attemptId) : state.attempts[target.id]!;
+    const create = action.kind === 'restart' || !state.attempts[target.id];
+    if (create && (Object.values(state.attempts).some(candidate => candidate.attemptId === action.attemptId)
+        || campaignVictories(state).some(victory => victory.attemptId === action.attemptId))) return state;
+    const next = create ? createAttempt(target, action.attemptId) : state.attempts[target.id]!;
     if (state.activeLevelId === target.id && next === attempt) return state;
-    return { ...state, activeLevelId: target.id, attempts: { ...state.attempts, [target.id]: next } };
+    return { ...state, activeLevelId: target.id, attempts: { ...state.attempts, [target.id]: next }, victories: campaignVictories(state) };
   }
   if (action.kind === 'pin') {
     const taps = state.onboarding.earlyPinTaps ?? Number(state.onboarding.pinExplained);
@@ -166,6 +177,11 @@ export function applyAction(state: Workspace, action: Action, fingerprints: Read
     const category = next.assisted ? 'assisted' : 'clean';
     result.bests = { ...state.bests, [level.id]: { ...previous, [category]: Math.min(previous[category] ?? Infinity, next.moves) } };
     if (!state.completed.includes(level.id)) result.completed = [...state.completed, level.id];
+    const history = campaignVictories(state);
+    const reference = state.preferences.statistics ? publishedBenchmark(level, previous.fingerprint, benchmarks) : undefined;
+    if (!history.some(victory => victory.attemptId === next.attemptId)) {
+      result.victories = [...history, campaignVictory(next, previous.fingerprint, reference)];
+    }
     result.rights = earnedRights(result, fingerprints);
     result.lastCompletion = { attemptId: next.attemptId, levelId: level.id, newRights: result.rights.filter(id => !state.rights.includes(id)) };
   }

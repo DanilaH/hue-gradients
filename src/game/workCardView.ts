@@ -1,5 +1,6 @@
 import { exportResultMessage, type ExportFiles } from '../app/exportFiles';
 import { wallpaperField, type ExportField, type WallpaperSize } from '../domain/export';
+import type { PublishedBenchmark } from '../domain/playerProgress';
 import type { Workspace } from '../domain/workspace';
 import { renderWallpaper } from './exportRenderer';
 
@@ -20,6 +21,7 @@ export interface WorkCard {
   best: { clean: number | null; assisted: number | null };
   minimum: number;
   perfect: boolean;
+  reference?: PublishedBenchmark;
 }
 
 export class WorkCardView {
@@ -70,14 +72,23 @@ export class WorkCardView {
     const choices = document.createElement('div');
     choices.className = 'work-card-menu';
     const best = work.best;
-    const records = [
-      work.detail, `Минимум — ${work.minimum}`,
-      best.clean === null ? null : `Без помощи — ${best.clean}`,
-      best.assisted === null ? null : `С помощью — ${best.assisted}`,
-    ];
-    const stats = document.createElement('p');
-    stats.textContent = records.filter(Boolean).join(' · ');
-    choices.append(stats);
+    const records = [work.detail];
+    if (state.preferences.statistics) {
+      records.push(`Минимум — ${work.minimum}`);
+      if (best.clean !== null) records.push(`Без помощи — ${best.clean}`);
+      if (best.assisted !== null) records.push(`С помощью — ${best.assisted}`);
+    }
+    if (records.some(Boolean)) {
+      const stats = document.createElement('p');
+      stats.textContent = records.filter(Boolean).join(' · ');
+      choices.append(stats);
+    }
+    if (state.preferences.statistics && work.reference) {
+      const row = document.createElement('p');
+      const { mean, sampleSize, source, version } = work.reference;
+      row.textContent = `Среднее игроков — ${mean} · ${sampleSize} результатов · ${source} · ${version}`;
+      choices.append(row);
+    }
     if (work.perfect) {
       const mastery = document.createElement('p');
       mastery.className = 'work-card-mastery';

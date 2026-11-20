@@ -213,7 +213,7 @@ try {
   assert.equal(await page.locator('.level-preview rect').count(), level.width * level.height);
   const pickerFit = async () => page.locator('#game-dialog').evaluate(dialog => {
     const anchors = [...dialog.querySelectorAll('.level-picker-nav button, [data-level-action], [data-open-chapters], .level-rail [aria-current=true]')];
-    return anchors.length === 5 && dialog.scrollHeight <= dialog.clientHeight + 1 && anchors.every(anchor => {
+    return anchors.length === 6 && dialog.scrollHeight <= dialog.clientHeight + 1 && anchors.every(anchor => {
       const { x, y, width, height } = anchor.getBoundingClientRect();
       return x >= 0 && y >= 0 && x + width <= innerWidth + 1 && y + height <= innerHeight + 1 &&
         anchor.contains(document.elementFromPoint(x + width / 2, y + height / 2));

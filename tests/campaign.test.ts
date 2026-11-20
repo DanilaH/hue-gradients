@@ -7,6 +7,7 @@ import { createAttempt, proposeSwap, validateAttempt } from '../src/domain/puzzl
 import { applyAction, decodeWorkspace, fingerprintPayload, newWorkspace, upgradeWorkspace, type Workspace } from '../src/domain/workspace';
 import { chapterCount, chapterIsOpen, earnedRights, levelIsOpen, recommendedLevel, visibleRewards } from '../src/domain/progression';
 import { hashText } from '../src/local-store/command';
+import { campaignProgress } from '../src/domain/playerProgress';
 
 const fingerprints = new Map(await Promise.all(levels.map(async level => [level.id, await hashText(fingerprintPayload(level))] as const)));
 function complete(state: Workspace, ordinal: number, assisted = false): Workspace {
@@ -41,6 +42,9 @@ test('first five stay sequential, then the remaining chapter is freely selectabl
   const locked = applyAction(state,{kind:'restart',levelId:levels[15]!.id,attemptId:'bypass'},fingerprints);
   expect(locked).toBe(state);
   state = complete(state,15); expect(recommendedLevel(state,0)).toBe('gradient-006');
+  expect(campaignProgress(state)).toMatchObject({ xp: 6, complete: false,
+    sets: [expect.objectContaining({ open: true, finale: true, complete: false, count: 6 }),
+      expect.objectContaining({ open: false }), expect.objectContaining({ open: false }), expect.objectContaining({ open: false })] });
 });
 test('9→10 and 14→15 are atomic milestones; replays do not farm progress; final chapter has no phantom successor', () => {
   let state = newWorkspace('first');
@@ -56,6 +60,7 @@ test('9→10 and 14→15 are atomic milestones; replays do not farm progress; fi
     if ([4, 5, 14, 15, 29, 30].includes(n)) expect(state.rights.filter(id => id.startsWith('export-'))).toEqual(['export-clean']);
   }
   expect(state.completed).toHaveLength(60); expect(recommendedLevel(state)).toBeNull();
+  expect(campaignProgress(state)).toMatchObject({ xp: 60, complete: true });
   expect(state.rights).not.toContain('chapter-open:chapter-05');
   expect(state.rights.filter(r=>r.startsWith('campaign-card:'))).toHaveLength(60);
   const before = [...state.rights];

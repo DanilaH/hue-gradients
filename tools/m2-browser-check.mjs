@@ -69,7 +69,7 @@ try {
   await tap(1); await tap(2); await idle(); assert.equal(await page.evaluate(()=>window.__feedback.audio+window.__feedback.haptic.length),muted);
   assert.equal(await page.locator('#hue-app').getAttribute('data-motion'),'false');
   const frame=await page.locator('.atmosphere').getAttribute('data-frames'); await page.waitForTimeout(200); assert.equal(await page.locator('.atmosphere').getAttribute('data-frames'),frame);
-  await page.reload(); await page.waitForSelector('html[data-state=ready]'); assert.deepEqual((await state()).preferences,{sound:false,haptics:false,motion:false}); reports.push('sound/haptic/motion settings persist; muted actions stay silent');
+  await page.reload(); await page.waitForSelector('html[data-state=ready]'); assert.deepEqual((await state()).preferences,{sound:false,haptics:false,motion:false,statistics:true}); reports.push('sound/haptic/motion settings persist; muted actions stay silent');
   await page.locator('#settings').click(); await page.getByRole('checkbox',{name:'Движение фона',exact:true}).check(); await idle(); await page.getByRole('button',{name:'Вернуться к игре'}).click();
   await page.emulateMedia({reducedMotion:'reduce'}); await page.waitForSelector('#hue-app[data-motion=false]'); assert.equal(await page.locator('#hue-app').getAttribute('data-motion'),'false');
   const reduced=await page.locator('.atmosphere').getAttribute('data-frames'); await page.waitForTimeout(200); assert.equal(await page.locator('.atmosphere').getAttribute('data-frames'),reduced); reports.push('system reduced motion overrides the animation preference');

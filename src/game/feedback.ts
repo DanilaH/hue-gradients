@@ -31,14 +31,16 @@ function makeBuffer(context: AudioContext, cue: FeedbackCue, variant: number): A
   }
   return buffer;
 }
+type FeedbackPreferences = Pick<Preferences, 'sound' | 'haptics'>;
+
 export class GameFeedback {
   private readonly buffers = new WeakMap<AudioContext, Map<string, AudioBuffer>>();
   private readonly player = new OneShotPlayer({ groups: { glass: { minIntervalMs: 0, replacementFadeMs: 9 } }, maxVoices: 4, resumeDeadlineMs: 90 });
   private variant = 0;
-  private preferences: Preferences = { sound: false, haptics: false, motion: false };
+  private preferences: FeedbackPreferences = { sound: false, haptics: false };
   private blocked = true;
   constructor(private readonly haptic: Haptic = cue => { try { navigator.vibrate?.(cue === 'win' ? [12, 30, 18] : 8); } catch {} }) {}
-  configure(preferences: Preferences, blocked: boolean): void {
+  configure(preferences: FeedbackPreferences, blocked: boolean): void {
     this.preferences = preferences; this.blocked = blocked;
     const eligible = !blocked && preferences.sound;
     this.player.setEligibility({ gameplay: eligible, ui: eligible });

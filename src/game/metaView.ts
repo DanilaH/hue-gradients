@@ -3,10 +3,11 @@ import { chapterCount, chapterIndexFor, chapterIsOpen, levelIsOpen, META_POLICY,
 import type { LevelDefinition } from '../domain/puzzle';
 import type { Workspace } from '../domain/workspace';
 import type { AlbumRoute } from './albumView';
+import { renderProgress } from './progressView';
 
 type PickerRoute = { kind: 'chapter'; levelId: string; chapterMenu?: number };
 export type MetaRoute = PickerRoute | AlbumRoute | { kind: 'card' | 'copy'; levelId: string } |
-  { kind: 'own-card'; workId: string; nodeId: string } | { kind: 'draft'; draftId: string; nodeId?: string };
+  { kind: 'own-card'; workId: string; nodeId: string } | { kind: 'draft'; draftId: string; nodeId?: string } | { kind: 'progress' };
 interface MetaView {
   route: MetaRoute; state: Workspace; disabled: boolean;
   title: HTMLElement; copy: HTMLElement; actions: HTMLElement;
@@ -96,6 +97,7 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
   }
 
   v.title.textContent = 'Уровни';
+  button('Прогресс', () => v.navigate({ kind: 'progress' }), nav).className = 'quiet';
   button('Альбом', () => v.navigate({ kind: 'album', tab: 'campaign' }), nav).className = 'quiet';
   const position = chapter.levelIds.indexOf(route.levelId);
   const selectedState = pickerState(state, route.levelId);
@@ -183,6 +185,9 @@ export function renderMeta(v: MetaView): void {
   const back = () => button('Назад', v.back);
   if (route.kind === 'chapter') {
     renderPicker(v, route);
+  } else if (route.kind === 'progress') {
+    v.title.textContent = 'Прогресс';
+    renderProgress(actions, state, v.disabled, v.back);
   } else if (route.kind === 'card' || route.kind === 'copy') {
     const level = getLevel(route.levelId);
     v.title.textContent = level.title;

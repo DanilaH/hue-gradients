@@ -16,6 +16,7 @@ import { chapterIndexFor, recommendedLevel, rewardTitle } from '../domain/progre
 import { authorBests, authorView, findDraft, hasAuthorProof, type CreativeAction } from '../domain/creative';
 import { makeField, playableField } from '../domain/editor';
 import { AUTO_HELP_COST, autoHelpSwap, pulsePosition, type Assistance } from '../domain/puzzle';
+import { publishedBenchmark } from '../domain/playerProgress';
 import { EditorView } from './editorView';
 import { renderAlbum, type AlbumPosition, type AlbumRoute } from './albumView';
 import { WorkCardView } from './workCardView';
@@ -245,7 +246,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       byId('dialog-title').textContent = own ? 'Проверка пройдена' : 'Собрано';
       const count = attempt?.moves ?? 0, form = new Intl.PluralRules('ru').select(count);
       const word = form === 'one' ? 'ход' : form === 'few' ? 'хода' : 'ходов';
-      byId('dialog-copy').textContent = `${count} ${word}`;
+      byId('dialog-copy').textContent = session.state.preferences.statistics ? `${count} ${word}` : '';
       if (own) {
         button('В редактор', leaveAuthor);
       } else {
@@ -275,7 +276,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       close.autofocus = true;
       if (attempt && !attempt.completed) button('Помощь', () => { layer = 'help-menu'; render(); }, true);
       button('Заново', () => askRestart(session.state.activeLevelId), true).id = 'restart';
-      for (const [key, label] of [['sound', 'Звуки'], ['haptics', 'Вибрация'], ['motion', 'Движение фона']] as const) {
+      for (const [key, label] of [['sound', 'Звуки'], ['haptics', 'Вибрация'], ['motion', 'Движение фона'], ['statistics', 'Статистика уровня']] as const) {
         const row = document.createElement('label'); row.className = 'setting';
         const input = document.createElement('input'); input.type = 'checkbox'; input.checked = session.state.preferences[key]; input.disabled = busy || activity.isBlocked();
         input.setAttribute('aria-label', label);
@@ -284,7 +285,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       }
     } else if (layer === 'help-menu') {
       byId('dialog-title').textContent = 'Помощь';
-      byId('dialog-copy').textContent = 'Если воспользоваться помощью, результат попадёт в «С помощью».';
+      byId('dialog-copy').textContent = 'Подсветка и просмотр не добавят ходов. Любая помощь отмечает результат «С помощью».';
       button('Показать одну плитку', () => {
         if (attempt) askHelp({ kind: 'pulse', scanFrom: Math.floor(Math.random() * attempt.board.length) });
       }, true);
@@ -303,9 +304,10 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
         const record = finished ? session.state.bests[finished.id]! : authorBests(authorCard!.work, authorCard!.nodeId);
         const minimum = finished?.minimumSwaps ?? playableField(authorCard!.work.nodes[authorCard!.nodeId]!.field, authorCard!.work.workId, title).minimumSwaps;
         const perfect = finished ? session.state.rights.includes(`mastery:${fingerprints.get(finished.id)}:perfect-no-assist`) : record.clean === minimum;
+        const reference = finished ? publishedBenchmark(finished, fingerprints.get(finished.id)) : undefined;
         byId('dialog-title').textContent = title;
         if (!workCard) workCard = new WorkCardView(actions, session.state, {
-          key: cardKey, title, best: record, minimum, perfect,
+          key: cardKey, title, best: record, minimum, perfect, ...(reference ? { reference } : {}),
           ...(finished ? {
             levelId: finished.id, filename: `Poluson-${String(finished.ordinal).padStart(3, '0')}.png`,
           } : {

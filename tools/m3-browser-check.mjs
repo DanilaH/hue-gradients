@@ -119,7 +119,38 @@ try{
  for(const viewport of[{width:320,height:568},{width:844,height:390}]){
   await page.setViewportSize(viewport);await page.waitForTimeout(80);const bounds=await page.locator('#game-dialog').boundingBox();assert(bounds.x>=0&&bounds.x+bounds.width<=viewport.width+1);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
  }
- passed.push('album/page navigation fits narrow portrait and landscape');assert.deepEqual(errors,[]);await context.close();
+ passed.push('album/page navigation fits narrow portrait and landscape');
+ await page.setViewportSize({width:320,height:568});
+ await picker();
+ await context.setOffline(true);
+ await albumButton('Прогресс').click();
+ const progress=page.locator('[data-meta=progress]');
+ assert.match(await progress.innerText(),/Собрано 15 из 60 · 15 XP/);
+ assert.match(await progress.getByLabel('Главы').innerText(),/Глава 1 · 15\/15 · Собрана/);
+ await progress.getByText(/^История побед ·/).click();
+ assert.equal(await progress.locator('[data-attempt-id]').count(),current.victories.length);
+ await progress.getByText('Ступени мастерства',{exact:true}).click();
+ assert.match(await progress.innerText(),/появится после публикации результатов/);
+ assert.equal(await progress.locator('li').filter({hasText:/Получено/}).count(),0);
+ assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+ await page.screenshot({path:'.test-output/m3/progress.png'});
+ await context.setOffline(false);
+ await progress.getByRole('button',{name:'‹ Назад',exact:true}).click();
+ assert.equal(await page.locator('.level-stage').count(),1);
+ passed.push('offline progress shows real XP, chapter completion, victory history and pending world comparison');
+ await page.keyboard.press('Escape');
+ await page.locator('#settings').click();
+ await page.getByRole('checkbox',{name:'Статистика уровня',exact:true}).uncheck();
+ await idle();
+ await page.reload();await page.waitForSelector('html[data-state=ready]');
+ assert.equal((await state()).preferences.statistics,false);
+ await picker();
+ await albumButton('Прогресс').click();
+ assert.equal(await progress.getByText('Ступени мастерства',{exact:true}).count(),0);
+ assert.match(await progress.innerText(),/История побед/);
+ assert.deepEqual((await state()).victories,current.victories);
+ passed.push('statistics preference persists and does not remove campaign history');
+ assert.deepEqual(errors,[]);await context.close();
  // Fixture cases below validate imported durable state, not 60 human/phone playthroughs.
  for(const fault of[false,true]){
   const c=await browser.newContext({viewport:{width:390,height:844}}),p=await c.newPage();await p.goto(base);await p.waitForSelector('html[data-state=ready]');
