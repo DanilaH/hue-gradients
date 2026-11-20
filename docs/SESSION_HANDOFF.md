@@ -10,7 +10,9 @@ Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and
 
 ## Current slice
 
-C2 (0.4.20/versionCode24, a763853) adds a 13×13 board. A second touch cancels the pending swap, pinch and pan transform paint and hit geometry together, and drag near a visible edge scrolls only at zoom. Chromium hit pin 84, exchanged 83/85 and then rejected a captured drop outside the canvas. A1 seam and small landscape control still pass. **Resume at D1**. [Evidence](evidence/queue-c2-2026-11-20.json)
+D1 (0.4.21/versionCode25, 7341192) adds a daily client and immutable cache. Browser fixtures covered identical starts on two profiles, UTC midnight during a game, an immutable cached version and an offline replay with one first-win receipt. No production catalog or clock is configured. **Resume at D2**. [Evidence](evidence/queue-d1-2026-11-20.json)
+
+C2 (0.4.20/versionCode24, a763853) adds a 13×13 board. A second touch cancels the pending swap, pinch and pan transform paint and hit geometry together, and drag near a visible edge scrolls only at zoom. Chromium hit pin 84, exchanged 83/85 and then rejected a captured drop outside the canvas. A1 seam and small landscape control still pass. [Evidence](evidence/queue-c2-2026-11-20.json)
 
 C1 (0.4.19/versionCode23, 493b241) ships four boards via Levels → Challenges → Shapes. Browser touch accepted a compatible swap on all four, rejected pins and cross-shape exchanges, and matched actual PNG RGB and saved replay starts. The campaign bank remains byte-exact. [Evidence](evidence/queue-c1-2026-11-20.json)
 

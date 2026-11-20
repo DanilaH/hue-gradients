@@ -1,6 +1,6 @@
 {
   "schema": "consumer-adoption-ledger-v1",
-  "consumerCommit": "a76385346086edaa86252e01a0ffc6519aa1cce7",
+  "consumerCommit": "7341192f984b0a4a7a75a6d78d5017349eb28d14",
   "asOf": "2026-11-20",
   "features": [
     {
@@ -377,21 +377,21 @@
     },
     {
       "id": "h2-daily-open",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
       "stage": "Пакет 05",
-      "currentImplementation": "Общий каталог в плане, XP-ворот нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md",
-      "nextAction": "Реализовать соответствующий пункт пакета 05 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "D1: фиксированный старт по доверенной дате, версия кеша, офлайн-архив и одна отметка о победе подтверждены на датированных фикстурах. | https://github.com/DanilaH/hue-gradients/blob/7341192f984b0a4a7a75a6d78d5017349eb28d14/tools/daily-browser-check.mjs",
+      "nextAction": "Подключить опубликованный версионированный календарь и доверенный источник UTC-времени, затем проверить реальный общий слот и архив.",
       "deliveryPackage": "05",
       "sourceNextCheck": "Определить момент знакомства с daily при запуске сервиса."
     },
     {
       "id": "h2-daily-date",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
       "stage": "Пакет 05",
-      "currentImplementation": "Спроектирован общий UTC-каталог с доверенным временем. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/TECHNICAL_SPEC_0_1.md",
-      "nextAction": "Реализовать соответствующий пункт пакета 05 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "D1: фиксированный старт по доверенной дате, версия кеша, офлайн-архив и одна отметка о победе подтверждены на датированных фикстурах. | https://github.com/DanilaH/hue-gradients/blob/7341192f984b0a4a7a75a6d78d5017349eb28d14/tools/daily-browser-check.mjs",
+      "nextAction": "Подключить опубликованный версионированный календарь и доверенный источник UTC-времени, затем проверить реальный общий слот и архив.",
       "deliveryPackage": "05",
       "sourceNextCheck": "Проверить две зоны и перевод часов на опубликованном слоте."
     },
@@ -427,11 +427,11 @@
     },
     {
       "id": "h2-daily-history",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
       "stage": "Пакет 05",
-      "currentImplementation": "Фиксированному общему слоту не нужен персональный подбор. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md",
-      "nextAction": "Реализовать соответствующий пункт пакета 05 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "D1: фиксированный старт по доверенной дате, версия кеша, офлайн-архив и одна отметка о победе подтверждены на датированных фикстурах. | https://github.com/DanilaH/hue-gradients/blob/7341192f984b0a4a7a75a6d78d5017349eb28d14/tools/daily-browser-check.mjs",
+      "nextAction": "Подключить опубликованный версионированный календарь и доверенный источник UTC-времени, затем проверить реальный общий слот и архив.",
       "deliveryPackage": "05",
       "sourceNextCheck": "Проверить на двух разных профилях, если вводится личная подборка."
     },
@@ -441,7 +441,7 @@
       "gap": "MISSING",
       "stage": "Пакет 05",
       "currentImplementation": "Общего daily-XP в локальной игре нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md",
-      "nextAction": "Реализовать соответствующий пункт пакета 05 и проверить приёмку из FULL_ROADMAP.md. ",
+      "nextAction": "Публичную календарную выдачу принять только после D1 с опубликованным источником и правилами наград; запись локального факта сама не даёт глобальных прав.",
       "deliveryPackage": "05",
       "sourceNextCheck": "Повторная победа по одному слоту, отдельность от кампании."
     },
@@ -807,11 +807,11 @@
     },
     {
       "id": "mt-m09",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
       "stage": "Пакет 05",
-      "currentImplementation": "Нет игрового daily-входа и этого ритуала. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md",
-      "nextAction": "Реализовать соответствующий пункт пакета 05 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "D1: фиксированный старт по доверенной дате, версия кеша, офлайн-архив и одна отметка о победе подтверждены на датированных фикстурах. | https://github.com/DanilaH/hue-gradients/blob/7341192f984b0a4a7a75a6d78d5017349eb28d14/tools/daily-browser-check.mjs",
+      "nextAction": "Подключить опубликованный версионированный календарь и доверенный источник UTC-времени, затем проверить реальный общий слот и архив.",
       "deliveryPackage": "05",
       "sourceNextCheck": "Сравнить короткое своё вступление со входом сразу в поле."
     },

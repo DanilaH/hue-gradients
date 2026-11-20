@@ -1,6 +1,6 @@
 # Status — 20 November 2026
 
-Signed Android preview **0.4.20/versionCode24** is based on `feat/m0-foundation`. That branch includes the full audit roadmap from PR #4 and package 01 from PR #5.
+Signed Android preview **0.4.21/versionCode25** is based on `feat/m0-foundation`. That branch includes the full audit roadmap from PR #4 and package 01 from PR #5.
 
 | Stage | Actual state |
 | --- | --- |
@@ -11,6 +11,7 @@ Signed Android preview **0.4.20/versionCode24** is based on `feat/m0-foundation`
 | M4a | LOCAL IMPLEMENTATION: full-screen live colour editor, immutable revisions, durable previews, recovery, and exact-revision author play |
 | M4b | LOCAL IMPLEMENTATION: one full-screen wallpaper per verified work, browser download/share and Android display metrics bridge. Device acceptance pending |
 | UI simplification | Editor ready for playtest. Three help actions, pin feedback and result details ready for playtest in 0.4.11 |
+| Queue D1 | Daily client, UTC rollover and archive tested with a dated fixture. Published feed and trusted clock pending. [Checks](evidence/queue-d1-2026-11-20.json) |
 | Queue C2 | 13×13 field, pinch, pan, visible edges and canceled drop verified in Chromium. [Checks](evidence/queue-c2-2026-11-20.json) |
 | Queue C1 | Four original shape boards, deterministic generated starts and exact RGB verified. [Checks](evidence/queue-c1-2026-11-20.json) |
 | Queue B3 | Ten-minute local series and score; save, pause and duplicate finish checked in Chromium. [Checks](evidence/queue-b3-2026-11-20.json) |
@@ -21,7 +22,7 @@ Signed Android preview **0.4.20/versionCode24** is based on `feat/m0-foundation`
 | Queue A1 | Chromium tap/drop at the seam and 568×320 field fit verified. Physical touch and insets pending. [Checks](evidence/queue-a1-2026-11-20.json) |
 | Package 02 | Campaign progress, victory history, XP and statistics on 0.4.12. Published world sample pending |
 | M5 | ON HOLD by owner19 Nov: cloud/account/synchronization deferred from the current local milestone |
-| M6 | NEXT CLIENT WORK: local daily/archive state/cache; live shared calendar/catalog/trusted time remain unconfigured |
+| M6 | LOCAL CLIENT: dated catalog cache, active attempt and offline archive; live shared calendar/catalog/trusted time remain unconfigured |
 | M7–M8 | NOT STARTED |
 
 0.4.12 adds «Уровни → Прогресс», one XP for each first campaign completion, separate finale and full-chapter states, and replay history. Optional statistics preserve published comparison version, source and sample size on eligible wins. The application has no published comparison sample. [Progress and APK checks](evidence/player-progress-2026-11-20.json)
