@@ -16,6 +16,7 @@ import { chapterIndexFor, recommendedLevel, rewardTitle } from '../domain/progre
 import { authorBests, authorView, findDraft, hasAuthorProof, type CreativeAction } from '../domain/creative';
 import { makeField, playableField } from '../domain/editor';
 import { AUTO_HELP_COST, autoHelpSwap, pulsePosition, type Assistance } from '../domain/puzzle';
+import { activeTimed, timedRemaining } from '../domain/timeTrial';
 import { activeChallenge } from '../domain/challenges';
 import { publishedBenchmark } from '../domain/playerProgress';
 import { EditorView } from './editorView';
@@ -34,15 +35,16 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   await session.load();
   const exportFiles = options.exportFiles ?? browserExportFiles();
   const current = () => {
+    const timed = activeTimed(session.state.timedProgress);
     const challenge = activeChallenge(session.state.challengeProgress);
-    const own = !challenge && session.state.creative?.playing ? authorView(session.state.creative) : null;
-    const level = challenge?.level ?? own?.level ?? getLevel(session.state.activeLevelId);
-    return { own, challenge, level, attempt: challenge?.attempt ?? own?.attempt ?? session.state.attempts[level.id] };
+    const own = !timed && !challenge && session.state.creative?.playing ? authorView(session.state.creative) : null;
+    const level = timed?.level ?? challenge?.level ?? own?.level ?? getLevel(session.state.activeLevelId);
+    return { own, challenge, timed, level, attempt: timed?.run.attempt ?? challenge?.attempt ?? own?.attempt ?? session.state.attempts[level.id] };
   };
   const gameLayer = (): Layer => {
-    const { attempt, challenge } = current();
+    const { attempt, challenge, timed } = current();
     if (!attempt) return 'recovery';
-    return attempt.completed || challenge?.status === 'lost' ? 'result' : 'none';
+    return attempt.completed || challenge?.status === 'lost' || timed?.run.remainingMs === 0 ? 'result' : 'none';
   };
   parent.innerHTML = `<section id="hue-app" aria-label="Полусон">
     <header class="hud"><button id="levels" class="quiet">‹ Уровни</button><h1 id="title"></h1><button id="settings" class="quiet" aria-label="Пауза">⋯</button></header>
@@ -68,6 +70,9 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   let markPosition: number | null = null, markTimer: ReturnType<typeof setTimeout> | undefined;
   let pendingHelp: (() => void) | null = null;
   let foregroundEpoch = 0;
+  let queuedClock = false;
+  let pauseRequestedAt: number | null = null;
+  const timeCaption = (seconds: number) => `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
   let layer = gameLayer();
   let editorView: EditorView | null = null, editorDraftId: string | null = null;
   let workCard: WorkCardView | null = null, workCardId: string | null = null;
@@ -90,13 +95,15 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   }
   const scene = new PuzzleScene(initialLevel, initialAttempt, {
     paint, swap: (from, to) => {
-      const { own, attempt, challenge } = current();
-      if (attempt) void run({ kind: challenge ? 'challenge-swap' : own ? 'author-swap' : 'swap', from, to, attemptId: attempt.attemptId });
+      const { own, attempt, challenge, timed } = current();
+      if (!attempt) return;
+      if (timed) void run({ kind: 'timed-swap', from, to, attemptId: attempt.attemptId, now: Date.now() });
+      else void run({ kind: challenge ? 'challenge-swap' : own ? 'author-swap' : 'swap', from, to, attemptId: attempt.attemptId });
     },
     pin: position => {
       showMark(position, 'pin');
-      const { own, level, challenge } = current();
-      if (challenge) return;
+      const { own, level, challenge, timed } = current();
+      if (challenge || timed) return;
       const onboarding = session.state.onboarding;
       if (own) { notice = 'Плитки с точкой закреплены'; render(); }
       else if (!onboarding.pinExplained || level.ordinal <= 10 && (onboarding.earlyPinTaps ?? 1) < 3) {
@@ -193,13 +200,47 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       layer = firstOpen && current().challenge?.afterFinaleId ? 'secret' : gameLayer();
     });
   }
+  function challengeLobby(chapterTests = false): void {
+    metaReturn = gameLayer();
+    metaHistory = [{ kind: 'chapter', levelId: session.state.activeLevelId }];
+    metaRoute = { kind: 'challenges', chapterTests };
+    layer = 'meta';
+  }
   function leaveChallenge(): void {
     const chapterTests = current().challenge?.chapterIndex !== undefined;
-    void run({ kind: 'challenge-leave' }, () => {
-      metaReturn = gameLayer();
-      metaHistory = [{ kind: 'chapter', levelId: session.state.activeLevelId }];
-      metaRoute = { kind: 'challenges', chapterTests };
-      layer = 'meta';
+    void run({ kind: 'challenge-leave' }, () => challengeLobby(chapterTests));
+  }
+  function playTimed(): void {
+    void run({ kind: 'timed-open', id: crypto.randomUUID(), now: Date.now() }, () => {
+      metaHistory = [];
+      layer = gameLayer();
+    });
+  }
+  function leaveTimed(): void {
+    void run({ kind: 'timed-leave', now: Date.now() }, () => challengeLobby());
+  }
+  function updateTimedClock(): void {
+    const timed = session.state.timedProgress;
+    if (!alive || !timed?.active || timed.run.remainingMs === 0) return;
+    const now = Date.now();
+    const wantRunning = layer === 'none' && !activity.isBlocked() && !session.pending;
+    if (wantRunning) pauseRequestedAt = null;
+    else pauseRequestedAt ??= now;
+    const clock = timedRemaining(timed.run, pauseRequestedAt ?? now);
+    if (layer === 'none') {
+      const guidance = byId('guidance');
+      const label = `${timeCaption(Math.ceil(clock / 1000))} · Собрано ${timed.run.cleared}`;
+      if (guidance.textContent !== label) guidance.textContent = label;
+    }
+    if (!ready || busy || queuedClock || session.pending) return;
+    const kind = !wantRunning && timed.run.startedAt !== null ? 'timed-pause'
+      : wantRunning && timed.run.startedAt === null ? 'timed-resume'
+      : wantRunning && clock === 0 ? 'timed-expire' : null;
+    if (!kind) return;
+    queuedClock = true;
+    queueMicrotask(() => {
+      queuedClock = false;
+      if (alive) void run({ kind, now: pauseRequestedAt ?? Date.now() });
     });
   }
   function askRestart(id: string): void { restartLevelId = id; restartReturn = layer; scene.cancel(); layer = 'restart'; render(); }
@@ -263,10 +304,14 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (editorDraftId !== draftId) { editorView?.destroy(); editorView = null; editorDraftId = draftId; }
     dialog.dataset.editor = String(!!draftId);
     byId('dialog-copy').textContent = ''; if (!editorView && !workCard) actions.replaceChildren();
-    const { level, attempt, own, challenge } = current();
-    dialog.dataset.challengeLost = String(challenge?.status === 'lost');
-    prism.hidden = layer !== 'result' || challenge?.status === 'lost';
-    if (layer === 'result' && challenge) {
+    const { level, attempt, own, challenge, timed } = current();
+    dialog.dataset.challengeLost = String(challenge?.status === 'lost' || !!timed);
+    prism.hidden = layer !== 'result' || challenge?.status === 'lost' || !!timed;
+    if (layer === 'result' && timed) {
+      byId('dialog-title').textContent = 'Время вышло';
+      byId('dialog-copy').textContent = `Собрано · ${timed.run.cleared} · Рекорд · ${timed.best}`;
+      button('К испытаниям', leaveTimed);
+    } else if (layer === 'result' && challenge) {
       const won = challenge.status === 'won';
       if (won) colourPrism(prism, level);
       byId('dialog-title').textContent = won ? 'Испытание пройдено' : 'Ходы закончились';
@@ -300,7 +345,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       }
     } else if (layer === 'restart') {
       byId('dialog-title').textContent = 'Начать заново?';
-      byId('dialog-copy').textContent = `«${own || challenge ? level.title : getLevel(restartLevelId ?? level.id).title}» начнётся с исходного поля.`;
+      byId('dialog-copy').textContent = `«${own || challenge || timed ? level.title : getLevel(restartLevelId ?? level.id).title}» начнётся с исходного поля.`;
       button('Начать заново', () => {
         if (challenge) { playChallenge(level.id, true); return; }
         void run(own ? { kind: 'author-start', workId: own.work.workId, nodeId: own.node.nodeId, attemptId: crypto.randomUUID(), restart: true } : { kind: 'restart', levelId: restartLevelId ?? level.id, attemptId: crypto.randomUUID() }, () => { metaHistory = []; layer = 'none'; });
@@ -312,8 +357,9 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       close.className = 'quiet settings-close';
       close.setAttribute('aria-label', 'Вернуться к игре');
       close.autofocus = true;
-      if (attempt && !attempt.completed && !challenge) button('Помощь', () => { layer = 'help-menu'; render(); }, true);
-      button('Заново', () => askRestart(session.state.activeLevelId), true).id = 'restart';
+      if (attempt && !attempt.completed && !challenge && !timed) button('Помощь', () => { layer = 'help-menu'; render(); }, true);
+      if (timed) button('К испытаниям', leaveTimed, true);
+      else button('Заново', () => askRestart(session.state.activeLevelId), true).id = 'restart';
       for (const [key, label] of [['sound', 'Звуки'], ['haptics', 'Вибрация'], ['motion', 'Движение фона'], ['statistics', 'Статистика уровня']] as const) {
         const row = document.createElement('label'); row.className = 'setting';
         const input = document.createElement('input'); input.type = 'checkbox'; input.checked = session.state.preferences[key]; input.disabled = busy || activity.isBlocked();
@@ -388,7 +434,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       } else {
       renderMeta({ route: metaRoute, state: session.state, disabled: busy || activity.isBlocked() || !!session.pending,
         title: byId('dialog-title'), copy: byId('dialog-copy'), actions, navigate: showMeta, back: () => { back(); },
-        play: startLevel, repeat: repeatLevel, playChallenge,
+        play: startLevel, repeat: repeatLevel, playChallenge, playTimed,
         saveCopy: (levelId, name) => {
           const draftId = crypto.randomUUID();
           void run({ kind: 'copy', levelId, name, draftId, workId: crypto.randomUUID(), nodeId: crypto.randomUUID() }, () => {
@@ -410,18 +456,19 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   }
   function render(): void {
     if (!alive) return;
-    const { level, attempt, own, challenge } = current();
+    const { level, attempt, own, challenge, timed } = current();
     if (!attempt && !session.pending) layer = 'recovery';
-    if (layer === 'none' && challenge && challenge.status !== 'playing') layer = 'result';
+    if (layer === 'none' && (challenge && challenge.status !== 'playing' || timed?.run.remainingMs === 0)) layer = 'result';
     root.dataset.level = level.id; root.dataset.moves = String(attempt?.moves ?? 0); root.dataset.busy = String(busy); root.dataset.layer = layer;
-    root.dataset.mode = challenge ? 'challenge' : own ? 'author' : 'campaign';
+    root.dataset.mode = timed ? 'timed' : challenge ? 'challenge' : own ? 'author' : 'campaign';
     root.dataset.motion = String(motionAllowed());
     root.style.setProperty('--color-a', level.solvedTileColors[0]!); root.style.setProperty('--color-b', level.solvedTileColors.at(-1)!);
-    byId('levels').textContent = challenge ? '‹ Испытания' : own ? '‹ Редактор' : '‹ Уровни';
-    byId('title').textContent = own || challenge ? level.title : `Уровень ${level.ordinal}`;
+    byId('levels').textContent = timed || challenge ? '‹ Испытания' : own ? '‹ Редактор' : '‹ Уровни';
+    byId('title').textContent = own || challenge || timed ? level.title : `Уровень ${level.ordinal}`;
     const guidance = byId('guidance');
     guidance.textContent = layer === 'secret' ? '' : challenge ? `Ходов осталось · ${challenge.moveLimit - challenge.attempt.moves}` : layer === 'help' ? 'Готовое поле' : notice || (!own && !session.state.onboarding.firstSwapDone ? 'Поменяй две плитки местами' : '');
-    guidance.hidden = !guidance.textContent;
+    guidance.setAttribute('aria-live', timed ? 'off' : 'polite');
+    guidance.hidden = !timed && !guidance.textContent;
     const footerAction = byId<HTMLButtonElement>('help');
     footerAction.hidden = layer !== 'help' && layer !== 'secret' && !attempt?.completed;
     footerAction.textContent = layer === 'secret' ? 'Открыть поле' : layer === 'help' ? 'К игре' : 'Результат';
@@ -447,7 +494,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     atmosphere.configure(ready && !activity.isBlocked() && (picker !== null || cardId !== null || authorCard !== null || gallery || ['none', 'help', 'result'].includes(layer)), motionAllowed());
     feedback.configure(session.state.preferences, !ready || activity.isBlocked());
     activity.setGameplayDesired(ready && !busy && layer === 'none' && !attempt?.completed && !activity.isBlocked());
-    renderDialog(); paint();
+    renderDialog(); paint(); updateTimedClock();
   }
   function askHelp(assistance: Assistance): void {
     if (layer !== 'help-menu' || busy || session.pending || activity.isBlocked()) return;
@@ -470,9 +517,9 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     }).then(() => { if (!session.pending) pendingHelp = null; });
   }
   async function run(action: Action | CreativeAction, after?: () => void): Promise<boolean> {
-    if (busy || session.pending || activity.isBlocked()) return false;
-    const { attempt: previous, level: previousLevel } = current();
-    const ordinarySwap = action.kind === 'swap' || action.kind === 'author-swap' || action.kind === 'challenge-swap';
+    if (busy || session.pending || activity.isBlocked() && action.kind !== 'timed-pause') return false;
+    const { attempt: previous, level: previousLevel, timed: timedBefore } = current();
+    const ordinarySwap = action.kind === 'swap' || action.kind === 'author-swap' || action.kind === 'challenge-swap' || action.kind === 'timed-swap';
     const autoSwap = (action.kind === 'help' || action.kind === 'author-help') && action.assistance?.kind === 'auto';
     const pair = ordinarySwap ? action : autoSwap && previous ? autoHelpSwap(previousLevel, previous) : null;
     const cost = autoSwap ? AUTO_HELP_COST : 1;
@@ -487,7 +534,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
         notice = '';
         if (pair) clearMark();
         after?.();
-        if (pair && gameLayer() === 'result') layer = 'result';
+        if ((pair || action.kind === 'timed-expire' || action.kind === 'timed-pause') && gameLayer() === 'result') layer = 'result';
         swapAccepted = pair !== null;
       }
     } catch {
@@ -496,6 +543,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     } finally {
       busy = false; render(); resize();
       const { level, attempt: next } = current();
+      if (swapAccepted && timedBefore && current().timed?.run.cleared === timedBefore.run.cleared + 1 &&
+          !activity.isBlocked() && foreground === foregroundEpoch) feedback.accepted('win');
       if (swapAccepted && pair && previous && next && previous.attemptId === next.attemptId && !activity.isBlocked() &&
           foreground === foregroundEpoch && next.moves === previous.moves + cost &&
           next.board[pair.from] === previous.board[pair.to] && next.board[pair.to] === previous.board[pair.from]) {
@@ -547,6 +596,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     }
     if (layer === 'restart') { cancelRestart(); return true; }
     if (layer === 'help-menu') { layer = 'settings'; render(); return true; }
+    if ((layer === 'result' || layer === 'none') && current().timed) { leaveTimed(); return true; }
     if ((layer === 'result' || layer === 'none') && current().challenge) { leaveChallenge(); return true; }
     if (layer !== 'none') { layer = 'none'; render(); return true; }
     if (current().own) { leaveAuthor(); return true; }
@@ -557,7 +607,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (current().attempt?.completed) { layer = 'result'; render(); }
   }, { signal: listeners.signal });
   byId('levels').addEventListener('click', () => {
-    if (current().challenge) leaveChallenge();
+    if (current().timed) leaveTimed();
+    else if (current().challenge) leaveChallenge();
     else if (current().own) leaveAuthor();
     else showMeta({ kind: 'chapter', levelId: session.state.activeLevelId });
   }, { signal: listeners.signal });
@@ -588,6 +639,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     else { game.sound.mute = false; resize(); }
     render();
   });
+  const clockTicker = setInterval(updateTimedClock, 200);
   await frame; ready = true; render(); resize();
-  return { back, destroy() { alive = false; clearMark(); editorView?.destroy(); workCard?.destroy(); prismGlint?.cancel(); exportFiles.destroy?.(); listeners.abort(); observer.disconnect(); unblock(); atmosphere.destroy(); feedback.destroy(); activity.setGameplayDesired(false); store.close(); destroyRenderer(game); } };
+  return { back, destroy() { alive = false; clearInterval(clockTicker); clearMark(); editorView?.destroy(); workCard?.destroy(); prismGlint?.cancel(); exportFiles.destroy?.(); listeners.abort(); observer.disconnect(); unblock(); atmosphere.destroy(); feedback.destroy(); activity.setGameplayDesired(false); store.close(); destroyRenderer(game); } };
 }

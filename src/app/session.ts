@@ -47,6 +47,8 @@ export class Session {
     const firstChallengeWin = challenge?.status === 'won' &&
       next.challengeProgress?.best[challenge.level.id] !== undefined &&
       this.state?.challengeProgress?.best[challenge.level.id] === undefined;
+    const timed = kind.startsWith('timed-') ? next.timedProgress : undefined;
+    const timedFinished = !!timed && timed.finished > (this.state?.timedProgress?.finished ?? 0);
     const lastVictory = next.victories?.at(-1);
     const victory = lastVictory?.attemptId === this.state?.victories?.at(-1)?.attemptId ? undefined : lastVictory;
     const fact = { id: operationId, destination: { kind: 'guest' as const, vaultId: GUEST_VAULT },
@@ -54,6 +56,7 @@ export class Session {
         levelId: next.activeLevelId, fingerprint: this.fingerprints.get(next.activeLevelId), attempt,
         best: next.bests[next.activeLevelId], onboarding: next.onboarding, assistance, victory,
         ...(challenge ? { challengeId: challenge.level.id, challengeAttempt: challenge.attempt, challengeStatus: challenge.status, ...(firstChallengeWin ? { firstChallengeWin: true } : {}) } : {}),
+        ...(timed ? { timed, ...(timedFinished ? { timedFinished: true } : {}) } : {}),
         creativeAction, authorTest: creativeAction?.kind.startsWith('author-') ? next.creative?.activeTest : undefined,
         newCopies: Object.values(next.albumCopies).filter(copy => !this.state?.albumCopies[copy.draftId]),
         newCompletions: next.completed.filter(id => !this.state?.completed.includes(id)),

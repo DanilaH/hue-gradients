@@ -3,6 +3,7 @@ import { getLevel, levels } from './levels';
 import { earnedRights, isKnownRight, levelIsOpen, META_POLICY } from './progression';
 import { initialCreative, validateCreative, type CreativeState } from './creative';
 import { applyChallenge, validateChallengeProgress, type ChallengeAction, type ChallengeProgress } from './challenges';
+import { applyTimed, validateTimedProgress, type TimedAction, type TimedProgress } from './timeTrial';
 import { campaignVictories, campaignVictory, publishedBenchmark, validateCampaignVictories, type CampaignVictory, type PublishedBenchmark } from './playerProgress';
 
 export interface Best { fingerprint: string; rulesVersion: typeof RULES_VERSION; clean: number | null; assisted: number | null }
@@ -26,12 +27,13 @@ export interface Workspace {
   /** Absent in snapshots saved before campaign history. */
   victories?: readonly CampaignVictory[];
   challengeProgress?: ChallengeProgress;
+  timedProgress?: TimedProgress;
   albumCopies: Record<string, AlbumCopy>;
   /** Absent only in pre-editor saves; Session backs up and migrates before use. */
   creative?: CreativeState;
   lastCompletion: { attemptId: string; levelId: string; newRights: string[] } | null;
 }
-export type Action = ChallengeAction | { kind: 'swap'; from: number; to: number; attemptId: string } |
+export type Action = ChallengeAction | TimedAction | { kind: 'swap'; from: number; to: number; attemptId: string } |
   { kind: 'help'; attemptId: string; assistance?: Assistance } | { kind: 'pin' } |
   { kind: 'preferences'; key: keyof Preferences; value: boolean } |
   { kind: 'copy'; levelId: string; draftId: string; workId: string; nodeId: string; name: string } |
@@ -100,6 +102,7 @@ export function decodeWorkspace(json: string, fingerprints: ReadonlyMap<string, 
   }
   if (!Object.hasOwn(state, 'victories')) state.victories = campaignVictories(state);
   validateCampaignVictories(state, fingerprints);
+  if (state.timedProgress !== undefined) validateTimedProgress(state.timedProgress);
   if (state.challengeProgress !== undefined) validateChallengeProgress(state.challengeProgress, state.completed);
   if (legacy) { state.albumCopies = {}; state.lastCompletion = null; }
   else {
@@ -129,13 +132,21 @@ export function decodeWorkspace(json: string, fingerprints: ReadonlyMap<string, 
           fingerprintPayload({ ...node.field, id: work.workId, ordinal: 0, title: work.name, minimumSwaps: copy.snapshot.minimumSwaps }) !== fingerprintPayload({ ...copy.snapshot, id: work.workId, ordinal: 0, title: copy.name })) throw new Error('Missing original copied revision');
     }
   }
+  if (state.timedProgress?.active && (state.challengeProgress?.active || state.creative?.playing)) throw new Error('Conflicting active game modes');
   return state;
 }
 
 export function applyAction(state: Workspace, action: Action, fingerprints: ReadonlyMap<string, string>,
   benchmarks?: readonly PublishedBenchmark[]): Workspace {
+  if (action.kind === 'timed-open' || action.kind === 'timed-pause' || action.kind === 'timed-resume' ||
+      action.kind === 'timed-leave' || action.kind === 'timed-expire' || action.kind === 'timed-swap') {
+    if (state.challengeProgress?.active || state.creative?.playing) return state;
+    const timedProgress = applyTimed(state.timedProgress, action);
+    return !timedProgress || timedProgress === state.timedProgress ? state : { ...state, timedProgress };
+  }
   if (action.kind === 'challenge-open' || action.kind === 'challenge-restart' ||
       action.kind === 'challenge-swap' || action.kind === 'challenge-leave') {
+    if (state.timedProgress?.active) return state;
     const challengeProgress = applyChallenge(state.challengeProgress, state.completed, action);
     return !challengeProgress || challengeProgress === state.challengeProgress ? state : { ...state, challengeProgress };
   }

@@ -16,6 +16,7 @@ interface MetaView {
   play(id: string): void; saveCopy(id: string, name: string): void;
   repeat(id: string): void;
   playChallenge(id: string, restart: boolean): void;
+  playTimed(): void;
 }
 function actionButton(parent: HTMLElement, text: string, invoke: () => void, disabled: boolean): HTMLButtonElement {
   const button = document.createElement('button');
@@ -229,6 +230,12 @@ export function renderMeta(v: MetaView): void {
     }
     const list = document.createElement('div');
     list.className = 'challenge-list';
+    const timed = state.timedProgress;
+    const timedButton = button(timed && timed.run.remainingMs > 0 ? 'Продолжить заезд' : 'Заезд на время', v.playTimed);
+    timedButton.className = 'quiet challenge-card';
+    const detail = document.createElement('small');
+    detail.textContent = timed?.finished ? `10 минут · Рекорд · ${timed.best}` : '10 минут';
+    timedButton.append(detail);
     actions.append(tabs, list);
     for (const definition of route.chapterTests ? chapterChallenges : challenges) {
       const { level, requiredWorks, moveLimit } = definition;
