@@ -1,3 +1,4 @@
+import { acceptedInput } from './gameTelemetry';
 import { applyAction, decodeWorkspace, newWorkspace, upgradeWorkspace, type Action, type Workspace } from '../domain/workspace';
 import { hashText, prepareCommit } from '../local-store/command';
 import { applyCreative, validateCreativeHashes, type CreativeAction } from '../domain/creative';
@@ -43,6 +44,7 @@ export class Session {
   private async write(next: Workspace, kind: string, backupSnapshot?: string, creativeAction?: CreativeAction, assistance?: Assistance): Promise<void> {
     if (this.pending) throw new Error('Resolve pending operation first');
     const operationId = crypto.randomUUID();
+    const input = acceptedInput(kind, this.state, next);
     const attempt = next.attempts[next.activeLevelId];
     const challenge = kind.startsWith('challenge-') ? activeChallenge(kind === 'challenge-leave'
       ? this.state?.challengeProgress : next.challengeProgress) : null;
@@ -66,6 +68,7 @@ export class Session {
         ...(daily ? { dailyDate: daily.date, dailyCatalog: daily.version, dailyAttempt: daily.attempt,
           ...(firstDailyWin ? { firstDailyWin: true } : {}) } : {}),
         ...(personal ? { personalKey: personal.key, personalAttempt: personal.attempt, ...(personalAward ? { personalAward: true } : {}) } : {}),
+        ...(input ? { input: { ...input, eventId: operationId } } : {}),
         creativeAction, authorTest: creativeAction?.kind.startsWith('author-') ? next.creative?.activeTest : undefined,
         newCopies: Object.values(next.albumCopies).filter(copy => !this.state?.albumCopies[copy.draftId]),
         newCompletions: next.completed.filter(id => !this.state?.completed.includes(id)),

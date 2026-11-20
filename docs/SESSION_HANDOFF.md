@@ -10,7 +10,9 @@ Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and
 
 ## Current slice
 
-F1 local adapter and policy fixtures passed. Ads, gifts, real purchases and rating need platform configuration and owner choices; no mock SDK is enabled in preview. Campaign stays free. **Resume at F2**. [Evidence](evidence/queue-f1-2026-11-20.json)
+F2 separates swap intent from the atomic accepted event. The injected write failure/test replay produced one win and one input receipt. Local score replay verifies rules/start/help and rejects mismatches. Network competition and cloud stay unconfigured/on owner hold. **Resume at G1**. [Evidence](evidence/queue-f2-2026-11-20.json)
+
+F1 local adapter and policy fixtures passed. Ads, gifts, real purchases and rating need platform configuration and owner choices; no mock SDK is enabled in preview. Campaign stays free. [Evidence](evidence/queue-f1-2026-11-20.json)
 
 E3 durable publication model passed lost response, quota, approved feed filtering, withdrawal and complaint fixtures. Public service/identity/date remain unconfigured, so the preview has no live submission or feed. [Evidence](evidence/queue-e3-2026-11-20.json)
 

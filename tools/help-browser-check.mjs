@@ -231,7 +231,20 @@ try {
   await damaged.reload();
   await layer(damaged, 'result');
   assert.deepEqual(await state(damaged), reloaded);
-  passed.push('failed auto-help write is invisible; receipt retry commits one assisted win');
+  const receiptInputs = await damaged.evaluate(async () => {
+    const { openIndexedDb } = await import('/src/local-store/indexed-db.ts');
+    const db = await openIndexedDb();
+    const facts = await db.listFacts('guest-local-v1');
+    db.close();
+    return facts.flatMap(fact => {
+      const input = JSON.parse(fact.payloadJson).input;
+      return input?.kind === 'help-accepted' ? [{ stable: input.eventId === fact.id, ...input }] : [];
+    });
+  });
+  assert.equal(receiptInputs.length, 1);
+  assert.equal(receiptInputs[0].stable, true);
+  assert.equal(receiptInputs[0].chargedMoves, 3);
+  passed.push('failed auto-help write is invisible; receipt retry commits one assisted win and one accepted-input fact');
   await fault.context.close();
 
   const background = await newProfile();

@@ -6,6 +6,7 @@ import { levels, getLevel } from '../domain/levels';
 import { fingerprintPayload, type Action } from '../domain/workspace';
 import { hashText } from '../local-store/command';
 import type { TransactionalLocalStore } from '../local-store/contracts';
+import { gameMode, type InputIntent } from '../app/gameTelemetry';
 import { Session } from '../app/session';
 import { PuzzleScene, GAME_PRESENTABLE } from './PuzzleScene';
 import { Atmosphere, type ColourPointer } from './atmosphere';
@@ -32,7 +33,7 @@ import './game.css';
 type Layer = 'none' | 'secret' | 'help' | 'help-menu' | 'pin-guide' | 'result' | 'meta' | 'restart' | 'recovery' | 'settings';
 interface Activity extends Pick<GameplayActivityCoordinator, 'isBlocked' | 'onBlockedChange' | 'setGameplayDesired'> {}
 
-export async function mountGame(parent: HTMLElement, store: TransactionalLocalStore, activity: Activity, options: { haptic?: Haptic; exportFiles?: ExportFiles; dailySource?: () => Promise<DailyFeed> } = {}): Promise<{ back(): boolean; destroy(): void }> {
+export async function mountGame(parent: HTMLElement, store: TransactionalLocalStore, activity: Activity, options: { haptic?: Haptic; exportFiles?: ExportFiles; dailySource?: () => Promise<DailyFeed>; onIntent?: (intent: InputIntent) => void } = {}): Promise<{ back(): boolean; destroy(): void }> {
   const fingerprints = new Map(await Promise.all(levels.map(async level => [level.id, await hashText(fingerprintPayload(level))] as const)));
   const session = new Session(store, fingerprints);
   await session.load();
@@ -105,6 +106,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     paint, swap: (from, to) => {
       const { own, attempt, challenge, timed, daily, personal } = current();
       if (!attempt) return;
+      try { options.onIntent?.({ kind: 'swap-intent', mode: gameMode(session.state) }); }
+      catch { /* Analytics cannot block a puzzle gesture. */ }
       if (personal) void run({ kind: 'personal-swap', from, to, attemptId: attempt.attemptId, now: Date.now() });
       else if (timed) void run({ kind: 'timed-swap', from, to, attemptId: attempt.attemptId, now: Date.now() });
       else void run({ kind: daily ? 'daily-swap' : challenge ? 'challenge-swap' : own ? 'author-swap' : 'swap', from, to, attemptId: attempt.attemptId });

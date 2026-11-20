@@ -149,8 +149,8 @@
       "status": "ROADMAPPED",
       "gap": "PARTIAL",
       "stage": "Пакет 09",
-      "currentImplementation": "Веб-путь восстанавливает подтверждённое поле; физический Android открыт. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/workspace.ts A2: ресурсы 0.4.14 из APK открывают ту же попытку на Chromium 92/158. Обновление и несовместимость сохраняют байты локальной партии Chromium 0.4.12. | https://github.com/DanilaH/hue-gradients/blob/356c9576436d7b0f5378aee432add400fffcdeec/tools/first-launch-apk-check.mjs",
-      "nextAction": "Обновить preview на физическом Android и проверить штатный WebView/SQLite на минимальном и современном провайдере (G1).",
+      "currentImplementation": "Веб-путь восстанавливает подтверждённое поле; физический Android открыт. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/workspace.ts A2: ресурсы 0.4.14 из APK открывают ту же попытку на Chromium 92/158. Обновление и несовместимость сохраняют байты локальной партии Chromium 0.4.12. | https://github.com/DanilaH/hue-gradients/blob/356c9576436d7b0f5378aee432add400fffcdeec/tools/first-launch-apk-check.mjs F2: добавлены атомарные локальные факты «принято», проверка replay, разделение сопоставимых результатов и тест дедупликации.",
+      "nextAction": "Сетевой провайдер соревнования, доверенное время и аналитика ждут конфигурации. Реальные Android-записи и прерывание проверить в G1.",
       "deliveryPackage": "09",
       "sourceNextCheck": "Убить процесс после хода на тестовом устройстве."
     },
@@ -159,8 +159,8 @@
       "status": "DEFERRED",
       "gap": "PARTIAL",
       "stage": "Пакет 09",
-      "currentImplementation": "Есть локальное сохранение и контракт, нет подтверждённого переноса между устройствами. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/TECHNICAL_SPEC_0_1.md",
-      "nextAction": "Сохранить совместимость локального контракта. Интеграция двух устройств после возобновления M5 владельцем.",
+      "currentImplementation": "Есть локальное сохранение и контракт, нет подтверждённого переноса между устройствами. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/TECHNICAL_SPEC_0_1.md F2: добавлены атомарные локальные факты «принято», проверка replay, разделение сопоставимых результатов и тест дедупликации.",
+      "nextAction": "Сетевой провайдер соревнования, доверенное время и аналитика ждут конфигурации. Реальные Android-записи и прерывание проверить в G1.",
       "reason": "Пауза владельца 19 ноября, см. AGENTS.md.",
       "deliveryPackage": "09",
       "sourceNextCheck": "После снятия паузы проверить два расходящихся профиля."
@@ -700,8 +700,8 @@
       "status": "ROADMAPPED",
       "gap": "PARTIAL",
       "stage": "Пакет 09",
-      "currentImplementation": "У нас контракт сильнее: фиксируем каждый ход; device kill ещё открыт. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/workspace.ts A2: ресурсы 0.4.14 из APK открывают ту же попытку на Chromium 92/158. Обновление и несовместимость сохраняют байты локальной партии Chromium 0.4.12. | https://github.com/DanilaH/hue-gradients/blob/356c9576436d7b0f5378aee432add400fffcdeec/tools/first-launch-apk-check.mjs",
-      "nextAction": "Обновить preview на физическом Android и проверить штатный WebView/SQLite на минимальном и современном провайдере (G1).",
+      "currentImplementation": "У нас контракт сильнее: фиксируем каждый ход; device kill ещё открыт. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/workspace.ts A2: ресурсы 0.4.14 из APK открывают ту же попытку на Chromium 92/158. Обновление и несовместимость сохраняют байты локальной партии Chromium 0.4.12. | https://github.com/DanilaH/hue-gradients/blob/356c9576436d7b0f5378aee432add400fffcdeec/tools/first-launch-apk-check.mjs F2: добавлены атомарные локальные факты «принято», проверка replay, разделение сопоставимых результатов и тест дедупликации.",
+      "nextAction": "Сетевой провайдер соревнования, доверенное время и аналитика ждут конфигурации. Реальные Android-записи и прерывание проверить в G1.",
       "deliveryPackage": "09",
       "sourceNextCheck": "Проверить HOME→kill, force-stop→launcher и сохранение последнего хода."
     },
@@ -788,10 +788,10 @@
     {
       "id": "mt-m07",
       "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "gap": "PARTIAL",
       "stage": "Пакет 09",
-      "currentImplementation": "Нет сетевого сравнения результатов. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md",
-      "nextAction": "Реализовать соответствующий пункт пакета 09 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Нет сетевого сравнения результатов. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md F2: добавлены атомарные локальные факты «принято», проверка replay, разделение сопоставимых результатов и тест дедупликации.",
+      "nextAction": "Сетевой провайдер соревнования, доверенное время и аналитика ждут конфигурации. Реальные Android-записи и прерывание проверить в G1.",
       "deliveryPackage": "09",
       "sourceNextCheck": "Выработать сравнимый старт и правила помощи перед счётом."
     },
@@ -830,8 +830,8 @@
       "status": "ROADMAPPED",
       "gap": "PARTIAL",
       "stage": "Пакет 09",
-      "currentImplementation": "Есть локальные факты и receipts. Доставку продуктовых событий аналитическому провайдеру не подтвердили. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/local-store/contracts.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 09 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Есть локальные факты и receipts. Доставку продуктовых событий аналитическому провайдеру не подтвердили. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/local-store/contracts.ts F2: добавлены атомарные локальные факты «принято», проверка replay, разделение сопоставимых результатов и тест дедупликации.",
+      "nextAction": "Сетевой провайдер соревнования, доверенное время и аналитика ждут конфигурации. Реальные Android-записи и прерывание проверить в G1.",
       "deliveryPackage": "09",
       "sourceNextCheck": "Развести local commit, событие и подтверждённую доставку; проверять повторы по eventId."
     },
