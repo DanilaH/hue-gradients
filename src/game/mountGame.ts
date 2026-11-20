@@ -9,7 +9,7 @@ import type { TransactionalLocalStore } from '../local-store/contracts';
 import { Session } from '../app/session';
 import { PuzzleScene, GAME_PRESENTABLE } from './PuzzleScene';
 import { Atmosphere, type ColourPointer } from './atmosphere';
-import { boardGeometry, cellAt, cellCenter } from './geometry';
+import { cellCenter } from './geometry';
 import { GameFeedback, type Haptic } from './feedback';
 import { levelPreview, renderMeta, type MetaRoute } from './metaView';
 import { chapterIndexFor, recommendedLevel, rewardTitle } from '../domain/progression';
@@ -126,6 +126,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   function paint(): void {
     // The scene's create callback may run before the local game binding is assigned.
     if (!alive || !region.querySelector('canvas')) return;
+    if (markPosition !== null) positionMark();
     queueMicrotask(() => {
       if (!alive || !game.isBooted || paintPending || activity.isBlocked()) return;
       paintPending = true;
@@ -139,13 +140,12 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     atmosphere.resize();
     const w = Math.round(s.width * s.dpr), h = Math.round(s.height * s.dpr);
     if (game.scale.width !== w || game.scale.height !== h) { scene.cancel(); game.scale.resize(w, h); }
-    positionMark(s.width, s.height);
+    positionMark();
     paint();
   }
-  function positionMark(width: number, height: number): void {
+  function positionMark(): void {
     if (markPosition === null) return;
-    const { level } = current();
-    const cell = cellAt(boardGeometry(width, height, level.width, level.height, level.positions), markPosition);
+    const cell = scene.boardCell(markPosition);
     const clipPath = cell.points ? `polygon(${cell.points.map(([x, y]) => `${x}px ${y}px`).join(',')})` : '';
     Object.assign(marker.style, {
       clipPath, left: `${cell.x}px`, top: `${cell.y}px`, width: `${cell.width}px`, height: `${cell.height}px`,
@@ -159,8 +159,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   function showMark(position: number, kind: 'pulse' | 'pin'): void {
     clearMark();
     markPosition = position;
-    const { width, height } = region.getBoundingClientRect();
-    positionMark(width, height);
+    positionMark();
     marker.dataset.position = String(position);
     marker.dataset.kind = kind;
     marker.hidden = false;
@@ -551,8 +550,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
           foreground === foregroundEpoch && next.moves === previous.moves + cost &&
           next.board[pair.from] === previous.board[pair.to] && next.board[pair.to] === previous.board[pair.from]) {
         scene.presentSwap(previous, next, pair.from, pair.to, motionAllowed(), cost);
-        const { width, height } = region.getBoundingClientRect();
-        const cell = cellAt(boardGeometry(width, height, level.width, level.height, level.positions), pair.to);
+        const cell = scene.boardCell(pair.to);
         atmosphere.accepted(atmospherePoint({ ...cellCenter(cell), color: level.solvedTileColors[next.board[pair.to]!]! }), next.completed);
         feedback.accepted(next.completed ? 'win' : 'swap');
         if (next.completed && motionAllowed()) prismGlint = flashPrismEdge(prism);

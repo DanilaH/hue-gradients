@@ -91,6 +91,24 @@ function shaped(source: LevelDefinition, id: string, title: string,
   return level;
 }
 
+const size = 13;
+const widePins = Object.freeze([0, 12, 84, 156, 168]);
+const rgbChannel = (value: number) => value.toString(16).padStart(2, '0');
+const wideColors = Object.freeze(Array.from({ length: size * size }, (_, i) => {
+  const col = i % size, row = Math.floor(i / size);
+  return `#${rgbChannel(44 + 11 * col + 2 * row)}${rgbChannel(59 + col + 10 * row)}${rgbChannel(134 + 5 * col + 3 * row)}`;
+}));
+const wideStart = wideColors.map((_, i) => i);
+const rearranged = [[14, 15, 16, 30, 42, 43, 28], [8, 9, 22, 35, 36, 49, 48],
+  [81, 82, 83, 95, 69, 68, 96], [85, 86, 87, 98, 99, 113, 111],
+  [118, 119, 132, 131, 144, 145, 157], [123, 124, 138, 137, 151, 150, 164]];
+for (const cycle of rearranged) cycle.forEach((position, i) => { wideStart[position] = cycle[(i + 1) % cycle.length]!; });
+const wide: LevelDefinition = Object.freeze({ id: 'geometry-v1-wide', ordinal: 61, title: 'Большое поле',
+  contentVersion: CHALLENGE_CONTENT_VERSION, width: size, height: size,
+  solvedTileColors: wideColors, pinnedPositions: widePins, startTileAtPosition: Object.freeze(wideStart),
+  minimumSwaps: minimumSwaps(wideStart, widePins) });
+validateLevel(wide);
+
 export const geometryLevels: readonly LevelDefinition[] = Object.freeze([
   shaped(getLevel('gradient-043'), 'geometry-v1-rect', 'Прямоугольники'),
   shaped(getLevel('gradient-009'), 'geometry-v1-triangles', 'Треугольники', 'triangles',
@@ -99,4 +117,5 @@ export const geometryLevels: readonly LevelDefinition[] = Object.freeze([
     { version: 'shape-start-1', mode: 'repair-fixed', seed: 577 }),
   shaped(getLevel('gradient-015'), 'geometry-v1-mixed', 'Смешанное поле', 'mixed',
     { version: 'shape-start-1', mode: 'group-cycle', seed: 812 }),
+  wide,
 ]);

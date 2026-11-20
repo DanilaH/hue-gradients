@@ -80,7 +80,7 @@ export function canSwap(level: LevelDefinition, from: number, to: number): boole
 }
 
 export function validateLevel(level: LevelDefinition): void {
-  if (!integer(level.width, 1, 6) || !integer(level.height, 1, 5)) throw new Error('Invalid board dimensions');
+  if (!integer(level.width, 1, 13) || !integer(level.height, 1, 13)) throw new Error('Invalid board dimensions');
   const size = level.width * level.height;
   if (level.startTileAtPosition.length !== size || level.solvedTileColors.length !== size) throw new Error('Invalid board size');
   if (level.solvedTileColors.some(color => !/^#[0-9A-Fa-f]{6}$/.test(color))) throw new Error('Invalid RGB');
