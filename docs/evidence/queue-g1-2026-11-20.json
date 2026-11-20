@@ -1,0 +1,109 @@
+{
+  "package": "G1",
+  "date": "2026-11-20",
+  "sourceCommit": "7b8200062ab6398980827fd27d884506ca3eb786",
+  "preview": {
+    "versionName": "0.4.25",
+    "versionCode": 29,
+    "file": "Poluson-0.4.25-preview.apk",
+    "recording": "Poluson-G1-feel.gif",
+    "recordingEnvironment": "Chromium; GIF is silent"
+  },
+  "nativeBuild": {
+    "debug": "PASS",
+    "r8ReleaseCheck": "PASS",
+    "exactSignedApkInspection": "PASS",
+    "privateSharePuzzleMethod": "PASS"
+  },
+  "exactApkBrowserProfiles": [
+    {
+      "chromium": "92.0.4512.0",
+      "startup": true,
+      "move": true,
+      "resume": true,
+      "oldSaveBytesPreserved": true
+    },
+    {
+      "chromium": "158.0.8127.36",
+      "startup": true,
+      "move": true,
+      "resume": true,
+      "oldSaveBytesPreserved": true
+    }
+  ],
+  "episode": {
+    "environment": "Chromium",
+    "cancelMoves": 0,
+    "winningMoves": 1,
+    "victoryCues": 1,
+    "victoryCueMs": 560,
+    "vibrationApiCalls": 1,
+    "ambientLoopSeconds": 12,
+    "musicOptIn": true,
+    "independentSoundControls": true,
+    "backgroundMusicSuspends": true
+  },
+  "regression": {
+    "unitTests": 185,
+    "browserScenarios": {
+      "core": 21,
+      "presentation": 12,
+      "help": 7,
+      "meta": 15,
+      "editor": 19,
+      "wallpaper": 6
+    },
+    "wallpaperPngsDecoded": 8,
+    "exactSpecFiles": 40,
+    "rapidSwaps": 20,
+    "reducedMotion": "PASS",
+    "mute": "PASS",
+    "rejectedCommitSuccessSignal": "absent",
+    "tileRgb": "PASS",
+    "largeText": {
+      "percent": 150,
+      "viewports": [
+        [
+          320,
+          568
+        ],
+        [
+          568,
+          320
+        ]
+      ],
+      "status": "PASS"
+    }
+  },
+  "physicalAndroid": {
+    "status": "NOT RUN",
+    "devicesAttached": 0,
+    "next": [
+      "two physical profiles",
+      "WebView and SQLite",
+      "touch and 13×13 multitouch",
+      "background and system sleep",
+      "audio and haptics",
+      "Android Back",
+      "JSON chooser and picker",
+      "system wallpaper"
+    ]
+  },
+  "ownerAcceptance": [
+    "UI font and PSX treatment before wider rollout",
+    "repeat-cycle scoring and recognition",
+    "gift, optional reward and purchase product"
+  ],
+  "liveDependencies": [
+    "A3 comparable clean sample",
+    "D1 calendar and trusted time",
+    "E1 live dates",
+    "E3 publication and moderation",
+    "F1 provider configuration",
+    "F2 analytics delivery and server ranking"
+  ],
+  "reproduction": [
+    "tools/feel-queue-browser-check.mjs",
+    "tools/m2-browser-check.mjs"
+  ]
+}

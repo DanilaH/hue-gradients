@@ -1,6 +1,6 @@
 {
   "schema": "consumer-adoption-ledger-v1",
-  "consumerCommit": "2540d4f2e448e1727bd3a3b389fbc88acd07000e",
+  "consumerCommit": "7b8200062ab6398980827fd27d884506ca3eb786",
   "asOf": "2026-11-20",
   "features": [
     {
@@ -197,11 +197,11 @@
     },
     {
       "id": "h1-music",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
       "stage": "Пакет 10",
-      "currentImplementation": "Синтез коротких событий; отдельный музыкальный цикл в этом маршруте отсутствует. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/feedback.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 10 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "В 0.4.25 собственная 12-секундная музыкальная петля управляется отдельно от игровых сигналов, выключена по умолчанию и останавливается в фоне. В Chromium проверены независимость регуляторов, приостановка и возобновление. | https://github.com/DanilaH/hue-gradients/blob/7b8200062ab6398980827fd27d884506ca3eb786/tools/feel-queue-browser-check.mjs",
+      "nextAction": "Проверить громкость и паузы музыки и игровых сигналов на двух телефонах. Согласовать тембр и шрифт с владельцем.",
       "deliveryPackage": "10",
       "sourceNextCheck": "Сравнить тихую петлю с текущей партией на телефоне."
     },

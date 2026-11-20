@@ -10,7 +10,9 @@ Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and
 
 ## Current slice
 
-F2 separates swap intent from the atomic accepted event. The injected write failure/test replay produced one win and one input receipt. Local score replay verifies rules/start/help and rejects mismatches. Network competition and cloud stay unconfigured/on owner hold. **Resume at G1**. [Evidence](evidence/queue-f2-2026-11-20.json)
+G1 (0.4.25/versionCode29, 7b82000) closes the available local queue through G1. The signed preview contains independently controlled opt-in ambient music. Cancel leaves zero moves, the winning swap records one move, and the browser records one victory cue and one vibration API call. Resources from the exact APK passed Chromium 92 and 158 startup and save recovery. [Evidence](evidence/queue-g1-2026-11-20.json)
+
+F2 separates swap intent from the atomic accepted event. The injected write failure/test replay produced one win and one input receipt. Local score replay verifies rules/start/help and rejects mismatches. Network competition and cloud stay unconfigured/on owner hold. G1 verification is recorded above. [Evidence](evidence/queue-f2-2026-11-20.json)
 
 F1 local adapter and policy fixtures passed. Ads, gifts, real purchases and rating need platform configuration and owner choices; no mock SDK is enabled in preview. Campaign stays free. [Evidence](evidence/queue-f1-2026-11-20.json)
 
@@ -78,9 +80,7 @@ Author activeTest persists work/node/frozen Attempt; creative.playing controls c
 
 ## Next work
 
-1. **Follow package 03 in the [audit roadmap](porting/FULL_ROADMAP.md).** Package 02 waits for a published comparison sample. Device checks cover Back, touch, progress and the wallpaper crop handler. Preserve the editor’s exact revision routes and the one-work wallpaper. M5 remains on hold. A shared daily requires a published catalog and trusted time.
-2. Keep M2 tokens and read M2_ART_BIBLE before visual changes. Two licensed Cyrillic fonts, native150% text and owner review remain pending. Editor browser computed-font enlargement is smoke evidence only. No mass styling or new A/B/C contest.
-3. Native SQLite, haptics, process death, storage pressure and touch remain NOT RUN. No Android device was attached. Hosted Yandex, identity/cloud/ads are external gates. Production register71 NOT RUN; full release unfinished.
+Resume at the first resolved external dependency in the [delivery queue](porting/DELIVERY_QUEUE.md). No locally runnable packet remains in A1–G1. Phone checks, benchmark/calendar data, providers and owner decisions are listed there. M5 cloud/account remains on hold.
 
 ## Campaign contracts retained
 

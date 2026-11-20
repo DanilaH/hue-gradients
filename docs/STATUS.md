@@ -1,6 +1,6 @@
 # Status — 20 November 2026
 
-Signed Android preview **0.4.24/versionCode28** is based on `feat/m0-foundation`. That branch includes the full audit roadmap from PR #4 and package 01 from PR #5.
+Signed Android preview **0.4.25/versionCode29** is based on `feat/m0-foundation`. That branch includes the full audit roadmap from PR #4 and package 01 from PR #5.
 
 | Stage | Actual state |
 | --- | --- |
@@ -11,6 +11,7 @@ Signed Android preview **0.4.24/versionCode28** is based on `feat/m0-foundation`
 | M4a | LOCAL IMPLEMENTATION: full-screen live colour editor, immutable revisions, durable previews, recovery, and exact-revision author play |
 | M4b | LOCAL IMPLEMENTATION: one full-screen wallpaper per verified work, browser download/share and Android display metrics bridge. Device acceptance pending |
 | UI simplification | Editor ready for playtest. Three help actions, pin feedback and result details ready for playtest in 0.4.11 |
+| Queue G1 | Ambient music has a separate opt-in switch. Cancel, final swap, victory feedback and large text passed in Chromium. Two physical device profiles and visual acceptance remain. [Checks](evidence/queue-g1-2026-11-20.json) |
 | Queue F2 | Local replay validation, dedup and atomic input facts. Network competition unconfigured. [Checks](evidence/queue-f2-2026-11-20.json) |
 | Queue F1 | Local monetization policy and provider fixtures. Live SDK and commerce unconfigured. [Checks](evidence/queue-f1-2026-11-20.json) |
 | Queue E3 | Local publication protocol and retry fixtures pass. Public entry waits for a service. [Checks](evidence/queue-e3-2026-11-20.json) |
