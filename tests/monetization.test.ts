@@ -37,6 +37,8 @@ test('eligible campaign and challenge transitions consume request budget even on
   expect(await f.client.transition({ ...plan, protectedResult: true })).toBe('skipped');
   expect(await f.client.transition({ ...plan, explicit: false })).toBe('skipped');
   expect(await f.client.transition({ ...plan, clear: false })).toBe('skipped');
+  expect(await f.client.banner({ stage: 'campaign', stable: true, geometryFits: false })).toBe('hidden');
+  expect(await f.client.banner({ stage: 'challenge', stable: true, geometryFits: true })).toBe('visible');
   const first = f.client.transition(plan);
   await tick();
   f.callbacks().terminal('no-fill');
@@ -52,7 +54,7 @@ test('eligible campaign and challenge transitions consume request budget even on
   f.callbacks().terminal('dismissed'); f.callbacks().terminal('dismissed');
   expect(await second).toBe('dismissed');
   expect(f.blockers).toEqual(new Set(['background']));
-  expect(f.actions).toEqual(['campaign','challenge']);
+  expect(f.actions).toEqual(['banner:null','banner:challenge','campaign','challenge']);
 });
 
 test('cancel does not grant a reward, duplicate callbacks are harmless, and restore persists the paid right', async () => {

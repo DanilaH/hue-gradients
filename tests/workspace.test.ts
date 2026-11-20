@@ -60,7 +60,7 @@ test('preferences extend old saves without resetting attempts, progress or assis
   const state = finish(newWorkspace('old'));
   const old = JSON.parse(JSON.stringify(state)); delete old.preferences;
   const loaded = decodeWorkspace(JSON.stringify(old), fingerprints);
-  expect(loaded.preferences).toEqual({ motion: true, sound: true, haptics: true, statistics: true });
+  expect(loaded.preferences).toEqual({ motion: true, sound: true, haptics: true, statistics: true, music: false });
   expect(loaded.attempts).toEqual(state.attempts); expect(loaded.completed).toEqual(state.completed);
   const changed = applyAction(loaded, { kind: 'preferences', key: 'sound', value: false }, fingerprints);
   expect(changed.attempts).toBe(loaded.attempts); expect(changed.bests).toBe(loaded.bests);

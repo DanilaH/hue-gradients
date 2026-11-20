@@ -11,8 +11,8 @@ import { applyTimed, validateTimedProgress, type TimedAction, type TimedProgress
 import { campaignVictories, campaignVictory, publishedBenchmark, validateCampaignVictories, type CampaignVictory, type PublishedBenchmark } from './playerProgress';
 
 export interface Best { fingerprint: string; rulesVersion: typeof RULES_VERSION; clean: number | null; assisted: number | null }
-export interface Preferences { sound: boolean; haptics: boolean; motion: boolean; statistics: boolean }
-export const DEFAULT_PREFERENCES: Readonly<Preferences> = { sound: true, haptics: true, motion: true, statistics: true };
+export interface Preferences { sound: boolean; haptics: boolean; motion: boolean; statistics: boolean; music: boolean }
+export const DEFAULT_PREFERENCES: Readonly<Preferences> = { sound: true, haptics: true, motion: true, statistics: true, music: false };
 export interface AlbumCopy {
   schemaVersion: 1; draftId: string; workId: string; nodeId: string; parentNodeIds: readonly string[];
   name: string; fingerprint: string; rulesVersion: typeof RULES_VERSION;
@@ -88,6 +88,7 @@ export function decodeWorkspace(json: string, fingerprints: ReadonlyMap<string, 
   getLevel(state.activeLevelId);
   if (!Object.hasOwn(state, 'preferences')) state.preferences = { ...DEFAULT_PREFERENCES };
   if (!record(state.preferences)) throw new Error('Invalid saved preferences');
+  if (!Object.hasOwn(state.preferences, 'music')) state.preferences.music = DEFAULT_PREFERENCES.music;
   if (!Object.hasOwn(state.preferences, 'statistics')) state.preferences.statistics = DEFAULT_PREFERENCES.statistics;
   if (Object.keys(DEFAULT_PREFERENCES).some(key => typeof state.preferences[key as keyof Preferences] !== 'boolean')) throw new Error('Invalid saved preferences');
   for (const list of [state.completed, state.rights]) if (new Set(list).size !== list.length || list.some(id => typeof id !== 'string')) throw new Error('Invalid saved progress');

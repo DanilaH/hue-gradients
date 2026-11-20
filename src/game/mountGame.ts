@@ -11,6 +11,7 @@ import { Session } from '../app/session';
 import { PuzzleScene, GAME_PRESENTABLE } from './PuzzleScene';
 import { Atmosphere, type ColourPointer } from './atmosphere';
 import { cellCenter } from './geometry';
+import { AmbientMusic } from './music';
 import { GameFeedback, type Haptic } from './feedback';
 import { dailyLabel, levelPreview, renderMeta, type MetaRoute } from './metaView';
 import { chapterIndexFor, recommendedLevel, rewardTitle } from '../domain/progression';
@@ -67,7 +68,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   region.append(marker);
   const dialog = root.querySelector<HTMLDialogElement>('#game-dialog')!;
   const actions = root.querySelector<HTMLElement>('#dialog-actions')!;
-  const atmosphere = new Atmosphere(root), feedback = new GameFeedback(options.haptic);
+  const atmosphere = new Atmosphere(root), feedback = new GameFeedback(options.haptic), music = new AmbientMusic();
   const systemMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const motionAllowed = () => session.state.preferences.motion && !systemMotion.matches && !activity.isBlocked();
   const byId = <T extends HTMLElement>(id: string) => root.querySelector<T>(`#${id}`)!;
@@ -463,11 +464,14 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       if (attempt && !attempt.completed && !challenge && !timed && !daily && !personal) button('Помощь', () => { layer = 'help-menu'; render(); }, true);
       if (timed) button('К испытаниям', leaveTimed, true);
       else button('Заново', () => askRestart(session.state.activeLevelId), true).id = 'restart';
-      for (const [key, label] of [['sound', 'Звуки'], ['haptics', 'Вибрация'], ['motion', 'Движение фона'], ['statistics', 'Статистика уровня']] as const) {
+      for (const [key, label] of [['sound', 'Звуки'], ['music', 'Музыка'], ['haptics', 'Вибрация'], ['motion', 'Движение фона'], ['statistics', 'Статистика уровня']] as const) {
         const row = document.createElement('label'); row.className = 'setting';
         const input = document.createElement('input'); input.type = 'checkbox'; input.checked = session.state.preferences[key]; input.disabled = busy || activity.isBlocked();
         input.setAttribute('aria-label', label);
-        input.onchange = () => void run({ kind: 'preferences', key, value: input.checked });
+        input.onchange = () => {
+          if (key === 'music' && input.checked) music.unlock();
+          void run({ kind: 'preferences', key, value: input.checked });
+        };
         const title = document.createElement('span'); title.textContent = label; row.append(title, input); actions.append(row);
       }
     } else if (layer === 'help-menu') {
@@ -602,6 +606,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     }
     atmosphere.configure(ready && !activity.isBlocked() && (picker !== null || cardId !== null || authorCard !== null || gallery || ['none', 'help', 'result'].includes(layer)), motionAllowed());
     feedback.configure(session.state.preferences, !ready || activity.isBlocked());
+    music.configure(ready && !activity.isBlocked() && session.state.preferences.music);
     activity.setGameplayDesired(ready && !busy && layer === 'none' && !attempt?.completed && !activity.isBlocked());
     renderDialog(); paint(); updateTimedClock(); finishImport();
   }
@@ -712,6 +717,9 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (current().own) { leaveAuthor(); return true; }
     return false;
   };
+  const unlockMusic = () => { if (session.state.preferences.music && !activity.isBlocked()) music.unlock(); };
+  root.addEventListener('pointerdown', unlockMusic, { signal: listeners.signal, capture: true });
+  root.addEventListener('keydown', unlockMusic, { signal: listeners.signal, capture: true });
   byId('help').addEventListener('click', () => {
     if (layer === 'help' || layer === 'secret') { layer = 'none'; render(); return; }
     if (current().attempt?.completed) { layer = 'result'; render(); }
@@ -753,5 +761,5 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   });
   const clockTicker = setInterval(updateTimedClock, 200);
   await frame; ready = true; render(); resize();
-  return { back, destroy() { alive = false; clearInterval(clockTicker); clearMark(); editorView?.destroy(); workCard?.destroy(); prismGlint?.cancel(); exportFiles.destroy?.(); listeners.abort(); observer.disconnect(); unblock(); atmosphere.destroy(); feedback.destroy(); activity.setGameplayDesired(false); store.close(); destroyRenderer(game); } };
+  return { back, destroy() { alive = false; clearInterval(clockTicker); clearMark(); editorView?.destroy(); workCard?.destroy(); prismGlint?.cancel(); exportFiles.destroy?.(); listeners.abort(); observer.disconnect(); unblock(); atmosphere.destroy(); feedback.destroy(); music.destroy(); activity.setGameplayDesired(false); store.close(); destroyRenderer(game); } };
 }

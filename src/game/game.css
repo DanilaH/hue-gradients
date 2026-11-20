@@ -54,6 +54,7 @@ footer { min-height: 56px; padding: 2px 12px 6px; display: flex; gap: 10px; alig
 #dialog-copy { font-size: 16px; color: #fff0e4; white-space: pre-line; }
 #dialog-copy:empty { display: none; }
 #dialog-actions { display: grid; gap: 10px; }
+#game-dialog[data-layer=settings] { padding: 16px; }
 #game-dialog[data-layer=settings] h2 { padding-right: 52px; }
 #game-dialog[data-layer=settings] #dialog-actions { gap: 1px; }
 #game-dialog[data-layer=help-menu] { width: min(94%,440px); padding: 16px; }
@@ -62,6 +63,9 @@ footer { min-height: 56px; padding: 2px 12px 6px; display: flex; gap: 10px; alig
 #game-dialog[data-layer=help-menu] #dialog-actions button { text-align: left; padding: 7px 12px; }
 @media (orientation:landscape) and (max-height:450px) {
   #game-dialog[data-layer=help-menu] #dialog-actions { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  #game-dialog[data-layer=settings] { width: min(96%,620px); max-height: calc(100% - 12px); padding: 12px; }
+  #game-dialog[data-layer=settings] #dialog-actions { grid-template-columns: repeat(3,minmax(0,1fr)); }
+  #game-dialog[data-layer=settings] .setting { padding-inline: 5px; line-height: 1.2; overflow-wrap: anywhere; }
 }
 .settings-close { position: absolute; top: 12px; right: 12px; width: 48px; padding: 0; font-size: 1.5rem; }
 #restart { text-align: left; padding: 8px 0; background: transparent; border-width: 0 0 1px; border-radius: 0; }
