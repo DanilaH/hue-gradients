@@ -2,6 +2,10 @@
 
 Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and M4_EXPORT_IMPLEMENTATION.md. Owner authorized roadmap continuation. Bound file reads/output; no blobs/base64 or whole-archive re-reads. Commit checkpoints and preserve newer remote work. Branch feat/m0-foundation, draft PR #1; main still contains the original README.
 
+## Research revision — 20 November 2026
+
+[Reference-to-product audit and next packages](porting/README.md) · [Adoption ledger](porting/ADOPTION_LEDGER.json) · [71-requirement review](porting/REQUIREMENTS_REVIEW.md). Use this overlay with current owner decisions when consulting the frozen 1.0 roadmap. Current export is a single continuous device-sized wallpaper. The old collage milestones are historical; the current code still grants legacy format IDs at thresholds. The next field/pause/result slice has observed assist/mastery differences and a two-run browser acceptance case. Original challenge modes and softer hints are candidates pending owner choice.
+
 ## Current slice
 
 0.4.10/versionCode14 opens a full-screen editor with the name, continuous gradient and «Испытать». Tapping a corner shows a palette and custom colour with live preview. «Готово» commits a single revision. Resize, pins, fixed start and history sit under ⋯. Returning from author play opens the exact played node, and the wallpaper action always points at the selected verified node. A draft created and partially verified in 0.4.9 survives a new colour edit and reload. [Editor evidence and captures](evidence/editor-ui-2026-11-20.json)
