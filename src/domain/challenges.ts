@@ -1,4 +1,5 @@
 import { chapters, getLevel } from './levels';
+import { geometryLevels } from './shapeLevels';
 import { CHALLENGE_CONTENT_VERSION, createAttempt, minimumSwaps, proposeSwap, validateAttempt, validateLevel,
   type Attempt, type LevelDefinition } from './puzzle';
 
@@ -69,7 +70,9 @@ export type ChallengeAction =
   | { kind: 'challenge-swap'; from: number; to: number; attemptId: string }
   | { kind: 'challenge-leave' };
 
-const allChallenges = [...challenges, ...chapterChallenges];
+export const geometryChallenges: readonly ChallengeDefinition[] = Object.freeze(geometryLevels.map(level =>
+  Object.freeze({ level, requiredWorks: 0, moveLimit: level.minimumSwaps + 3 })));
+const allChallenges = [...challenges, ...chapterChallenges, ...geometryChallenges];
 const entry = (id: string | null): ChallengeDefinition | undefined => allChallenges.find(item => item.level.id === id);
 
 export function challengeAvailable(definition: ChallengeDefinition, completed: readonly string[], progress?: ChallengeProgress): boolean {

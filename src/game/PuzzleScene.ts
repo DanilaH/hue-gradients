@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
-import type { Attempt, LevelDefinition } from '../domain/puzzle';
-import { boardGeometry, cellAt, hitTest, type BoardGeometry, type Cell } from './geometry';
+import { canSwap, type Attempt, type LevelDefinition } from '../domain/puzzle';
+import { boardGeometry, cellAt, cellCenter, hitTest, type BoardGeometry, type Cell } from './geometry';
 
 export const GAME_PRESENTABLE = 'hue:presentable';
 interface Hooks { swap(from: number, to: number): void; pin(position: number): void; paint(): void; interaction?(value: { x: number; y: number; color: string } | null): void }
@@ -97,7 +97,7 @@ export class PuzzleScene extends Phaser.Scene {
     if (!this.enabled) { this.cancel(); return; }
     if (g.drag) {
       this.selected = null;
-      if (g.from !== null && target !== null && target !== g.from && !this.level.pinnedPositions.includes(target)) {
+      if (g.from !== null && target !== null && canSwap(this.level, g.from, target)) {
         this.released = { from: g.from, to: target, dx: x - g.x, dy: y - g.y }; this.hooks.swap(g.from, target);
       }
     } else if (g.from === target) this.tap(target);
@@ -112,7 +112,7 @@ export class PuzzleScene extends Phaser.Scene {
     if (this.selected === null) this.selected = position;
     else {
       const from = this.selected; this.selected = null;
-      if (from !== position) { this.released = { from, to: position, dx: 0, dy: 0 }; this.hooks.swap(from, position); }
+      if (canSwap(this.level, from, position)) { this.released = { from, to: position, dx: 0, dy: 0 }; this.hooks.swap(from, position); }
     }
   }
   cancel = (event?: PointerEvent): void => {
@@ -141,7 +141,24 @@ export class PuzzleScene extends Phaser.Scene {
     if (position === null || this.level.pinnedPositions.includes(position)) { this.hooks.interaction?.(null); return; }
     this.hooks.interaction?.({ x, y, color: this.level.solvedTileColors[this.attempt.board[position]!]! });
   }
+  private polygon(cell: Cell, dx = 0, dy = 0, gutter = .98) {
+    const center = cellCenter(cell);
+    return cell.points!.map(([x, y]) => new Phaser.Math.Vector2(
+      center.x + (cell.x + x - center.x) * gutter + dx,
+      center.y + (cell.y + y - center.y) * gutter + dy,
+    ));
+  }
+  private fillCell(cell: Cell, dx: number, dy: number, color: number, alpha = 1): void {
+    this.art.fillStyle(color, alpha);
+    if (cell.points) this.art.fillPoints(this.polygon(cell, dx, dy), true);
+    else this.art.fillRoundedRect(cell.x + dx, cell.y + dy, cell.width, cell.height, cell.radius);
+  }
   private brackets(cell: Cell): void {
+    if (cell.points) {
+      this.art.lineStyle(4, 0x151020).strokePoints(this.polygon(cell, 0, 0, .86), true);
+      this.art.lineStyle(2, 0xfff3df).strokePoints(this.polygon(cell, 0, 0, .86), true);
+      return;
+    }
     const inset = 4, length = Math.min(13, cell.width * .18, cell.height * .18);
     const art = this.art;
     for (const [width, color] of [[4, 0x151020], [2, 0xfff3df]] as const) {
@@ -155,6 +172,10 @@ export class PuzzleScene extends Phaser.Scene {
     }
   }
   private trailingLight(cell: Cell, dx: number, dy: number, alpha: number): void {
+    if (cell.points) {
+      this.art.lineStyle(1.4, 0xfff4df, alpha * .9).strokePoints(this.polygon(cell), true);
+      return;
+    }
     const { x, y, width, height } = cell;
     const horizontal = Math.abs(dx) >= Math.abs(dy);
     const left = dx >= 0 ? x + 1 : x + width - 1, top = dy >= 0 ? y + 1 : y + height - 1;
@@ -168,22 +189,24 @@ export class PuzzleScene extends Phaser.Scene {
   private draw(): void {
     const rect = this.game.canvas.getBoundingClientRect();
     this.ratio = this.scale.width / Math.max(1, rect.width);
-    this.geometry = boardGeometry(rect.width, rect.height, this.level.width, this.level.height);
+    this.geometry = boardGeometry(rect.width, rect.height, this.level.width, this.level.height, this.level.positions);
     this.art.clear().setScale(this.ratio);
     const tile = (position: number, dx = 0, dy = 0, lifted = false): void => {
       const cell = cellAt(this.geometry, position), tileId = this.preview ? position : this.attempt.board[position]!;
-      if (lifted) this.art.fillStyle(0x100e1c, .65).fillRoundedRect(cell.x + dx + 3, cell.y + dy + 5, cell.width, cell.height, cell.radius);
+      if (lifted) this.fillCell(cell, dx + 3, dy + 5, 0x100e1c, .65);
       const pinned = this.level.pinnedPositions.includes(position);
       const color = this.concealed && !pinned ? 0x2f263d : Number.parseInt(this.level.solvedTileColors[tileId]!.slice(1), 16);
-      this.art.fillStyle(color);
-      this.art.fillRoundedRect(cell.x + dx, cell.y + dy, cell.width, cell.height, cell.radius);
+      this.fillCell(cell, dx, dy, color);
       if (pinned) {
-        const cx = cell.x + cell.width / 2, cy = cell.y + cell.height / 2;
+        const { x: cx, y: cy } = cellCenter(cell);
         this.art.fillStyle(0x101019).fillCircle(cx, cy, 5).fillStyle(0xffffff).fillCircle(cx, cy, 2.5);
       }
       if (position === this.focused && !lifted) {
-        this.art.lineStyle(4, 0x101019).strokeRoundedRect(cell.x + dx + 3, cell.y + dy + 3, cell.width - 6, cell.height - 6, cell.radius);
-        this.art.lineStyle(2, 0xffffff).strokeRoundedRect(cell.x + dx + 3, cell.y + dy + 3, cell.width - 6, cell.height - 6, cell.radius);
+        if (cell.points) this.brackets({ ...cell, x: cell.x + dx, y: cell.y + dy });
+        else {
+          this.art.lineStyle(4, 0x101019).strokeRoundedRect(cell.x + dx + 3, cell.y + dy + 3, cell.width - 6, cell.height - 6, cell.radius);
+          this.art.lineStyle(2, 0xffffff).strokeRoundedRect(cell.x + dx + 3, cell.y + dy + 3, cell.width - 6, cell.height - 6, cell.radius);
+        }
       }
       if (!lifted && (position === this.selected || (this.gesture?.from === position && !this.gesture.drag))) {
         this.brackets({ ...cell, x: cell.x + dx, y: cell.y + dy });
@@ -194,8 +217,9 @@ export class PuzzleScene extends Phaser.Scene {
     for (let i = 0; i < this.attempt.board.length; i++) {
       if (i === lifted) {
         const cell = cellAt(this.geometry, i);
-        this.art.fillStyle(0x282031, .83).fillRoundedRect(cell.x, cell.y, cell.width, cell.height, cell.radius);
-        this.art.lineStyle(1, 0xd9c5e2, .42).strokeRoundedRect(cell.x + 2, cell.y + 2, cell.width - 4, cell.height - 4, cell.radius);
+        this.fillCell(cell, 0, 0, 0x282031, .83);
+        if (cell.points) this.art.lineStyle(1, 0xd9c5e2, .42).strokePoints(this.polygon(cell, 0, 0, .94), true);
+        else this.art.lineStyle(1, 0xd9c5e2, .42).strokeRoundedRect(cell.x + 2, cell.y + 2, cell.width - 4, cell.height - 4, cell.radius);
       } else if (!settle || (i !== settle.from && i !== settle.to)) tile(i);
     }
     if (settle) {
@@ -208,7 +232,7 @@ export class PuzzleScene extends Phaser.Scene {
     }
     if (g && lifted !== null) {
       const target = hitTest(this.geometry, g.latestX, g.latestY);
-      if (target !== null && target !== lifted && !this.level.pinnedPositions.includes(target)) this.brackets(cellAt(this.geometry, target));
+      if (target !== null && canSwap(this.level, lifted, target)) this.brackets(cellAt(this.geometry, target));
       const cell = cellAt(this.geometry, lifted), dx = g.latestX - g.x, dy = g.latestY - g.y;
       tile(lifted, dx, dy, true);
       this.trailingLight({ ...cell, x: cell.x + dx, y: cell.y + dy }, dx, dy, 1);

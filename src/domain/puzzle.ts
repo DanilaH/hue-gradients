@@ -1,3 +1,5 @@
+import { RECTANGLE, validPosition, type StartRecipe, type TilePosition } from './tileShapes';
+
 /** Game-owned rules. This module has no renderer, SDK, clock or storage imports. */
 export const RULES_VERSION = 'gradient-rules-1';
 export const CONTENT_VERSION = 'gradient-prototype-0.1';
@@ -16,6 +18,8 @@ export interface LevelDefinition {
   readonly pinnedPositions: readonly number[];
   readonly startTileAtPosition: readonly number[];
   readonly minimumSwaps: number;
+  readonly positions?: readonly TilePosition[];
+  readonly startRecipe?: StartRecipe;
 }
 
 export interface Attempt {
@@ -29,6 +33,7 @@ export interface Attempt {
   readonly assisted: boolean;
   readonly assistsUsed: number;
   readonly completed: boolean;
+  readonly generatedStart?: StartRecipe & { readonly board: readonly number[] };
 }
 
 export const AUTO_HELP_COST = 3;
@@ -63,12 +68,25 @@ export function minimumSwaps(board: readonly number[], pins: readonly number[]):
   return board.length - pins.length - cycles;
 }
 
+function respectsShapes(level: LevelDefinition, order: readonly number[]): boolean {
+  return !level.positions || order.every((tile, position) => level.positions![tile]!.shape === level.positions![position]!.shape);
+}
+
+export function canSwap(level: LevelDefinition, from: number, to: number): boolean {
+  const size = level.width * level.height;
+  return from !== to && integer(from, 0, size - 1) && integer(to, 0, size - 1) &&
+    !level.pinnedPositions.includes(from) && !level.pinnedPositions.includes(to) &&
+    (level.positions?.[from]?.shape ?? RECTANGLE) === (level.positions?.[to]?.shape ?? RECTANGLE);
+}
+
 export function validateLevel(level: LevelDefinition): void {
   if (!integer(level.width, 1, 6) || !integer(level.height, 1, 5)) throw new Error('Invalid board dimensions');
   const size = level.width * level.height;
   if (level.startTileAtPosition.length !== size || level.solvedTileColors.length !== size) throw new Error('Invalid board size');
   if (level.solvedTileColors.some(color => !/^#[0-9A-Fa-f]{6}$/.test(color))) throw new Error('Invalid RGB');
   validatePermutation(level.startTileAtPosition, level.pinnedPositions);
+  if (level.positions && (level.positions.length !== size || !level.positions.every(validPosition) ||
+      !respectsShapes(level, level.startTileAtPosition))) throw new Error('Invalid tile positions');
   const movableColors = level.solvedTileColors.filter((_, position) => !level.pinnedPositions.includes(position));
   if (movableColors.length < 2 || new Set(movableColors.map(color => color.toUpperCase())).size !== movableColors.length) {
     throw new Error('Invalid movable colors');
@@ -85,6 +103,7 @@ export function createAttempt(level: LevelDefinition, attemptId: string): Attemp
     schemaVersion: 1, rulesVersion: RULES_VERSION, contentVersion: level.contentVersion ?? CONTENT_VERSION,
     levelId: level.id, attemptId, board: [...level.startTileAtPosition],
     moves: 0, assisted: false, assistsUsed: 0, completed: false,
+    ...(level.startRecipe ? { generatedStart: { ...level.startRecipe, board: [...level.startTileAtPosition] } } : {}),
   };
 }
 
@@ -100,13 +119,20 @@ export function validateAttempt(level: LevelDefinition, attempt: Attempt): void 
     throw new Error('Invalid saved attempt');
   }
   validatePermutation(attempt.board, level.pinnedPositions);
+  if (!respectsShapes(level, attempt.board)) throw new Error('Incompatible tiles in saved field');
+  const generated = attempt.generatedStart, recipe = level.startRecipe;
+  if (recipe ? !generated || recipe.version !== generated.version || recipe.seed !== generated.seed ||
+      recipe.mode !== generated.mode || !Array.isArray(generated.board) ||
+      generated.board.length !== level.startTileAtPosition.length ||
+      generated.board.some((tile, position) => tile !== level.startTileAtPosition[position]) : !!generated) {
+    throw new Error('Invalid generated start');
+  }
 }
 
 /** Returns a proposed next value. Only the local transaction may accept it. */
 export function proposeSwap(level: LevelDefinition, attempt: Attempt, from: number, to: number): Attempt {
   validateAttempt(level, attempt);
-  if (attempt.completed || from === to || !integer(from, 0, attempt.board.length - 1) ||
-      !integer(to, 0, attempt.board.length - 1) || level.pinnedPositions.includes(from) || level.pinnedPositions.includes(to)) return attempt;
+  if (attempt.completed || !canSwap(level, from, to)) return attempt;
   if (attempt.moves === Number.MAX_SAFE_INTEGER) throw new Error('Move counter overflow');
   const board = [...attempt.board];
   [board[from], board[to]] = [board[to]!, board[from]!];
