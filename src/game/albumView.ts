@@ -17,6 +17,8 @@ interface Props {
   navigate(route: MetaRoute): void;
   back(): void;
   createWork(): void;
+  importPuzzle(file: File): void;
+  importNote: string;
   play(): void;
 }
 
@@ -115,6 +117,21 @@ export function renderAlbum(parent: HTMLElement, props: Props): void {
       }
     } else empty('Ваши композиции и копии будут здесь.');
     button(footer, 'Создать', props.createWork).dataset.albumFocus = 'create';
+    const file = document.createElement('input');
+    file.type = 'file'; file.accept = '.json,application/json'; file.hidden = true;
+    file.dataset.importPuzzle = '';
+    file.onchange = () => {
+      const selected = file.files?.[0];
+      file.value = '';
+      if (selected) props.importPuzzle(selected);
+    };
+    button(footer, 'Импорт задачи', () => file.click()).className = 'quiet';
+    footer.append(file);
+    if (props.importNote) {
+      const status = document.createElement('p');
+      status.className = 'album-import-status'; status.setAttribute('role', 'status');
+      status.textContent = props.importNote; scroll.append(status);
+    }
   }
 
   panel.append(nav, tabs, scroll, footer);

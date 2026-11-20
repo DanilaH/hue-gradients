@@ -24,11 +24,13 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import org.json.JSONObject;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/** Explicit user-requested PNG export. No workspace/database path is exposed. */
+/** Explicit user-requested PNG or puzzle sharing from a private cache. */
 @CapacitorPlugin(name="HueExport")
 public class HueExportPlugin extends Plugin {
   private static final ExecutorService WRITER=Executors.newSingleThreadExecutor();
@@ -49,10 +51,14 @@ public class HueExportPlugin extends Plugin {
         || (long) width * height > MAX_WALLPAPER_PIXELS) {
       throw new IllegalArgumentException("PNG dimensions");
     }
+    File file=writeCache(bytes,".png");
+    call.getData().put("exportCacheFile",file.getName());call.getData().remove("base64");return file;
+  }
+  private File writeCache(byte[] bytes, String suffix) throws Exception {
     File directory=new File(getContext().getCacheDir(),"hue-exports");if(!directory.isDirectory()&&!directory.mkdirs())throw new java.io.IOException("Cache unavailable");
     File[] old=directory.listFiles();if(old!=null)for(File file:old)if(file.lastModified()<System.currentTimeMillis()-24*60*60*1000L)file.delete();
-    File file=new File(directory,UUID.randomUUID()+".png");try(FileOutputStream out=new FileOutputStream(file)){out.write(bytes);out.getFD().sync();}
-    call.getData().put("exportCacheFile",file.getName());call.getData().remove("base64");return file;
+    File file=new File(directory,UUID.randomUUID()+suffix);try(FileOutputStream out=new FileOutputStream(file)){out.write(bytes);out.getFD().sync();}
+    return file;
   }
   private String filename(PluginCall call){String name=call.getString("filename","Poluson.png");return name.matches("[A-Za-z0-9._-]{1,100}\\.png")?name:"Poluson.png";}
   @PluginMethod public void screenSize(PluginCall call) {
@@ -95,15 +101,34 @@ public class HueExportPlugin extends Plugin {
     }catch(Exception error){file.delete();reject(call,error);return;}
     file.delete();resolve(call,"saved");});
   }
+  private void openShare(PluginCall call, File file, String mime, String label) {
+    Uri uri=FileProvider.getUriForFile(getContext(),getContext().getPackageName()+".hue-export",file);
+    Intent send=new Intent(Intent.ACTION_SEND);
+    send.setType(mime);send.putExtra(Intent.EXTRA_STREAM,uri);
+    send.setClipData(ClipData.newRawUri(label,uri));send.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+    getActivity().runOnUiThread(() -> {
+      try {
+        getActivity().startActivity(Intent.createChooser(send,label));
+        resolve(call,"opened");
+      } catch (Exception error) { reject(call,error); }
+    });
+  }
   @PluginMethod public void share(PluginCall call){
     if(!claim()){call.reject("Экспорт уже открыт.","EXPORT_BUSY");return;}
-    try{
-      File file=prepare(call);Uri uri=FileProvider.getUriForFile(getContext(),getContext().getPackageName()+".hue-export",file);
-      Intent send=new Intent(Intent.ACTION_SEND);send.setType("image/png");send.putExtra(Intent.EXTRA_STREAM,uri);send.setClipData(ClipData.newRawUri("PNG",uri));send.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-      getActivity().runOnUiThread(()->{try{getActivity().startActivity(Intent.createChooser(send,"Поделиться изображением"));
-        // Starting a chooser cannot establish delivery/publication or distinguish later cancellation.
-        resolve(call,"opened");}catch(Exception error){reject(call,error);}});
-    }catch(Exception error){reject(call,error);}
+    try { openShare(call,prepare(call),"image/png","Поделиться изображением"); }
+    catch(Exception error){reject(call,error);}
+  }
+  @PluginMethod public void sharePuzzle(PluginCall call){
+    if(!claim()){call.reject("Отправка уже открыта.","EXPORT_BUSY");return;}
+    WRITER.execute(() -> {
+      try {
+        String text=call.getString("text");
+        if(text==null||text.length()>65536)throw new IllegalArgumentException("Puzzle size");
+        byte[] bytes=text.getBytes(StandardCharsets.UTF_8);
+        if(bytes.length>65536||!"poluson-puzzle".equals(new JSONObject(text).optString("format")))throw new IllegalArgumentException("Puzzle format");
+        openShare(call,writeCache(bytes,".poluson.json"),"application/json","Поделиться задачей");
+      } catch(Exception error){reject(call,error);}
+    });
   }
   @PluginMethod public void setWallpaper(PluginCall call) {
     if (!claim()) {

@@ -1,4 +1,4 @@
-import { exportResultMessage, type ExportFiles } from '../app/exportFiles';
+import { exportResultMessage, type ExportFiles, type ExportResult } from '../app/exportFiles';
 import { wallpaperField, type ExportField, type WallpaperSize } from '../domain/export';
 import type { PublishedBenchmark } from '../domain/playerProgress';
 import type { Workspace } from '../domain/workspace';
@@ -10,6 +10,7 @@ interface Actions {
   copy?(): void;
   edit?(): void;
   collection?(): void;
+  sharePuzzle?(): Promise<ExportResult>;
 }
 
 export interface WorkCard {
@@ -104,6 +105,7 @@ export class WorkCardView {
     if (actions.replay) add(choices, 'Повторить работу', actions.replay);
     if (actions.copy) add(choices, 'Сохранить копию', actions.copy);
     if (actions.edit) add(choices, 'Редактировать', actions.edit);
+    if (actions.sharePuzzle) add(choices, 'Поделиться задачей', () => void this.sendPuzzle(actions.sharePuzzle!));
     this.options.append(this.summary, choices);
     nav.append(this.options);
     this.saveButton.type = 'button';
@@ -165,6 +167,23 @@ export class WorkCardView {
       }
     } finally {
       this.preparing = false;
+      this.finish();
+    }
+  }
+
+  private async sendPuzzle(deliver: () => Promise<ExportResult>): Promise<void> {
+    if (this.blocked || this.sending) return;
+    this.sending = true;
+    this.update(this.blocked);
+    try {
+      const result = await deliver();
+      if (!this.disposed) this.note.textContent = result === 'cancelled' ? 'Отправка задачи отменена.'
+        : result === 'opened' ? 'Открыто окно отправки задачи.'
+        : result === 'download-requested' ? 'Файл задачи появится в загрузках.' : 'Файл задачи готов.';
+    } catch {
+      if (!this.disposed) this.note.textContent = 'Не удалось передать файл задачи.';
+    } finally {
+      this.sending = false;
       this.finish();
     }
   }

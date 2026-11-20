@@ -6,6 +6,7 @@ export interface ExportFiles {
   canShare(file: File): boolean;
   save(file: File): Promise<ExportResult>;
   share(file: File): Promise<ExportResult>;
+  sharePuzzle?(file: File): Promise<ExportResult>;
   setWallpaper?(file: File): Promise<ExportResult>;
   destroy?(): void;
 }
@@ -27,7 +28,10 @@ export function browserExportFiles():ExportFiles {
       try {
         if(picker && window.self===window.top) {
           // Invoke the picker while the explicit click's transient activation still exists.
-          const handle=await picker.call(window,{suggestedName:file.name,types:[{description:'PNG',accept:{'image/png':['.png']}}]});
+          const puzzle = file.type === 'application/json';
+          const format = puzzle ? { description: 'Задача Полусна', accept: { 'application/json': ['.json'] } }
+            : { description: 'PNG', accept: { 'image/png': ['.png'] } };
+          const handle=await picker.call(window,{suggestedName:file.name,types:[format]});
           const writer=await handle.createWritable();
           try{await writer.write(file);await writer.close();}catch(error){await writer.abort?.().catch(()=>{});throw error;}
           return 'saved';

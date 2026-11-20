@@ -14,6 +14,7 @@ import { GameFeedback, type Haptic } from './feedback';
 import { dailyLabel, levelPreview, renderMeta, type MetaRoute } from './metaView';
 import { chapterIndexFor, recommendedLevel, rewardTitle } from '../domain/progression';
 import { authorBests, authorView, findDraft, hasAuthorProof, type CreativeAction } from '../domain/creative';
+import { makePuzzleFile, parsePuzzleFile } from '../domain/puzzleTransfer';
 import { makeField, playableField } from '../domain/editor';
 import { AUTO_HELP_COST, autoHelpSwap, pulsePosition, type Assistance } from '../domain/puzzle';
 import { activePersonal, taskNames } from '../domain/personal';
@@ -76,6 +77,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   let foregroundEpoch = 0;
   let queuedClock = false;
   let dailyLoading = false;
+  let importing = false, importNote = '';
+  let pendingImport: Awaited<ReturnType<typeof parsePuzzleFile>> | null = null;
   let pauseRequestedAt: number | null = null;
   const timeCaption = (seconds: number) => `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
   let layer = gameLayer();
@@ -337,6 +340,25 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     void run({ kind: 'editor-create', draftId, workId: crypto.randomUUID(), nodeId: crypto.randomUUID(), name: 'Моя композиция', field: makeField(), seed: 0 },
       () => showMeta({ kind: 'draft', draftId }));
   }
+  async function importPuzzle(file: File): Promise<void> {
+    if (importing || pendingImport || session.pending) return;
+    importing = true;
+    importNote = '';
+    try { pendingImport = await parsePuzzleFile(file); }
+    catch { importNote = 'Файл повреждён или создан в несовместимой версии Полусна.'; }
+    finally { importing = false; if (alive) render(); }
+  }
+  function finishImport(): void {
+    if (!pendingImport || busy || activity.isBlocked() || session.pending) return;
+    const source = pendingImport;
+    pendingImport = null;
+    if (layer !== 'meta' || metaRoute.kind !== 'album' || metaRoute.tab !== 'own') return;
+    const draftId = crypto.randomUUID();
+    queueMicrotask(() => {
+      void run({ kind: 'editor-create', draftId, workId: crypto.randomUUID(), nodeId: crypto.randomUUID(),
+        name: source.name, field: source.field, seed: source.seed }, () => showMeta({ kind: 'draft', draftId }));
+    });
+  }
   function rememberAlbum(): void {
     if (!shownAlbum) return;
     const scroller = actions.querySelector('.album-scroll');
@@ -489,7 +511,11 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
                 showMeta(route);
               },
             } : {}),
-          } : { edit: () => {
+          } : { sharePuzzle: () => {
+            const file = makePuzzleFile(title, authorCard!.work.nodes[authorCard!.nodeId]!);
+            if (exportFiles.sharePuzzle) return exportFiles.sharePuzzle(file);
+            return exportFiles.canShare(file) ? exportFiles.share(file) : exportFiles.save(file);
+          }, edit: () => {
             const draftId = authorCard!.work.draftId, previous = metaHistory.at(-1);
             if (previous?.kind === 'draft' && previous.draftId === draftId) popMeta();
             else showMeta({ kind: 'draft', draftId, nodeId: authorCard!.nodeId });
@@ -499,7 +525,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       } else if (shownAlbum) {
         byId('dialog-title').textContent = 'Альбом';
         renderAlbum(actions, { state: session.state, disabled: busy || activity.isBlocked() || !!session.pending, route: shownAlbum,
-          position: albumPositions.get(shownAlbum.tab), navigate: showMeta, back: popMeta, createWork,
+          position: albumPositions.get(shownAlbum.tab), navigate: showMeta, back: popMeta, createWork, importPuzzle, importNote,
           play: () => startLevel(session.state.activeLevelId) });
       } else if (work) {
         byId('dialog-title').textContent = work.name;
@@ -574,7 +600,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     atmosphere.configure(ready && !activity.isBlocked() && (picker !== null || cardId !== null || authorCard !== null || gallery || ['none', 'help', 'result'].includes(layer)), motionAllowed());
     feedback.configure(session.state.preferences, !ready || activity.isBlocked());
     activity.setGameplayDesired(ready && !busy && layer === 'none' && !attempt?.completed && !activity.isBlocked());
-    renderDialog(); paint(); updateTimedClock();
+    renderDialog(); paint(); updateTimedClock(); finishImport();
   }
   function askHelp(assistance: Assistance): void {
     if (layer !== 'help-menu' || busy || session.pending || activity.isBlocked()) return;

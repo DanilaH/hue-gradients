@@ -5,6 +5,7 @@ interface ExportBridge {
   screenSize(): Promise<WallpaperSize>;
   save(options: {base64: string; filename: string}): Promise<{status: ExportResult}>;
   share(options: {base64: string; filename: string}): Promise<{status: ExportResult}>;
+  sharePuzzle(options: {text: string}): Promise<{status: ExportResult}>;
   setWallpaper(options: {base64: string; filename: string}): Promise<{status: ExportResult}>;
 }
 const bridge=registerPlugin<ExportBridge>('HueExport');
@@ -14,5 +15,6 @@ export const nativeExportFiles:ExportFiles={
   canShare:()=>true,
   async save(file){return(await bridge.save({base64:await encoded(file),filename:file.name})).status;},
   async share(file){return(await bridge.share({base64:await encoded(file),filename:file.name})).status;},
+  async sharePuzzle(file){return(await bridge.sharePuzzle({text:await file.text()})).status;},
   async setWallpaper(file){return(await bridge.setWallpaper({base64:await encoded(file),filename:file.name})).status;},
 };
