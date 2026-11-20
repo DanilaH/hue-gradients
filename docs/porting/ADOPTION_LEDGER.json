@@ -7,792 +7,896 @@
       "id": "h1-swap",
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "MATCH",
-      "stage": "M1",
+      "stage": "Пакет 01",
       "currentImplementation": "Два подвижных ID меняют места, +1 ход. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/puzzle.ts",
-      "nextAction": "Проверить tap и drag одного обмена на Android."
+      "nextAction": "Переиспользовать реализованное поведение и пройти регрессию пакета 01.",
+      "deliveryPackage": "01",
+      "sourceNextCheck": "Проверить tap и drag одного обмена на Android."
     },
     {
       "id": "h1-pins",
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "MATCH",
-      "stage": "M1",
+      "stage": "Пакет 01",
       "currentImplementation": "Закреплённые позиции защищены доменной проверкой. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/puzzle.ts",
-      "nextAction": "Попытаться уронить плитку на опору."
+      "nextAction": "Переиспользовать реализованное поведение и пройти регрессию пакета 01.",
+      "deliveryPackage": "01",
+      "sourceNextCheck": "Попытаться уронить плитку на опору."
     },
     {
       "id": "h1-geometry",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "PARTIAL",
-      "stage": "контент",
+      "stage": "Пакет 04",
       "currentImplementation": "Наш банк использует прямоугольные клетки. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/levels.ts",
-      "nextAction": "Сравнить по одной собственной задаче одинаковой длины с разной геометрией.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 04 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "04",
+      "sourceNextCheck": "Сравнить по одной собственной задаче одинаковой длины с разной геометрией."
     },
     {
       "id": "h1-shuffle",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "контент",
+      "stage": "Пакет 04",
       "currentImplementation": "Кампания воспроизводит один авторский старт на уровень. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/levels.ts",
-      "nextAction": "Для отдельного варианта измерить разброс оптимума при replay.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 04 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "04",
+      "sourceNextCheck": "Для отдельного варианта измерить разброс оптимума при replay."
     },
     {
       "id": "h1-unlock",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "PARTIAL",
-      "stage": "M3",
+      "stage": "Пакет 02",
       "currentImplementation": "10 разных побед в предыдущей главе; новая глава содержит 15 задач. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/progression.ts",
-      "nextAction": "Сопоставить открытие и заполнение всей главы.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 02 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "02",
+      "sourceNextCheck": "Сопоставить открытие и заполнение всей главы."
     },
     {
       "id": "h1-world-average",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "мастерство",
+      "stage": "Пакет 02",
       "currentImplementation": "Показываются личные результаты. История происхождения среднего оригинала неизвестна. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/workCardView.ts",
-      "nextAction": "Для сравнения выбрать прозрачно названный ориентир и источник.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 02 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "02",
+      "sourceNextCheck": "Для сравнения выбрать прозрачно названный ориентир и источник."
     },
     {
       "id": "h1-entry",
       "status": "OWNER_EXCLUDED",
       "gap": "MISSING",
-      "stage": "решение владельца",
+      "stage": "Пакет 08",
       "currentImplementation": "Игра без энергии и цены входа. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/PRODUCT_SPEC_1_0.md",
-      "nextAction": "Сохранить бесплатный вход при переносе идей прогрессии.",
-      "ownerDecisionRef": "https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/AGENTS.md"
+      "nextAction": "Проверять бесплатный вход и повтор на новом и старом профилях.",
+      "ownerDecisionRef": "https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/AGENTS.md",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Сохранить бесплатный вход при переносе идей прогрессии."
     },
     {
       "id": "h1-gift",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "мета",
+      "stage": "Пакет 08",
       "currentImplementation": "Подарка расходуемого ресурса нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/progression.ts",
-      "nextAction": "Оценивать отдельно от бесплатного доступа и от daily-задачи.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 08 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Оценивать отдельно от бесплатного доступа и от daily-задачи."
     },
     {
       "id": "h1-rewarded",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "M7",
+      "stage": "Пакет 08",
       "currentImplementation": "У нас бесплатная помощь; rewarded за призмы не запланирован. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md",
-      "nextAction": "Рассматривать размещения отдельно, с назначением награды.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 08 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Рассматривать размещения отдельно, с назначением награды."
     },
     {
       "id": "h1-iap",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "M7",
+      "stage": "Пакет 08",
       "currentImplementation": "Экономики расходуемых призм нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md",
-      "nextAction": "Зафиксировать решение о покупках отдельно от решения об энергии.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 08 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Зафиксировать решение о покупках отдельно от решения об энергии."
     },
     {
       "id": "h1-paying-noads",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "M7",
+      "stage": "Пакет 08",
       "currentImplementation": "Рабочая политика проекта без IAP. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md",
-      "nextAction": "Проверять entitlement только при выборе предложения.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 08 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Проверять entitlement только при выборе предложения."
     },
     {
       "id": "h1-interstitial",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "M7",
+      "stage": "Пакет 08",
       "currentImplementation": "Для Полусна спроектирован иной переход и лимит; M7 открыт. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md",
-      "nextAction": "Прогнать provider-ready/no-fill и реальный переход.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 08 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Прогнать provider-ready/no-fill и реальный переход."
     },
     {
       "id": "h1-rate-grace",
-      "status": "EVIDENCE_GAP",
+      "status": "ROADMAPPED",
       "gap": "UNKNOWN",
-      "stage": "M7",
+      "stage": "Пакет 08",
       "currentImplementation": "Привязка поставленного значения к исполненному сценарию не проверена. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md",
-      "nextAction": "Проследить вызовы в Lua; проверить таймер до и после оценки."
+      "nextAction": "Реализовать соответствующий пункт пакета 08 и проверить приёмку из FULL_ROADMAP.md. Подтвердить границу источника: Проследить вызовы в Lua; проверить таймер до и после оценки.",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Проследить вызовы в Lua; проверить таймер до и после оценки."
     },
     {
       "id": "h1-reward-grace",
-      "status": "EVIDENCE_GAP",
+      "status": "ROADMAPPED",
       "gap": "UNKNOWN",
-      "stage": "M7",
+      "stage": "Пакет 08",
       "currentImplementation": "В оригинале проверена настройка, применение в живой сессии открыто. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md",
-      "nextAction": "После тестовой награды снять состояние nextAdTime."
+      "nextAction": "Реализовать соответствующий пункт пакета 08 и проверить приёмку из FULL_ROADMAP.md. Подтвердить границу источника: После тестовой награды снять состояние nextAdTime.",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "После тестовой награды снять состояние nextAdTime."
     },
     {
       "id": "h1-local-resume",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "PARTIAL",
-      "stage": "M1",
+      "stage": "Пакет 09",
       "currentImplementation": "Веб-путь восстанавливает подтверждённое поле; физический Android открыт. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/workspace.ts",
-      "nextAction": "Убить процесс после хода на тестовом устройстве.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 09 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "09",
+      "sourceNextCheck": "Убить процесс после хода на тестовом устройстве."
     },
     {
       "id": "h1-cloud",
       "status": "DEFERRED",
       "gap": "PARTIAL",
-      "stage": "M5 HOLD",
+      "stage": "Пакет 09",
       "currentImplementation": "Есть локальное сохранение и контракт, нет подтверждённого переноса между устройствами. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/TECHNICAL_SPEC_0_1.md",
-      "nextAction": "После снятия паузы проверить два расходящихся профиля.",
+      "nextAction": "Сохранить совместимость локального контракта. Интеграция двух устройств после возобновления M5 владельцем.",
       "reason": "Пауза владельца 19 ноября, см. AGENTS.md.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "deliveryPackage": "09",
+      "sourceNextCheck": "После снятия паузы проверить два расходящихся профиля."
     },
     {
       "id": "h1-share",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "PARTIAL",
-      "stage": "M4",
+      "stage": "Пакет 01",
       "currentImplementation": "В оригинале поле на шаблоне. У нас одно плавное изображение под дисплей. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/export.ts",
-      "nextAction": "Сохранить и отправить одну и ту же проверенную версию.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 01 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "01",
+      "sourceNextCheck": "Сохранить и отправить одну и ту же проверенную версию."
     },
     {
       "id": "h1-pin-feedback",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "PARTIAL",
-      "stage": "M2",
+      "stage": "Пакет 01",
       "currentImplementation": "У нас при первом тапе текст, для кампании последующие тапы не запускают отдельного покачивания опоры. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/mountGame.ts",
-      "nextAction": "Нажать ту же опору дважды, с движением и без него.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 01 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "01",
+      "sourceNextCheck": "Нажать ту же опору дважды, с движением и без него."
     },
     {
       "id": "h1-audio",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "PARTIAL",
-      "stage": "M2",
+      "stage": "Пакет 10",
       "currentImplementation": "Свой звук подтверждённого обмена и победы. Стеклянный тембр предложен в PR2. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/feedback.ts",
-      "nextAction": "Проверить отмену и быстрый следующий ход со звуком.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 10 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "10",
+      "sourceNextCheck": "Проверить отмену и быстрый следующий ход со звуком."
     },
     {
       "id": "h1-music",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "звук",
+      "stage": "Пакет 10",
       "currentImplementation": "Синтез коротких событий; отдельный музыкальный цикл в этом маршруте отсутствует. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/feedback.ts",
-      "nextAction": "Сравнить тихую петлю с текущей партией на телефоне.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 10 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "10",
+      "sourceNextCheck": "Сравнить тихую петлю с текущей партией на телефоне."
     },
     {
       "id": "h1-score-toggle",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "M2",
+      "stage": "Пакет 02",
       "currentImplementation": "В паузе есть звук, вибрация и движение. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/mountGame.ts",
-      "nextAction": "Проверить спрос на спокойный режим без счётчика.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 02 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "02",
+      "sourceNextCheck": "Проверить спрос на спокойный режим без счётчика."
     },
     {
       "id": "h1-belts",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "мастерство",
+      "stage": "Пакет 02",
       "currentImplementation": "Мастерство хранится по задаче; долгосрочного счётчика этой цели нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/progression.ts",
-      "nextAction": "Проверить повтор одного уровня и показ достижения без сети; выбрать честный ориентир для своей шкалы.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 02 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "02",
+      "sourceNextCheck": "Проверить повтор одного уровня и показ достижения без сети; выбрать честный ориентир для своей шкалы."
     },
     {
       "id": "h1-set-award",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "PARTIAL",
-      "stage": "M3",
+      "stage": "Пакет 02",
       "currentImplementation": "Отметка открытой/полной главы отличается по условию от финального этапа. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/progression.ts",
-      "nextAction": "Проверить завершение финального этапа с пропусками и без них.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 02 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "02",
+      "sourceNextCheck": "Проверить завершение финального этапа с пропусками и без них."
     },
     {
       "id": "h1-category-award",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "PARTIAL",
-      "stage": "M3",
+      "stage": "Пакет 02",
       "currentImplementation": "Есть закрытие отдельной главы 15/15; общей категории из наборов нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/progression.ts",
-      "nextAction": "Отделить полную главу от полного набора глав.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 02 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "02",
+      "sourceNextCheck": "Отделить полную главу от полного набора глав."
     },
     {
       "id": "h1-rating",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "платформа",
+      "stage": "Пакет 08",
       "currentImplementation": "Числа заданы в конфиге оригинала. Что именно учитывается как play и показано в UI, открыто. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md",
-      "nextAction": "Проверить пользовательский показ и подавление после выставления флага. Напоминание в игре отделять от окна магазина.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 08 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Проверить пользовательский показ и подавление после выставления флага. Напоминание в игре отделять от окна магазина."
     },
     {
       "id": "h1-pin-dialog",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "PARTIAL",
-      "stage": "FTUE",
+      "stage": "Пакет 01",
       "currentImplementation": "У нас объяснение сразу при первом тапе. Значение 3 само по себе не подтверждает показ на третьем. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/mountGame.ts",
-      "nextAction": "Сравнить первый и третий тап в игре на новом профиле. Проверить, доступно ли объяснение игроку после перезапуска.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 01 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "01",
+      "sourceNextCheck": "Сравнить первый и третий тап в игре на новом профиле. Проверить, доступно ли объяснение игроку после перезапуска."
     },
     {
       "id": "h2-shape-swap",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "контент",
+      "stage": "Пакет 04",
       "currentImplementation": "Поддерживается единый тип прямоугольной плитки. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/puzzle.ts",
-      "nextAction": "На прототипе проверить, как игрок видит допустимые пары разных форм.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 04 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "04",
+      "sourceNextCheck": "На прототипе проверить, как игрок видит допустимые пары разных форм."
     },
     {
       "id": "h2-cycles",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "PARTIAL",
-      "stage": "контент",
+      "stage": "Пакет 04",
       "currentImplementation": "Редактор формирует один цикл среди всех подвижных, кампания загружает заданный старт. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/editor.ts",
-      "nextAction": "Сверить минимумы однотипного и смешанного полей отдельно.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 04 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "04",
+      "sourceNextCheck": "Сверить минимумы однотипного и смешанного полей отдельно."
     },
     {
       "id": "h2-perfect",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "PARTIAL",
-      "stage": "мастерство",
+      "stage": "Пакет 01",
       "currentImplementation": "Минимум и право perfect вычисляются; в подробностях карточки указаны только два best. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/workCardView.ts",
-      "nextAction": "Довести знак и минимум до карточки и проверить после replay.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 01 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "01",
+      "sourceNextCheck": "Довести знак и минимум до карточки и проверить после replay."
     },
     {
       "id": "h2-zoom",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "крупные поля",
+      "stage": "Пакет 04",
       "currentImplementation": "Второй указатель игнорируется, UX-02 задаёт поле без zoom. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/PuzzleScene.ts",
-      "nextAction": "Оценивать только вместе с размером поля.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 04 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "04",
+      "sourceNextCheck": "Оценивать только вместе с размером поля."
     },
     {
       "id": "h2-pan",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "крупные поля",
+      "stage": "Пакет 04",
       "currentImplementation": "Панорамирования доски нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/PuzzleScene.ts",
-      "nextAction": "Сравнить читаемость крупных задач при масштабировании.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 04 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "04",
+      "sourceNextCheck": "Сравнить читаемость крупных задач при масштабировании."
     },
     {
       "id": "h2-edge-pan",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "крупные поля",
+      "stage": "Пакет 04",
       "currentImplementation": "При выходе за поле обмен отменяется. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/PuzzleScene.ts",
-      "nextAction": "Проверить дотягивание до края при увеличении отдельно от cancel.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 04 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "04",
+      "sourceNextCheck": "Проверить дотягивание до края при увеличении отдельно от cancel."
     },
     {
       "id": "h2-rgb",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "PARTIAL",
-      "stage": "цвет",
+      "stage": "Пакет 04",
       "currentImplementation": "Собственный прямоугольный RGB-путь и округление. Полный визуальный паритет не проверен. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/editor.ts",
-      "nextAction": "Сравнить известные углы на одном измеряемом поле.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 04 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "04",
+      "sourceNextCheck": "Сравнить известные углы на одном измеряемом поле."
     },
     {
       "id": "h2-xp",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "PARTIAL",
-      "stage": "M3",
+      "stage": "Пакет 02",
       "currentImplementation": "Новая победа продвигает главу один раз, общей валюты XP нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/progression.ts",
-      "nextAction": "Проверить повтор идеального решения.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 02 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "02",
+      "sourceNextCheck": "Проверить повтор идеального решения."
     },
     {
       "id": "h2-boss",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "контент",
+      "stage": "Пакет 03",
       "currentImplementation": "В главе открывается следующая; отдельного испытания главы нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/levels.ts",
-      "nextAction": "Сравнить одно испытание главы с обычной новой главой.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 03 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "03",
+      "sourceNextCheck": "Сравнить одно испытание главы с обычной новой главой."
     },
     {
       "id": "h2-secret",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "контент",
+      "stage": "Пакет 03",
       "currentImplementation": "Нет отдельной вступительной фазы; закрытая карточка уровня — другое состояние. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/PuzzleScene.ts",
-      "nextAction": "Снять свежий вход и resume в оригинале, отдельно от закрытого уровня.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 03 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "03",
+      "sourceNextCheck": "Снять свежий вход и resume в оригинале, отдельно от закрытого уровня."
     },
     {
       "id": "h2-auto-hint",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "помощь",
+      "stage": "Пакет 01",
       "currentImplementation": "Наша подсказка открывает решение и отмечает assisted, ходов не добавляет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/puzzle.ts",
-      "nextAction": "Сравнить автоматический правильный обмен с preview; решение владельца открыто.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 01 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "01",
+      "sourceNextCheck": "Сравнить автоматический правильный обмен с preview; решение владельца открыто."
     },
     {
       "id": "h2-daily-open",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "M6",
+      "stage": "Пакет 05",
       "currentImplementation": "Общий каталог в плане, XP-ворот нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md",
-      "nextAction": "Определить момент знакомства с daily при запуске сервиса.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 05 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "05",
+      "sourceNextCheck": "Определить момент знакомства с daily при запуске сервиса."
     },
     {
       "id": "h2-daily-date",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "M6",
+      "stage": "Пакет 05",
       "currentImplementation": "Спроектирован общий UTC-каталог с доверенным временем. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/TECHNICAL_SPEC_0_1.md",
-      "nextAction": "Проверить две зоны и перевод часов на опубликованном слоте.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 05 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "05",
+      "sourceNextCheck": "Проверить две зоны и перевод часов на опубликованном слоте."
     },
     {
       "id": "h2-daily-past",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "режимы после ядра",
+      "stage": "Пакет 05",
       "currentImplementation": "Личные best есть; отдельных daily-целей нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md",
-      "nextAction": "Прототип из уже решённой работы, последний допустимый ход засчитывается.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 05 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "05",
+      "sourceNextCheck": "Прототип из уже решённой работы, последний допустимый ход засчитывается."
     },
     {
       "id": "h2-daily-present",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "режимы после ядра",
+      "stage": "Пакет 05",
       "currentImplementation": "В спроектированном UTC daily обычные правила без таймера. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md",
-      "nextAction": "Проверить границу таймера и возобновление после паузы.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 05 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "05",
+      "sourceNextCheck": "Проверить границу таймера и возобновление после паузы."
     },
     {
       "id": "h2-daily-future",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "режимы после ядра",
+      "stage": "Пакет 05",
       "currentImplementation": "Нынешняя кампания такого предложения не делает. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md",
-      "nextAction": "Проверить выдачу на профилях с разным прогрессом.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 05 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "05",
+      "sourceNextCheck": "Проверить выдачу на профилях с разным прогрессом."
     },
     {
       "id": "h2-daily-history",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "M6",
+      "stage": "Пакет 05",
       "currentImplementation": "Фиксированному общему слоту не нужен персональный подбор. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md",
-      "nextAction": "Проверить на двух разных профилях, если вводится личная подборка.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 05 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "05",
+      "sourceNextCheck": "Проверить на двух разных профилях, если вводится личная подборка."
     },
     {
       "id": "h2-daily-reward",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "M6",
+      "stage": "Пакет 05",
       "currentImplementation": "Общего daily-XP в локальной игре нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md",
-      "nextAction": "Повторная победа по одному слоту, отдельность от кампании.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 05 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "05",
+      "sourceNextCheck": "Повторная победа по одному слоту, отдельность от кампании."
     },
     {
       "id": "h2-ads",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "M7",
+      "stage": "Пакет 08",
       "currentImplementation": "Наши 180 секунд относятся к активной игре и запросу; условия 5 завершений и 3 новых свои. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md",
-      "nextAction": "Развести запрос и фактический показ в QA.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 08 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Развести запрос и фактический показ в QA."
     },
     {
       "id": "h2-remove-prompt",
-      "status": "EVIDENCE_GAP",
+      "status": "ROADMAPPED",
       "gap": "UNKNOWN",
-      "stage": "M7",
+      "stage": "Пакет 08",
       "currentImplementation": "В игре нет реализованного предложения. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md",
-      "nextAction": "Проследить счетчик prompt и вызов магазина прежде чем формулировать оффер."
+      "nextAction": "Реализовать соответствующий пункт пакета 08 и проверить приёмку из FULL_ROADMAP.md. Подтвердить границу источника: Проследить счетчик prompt и вызов магазина прежде чем формулировать оффер.",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Проследить счетчик prompt и вызов магазина прежде чем формулировать оффер."
     },
     {
       "id": "cp-fixed-start",
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "MATCH",
-      "stage": "M1",
+      "stage": "Пакет 03",
       "currentImplementation": "Обычный replay нашего уровня начинает ту же расстановку. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/levels.ts",
-      "nextAction": "Сохранить fingerprint и replay первого уровня."
+      "nextAction": "Переиспользовать реализованное поведение и пройти регрессию пакета 03.",
+      "deliveryPackage": "03",
+      "sourceNextCheck": "Сохранить fingerprint и replay первого уровня."
     },
     {
       "id": "cp-exact-win",
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "MATCH",
-      "stage": "M1",
+      "stage": "Пакет 01",
       "currentImplementation": "Сверяются ID на целевых позициях. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/puzzle.ts",
-      "nextAction": "Поменять две похожие, но неверные плитки."
+      "nextAction": "Переиспользовать реализованное поведение и пройти регрессию пакета 01.",
+      "deliveryPackage": "01",
+      "sourceNextCheck": "Поменять две похожие, но неверные плитки."
     },
     {
       "id": "cp-four-corners",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "PARTIAL",
-      "stage": "M4",
+      "stage": "Пакет 04",
       "currentImplementation": "Та же основа, Полусон использует своё half-up округление и одномерные поля. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/editor.ts",
-      "nextAction": "Сверить промежуточные оттенки и вырожденную ось.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 04 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "04",
+      "sourceNextCheck": "Сверить промежуточные оттенки и вырожденную ось."
     },
     {
       "id": "cp-late-board",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "контент",
+      "stage": "Пакет 04",
       "currentImplementation": "Наш предел 6×5, кампания из 60. Удовольствие и удобство 13×13 не измерены. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/levels.ts",
-      "nextAction": "Пройти 6×5 и один крупный прототип на телефоне.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 04 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "04",
+      "sourceNextCheck": "Пройти 6×5 и один крупный прототип на телефоне."
     },
     {
       "id": "cp-preview",
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "MATCH",
-      "stage": "M1",
+      "stage": "Пакет 01",
       "currentImplementation": "Готовое поле видно до закрытия; раскладка и ходы сохраняются. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/mountGame.ts",
-      "nextAction": "Открыть/закрыть preview в незавершённой партии."
+      "nextAction": "Переиспользовать реализованное поведение и пройти регрессию пакета 01.",
+      "deliveryPackage": "01",
+      "sourceNextCheck": "Открыть/закрыть preview в незавершённой партии."
     },
     {
       "id": "cp-pulse-hint",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "помощь",
+      "stage": "Пакет 01",
       "currentImplementation": "У нас только полный просмотр. Пульсация выбранной игроком плитки не равна такой подсказке. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/mountGame.ts",
-      "nextAction": "Проверить мягкую помощь без раскрытия назначения и без автоматического хода.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 01 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "01",
+      "sourceNextCheck": "Проверить мягкую помощь без раскрытия назначения и без автоматического хода."
     },
     {
       "id": "cp-free-hint",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "PARTIAL",
-      "stage": "M7",
+      "stage": "Пакет 01",
       "currentImplementation": "Помощь всегда бесплатна, флаг относится к конкретной попытке. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/mountGame.ts",
-      "nextAction": "Проверить первый и повторный запрос обеих кнопок в оригинале.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 01 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "01",
+      "sourceNextCheck": "Проверить первый и повторный запрос обеих кнопок в оригинале."
     },
     {
       "id": "cp-rewarded-hint",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "M7",
+      "stage": "Пакет 08",
       "currentImplementation": "Нет этого платного пути к помощи; в проекте бесплатный preview. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md",
-      "nextAction": "Оценить placement отдельно от функциональности подсказки.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 08 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Оценить placement отдельно от функциональности подсказки."
     },
     {
       "id": "cp-challenge",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "испытания",
+      "stage": "Пакет 03",
       "currentImplementation": "Есть математический минимум, проигрыша по лимиту нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/puzzle.ts",
-      "nextAction": "Прототип на собственном поле: победа последним ходом, проигрыш с нерешённым полем.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 03 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "03",
+      "sourceNextCheck": "Прототип на собственном поле: победа последним ходом, проигрыш с нерешённым полем."
     },
     {
       "id": "cp-challenge-gate",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "испытания",
+      "stage": "Пакет 03",
       "currentImplementation": "10/15 открывает следующую обычную главу. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/progression.ts",
-      "nextAction": "Отдельно решить чем открывается необязательное испытание.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 03 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "03",
+      "sourceNextCheck": "Отдельно решить чем открывается необязательное испытание."
     },
     {
       "id": "cp-timed",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "режимы",
+      "stage": "Пакет 03",
       "currentImplementation": "Отсутствует timed/score режим; никакого основания считать его daily. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md",
-      "nextAction": "Зафиксировать паузу/таймер/новое поле до оценки.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 03 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "03",
+      "sourceNextCheck": "Зафиксировать паузу/таймер/новое поле до оценки."
     },
     {
       "id": "cp-creative-shuffle",
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "MATCH",
-      "stage": "M4",
+      "stage": "Пакет 07",
       "currentImplementation": "При двух и более подвижных редактор образует один цикл. Генератор случайных чисел собственный. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/editor.ts",
-      "nextAction": "Проверить один цикл и минимум n−1 для нескольких seeds."
+      "nextAction": "Переиспользовать реализованное поведение и пройти регрессию пакета 07.",
+      "deliveryPackage": "07",
+      "sourceNextCheck": "Проверить один цикл и минимум n−1 для нескольких seeds."
     },
     {
       "id": "cp-editor",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "PARTIAL",
-      "stage": "M4",
+      "stage": "Пакет 07",
       "currentImplementation": "У нас 1–6 × 1–5, собственные проверки и живое редактирование углов. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/editor.ts",
-      "nextAction": "Сравнить редактор на старом черновике и одномерной работе.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 07 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "07",
+      "sourceNextCheck": "Сравнить редактор на старом черновике и одномерной работе."
     },
     {
       "id": "cp-editor-gate",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "M4",
+      "stage": "Пакет 07",
       "currentImplementation": "У нас редактор доступен сразу, решение закреплено в ТЗ. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/albumView.ts",
-      "nextAction": "На пустом профиле открыть «Мои работы».",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 07 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "07",
+      "sourceNextCheck": "На пустом профиле открыть «Мои работы»."
     },
     {
       "id": "cp-author-proof",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "PARTIAL",
-      "stage": "M4",
+      "stage": "Пакет 07",
       "currentImplementation": "Старая подтверждённая версия у нас хранится и остаётся экспортируемой. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/creative.ts",
-      "nextAction": "Проверить выбор старой версии после цветовой правки.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 07 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "07",
+      "sourceNextCheck": "Проверить выбор старой версии после цветовой правки."
     },
     {
       "id": "cp-submit",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "UGC",
+      "stage": "Пакет 07",
       "currentImplementation": "Локальное создание и PNG доступны, публикации игровой задачи нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/creative.ts",
-      "nextAction": "Сначала проверить исходный UI submit, затем отдельный контракт валидации и жалоб.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 07 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "07",
+      "sourceNextCheck": "Сначала проверить исходный UI submit, затем отдельный контракт валидации и жалоб."
     },
     {
       "id": "cp-submission-quota",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "UGC",
+      "stage": "Пакет 07",
       "currentImplementation": "Нет канала отправки и квоты. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/creative.ts",
-      "nextAction": "В оригинале проверить смену дня после 15; риск не считать доказанным багом.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 07 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "07",
+      "sourceNextCheck": "В оригинале проверить смену дня после 15; риск не считать доказанным багом."
     },
     {
       "id": "cp-community-feed",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "UGC",
+      "stage": "Пакет 07",
       "currentImplementation": "Альбом локальных работ не публикует чужие задачи. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/creative.ts",
-      "nextAction": "Проверить отдельно выдачу, кеш и отзыв контента.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 07 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "07",
+      "sourceNextCheck": "Проверить отдельно выдачу, кеш и отзыв контента."
     },
     {
       "id": "cp-banner",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "M7",
+      "stage": "Пакет 08",
       "currentImplementation": "Размер слота и защита первых пяти — наши настройки M7. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md",
-      "nextAction": "Проверить отсутствие сдвига поля при загрузке и no-fill.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 08 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Проверить отсутствие сдвига поля при загрузке и no-fill."
     },
     {
       "id": "cp-campaign-ad",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "M7",
+      "stage": "Пакет 08",
       "currentImplementation": "Наш interstitial после сохранения и новых побед; интеграция впереди. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md",
-      "nextAction": "Проверить Continue, replay и недоступного провайдера.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 08 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Проверить Continue, replay и недоступного провайдера."
     },
     {
       "id": "cp-challenge-banner",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "M7/испытания",
+      "stage": "Пакет 08",
       "currentImplementation": "Нет отдельного режима/placement. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md",
-      "nextAction": "Решать только при принятии испытаний.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 08 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Решать только при принятии испытаний."
     },
     {
       "id": "cp-challenge-ad",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "M7/испытания",
+      "stage": "Пакет 08",
       "currentImplementation": "Механика и её размещение имеют разные зависимости. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md",
-      "nextAction": "Пройти первое и второе испытание, проверить opportunity.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 08 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Пройти первое и второе испытание, проверить opportunity."
     },
     {
       "id": "cp-average",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "мастерство",
+      "stage": "Пакет 02",
       "currentImplementation": "Есть личный результат; опубликованного среднего нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/workCardView.ts",
-      "nextAction": "Указывать происхождение сравнительной величины.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 02 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "02",
+      "sourceNextCheck": "Указывать происхождение сравнительной величины."
     },
     {
       "id": "cp-save",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "PARTIAL",
-      "stage": "M1",
+      "stage": "Пакет 09",
       "currentImplementation": "У нас контракт сильнее: фиксируем каждый ход; device kill ещё открыт. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/workspace.ts",
-      "nextAction": "Проверить HOME→kill, force-stop→launcher и сохранение последнего хода.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 09 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "09",
+      "sourceNextCheck": "Проверить HOME→kill, force-stop→launcher и сохранение последнего хода."
     },
     {
       "id": "cp-share",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "PARTIAL",
-      "stage": "M4",
+      "stage": "Пакет 01",
       "currentImplementation": "У нас плавные обои по цветам решения, собственного размера экрана. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/export.ts",
-      "nextAction": "Проверить фактические байты Preview/Save/Share.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 01 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "01",
+      "sourceNextCheck": "Проверить фактические байты Preview/Save/Share."
     },
     {
       "id": "cp-wallpaper",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "PARTIAL",
-      "stage": "M4",
+      "stage": "Пакет 01",
       "currentImplementation": "Экспортируем PNG, прямой установки системных обоев этот путь не делает. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/export.ts",
-      "nextAction": "Различать сохранить файл и установить обои в ОС.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 01 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "01",
+      "sourceNextCheck": "Различать сохранить файл и установить обои в ОС."
     },
     {
       "id": "mt-m01",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "мета",
+      "stage": "Пакет 06",
       "currentImplementation": "Альбом отдельных работ; запрет коллажей в PNG не запрещает внутренний игровой прогресс. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/albumView.ts",
-      "nextAction": "Сравнить внутреннюю сборную картину и альбом на одном наборе, без смены экспорта.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 06 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "06",
+      "sourceNextCheck": "Сравнить внутреннюю сборную картину и альбом на одном наборе, без смены экспорта."
     },
     {
       "id": "mt-m02",
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "MATCH",
-      "stage": "M4",
+      "stage": "Пакет 06",
       "currentImplementation": "В карточке можно скопировать работу и редактировать углы. Совпадает цепочка творчества. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/creative.ts",
-      "nextAction": "После копии проверить неизменность оригинала."
+      "nextAction": "Переиспользовать реализованное поведение и пройти регрессию пакета 06.",
+      "deliveryPackage": "06",
+      "sourceNextCheck": "После копии проверить неизменность оригинала."
     },
     {
       "id": "mt-m03",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "PARTIAL",
-      "stage": "M4",
+      "stage": "Пакет 06",
       "currentImplementation": "Сохранение одной работы за решение, отдельного испытания для него нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/export.ts",
-      "nextAction": "Сверять конкретный способ получения и что сохраняется.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 06 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "06",
+      "sourceNextCheck": "Сверять конкретный способ получения и что сохраняется."
     },
     {
       "id": "mt-m04",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "мета",
+      "stage": "Пакет 06",
       "currentImplementation": "Нет цепочки целей с отдельной задачей. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/progression.ts",
-      "nextAction": "Проверить интерес к двум разным действиям и конечной награде.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 06 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "06",
+      "sourceNextCheck": "Проверить интерес к двум разным действиям и конечной награде."
     },
     {
       "id": "mt-m05",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "LiveOps",
+      "stage": "Пакет 06",
       "currentImplementation": "Архив daily запланирован, публикации тематических событий нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md",
-      "nextAction": "Развести постоянный архив, ограниченную тему и сохранение права.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 06 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "06",
+      "sourceNextCheck": "Развести постоянный архив, ограниченную тему и сохранение права."
     },
     {
       "id": "mt-m06",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "мастерство",
+      "stage": "Пакет 02",
       "currentImplementation": "Отметки за конкретную задачу не образуют шкалу рангов. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/progression.ts",
-      "nextAction": "Проверить, есть ли у ранга новая понятная цель.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 02 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "02",
+      "sourceNextCheck": "Проверить, есть ли у ранга новая понятная цель."
     },
     {
       "id": "mt-m07",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "соревнования",
+      "stage": "Пакет 09",
       "currentImplementation": "Нет сетевого сравнения результатов. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md",
-      "nextAction": "Выработать сравнимый старт и правила помощи перед счётом.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 09 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "09",
+      "sourceNextCheck": "Выработать сравнимый старт и правила помощи перед счётом."
     },
     {
       "id": "mt-m08",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "UGC",
+      "stage": "Пакет 07",
       "currentImplementation": "Опубликованного каталога и отбора у нас нет. Серверная модерация оригинала неизвестна. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/creative.ts",
-      "nextAction": "Проверить выход в каталог независимо от успешной отправки.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 07 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "07",
+      "sourceNextCheck": "Проверить выход в каталог независимо от успешной отправки."
     },
     {
       "id": "mt-m09",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "M6",
+      "stage": "Пакет 05",
       "currentImplementation": "Нет игрового daily-входа и этого ритуала. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md",
-      "nextAction": "Сравнить короткое своё вступление со входом сразу в поле.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 05 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "05",
+      "sourceNextCheck": "Сравнить короткое своё вступление со входом сразу в поле."
     },
     {
       "id": "mt-m10",
-      "status": "EVIDENCE_GAP",
+      "status": "ROADMAPPED",
       "gap": "UNKNOWN",
-      "stage": "мета",
+      "stage": "Пакет 06",
       "currentImplementation": "В Полусне повтор сохраняет прогресс, prestige отсутствует. Сегодняшняя работа цикла оригинала неизвестна. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/progression.ts",
-      "nextAction": "Получить полные release notes либо оригинальную запись того, что сбрасывается."
+      "nextAction": "Реализовать соответствующий пункт пакета 06 и проверить приёмку из FULL_ROADMAP.md. Подтвердить границу источника: Получить полные release notes либо оригинальную запись того, что сбрасывается.",
+      "deliveryPackage": "06",
+      "sourceNextCheck": "Получить полные release notes либо оригинальную запись того, что сбрасывается."
     },
     {
       "id": "h1-analytics",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "PARTIAL",
-      "stage": "M3/M7",
+      "stage": "Пакет 09",
       "currentImplementation": "Есть локальные факты и receipts. Доставку продуктовых событий аналитическому провайдеру не подтвердили. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/local-store/contracts.ts",
-      "nextAction": "Развести local commit, событие и подтверждённую доставку; проверять повторы по eventId.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 09 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "09",
+      "sourceNextCheck": "Развести local commit, событие и подтверждённую доставку; проверять повторы по eventId."
     },
     {
       "id": "h2-daily-share",
-      "status": "EVIDENCE_GAP",
+      "status": "ROADMAPPED",
       "gap": "UNKNOWN",
-      "stage": "M6",
+      "stage": "Пакет 05",
       "currentImplementation": "Обои кампании реализованы. Доказательств аналогичного обычного экспорта в оригинале недостаточно. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md",
-      "nextAction": "Записать в исходной игре отдельно share обычной победы и всех трёх daily, сохранить выходные файлы."
+      "nextAction": "Реализовать соответствующий пункт пакета 05 и проверить приёмку из FULL_ROADMAP.md. Подтвердить границу источника: Записать в исходной игре отдельно share обычной победы и всех трёх daily, сохранить выходные файлы.",
+      "deliveryPackage": "05",
+      "sourceNextCheck": "Записать в исходной игре отдельно share обычной победы и всех трёх daily, сохранить выходные файлы."
     },
     {
       "id": "cp-creative-validation",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "PARTIAL",
-      "stage": "UGC",
+      "stage": "Пакет 07",
       "currentImplementation": "Собственный редактор проверяет разрешимость и цвет. Валидация публичной подачи отсутствует. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/editor.ts",
-      "nextAction": "Развести сохранить черновик, играть, отправить и получить публикацию четырьмя тестами.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 07 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "07",
+      "sourceNextCheck": "Развести сохранить черновик, играть, отправить и получить публикацию четырьмя тестами."
     },
     {
       "id": "cp-creative-blank",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "PARTIAL",
-      "stage": "M4",
+      "stage": "Пакет 07",
       "currentImplementation": "Невалидный черновик можно хранить; для игры действуют собственные проверки. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/editor.ts",
-      "nextAction": "Сравнить сохранение и запуск монохромного черновика.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 07 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "07",
+      "sourceNextCheck": "Сравнить сохранение и запуск монохромного черновика."
     },
     {
       "id": "h2-show-secret-on-resume",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "контент",
+      "stage": "Пакет 03",
       "currentImplementation": "У нас восстанавливается раскладка; вступительного secret-эффекта нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/PuzzleScene.ts",
-      "nextAction": "Если добавлять скрытие, проверить resume без повторного спойлера.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 03 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "03",
+      "sourceNextCheck": "Если добавлять скрытие, проверить resume без повторного спойлера."
     },
     {
       "id": "h2-perceptual",
-      "status": "EVIDENCE_GAP",
+      "status": "ROADMAPPED",
       "gap": "UNKNOWN",
-      "stage": "контент",
+      "stage": "Пакет 04",
       "currentImplementation": "У нас близость используется как предупреждение редактора. Называть это адаптивной сложностью оригинала нельзя. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/editor.ts",
-      "nextAction": "Найти места чтения поля и их связь с выдачей до постановки задачи про адаптацию."
+      "nextAction": "Реализовать соответствующий пункт пакета 04 и проверить приёмку из FULL_ROADMAP.md. Подтвердить границу источника: Найти места чтения поля и их связь с выдачей до постановки задачи про адаптацию.",
+      "deliveryPackage": "04",
+      "sourceNextCheck": "Найти места чтения поля и их связь с выдачей до постановки задачи про адаптацию."
     },
     {
       "id": "h1-share-scores",
-      "status": "RESEARCHED",
+      "status": "ROADMAPPED",
       "gap": "MISSING",
-      "stage": "мастерство",
+      "stage": "Пакет 02",
       "currentImplementation": "Личная отметка perfect зависит от математического минимума и использования помощи. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/progression.ts",
-      "nextAction": "На выборе своей механики определить допустимые попытки и отдельно проверить равенство ориентиру.",
-      "scopeNote": "Стадия обозначает место для решения/проверки; оригинальная фича не заказана автоматически."
+      "nextAction": "Реализовать соответствующий пункт пакета 02 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "02",
+      "sourceNextCheck": "На выборе своей механики определить допустимые попытки и отдельно проверить равенство ориентиру."
     }
   ],
   "sourceInventory": "https://github.com/DanilaH/mini-games-kit/blob/0353273fb37b329611951e4500dd6d7cba6690ac/research/games/hue/porting/SOURCE_FEATURES.json",
-  "method": "gap сравнивает только поведение, названное в строке. MATCH не означает приёмку на телефоне. MISSING не является обязательством внедрить. UNKNOWN охватывает недоказанную часть исходника/сопоставления. Все невыбранные варианты сохранены для решения владельца."
+  "method": "gap — наблюдение на 0.4.10. delivery — порядок работы после решения владельца. status ROADMAPPED означает наличие поручения, а не готовность. Проверка точного поведения в оригинале ведётся независимо от готовности собственной реализации.",
+  "ownerScope": "20.11.2026, после аудита 0.4.10: «это всё делать надо». Весь реестр включён в программу разработки. Более конкретные решения: бесплатные попытки, одни плавные обои на работу, cloud M5 на паузе. Формулировки прежнего аудита «кандидат» отражают предыдущий статус."
 }

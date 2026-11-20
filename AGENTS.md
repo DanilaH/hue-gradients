@@ -1,6 +1,8 @@
 # hue-gradients — agent contract
 **mini-games-kit pinned commit:** 469928d03f4bae5053e23db26e82187bedbc252e
 
+Use docs/porting/FULL_ROADMAP.md for the owner-ordered full transfer and docs/porting/FIRST_PACKAGE.md for the next development slice. For prior-audit wording about optional systems, apply the later 20 November decision in docs/PROJECT_DECISIONS.md.
+
 Read docs/PROJECT_DECISIONS.md, docs/STATUS.md and docs/SESSION_HANDOFF.md, then relevant requirements in docs/spec/PRODUCT_SPEC_1_0.md and ROADMAP_1_0.md. Select 1–2 routes in docs/kit-guidance/TASK_ROUTER.md before material work. Reference work follows docs/kit-guidance/REFERENCE_PROTOCOL.md. Reusable work follows docs/kit-guidance/KIT_FEEDBACK_LOOP.md; report KIT IMPACT. Inspect the pinned kit docs/API.md before adding infrastructure. Runtime and guidance pins are separate; no silent upgrades.
 
 Full first release includes campaign, meta, daily/archive, editor, export and cloud. No energy. First15 definitions are immutable. Visual direction is the owner's dreamy/PSX reference in docs/spec/reference; font pending M2. Accept one actual gameplay/win episode before broad styling. Do not restart the A/B/C visual contest. UI changes use routed UX/motion/layout guidance and the game's accepted tokens.

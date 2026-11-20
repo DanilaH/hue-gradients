@@ -1,10 +1,12 @@
 # Resume — 20 November 2026
 
+**Owner scope update, 20 Nov.** All 89 audited rows now have delivery packages. Start with [help, mastery and legacy rewards](porting/FIRST_PACKAGE.md); continue through the [full porting roadmap](porting/FULL_ROADMAP.md). Earlier “candidates pending owner choice” in the historical audit is superseded for inclusion. Specific owner decisions on energy, single wallpaper and the M5 hold still govern.
+
 Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and M4_EXPORT_IMPLEMENTATION.md. Owner authorized roadmap continuation. Bound file reads/output; no blobs/base64 or whole-archive re-reads. Commit checkpoints and preserve newer remote work. Branch feat/m0-foundation, draft PR #1; main still contains the original README.
 
 ## Research revision — 20 November 2026
 
-[Reference-to-product audit and next packages](porting/README.md) · [Adoption ledger](porting/ADOPTION_LEDGER.json) · [71-requirement review](porting/REQUIREMENTS_REVIEW.md). Use this overlay with current owner decisions when consulting the frozen 1.0 roadmap. Current export is a single continuous device-sized wallpaper. The old collage milestones are historical; the current code still grants legacy format IDs at thresholds. The next field/pause/result slice has observed assist/mastery differences and a two-run browser acceptance case. Original challenge modes and softer hints are candidates pending owner choice.
+[Reference-to-product audit and next packages](porting/README.md) · [Adoption ledger](porting/ADOPTION_LEDGER.json) · [71-requirement review](porting/REQUIREMENTS_REVIEW.md). Use this overlay with current owner decisions when consulting the frozen 1.0 roadmap. Current export is a single continuous device-sized wallpaper. The old collage milestones are historical; the current code still grants legacy format IDs at thresholds. The next field/pause/result slice has observed assist/mastery differences and a two-run browser acceptance case. Soft hints and challenge modes are assigned to packages 01 and 03.
 
 ## Current slice
 

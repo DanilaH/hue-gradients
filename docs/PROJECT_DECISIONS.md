@@ -1,4 +1,6 @@
 # Project decisions — 18 November 2026
+
+**20 November, after the transfer audit.** Owner directs delivery of the complete audited feature program. [Packages and dependencies](porting/FULL_ROADMAP.md) and [ledger](porting/ADOPTION_LEDGER.json) govern new implementation briefs. Earlier baseline exclusions of modes, zoom, social and commercial systems are superseded for the corresponding new packages. Preserve the existing fixed-start campaign and core rules for its saved attempts. No energy or paid entry, one device-sized wallpaper per chosen work, cloud/account M5 on hold.
 Guidance snapshot SHA: 469928d03f4bae5053e23db26e82187bedbc252e
 Runtime snapshot SHA: 469928d03f4bae5053e23db26e82187bedbc252e
 
