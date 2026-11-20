@@ -1,6 +1,6 @@
 {
   "schema": "consumer-adoption-ledger-v1",
-  "consumerCommit": "08a2162544b1eeb1cca403893078368d9e2c04ab",
+  "consumerCommit": "2e7c0b8546403b640167f11b691f143e164b5553",
   "asOf": "2026-11-20",
   "features": [
     {
@@ -8,8 +8,8 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "MATCH",
       "stage": "Пакет 01",
-      "currentImplementation": "Обмен, перетаскивание и отказ на опорах подтверждены тестом ядра. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/PuzzleScene.ts",
-      "nextAction": "Проверить drag и отмену на физическом телефоне.",
+      "currentImplementation": "Обмен, перетаскивание и отказ на опорах подтверждены тестом ядра. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/PuzzleScene.ts В A1 на 001 Chromium подтвердил тап и сброс на (200,398), плюс отказ на опоре и за пределами поля. | https://github.com/DanilaH/hue-gradients/blob/2e7c0b8546403b640167f11b691f143e164b5553/tools/board-input-browser-check.mjs",
+      "nextAction": "Повторить контрольный эпизод на физическом телефоне (G1).",
       "deliveryPackage": "01",
       "sourceNextCheck": "Проверить tap и drag одного обмена на Android."
     },
@@ -18,8 +18,8 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "MATCH",
       "stage": "Пакет 01",
-      "currentImplementation": "Опоры защищены перестановкой и доменными правилами. В Chromium тап по опоре не меняет ходы. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/domain/puzzle.ts",
-      "nextAction": "Проверить тап и попытку перетащить опору на телефоне.",
+      "currentImplementation": "Опоры защищены перестановкой и доменными правилами. В Chromium тап по опоре не меняет ходы. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/domain/puzzle.ts В A1 на 001 Chromium подтвердил тап и сброс на (200,398), плюс отказ на опоре и за пределами поля. | https://github.com/DanilaH/hue-gradients/blob/2e7c0b8546403b640167f11b691f143e164b5553/tools/board-input-browser-check.mjs",
+      "nextAction": "Повторить контрольный эпизод на физическом телефоне (G1).",
       "deliveryPackage": "01",
       "sourceNextCheck": "Попытаться уронить плитку на опору."
     },

@@ -1,0 +1,129 @@
+{
+  "browser": "158.0.8127.36",
+  "touch": [
+    {
+      "kind": "tap",
+      "x": 199,
+      "y": 398,
+      "moves": 0,
+      "pinAndOutside": true
+    },
+    {
+      "kind": "tap",
+      "x": 200,
+      "y": 398,
+      "moves": 1,
+      "pinAndOutside": false
+    },
+    {
+      "kind": "tap",
+      "x": 201,
+      "y": 398,
+      "moves": 1,
+      "pinAndOutside": false
+    },
+    {
+      "kind": "drop",
+      "x": 199,
+      "y": 398,
+      "moves": 0,
+      "pinAndOutside": true
+    },
+    {
+      "kind": "drop",
+      "x": 200,
+      "y": 398,
+      "moves": 1,
+      "pinAndOutside": false
+    },
+    {
+      "kind": "drop",
+      "x": 201,
+      "y": 398,
+      "moves": 1,
+      "pinAndOutside": false
+    }
+  ],
+  "landscape": [
+    {
+      "width": 1,
+      "height": 5,
+      "inset": false,
+      "cellWidth": 414,
+      "cellHeight": 62.4
+    },
+    {
+      "width": 1,
+      "height": 5,
+      "inset": true,
+      "cellWidth": 366,
+      "cellHeight": 52.8
+    },
+    {
+      "width": 6,
+      "height": 5,
+      "inset": false,
+      "cellWidth": 69,
+      "cellHeight": 62.4
+    },
+    {
+      "width": 6,
+      "height": 5,
+      "inset": true,
+      "cellWidth": 61,
+      "cellHeight": 52.8
+    }
+  ],
+  "lateCheckpoint": "gradient-037",
+  "limits": "CDP touch and simulated safe insets in Chromium. 6×5 opens from a seeded saved attempt.",
+  "sourceBase": "100cb5c5f7a77e2f347ac00b0ef6e9e2f66e05cf",
+  "source": "2e7c0b8546403b640167f11b691f143e164b5553",
+  "beforeCellHeight": 40.8,
+  "kitImpact": "REUSE",
+  "checks": {
+    "unit": 162,
+    "coreChromium": 21,
+    "androidDebug": true,
+    "androidReleaseCheck": true,
+    "androidExactApk": true,
+    "yandexAudit": true,
+    "guidanceDoctor": true,
+    "exactSpecFiles": 40
+  },
+  "apk": {
+    "kind": "releasecheck",
+    "package": "com.danilah.huegradients.preview3",
+    "versionName": "0.4.13",
+    "versionCode": 17,
+    "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+    "source": "2e7c0b8546403b640167f11b691f143e164b5553",
+    "apkSha256": "fc0c7974ffa1e329df13a7057bb4362193a66cc40a9618a49c94bca2d5e278d7",
+    "bytes": 1196200,
+    "certificateSha256": "3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85",
+    "productionSigner": false,
+    "v2": true,
+    "zipalign16k": true,
+    "debuggable": false,
+    "webViewDebuggingConfigured": false,
+    "nativeInsetOwner": "content-root",
+    "webPayload": {
+      "index.html": "1f370821fd6b4155c4639fa54fd0efb456764757a3ba3d39aa7c192097da8a6b",
+      "native-build.json": "d6776c22b4d785acafac6f324de6e51d9700f8d00340e5638b59090fc0a0fc70",
+      "assets/index-A72P3dPL.js": "fb2495a73ca126def389aec23ddc433bcba4093aa92e7c22ddb5d3cd849136fc",
+      "assets/nativeFeedback-BdXlsEx8.js": "aa12bc0f39307f8a86d95c5b93e428317c5282ed05069350ea7ef8fd1ad69648",
+      "assets/web-BM7xF5pS.js": "874bbd026b2a3757b6c7bedc1bd163f0c735a3e0a943605c9853f660d828d658",
+      "assets/nativeExport-CqbPFgKE.js": "5810d391885079b04fe08fbd9075ad787560ad4f04d814f2b7faac850fb46b8b",
+      "assets/native-BRf8Vtup.js": "c0ee103e5db093b632c2b0a8d00c59e51b8b10e97f54b99e0883aa6d66cb9e24",
+      "assets/command-DsiNmMzb.js": "3bdb3eee67e5f0fe3039141e80a3f8764b0d75be05f0c89e4b81260fc3bd9e89",
+      "assets/index-BHoprkCv.css": "f589ba69279eb226318f923df05793daa6455b488fff85d4a23a937bae76f181",
+      "assets/dist-CMedSjkm.js": "067d9ca66629f984cf538346471032b4b24f9acd1cb914834126e2b88d3250fe"
+    },
+    "nativeRuntime": "NOT RUN",
+    "liveServices": "NOT INSTALLED BY THIS HOST TEMPLATE"
+  },
+  "gif": {
+    "name": "Poluson-A1-seam.gif",
+    "sha256": "085efa4f31aadf7cb33b2491e776c29f402de244c72b36b0327bdd46b878a5ce",
+    "environment": "Actual Chrome touch CDP recording in 400×800"
+  }
+}

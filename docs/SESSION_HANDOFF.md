@@ -10,6 +10,8 @@ Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and
 
 ## Current slice
 
+A1 (0.4.13/versionCode17, 2e7c0b8) is in the game. Chromium touch hit the exact seam at (200,398) by tap and drop. In the 568×320 fixture with 24 px on each side and 150% text, 1×5 measured 366×52.8 and 6×5 cells 61×52.8 CSS px. Android debug, signed releaseCheck and exact APK inspection passed. Physical input waits for G1. **Resume at A2**. [Evidence](evidence/queue-a1-2026-11-20.json)
+
 0.4.12/versionCode16 adds the offline progress route, first-win XP and one atomic history row per completed campaign attempt. Older snapshots seed history from saved completed attempts. A live comparison requires a published versioned sample for the exact fingerprint and rules. In fixture tests ties do not qualify, and version changes preserve already recorded comparisons. The level statistics preference defaults to visible and can be turned off in pause. [Progress and APK checks](evidence/player-progress-2026-11-20.json)
 
 0.4.11/versionCode15 was the first audit package in [PR #5](https://github.com/DanilaH/hue-gradients/pull/5) and is included in `feat/m0-foundation`. The pause menu offers a single-tile highlight, full preview and a +3-move auto-swap. Cancellation leaves an identical workspace. An accepted request is committed before presentation. The card displays minimum and separate bests with the earned perfect mark. Six retired layout rights are valid in old saves. Android can request the system wallpaper flow with the same prepared PNG. Actual Android interaction remains pending. [Package evidence and captures](evidence/help-mastery-2026-11-20.json)
