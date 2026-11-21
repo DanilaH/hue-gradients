@@ -1,5 +1,5 @@
 const bayer = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5] as const;
-const period = 8;
+const period = 4;
 
 export function orderedGrain(context: CanvasRenderingContext2D, pixel: (rank: number) => readonly number[]): CanvasPattern {
   const stamp = document.createElement('canvas');
@@ -8,7 +8,7 @@ export function orderedGrain(context: CanvasRenderingContext2D, pixel: (rank: nu
   const data = ink.createImageData(period, period);
   const shades = bayer.map(pixel);
   for (let y = 0; y < period; y++) for (let x = 0; x < period; x++) {
-    data.data.set(shades[(y >> 1) * 4 + (x >> 1)]!, (y * period + x) * 4);
+    data.data.set(shades[y * period + x]!, (y * period + x) * 4);
   }
   ink.putImageData(data, 0, 0);
   return context.createPattern(stamp, 'repeat')!;

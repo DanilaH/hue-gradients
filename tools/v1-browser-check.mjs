@@ -6,20 +6,25 @@ import { mkdir, writeFile } from 'node:fs/promises';
 const require = createRequire(process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES
   ? `${process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES}/package.json` : import.meta.url);
 const { chromium } = require('playwright');
-const out = '.test-output/v1';
+const out = '.test-output/v11';
 const port = 4198, url = `http://127.0.0.1:${port}`;
 const record = process.env.RECORD_EPISODE === '1';
 const viewport = { width: 390, height: 740 };
 await mkdir(out, { recursive: true });
 const dev = spawn(process.execPath, ['node_modules/vite/bin/vite.js', '--host', '127.0.0.1',
   '--port', String(port), '--strictPort'], { stdio: 'ignore' });
+const baselineFolder = process.env.V11_BASELINE_DIR;
+const baselinePort = 4199;
+const baselineUrl = `http://127.0.0.1:${baselinePort}`;
+const baseline = baselineFolder ? spawn(process.execPath, ['node_modules/vite/bin/vite.js', '--host', '127.0.0.1',
+  '--port', String(baselinePort), '--strictPort'], { cwd: baselineFolder, stdio: 'ignore' }) : null;
 let browser;
 const report = { episodes: {}, quick: {}, limits: 'Chromium CDP touch, keyboard and browser audio/haptic calls. Prepared checkpoints use legal domain swaps. Android phone not run.' };
 const errors = [];
 try {
-  for (let i = 0; i < 100; i++) {
-    try { if ((await fetch(url)).ok) break; } catch { /* dev server is starting */ }
-    if (i === 99) throw new Error('Vite did not respond');
+  for (const address of baseline ? [url, baselineUrl] : [url]) for (let i = 0; i < 100; i++) {
+    try { if ((await fetch(address)).ok) break; } catch { /* dev server is starting */ }
+    if (i === 99) throw new Error(`Vite did not respond at ${address}`);
     await new Promise(resolve => setTimeout(resolve, 100));
   }
   browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH ?? '/usr/bin/chromium', args: ['--no-sandbox'] });
@@ -41,13 +46,18 @@ try {
   async function launch({ filming = false, reducedMotion = 'no-preference', deviceScaleFactor = 1 } = {}) {
     const context = await browser.newContext({ viewport, deviceScaleFactor, hasTouch: true, isMobile: true, reducedMotion,
       ...(filming && record ? { recordVideo: { dir: out, size: viewport } } : {}) });
-    await context.addInitScript(() => {
+    await context.addInitScript(capture => {
       const root = () => document.querySelector('#hue-app');
       Object.defineProperty(window, 'showSaveFilePicker', { value: undefined, configurable: true });
       window.v1 = { sounds: [], pulses: [], frames: [] };
       const start = AudioBufferSourceNode.prototype.start;
       AudioBufferSourceNode.prototype.start = function (...args) {
-        if (!this.loop) window.v1.sounds.push({ duration: this.buffer?.duration, phase: root()?.dataset.victoryPhase });
+        if (!this.loop) {
+          window.v1.sounds.push({ duration: this.buffer?.duration, phase: root()?.dataset.victoryPhase });
+          if (capture && this.buffer?.duration >= .23) window.v11Audio = {
+            time: Date.now(), rate: this.buffer.sampleRate, samples: Array.from(this.buffer.getChannelData(0)),
+          };
+        }
         return start.apply(this, args);
       };
       navigator.vibrate = value => { window.v1.pulses.push({ value, phase: root()?.dataset.victoryPhase }); return true; };
@@ -59,7 +69,7 @@ try {
         requestAnimationFrame(frame);
       };
       requestAnimationFrame(frame);
-    });
+    }, filming && record);
     const page = await context.newPage();
     page.on('pageerror', e => errors.push(e.message));
     const cdp = await context.newCDPSession(page);
@@ -93,8 +103,8 @@ try {
       await session.load();
       const id = () => crypto.randomUUID();
       let level, get, kind;
-      if (grid === 'wide') {
-        await session.act({ kind: 'challenge-open', id: 'geometry-v1-wide', attemptId: id() });
+      if (grid !== 'campaign') {
+        await session.act({ kind: 'challenge-open', id: `geometry-v1-${grid}`, attemptId: id() });
         const active = () => activeChallenge(session.state.challengeProgress);
         level = active().level;
         get = () => active().attempt;
@@ -160,6 +170,80 @@ try {
     if (handle) await handle.saveAs(`${out}/${name}.webm`);
     return { clipStart, clipEnd };
   }
+  async function opaqueCommands(page) {
+    const rows = await page.locator('#dialog-actions > *').evaluateAll(nodes =>
+      nodes.map(node => getComputedStyle(node).backgroundColor));
+    assert(rows.length > 0 && rows.every(colour => colour.startsWith('rgb(')), JSON.stringify(rows));
+  }
+  async function pauseEvidence(page, palette) {
+    await page.screenshot({ path: `${out}/${palette}-playing.png` });
+    await page.locator('#settings').tap();
+    await opaqueCommands(page);
+    await page.screenshot({ path: `${out}/pause-${palette}.png` });
+    // The same probe crosses colour boundaries in the tiles below each opaque row.
+    const row = button(page, 'Помощь').or(button(page, 'Настройки')).first();
+    await row.focus();
+    const focused = await row.evaluate(node => getComputedStyle(node).backgroundColor);
+    assert(focused.startsWith('rgb('));
+    const rect = await row.boundingBox();
+    await page.mouse.move(rect.x + rect.width - 18, rect.y + rect.height / 2);
+    await page.mouse.down();
+    const pressed = await row.evaluate(node => getComputedStyle(node).backgroundColor);
+    assert(pressed.startsWith('rgb('));
+    await page.screenshot({ path: `${out}/pause-${palette}-pressed.png` });
+    await page.mouse.move(rect.x - 3, rect.y + rect.height / 2);
+    await page.mouse.up();
+    await button(page, 'Настройки').tap();
+    await opaqueCommands(page);
+    await page.screenshot({ path: `${out}/preferences-${palette}.png` });
+    await page.keyboard.press('Escape');
+    await page.keyboard.press('Escape');
+    return { focused, pressed };
+  }
+  if (baseline) {
+    const prior = await launch({ reducedMotion: 'reduce' });
+    await prior.page.goto(baselineUrl); await ready(prior.page);
+    const before = await seed(prior.page, 'campaign');
+    await prior.page.screenshot({ path: `${out}/grain-before.png`, scale: 'device' });
+    await prior.context.close();
+    const fresh = await launch({ reducedMotion: 'reduce' });
+    await fresh.page.goto(url); await ready(fresh.page);
+    const after = await seed(fresh.page, 'campaign');
+    assert.deepEqual(after, before);
+    await fresh.page.screenshot({ path: `${out}/grain-after.png`, scale: 'device' });
+    const fixedPalette = await pauseEvidence(fresh.page, 'light');
+    report.pause = { light: fixedPalette };
+    await fresh.context.close();
+  }
+
+  async function trackTiles(page, width) {
+    await page.evaluate(async width => {
+      const { LIFT_START_MS, RISE_MS, RETURN_MS, tileJump } = await import('/src/game/victoryMotion.ts');
+      const canvas = document.querySelector('#board-region canvas');
+      window.v11Pair = { shots: [] };
+      const capture = () => {
+        if (!canvas.dataset.victoryFrame) {
+          requestAnimationFrame(capture);
+          return;
+        }
+        const { elapsed, at, airborne, delays } = JSON.parse(canvas.dataset.victoryFrame);
+        const neighbor = at % width + 1 === width ? at - 1 : at + 1;
+        const [a, b] = [at, neighbor].map(i => tileJump(elapsed, delays[i]));
+        const next = window.v11Pair.shots.length;
+        const startOfFall = LIFT_START_MS + delays[neighbor] + RISE_MS + 18;
+        const falling = elapsed > startOfFall && elapsed < startOfFall + RETURN_MS;
+        const hit = next === 0 ? a > .29 && !airborne.includes(neighbor)
+          : next === 1 ? !airborne.includes(at) && b > .18 && falling
+          : !airborne.includes(at) && !airborne.includes(neighbor);
+        if (hit) window.v11Pair.shots.push({ at, neighbor, elapsed, camera: canvas.dataset.camera, a, b,
+          image: canvas.toDataURL('image/png') });
+        if (window.v11Pair.shots.length < 3 && document.querySelector('#hue-app').dataset.victoryPhase !== 'landed') {
+          requestAnimationFrame(capture);
+        }
+      };
+      requestAnimationFrame(capture);
+    }, width);
+  }
   const ordinary = await launch({ filming: true });
   const { page: p, touch } = ordinary, ordinaryEpoch = Date.now();
   await p.goto(url); await ready(p);
@@ -198,6 +282,8 @@ try {
   assert.equal(await p.evaluate(() => document.activeElement.id), 'settings');
   assert.deepEqual(await read(p), before);
   if (record) await p.waitForTimeout(200);
+  const winClipStart = Date.now() - ordinaryEpoch;
+  await trackTiles(p, level.width);
   await touch('touchStart', start);
   for (let i = 1; i <= 5; i++) {
     await touch('touchMove', { x: start.x + (end.x - start.x) * i / 5, y: start.y + (end.y - start.y) * i / 5 });
@@ -211,6 +297,27 @@ try {
   assert.equal(await board(p).isVisible(), false);
   await wait(p, 'still');
   const normalAudio = await observations(p);
+  const snapshots = await p.evaluate(() => window.v11Pair.shots);
+  assert.equal(snapshots.length, 3, JSON.stringify(snapshots.map(({ image, ...rest }) => rest)));
+  assert.equal(new Set(snapshots.map(({ camera }) => camera)).size, 1);
+  const pair = [];
+  for (const [index, { image, ...metadata }] of snapshots.entries()) {
+    pair.push(metadata);
+    await writeFile(`${out}/tile-phase-${index}.png`, Buffer.from(image.split(',')[1], 'base64'));
+  }
+  if (record) {
+    const played = await p.evaluate(() => window.v11Audio);
+    const pcm = Buffer.alloc(44 + 2 * played.samples.length);
+    pcm.write('RIFF'); pcm.writeUInt32LE(pcm.length - 8, 4); pcm.write('WAVEfmt ', 8);
+    pcm.writeUInt32LE(16, 16); pcm.writeUInt16LE(1, 20); pcm.writeUInt16LE(1, 22);
+    pcm.writeUInt32LE(played.rate, 24); pcm.writeUInt32LE(played.rate * 2, 28);
+    pcm.writeUInt16LE(2, 32); pcm.writeUInt16LE(16, 34); pcm.write('data', 36);
+    pcm.writeUInt32LE(pcm.length - 44, 40);
+    played.samples.forEach((v, i) => pcm.writeInt16LE(Math.round(v * 32_767 * .32), 44 + 2 * i));
+    await writeFile(`${out}/ordinary-impact.wav`, pcm);
+    report.audioStartMillis = played.time - ordinaryEpoch;
+  }
+  await opaqueCommands(p);
   assert.deepEqual(normalAudio.pulses, [{ value: 22, phase: 'landed' }]);
   assert.equal(normalAudio.sounds.length, 1);
   assert(Math.abs(normalAudio.sounds[0].duration - .24) < .003);
@@ -230,7 +337,7 @@ try {
   const ordinaryVideo = await video(ordinary, 'ordinary', ordinaryEpoch, clipStart);
   report.episodes.ordinary = { id: level.id, moves: level.startMoves + 1, stableAndMovesWithTile: true, shades: grain.shades,
     mean: grain.mean, source: expectedColour, quietReplay: true, pauseKeyboardAndTouch: true, resultWallpaper: true,
-    sounds: normalAudio.sounds, vibration: normalAudio.pulses, ...ordinaryVideo, clipEnd: ordinaryClipEnd };
+    sounds: normalAudio.sounds, vibration: normalAudio.pulses, pair, ...ordinaryVideo, winClipStart, clipEnd: ordinaryClipEnd };
 
   const giant = await launch({ filming: true });
   const wide = giant.page, wideEpoch = Date.now();
@@ -284,6 +391,8 @@ try {
   await wait(wide, 'still');
   const bigAudio = await observations(wide);
   assert.deepEqual(bigAudio.pulses, [{ value: 22, phase: 'landed' }]);
+  const bigTimes = bigAudio.frames.filter(f => f.camera.zoom <= .951);
+  assert(bigTimes.length >= 10 && new Set(bigTimes.slice(-14).map(f => JSON.stringify(f.camera))).size === 1);
   const active = (await read(wide)).challengeProgress;
   assert.equal(active.best[large.id], large.startMoves + 1);
   assert.equal(active.attempts[large.id].completed, true);
@@ -300,7 +409,41 @@ try {
     naturalLight: naturalLight.mean, naturalDark: naturalDark.mean, zoomShades: zoomGrain.shades, sprayColors,
     sounds: bigAudio.sounds, vibration: bigAudio.pulses, ...giantVideo, clipEnd: wideClipEnd };
 
-  for (const scenario of ['before-hit', 'after-hit', 'reduced', 'background', 'assisted']) {
+  if (baseline) {
+    const fixed = await launch({ reducedMotion: 'reduce' });
+    await fixed.page.goto(url); await ready(fixed.page);
+    await seed(fixed.page, 'wide');
+    report.pause.dark = await pauseEvidence(fixed.page, 'dark');
+    await fixed.context.close();
+  }
+
+  const shape = await launch();
+  await shape.page.goto(url); await ready(shape.page);
+  const triangle = await seed(shape.page, 'triangles');
+  const taps = await shape.page.evaluate(async ({ from, to }) => {
+    const { activeChallenge } = await import('/src/domain/challenges.ts');
+    const { openIndexedDb } = await import('/src/local-store/indexed-db.ts');
+    const { boardGeometry, cellAt, cellCenter } = await import('/src/game/geometry.ts');
+    const store = await openIndexedDb();
+    const profile = JSON.parse((await store.load('guest-local-v1')).snapshotJson);
+    store.close();
+    const { level } = activeChallenge(profile.challengeProgress);
+    const bounds = document.querySelector('#board-region canvas').getBoundingClientRect();
+    const geometry = boardGeometry(bounds.width, bounds.height, level.width, level.height, level.positions);
+    return [from, to].map(index => {
+      const cell = cellCenter(cellAt(geometry, index));
+      return { x: bounds.x + cell.x, y: bounds.y + cell.y };
+    });
+  }, triangle);
+  for (const { x, y } of taps) await shape.page.touchscreen.tap(x, y);
+  await wait(shape.page, 'approach'); await wait(shape.page, 'still');
+  const shapeState = (await read(shape.page)).challengeProgress;
+  assert.equal(shapeState.best[triangle.id], triangle.startMoves + 1);
+  assert.deepEqual((await observations(shape.page)).pulses, [{ value: 22, phase: 'landed' }]);
+  report.episodes.triangles = { id: triangle.id, moves: shapeState.best[triangle.id] };
+  await shape.context.close();
+
+  for (const scenario of ['before-hit', 'after-hit', 'strip', 'reduced', 'background', 'assisted']) {
     const run = await launch({ reducedMotion: scenario === 'reduced' ? 'reduce' : 'no-preference',
       deviceScaleFactor: scenario === 'reduced' ? 2 : 1 });
     const page = run.page;
@@ -337,7 +480,7 @@ try {
       await page.evaluate(() => window.dispatchEvent(new Event('focus')));
       await idle(page);
     }
-    if (scenario === 'assisted') await wait(page, 'still');
+    if (scenario === 'assisted' || scenario === 'strip') await wait(page, 'still');
     await page.waitForTimeout(760);
     const seen = await observations(page), profile = await read(page);
     const firstAttempt = profile.attempts['gradient-001'];
@@ -363,4 +506,5 @@ try {
 } finally {
   await browser?.close();
   dev.kill();
+  baseline?.kill();
 }

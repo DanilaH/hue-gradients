@@ -66,7 +66,9 @@ footer { min-height: 56px; padding: 2px 12px 6px; display: flex; gap: 10px; alig
 .setting input { width: 24px; height: 24px; accent-color: #e3ccf8; }
 #hue-app[data-layer=result]:not([data-victory-phase=approach]) #board-region { visibility: hidden; }
 #hue-app[data-layer=result] #board-region { pointer-events: none; }
-#hue-app[data-layer=result] > .hud, #hue-app[data-layer=result] > footer { visibility: hidden; }
+#hue-app[data-layer=result]:not([data-victory-phase=approach]) > .hud,
+#hue-app[data-layer=result]:not([data-victory-phase=approach]) > footer,
+#hue-app[data-victory-phase=approach] #help { visibility: hidden; }
 #game-dialog[data-layer=result] { position: fixed; inset: 0; margin: 0; width: 100%; height: 100%; max-width: none; max-height: none; border: 0; border-radius: 0; padding: 20px; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; overflow: auto; }
 #game-dialog[data-layer=result]::backdrop { background: #12092244; backdrop-filter: none; }
 #game-dialog[data-layer=result] h2 { font-size: clamp(1.875rem,8vw,3.25rem); letter-spacing: .09em; text-transform: uppercase; text-shadow: 0 0 28px #fff2de70, 0 2px 6px #201432; margin: 12px 0 4px; }
@@ -94,36 +96,38 @@ footer { min-height: 56px; padding: 2px 12px 6px; display: flex; gap: 10px; alig
   #game-dialog[data-layer=result] #dialog-actions { grid-area: actions; justify-self: center; }
 }
 /* The board, pause and win share the same sharp corners and softened light. */
-#game-dialog[data-layer=settings], #game-dialog[data-layer=preferences] {
+#game-dialog:is([data-layer=settings],[data-layer=preferences]) {
   position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none;
-  margin: 0; border: 0; border-radius: 0; padding: 18px 24px; box-sizing: border-box;
-  background: linear-gradient(178deg,#100a1ae5,#1b112e79 33%,#21132f8e 66%,#0d0a1be8);
-  text-shadow: 0 2px 5px #0b0719; overflow: auto; overscroll-behavior: contain;
+  display: flex; flex-direction: column;
+  margin: 0; border: 0; border-radius: 0; padding: 16px; box-sizing: border-box;
+  background: none; overflow: auto; overscroll-behavior: contain;
 }
-#game-dialog[data-layer=settings]::backdrop, #game-dialog[data-layer=preferences]::backdrop {
-  background: #39214940; backdrop-filter: blur(1.5px);
+#game-dialog:is([data-layer=settings],[data-layer=preferences])::backdrop {
+  background: none; backdrop-filter: none;
 }
-#game-dialog[data-layer=settings]::before, #game-dialog[data-layer=preferences]::before {
-  content: ''; position: fixed; inset: 0; pointer-events: none; opacity: .23;
-  background: repeating-conic-gradient(#1c032b74 0 25%,#feceee49 0 50%) 0 0 / 4px 4px;
+#game-dialog:is([data-layer=settings],[data-layer=preferences]) h2 {
+  width: min(100%,288px); margin: auto auto 0; padding: 9px 14px 11px;
+  background: #22182f; border: 1px solid #695875; border-bottom: 0;
+  font-size: clamp(1.25rem,6vw,1.8rem); font-weight: 650; letter-spacing: .13em; text-transform: uppercase;
 }
-#game-dialog[data-layer=settings] h2, #game-dialog[data-layer=preferences] h2 {
-  position: relative; width: min(100%,340px); margin: clamp(16px,13vh,110px) auto 15px;
-  font-size: clamp(1.35rem,7vw,2.3rem); font-weight: 650; letter-spacing: .19em; text-transform: uppercase;
+#game-dialog:is([data-layer=settings],[data-layer=preferences]) #dialog-actions {
+  position: relative; width: min(100%,288px); margin: 0 auto auto; gap: 1px;
+  background: #51435d; border: 1px solid #695875;
 }
-#game-dialog[data-layer=settings] #dialog-actions, #game-dialog[data-layer=preferences] #dialog-actions {
-  position: relative; width: min(100%,340px); margin-inline: auto; gap: 0;
-  border-top: 1px solid #fff2de5e;
+#game-dialog:is([data-layer=settings],[data-layer=preferences]) #dialog-actions > * {
+  position: relative; border: 0; border-radius: 0; padding: 7px 14px; min-height: 48px;
+  background: #30243f; color: #fff2de; text-align: start; overflow-wrap: anywhere;
 }
-#game-dialog[data-layer=settings] #dialog-actions button, #game-dialog[data-layer=preferences] #dialog-actions > * {
-  position: relative; border: 0; border-bottom: 1px solid #fff2de3b; border-radius: 0;
-  padding: 7px 13px; min-height: 52px; background: transparent; color: #fff2de;
-  text-align: start; text-shadow: inherit; overflow-wrap: anywhere;
+#game-dialog[data-layer=settings] #dialog-actions button:first-child { font-weight: 700; background: #493752; }
+#game-dialog:is([data-layer=settings],[data-layer=preferences]) #dialog-actions > :focus-within {
+  outline: 0; background: #594466;
 }
-#game-dialog[data-layer=settings] #dialog-actions button:first-child { font-weight: 700; }
-#game-dialog[data-layer=settings] #dialog-actions button:focus,
-#game-dialog[data-layer=preferences] #dialog-actions button:focus,
-#game-dialog[data-layer=preferences] .setting:focus-within { outline: 0; background: #1a10394a; }
+#game-dialog:is([data-layer=settings],[data-layer=preferences]) #dialog-actions > :active {
+  background: #674c71;
+}
+#game-dialog:is([data-layer=settings],[data-layer=preferences]) #dialog-actions button:disabled {
+  opacity: 1; color: #d0c0d6;
+}
 #game-dialog[data-layer=settings] #dialog-actions button:focus::after,
 #game-dialog[data-layer=settings] #dialog-actions button:active::after,
 #game-dialog[data-layer=preferences] #dialog-actions > :focus-within::after,
@@ -145,7 +149,7 @@ footer { min-height: 56px; padding: 2px 12px 6px; display: flex; gap: 10px; alig
 #game-dialog[data-victory=true]:not([data-victory-phase=approach])::before {
   content: ''; position: absolute; inset: 0; z-index: -2; pointer-events: none;
   background:
-    repeating-conic-gradient(#200a3422 0 25%,#fff2e012 0 50%) 0 0 / 4px 4px,
+    repeating-conic-gradient(#200a341b 0 25%,#fff2e00e 0 50%) 0 0 / 2px 2px,
     radial-gradient(ellipse at 50% 38%,#28203e0d 10%,#1a122d4c 75%,#130d2263);
 }
 #game-dialog[data-victory-phase=landed] .victory-effects { display: block; z-index: -1; }
@@ -161,10 +165,13 @@ footer { min-height: 56px; padding: 2px 12px 6px; display: flex; gap: 10px; alig
   position: absolute; bottom: clamp(14px,5vh,52px); width: min(calc(100% - 32px),300px);
 }
 #game-dialog[data-victory=true] #dialog-actions button {
-  position: relative; border: 0; border-radius: 0; background: #211334bc; color: #fff2de;
+  position: relative; border: 0; border-radius: 0; background: #4a315b; color: #fff2de;
   box-shadow: 0 6px 20px #2113342a; text-shadow: 0 1px 4px #10051c;
 }
-#game-dialog[data-victory=true] #dialog-actions .quiet { background: #21133474; font-weight: 500; }
+#game-dialog[data-victory=true] #dialog-actions .quiet { background: #30203f; font-weight: 500; }
+#game-dialog[data-victory=true] #dialog-actions button:focus-visible { background: #59436c; }
+#game-dialog[data-victory=true] #dialog-actions button:active { background: #634875; }
+#game-dialog[data-victory=true] #dialog-actions button:disabled { opacity: 1; color: #d0c0d6; }
 #game-dialog[data-victory=true] .result-next { text-transform: uppercase; letter-spacing: .18em; font-weight: 700; }
 #game-dialog[data-victory=true] .result-next::before { content: '→'; position: absolute; right: 18px; }
 #game-dialog[data-victory=true] #dialog-actions button:focus-visible { outline: 0; }
@@ -173,11 +180,10 @@ footer { min-height: 56px; padding: 2px 12px 6px; display: flex; gap: 10px; alig
 }
 @keyframes result-light-in { from { opacity: 0; } to { opacity: 1; } }
 @media (orientation: landscape) and (max-height:450px) {
-  #game-dialog[data-layer=settings] h2, #game-dialog[data-layer=preferences] h2 { margin-top: 0; }
   #game-dialog[data-layer=settings] #dialog-actions, #game-dialog[data-layer=preferences] #dialog-actions {
-    grid-template-columns: repeat(2,minmax(0,1fr)); column-gap: 12px; width: min(100%,540px);
+    grid-template-columns: repeat(2,minmax(0,1fr)); column-gap: 1px; width: min(100%,380px);
   }
-  #game-dialog[data-layer=settings] h2, #game-dialog[data-layer=preferences] h2 { width: min(100%,540px); }
+  #game-dialog[data-layer=settings] h2, #game-dialog[data-layer=preferences] h2 { width: min(100%,380px); }
   #game-dialog[data-victory=true] { padding: 14px 24px; }
   #game-dialog[data-victory=true] #dialog-actions { position: relative; bottom: auto; }
   #game-dialog[data-victory-phase=approach] #dialog-actions { justify-self: end; align-self: end; }

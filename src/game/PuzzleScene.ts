@@ -2,13 +2,14 @@ import Phaser from 'phaser';
 import { canSwap, type Attempt, type LevelDefinition } from '../domain/puzzle';
 import { boardGeometry, cellAt, cellCenter, hitTest, type BoardGeometry, type Cell } from './geometry';
 import { TileDither } from './tileDither';
-import { amount, ease, LANDING_MS, tileJump, VICTORY_END_MS } from './victoryMotion';
+import { amount, ease, FRAME_END_MS, FRAME_START_MS, LANDING_MS, tileDelays, tileJump, VICTORY_END_MS } from './victoryMotion';
 import { clampCamera, edgeVelocity, moveCamera, REST_CAMERA, revealCell, viewBoard, type Camera, type Point } from './boardCamera';
 
 export const GAME_PRESENTABLE = 'hue:presentable';
 interface Hooks { swap(from: number, to: number): void; pin(position: number): void; paint(): void; interaction?(value: { x: number; y: number; color: string } | null): void }
 interface Gesture { id: number; from: number | null; x: number; y: number; latestX: number; latestY: number; drag: boolean; layout: string; camera: Camera }
 interface Navigation { anchor: Point; distance: number; camera: Camera }
+const liftHeight = (cell: Cell) => Math.min(32, Math.max(10, Math.min(cell.width, cell.height) * .48));
 
 export class PuzzleScene extends Phaser.Scene {
   private drawable = false;
@@ -26,7 +27,7 @@ export class PuzzleScene extends Phaser.Scene {
   private camera: Camera = REST_CAMERA;
   private readonly touches = new Map<number, Point>();
   private navigation: Navigation | null = null;
-  private victory: { started: number; from: Camera; at: number; frame(elapsed: number, board: BoardGeometry, origin: Point): void } | null = null;
+  private victory: { started: number; from: Camera; at: number; delays: number[]; elapsed: number; frame(elapsed: number, board: BoardGeometry, origin: Point): void } | null = null;
   private released: { from: number; to: number; dx: number; dy: number } | null = null;
   private settle: { from: number; to: number; dx: number; dy: number; started: number } | null = null;
   constructor(level: LevelDefinition, attempt: Attempt, private readonly hooks: Hooks) { super('puzzle'); this.level = level; this.attempt = attempt; }
@@ -70,7 +71,13 @@ export class PuzzleScene extends Phaser.Scene {
     this.game.canvas.dataset.settling = 'true'; this.draw();
   }
   presentVictory(at: number, frame: NonNullable<PuzzleScene['victory']>['frame']): void {
-    this.victory = { started: this.settle?.started ?? performance.now(), from: this.camera, at, frame };
+    // Normalize the centres to cell units so a narrow board keeps its own local rhythm.
+    const points = this.attempt.board.map((_, i) => {
+      const { x, y } = cellCenter(cellAt(this.natural, i));
+      return { x: x * this.natural.columns / this.natural.width, y: y * this.natural.rows / this.natural.height };
+    });
+    this.victory = { started: this.settle?.started ?? performance.now(), elapsed: 0, from: this.camera,
+      at, delays: tileDelays(points, points[at]!), frame };
     this.draw();
   }
   finishVictory(): void {
@@ -102,6 +109,7 @@ export class PuzzleScene extends Phaser.Scene {
     if (!this.victory && !this.settle && !edge.x && !edge.y) return;
     if (this.victory) {
       const beat = this.victory, elapsed = performance.now() - beat.started;
+      beat.elapsed = elapsed;
       this.draw();
       beat.frame(elapsed, this.geometry, cellCenter(cellAt(this.geometry, beat.at)));
       if (elapsed >= VICTORY_END_MS) this.finishVictory();
@@ -295,8 +303,10 @@ export class PuzzleScene extends Phaser.Scene {
       this.camera = revealCell(this.natural, this.camera, this.focused);
     }
     if (this.victory) {
-      const zoom = ease(amount((performance.now() - this.victory.started - 95) / 265));
-      const fit = .94, from = this.victory.from;
+      const zoom = ease(amount((this.victory.elapsed - FRAME_START_MS) / (FRAME_END_MS - FRAME_START_MS)));
+      const from = this.victory.from, top = cellAt(this.natural, 0);
+      const headroom = Math.max(0, liftHeight(top) + top.height * .015 - this.natural.y);
+      const fit = Math.min(from.zoom > 1 ? .94 : 1, Math.max(.8, 1 - 2 * headroom / this.natural.height));
       this.camera = { zoom: from.zoom + (fit - from.zoom) * zoom,
         x: from.x * (1 - zoom) + this.natural.width * (1 - fit) / 2 * zoom,
         y: from.y * (1 - zoom) + this.natural.height * (1 - fit) / 2 * zoom };
@@ -307,14 +317,13 @@ export class PuzzleScene extends Phaser.Scene {
   }
   private paintBoard(ctx: CanvasRenderingContext2D): void {
     const rect = this.game.canvas.getBoundingClientRect(), beat = this.victory;
-    const elapsed = beat ? performance.now() - beat.started : 0;
+    const elapsed = beat?.elapsed ?? 0;
     if (beat && elapsed >= LANDING_MS) return;
     ctx.save();
     ctx.setTransform(ctx.canvas.width / Math.max(1, rect.width), 0, 0, ctx.canvas.height / Math.max(1, rect.height), 0, 0);
     ctx.imageSmoothingEnabled = false;
     const ink = this.dither ??= new TileDither(ctx);
-    const origin = beat ? cellCenter(cellAt(this.geometry, beat.at)) : null;
-    const diagonal = Math.max(1, Math.hypot(this.geometry.width, this.geometry.height));
+    const flights = beat?.delays.map(delay => tileJump(elapsed, delay));
     const pins = this.level.pinnedPositions;
     const paintShape = (cell: Cell, colour: string) => {
       this.cellPath(ctx, cell);
@@ -324,18 +333,16 @@ export class PuzzleScene extends Phaser.Scene {
     const tile = (position: number, dx = 0, dy = 0, held = false): void => {
       const cell = cellAt(this.geometry, position), tileId = this.preview ? position : this.attempt.board[position]!;
       const center = cellCenter(cell);
-      const jump = origin ? tileJump(elapsed, center, origin, diagonal) : 0;
-      const lift = jump * Math.min(18, Math.max(7, cell.height * .24));
+      const jump = flights?.[position] ?? 0;
+      const lift = jump * liftHeight(cell);
       const scale = 1 + jump * .03;
-      if (held || jump > 0) {
-        paintShape({ ...cell, x: cell.x + dx + 3, y: cell.y + dy + 5 + lift * .22 }, 'rgba(16,14,28,.62)');
-      }
+      if (held) paintShape({ ...cell, x: cell.x + dx + 3, y: cell.y + dy + 5 }, 'rgba(16,14,28,.62)');
       const pinned = pins.includes(position);
       const colour = this.concealed && !pinned ? '#2f263d' : this.level.solvedTileColors[tileId]!;
       ctx.save();
       ctx.translate(cell.x + dx - cell.width * (scale - 1) / 2, cell.y + dy - lift - cell.height * (scale - 1) / 2);
-      ctx.scale(scale, scale);
-      const face = { ...cell, x: 0, y: 0 };
+      const face = { ...cell, x: 0, y: 0, width: cell.width * scale, height: cell.height * scale,
+        ...(cell.points && scale !== 1 ? { points: cell.points.map(([x, y]) => [x * scale, y * scale] as const) } : {}) };
       this.cellPath(ctx, face);
       ctx.fillStyle = ink.colour(colour);
       ctx.fill();
@@ -349,7 +356,7 @@ export class PuzzleScene extends Phaser.Scene {
         ctx.restore();
       }
       if (pinned) {
-        const x = center.x - cell.x, y = center.y - cell.y, radius = Math.min(5, cell.width / 8, cell.height / 8);
+        const x = (center.x - cell.x) * scale, y = (center.y - cell.y) * scale, radius = Math.min(5, cell.width / 8, cell.height / 8);
         for (const [r, colour] of [[radius, '#101019'], [radius / 2, '#fff3df']] as const) {
           ctx.beginPath(); ctx.arc(x, y, r, 0, 2 * Math.PI); ctx.fillStyle = colour; ctx.fill();
         }
@@ -360,13 +367,25 @@ export class PuzzleScene extends Phaser.Scene {
     };
     const settle = elapsed >= 150 && beat ? null : this.settle, g = this.gesture;
     const lifted = g?.drag ? g.from : null;
+    const airborne: number[] = [];
     for (let i = 0; i < this.attempt.board.length; i++) {
       if (i === lifted) {
         const cell = cellAt(this.geometry, i);
         paintShape(cell, 'rgba(40,32,49,.83)');
         this.cellPath(ctx, cell, 2);
         ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(217,197,226,.42)'; ctx.stroke();
+      } else if (flights?.[i]) {
+        const cell = cellAt(this.geometry, i);
+        paintShape(cell, 'rgba(16,14,28,.72)');
+        this.cellPath(ctx, cell, 1);
+        ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,238,216,.34)'; ctx.stroke();
+        airborne.push(i);
       } else if (!settle || (i !== settle.from && i !== settle.to)) tile(i);
+    }
+    for (const position of airborne) tile(position);
+    if (import.meta.env.DEV) {
+      if (beat) ctx.canvas.dataset.victoryFrame = JSON.stringify({ elapsed, at: beat.at, airborne, delays: beat.delays });
+      else delete ctx.canvas.dataset.victoryFrame;
     }
     if (settle) {
       const from = cellAt(this.geometry, settle.from), to = cellAt(this.geometry, settle.to);

@@ -70,12 +70,8 @@ export class VictoryArtwork {
       ctx.globalAlpha = .58 * (1 - travel ** 3);
       ctx.beginPath();
       ctx.arc(origin.x, origin.y, Math.max(1, travel * this.waveEnd), 0, 2 * Math.PI);
-      ctx.lineWidth = 12 + 21 * travel;
+      ctx.lineWidth = 7 + 10 * travel;
       ctx.strokeStyle = this.grain;
-      ctx.stroke();
-      ctx.globalAlpha *= .55;
-      ctx.strokeStyle = '#fff1d7';
-      ctx.lineWidth = 2;
       ctx.stroke();
     }
     for (const p of this.spray) {
