@@ -11,7 +11,7 @@ const output = '.test-output/books', base = 'http://127.0.0.1:4189';
 const { levels } = JSON.parse(await readFile('docs/spec/prototype/levels-0.1.json', 'utf8'));
 const { rows } = JSON.parse(await readFile('docs/spec/prototype/validation-0.1.json', 'utf8'));
 const [stagedDirectory] = process.argv.slice(2);
-const staged = stagedDirectory ? await stagedFeed(stagedDirectory, 'event-v1') : null;
+const staged = stagedDirectory ? await stagedFeed(stagedDirectory) : null;
 const featured = staged?.days.find(slot => slot.feature);
 assert(!staged || featured, 'The staged catalog must contain a visible event');
 const eventDate = featured?.date ?? '2026-11-20';
@@ -114,11 +114,14 @@ try {
     const store = await openIndexedDb();
     const session = new Session(store, new Map(await Promise.all(levels.map(async level => [level.id, await hashText(fingerprintPayload(level))]))));
     await session.load();
-    await session.act({ kind: 'daily-cache', feed: staged ?? { source: 'Verified event fixture', version: 'event-v1',
+    const { readPublishedDailyCatalog } = await import('/src/app/dailyCatalog.ts');
+    const feed = staged ? await readPublishedDailyCatalog(staged.publication, async path => Uint8Array.from(staged.files[path]).buffer)
+      : { source: 'Verified event fixture', version: 'event-v1',
       verifiedNowMs: Date.UTC(2026, 10, 20, 12), days: [{ date: '2026-11-20', feature: { id: 'warm-day', title: 'Мягкий свет' },
-        level: { ...levels[0], id: 'daily-event-fixture', contentVersion: DAILY_CONTENT_VERSION } }] } });
+        level: { ...levels[0], id: 'daily-event-fixture', contentVersion: DAILY_CONTENT_VERSION } }] };
+    await session.act({ kind: 'daily-cache', feed });
     store.close();
-  }, staged);
+  }, staged && { publication: staged.publication, files: staged.files });
   await page.reload();
   await ready();
   await books();

@@ -9,11 +9,12 @@ const require = createRequire(process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES
 const { chromium } = require('playwright');
 const output = '.test-output/daily';
 const base = 'http://127.0.0.1:4187';
-const [beforeDirectory, afterDirectory] = process.argv.slice(2);
+const [beforeDirectory, afterDirectory, bankDirectory] = process.argv.slice(2);
 assert.equal(Boolean(beforeDirectory), Boolean(afterDirectory), 'Supply both staged snapshots');
 const staged = beforeDirectory ? {
-  before: await stagedFeed(beforeDirectory, 'v1', '23:59:59'),
-  after: await stagedFeed(afterDirectory, 'v2'),
+  before: await stagedFeed(beforeDirectory, '23:59:59'),
+  after: await stagedFeed(afterDirectory),
+  bank: bankDirectory ? await stagedFeed(bankDirectory) : null,
 } : null;
 await mkdir(output, { recursive: true });
 const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', '--host', '127.0.0.1',
@@ -30,28 +31,52 @@ try {
   const viewport = { width: 390, height: 740 };
   const recording = process.env.RECORD_EPISODE === '1';
   const first = staged?.before.through ?? '2026-11-20', second = staged?.after.through ?? '2026-11-21';
+  const versions = { before: staged?.before.publication.catalogSha256 ?? 'v1', after: staged?.after.publication.catalogSha256 ?? 'v2' };
   const errors = [];
   async function profile(record) {
     const context = await browser.newContext({ viewport, hasTouch: true, isMobile: true,
       ...(record ? { recordVideo: { dir: output, size: viewport } } : {}) });
     await context.route('**/daily-fixture.html', route => route.fulfill({ contentType: 'text/html; charset=utf-8', body:
       '<!doctype html><html lang="ru" data-host="browser"><meta name="viewport" content="width=device-width,initial-scale=1"><main id="game-root"></main>' }));
+    if (staged) await context.route('**/__daily-fixture/**', route => {
+      const [, , phase, ...pathParts] = new URL(route.request().url()).pathname.split('/');
+      if (phase === 'offline') return route.abort();
+      const path = pathParts.join('/');
+      const files = (phase === 'bank' ? staged.bank : phase === 'before' ? staged.before : staged.after)?.files;
+      assert(files, 'Unexpected catalog phase: ' + phase);
+      assert(files[path], 'Unexpected catalog file: ' + path);
+      const body = Buffer.from(files[path]);
+      if (phase === 'corrupt' && path === staged.after.levelPaths[second]) body[0] ^= 1;
+      return route.fulfill({ contentType: 'application/json', body });
+    });
     const captureBase = Date.now();
     const page = await context.newPage();
     page.on('pageerror', error => errors.push(error.message));
     const boot = async () => {
-      await page.evaluate(async (staged) => {
+      await page.evaluate(async (publications) => {
         const { mountGame } = await import('/src/game/mountGame.ts');
         const { openIndexedDb } = await import('/src/local-store/indexed-db.ts');
         const { getLevel } = await import('/src/domain/levels.ts');
         const { DAILY_CONTENT_VERSION } = await import('/src/domain/puzzle.ts');
+        const { readPublishedDailyCatalog } = await import('/src/app/dailyCatalog.ts');
         const activity = { isBlocked: () => false, onBlockedChange: () => () => {}, setGameplayDesired: () => {} };
         await mountGame(document.querySelector('#game-root'), await openIndexedDb(), activity, {
           dailySource: async () => {
             const phase = sessionStorage.getItem('fixture-daily') ?? 'before';
-            if (phase === 'offline') throw new Error('Fixture disconnected');
             const before = phase === 'before';
-            if (staged) return before ? staged.before : staged.after;
+            if (publications) {
+              try {
+                const publication = phase === 'bank' ? publications.bank : before ? publications.before : publications.after;
+                return await readPublishedDailyCatalog(publication, async path => {
+                  const response = await fetch(`/__daily-fixture/${phase}/${path}`);
+                  if (!response.ok) throw new Error('Fixture file unavailable');
+                  return response.arrayBuffer();
+                });
+              } finally {
+                document.documentElement.dataset.fixtureRead = phase;
+              }
+            }
+            if (phase === 'offline') throw new Error('Fixture disconnected');
             return {
               source: 'Dated test fixture', version: before ? 'v1' : 'v2', verifiedNowMs: before
                 ? Date.UTC(2026, 10, 20, 23, 59, 59) : Date.UTC(2026, 10, 21),
@@ -62,7 +87,7 @@ try {
             };
           },
         });
-      }, staged);
+      }, staged && { before: staged.before.publication, after: staged.after.publication, bank: staged.bank?.publication });
     };
     await page.goto(`${base}/daily-fixture.html`);
     await boot();
@@ -122,18 +147,30 @@ try {
     assert.deepEqual(before.book.slots[first].level, level);
     assert.deepEqual(before.book.attempts[first].board, level.startTileAtPosition);
   }
-  assert.equal(before.book.slots[first].version, 'v1');
-  await one.page.evaluate(() => sessionStorage.setItem('fixture-daily', 'after'));
+  assert.equal(before.book.slots[first].version, versions.before);
+  await one.page.evaluate(phase => sessionStorage.setItem('fixture-daily', phase), staged ? 'corrupt' : 'after');
   await solve(one.page);
-  assert.equal((await state(one.page)).book.active, first);
+  const wonBeforeRefresh = await state(one.page);
+  assert.equal(wonBeforeRefresh.book.active, first);
   if (recording) await one.page.waitForTimeout(500);
   await one.page.getByRole('button', { name: 'К календарю' }).tap();
+  if (staged) {
+    await one.page.waitForSelector('html[data-fixture-read=corrupt]');
+    assert.equal(await slot(one.page, second).count(), 0);
+    const failed = await state(one.page);
+    assert.deepEqual(failed.book.slots, wonBeforeRefresh.book.slots);
+    assert.deepEqual(failed.book.attempts, wonBeforeRefresh.book.attempts);
+    assert.deepEqual(failed.distinctWins, [first]);
+    await one.page.evaluate(() => sessionStorage.setItem('fixture-daily', 'after'));
+    await one.page.getByRole('button', { name: '‹ Назад', exact: true }).tap();
+    await one.page.getByRole('button', { name: 'Задача дня', exact: true }).tap();
+  }
   await slot(one.page, second).waitFor();
   assert.match(await slot(one.page, first).innerText(), /Архив.*Собрано/s);
   assert.match(await slot(one.page, second).innerText(), /Общая задача/);
   const refreshed = await state(one.page);
-  assert.equal(refreshed.book.slots[first].version, 'v1');
-  assert.equal(refreshed.book.slots[second].version, 'v2');
+  assert.equal(refreshed.book.slots[first].version, versions.before);
+  assert.equal(refreshed.book.slots[second].version, versions.after);
   if (recording) await one.page.waitForTimeout(700);
   await one.page.evaluate(() => sessionStorage.setItem('fixture-daily', 'offline'));
   await one.page.reload();
@@ -155,10 +192,35 @@ try {
   const video = one.page.video();
   await one.context.close();
   if (video) await video.saveAs(`${output}/daily.webm`);
+  const bankPasses = [];
+  if (staged?.bank) {
+    const bank = await profile(false);
+    await bank.page.evaluate(() => sessionStorage.setItem('fixture-daily', 'bank'));
+    await bank.page.locator('#levels').tap();
+    await bank.page.getByRole('button', { name: 'Задача дня', exact: true }).tap();
+    await slot(bank.page, staged.bank.through).waitFor();
+    await bank.page.evaluate(() => sessionStorage.setItem('fixture-daily', 'offline'));
+    for (const { date, level } of staged.bank.days) {
+      await slot(bank.page, date).tap();
+      await idle(bank.page);
+      const opened = (await state(bank.page)).book;
+      assert.deepEqual(opened.slots[date].level, level);
+      assert.deepEqual(opened.attempts[date].board, level.startTileAtPosition);
+      await solve(bank.page);
+      bankPasses.push({ id: level.id, width: level.width, height: level.height, moves: level.minimumSwaps });
+      await bank.page.getByRole('button', { name: 'К календарю' }).tap();
+    }
+    assert.equal(bankPasses.length, 30);
+    assert.deepEqual((await state(bank.page)).distinctWins.sort(), staged.bank.days.map(day => day.date).sort());
+    await bank.context.close();
+  }
+  assert.deepEqual(errors, []);
   const report = { browser: browser.version(), authoredSnapshot: Boolean(staged),
     completedLevel: offline.book.slots[first].level.id, moves: offline.book.attempts[first].moves,
     sameDailyStartOnTwoProfiles: true, acrossUtcMidnight: [first, second],
-    reusedOldVersion: 'v1', offlineReplay: true, distinctWins: offline.distinctWins, clipStartMillis, clipMillis,
+    verifiedWireBytes: Boolean(staged), corruptUpdatePreservedArchive: Boolean(staged),
+    bankPasses,
+    reusedOldVersion: versions.before, newVersion: versions.after, offlineReplay: true, distinctWins: offline.distinctWins, clipStartMillis, clipMillis,
     limits: 'Injected dated feed and trusted clock. No public source, shared rewards or native runtime.' };
   await writeFile(`${output}/browser.json`, JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report));

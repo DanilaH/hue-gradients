@@ -80,6 +80,8 @@ Author activeTest persists work/node/frozen Attempt; creative.playing controls c
 
 ## Next work
 
+D1 verifies the raw catalog, month and level files before handing a feed to the existing save path. Browser tests rejected a damaged update, admitted the repaired UTC day and solved each of the 30 authored boards offline. The editorial order is undated and the closest palettes still need human play. Use the provider and trusted-time gates recorded below to resume the live calendar. [Evidence](evidence/queue-d1-client-2026-11-21.json)
+
 D1 publication staging is available in [the runbook](DAILY_STAGING.md). All 30 authored candidates pass technical checks. The browser solved the first authored slot in four moves on both online and offline routes, preserving one dated win across UTC midnight. Real editorial acceptance, the dated publication and the authoritative clock remain pending. [Evidence](evidence/queue-d1-staging-2026-11-21.json)
 
 Resume at the first resolved external dependency in the [delivery queue](porting/DELIVERY_QUEUE.md). No locally runnable packet remains in A1–G1. Phone checks, benchmark/calendar data, providers and owner decisions are listed there. M5 cloud/account remains on hold.

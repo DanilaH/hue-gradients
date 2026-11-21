@@ -1,0 +1,348 @@
+{
+  "date": "2026-11-21",
+  "baseCommit": "ec5afe2f4755f256bde098495f37fc55028da8a2",
+  "sourceFeatureIds": [
+    "h2-daily-open",
+    "h2-daily-date",
+    "mt-m05",
+    "mt-m09"
+  ],
+  "consumerRequirements": [
+    "DAILY-01",
+    "DAILY-02",
+    "DAILY-03",
+    "DAILY-04",
+    "DAILY-05",
+    "CONTENT-05"
+  ],
+  "reader": {
+    "byteIntegrity": [
+      "catalog",
+      "month",
+      "level"
+    ],
+    "catalogVersion": "Verified SHA-256 of catalog.json",
+    "clock": "Externally supplied verified UTC; staged runs use a controlled test clock",
+    "gameplayIdentity": [
+      "candidate ID",
+      "rules version",
+      "fingerprint"
+    ],
+    "cacheBoundary": "One feed after all checks"
+  },
+  "chromium": {
+    "stagedReader": {
+      "browser": "153.0.8010.0",
+      "authoredSnapshot": true,
+      "completedLevel": "gradient-daily-001",
+      "moves": 4,
+      "sameDailyStartOnTwoProfiles": true,
+      "acrossUtcMidnight": [
+        "2026-01-31",
+        "2026-02-01"
+      ],
+      "verifiedWireBytes": true,
+      "corruptUpdatePreservedArchive": true,
+      "bankPasses": [
+        {
+          "id": "gradient-daily-001",
+          "width": 3,
+          "height": 3,
+          "moves": 4
+        },
+        {
+          "id": "gradient-daily-002",
+          "width": 4,
+          "height": 4,
+          "moves": 3
+        },
+        {
+          "id": "gradient-daily-003",
+          "width": 5,
+          "height": 4,
+          "moves": 5
+        },
+        {
+          "id": "gradient-daily-004",
+          "width": 4,
+          "height": 4,
+          "moves": 7
+        },
+        {
+          "id": "gradient-daily-005",
+          "width": 4,
+          "height": 4,
+          "moves": 7
+        },
+        {
+          "id": "gradient-daily-006",
+          "width": 5,
+          "height": 3,
+          "moves": 4
+        },
+        {
+          "id": "gradient-daily-007",
+          "width": 4,
+          "height": 4,
+          "moves": 10
+        },
+        {
+          "id": "gradient-daily-008",
+          "width": 5,
+          "height": 4,
+          "moves": 7
+        },
+        {
+          "id": "gradient-daily-009",
+          "width": 5,
+          "height": 5,
+          "moves": 8
+        },
+        {
+          "id": "gradient-daily-010",
+          "width": 5,
+          "height": 4,
+          "moves": 9
+        },
+        {
+          "id": "gradient-daily-011",
+          "width": 3,
+          "height": 3,
+          "moves": 4
+        },
+        {
+          "id": "gradient-daily-012",
+          "width": 4,
+          "height": 4,
+          "moves": 3
+        },
+        {
+          "id": "gradient-daily-013",
+          "width": 5,
+          "height": 4,
+          "moves": 5
+        },
+        {
+          "id": "gradient-daily-014",
+          "width": 4,
+          "height": 4,
+          "moves": 7
+        },
+        {
+          "id": "gradient-daily-015",
+          "width": 4,
+          "height": 4,
+          "moves": 7
+        },
+        {
+          "id": "gradient-daily-016",
+          "width": 5,
+          "height": 3,
+          "moves": 4
+        },
+        {
+          "id": "gradient-daily-017",
+          "width": 4,
+          "height": 4,
+          "moves": 10
+        },
+        {
+          "id": "gradient-daily-018",
+          "width": 5,
+          "height": 4,
+          "moves": 7
+        },
+        {
+          "id": "gradient-daily-019",
+          "width": 5,
+          "height": 5,
+          "moves": 8
+        },
+        {
+          "id": "gradient-daily-020",
+          "width": 5,
+          "height": 4,
+          "moves": 9
+        },
+        {
+          "id": "gradient-daily-021",
+          "width": 3,
+          "height": 3,
+          "moves": 4
+        },
+        {
+          "id": "gradient-daily-022",
+          "width": 4,
+          "height": 4,
+          "moves": 3
+        },
+        {
+          "id": "gradient-daily-023",
+          "width": 5,
+          "height": 4,
+          "moves": 5
+        },
+        {
+          "id": "gradient-daily-024",
+          "width": 4,
+          "height": 4,
+          "moves": 7
+        },
+        {
+          "id": "gradient-daily-025",
+          "width": 4,
+          "height": 4,
+          "moves": 7
+        },
+        {
+          "id": "gradient-daily-026",
+          "width": 5,
+          "height": 3,
+          "moves": 4
+        },
+        {
+          "id": "gradient-daily-027",
+          "width": 4,
+          "height": 4,
+          "moves": 10
+        },
+        {
+          "id": "gradient-daily-028",
+          "width": 5,
+          "height": 4,
+          "moves": 7
+        },
+        {
+          "id": "gradient-daily-029",
+          "width": 5,
+          "height": 5,
+          "moves": 8
+        },
+        {
+          "id": "gradient-daily-030",
+          "width": 5,
+          "height": 4,
+          "moves": 9
+        }
+      ],
+      "reusedOldVersion": "5e53be4bc30c83fbcf0a1b829d697cefe9ac0b8de5b8066af35599efac7a32d2",
+      "newVersion": "cf74ffee78a7c7f7c01526cd7c270800255d9a4a409a05d1e953786896b3c6b6",
+      "offlineReplay": true,
+      "distinctWins": [
+        "2026-01-31"
+      ],
+      "limits": "Injected dated feed and trusted clock. No public source, shared rewards or native runtime."
+    },
+    "stagedEvent": {
+      "browser": "153.0.8010.0",
+      "lastGoalChangedFrom": "3/4",
+      "lastGoalChangedTo": "4/4",
+      "firstBookClaimsAfterReplay": 1,
+      "curatedOccasionOffline": true,
+      "stagedAuthoredEvent": true,
+      "eventDate": "2026-02-01",
+      "eventMoves": 3,
+      "eventWins": 1,
+      "cycleCancellationPreservedSnapshot": true,
+      "limits": "Actual book and event play with a test UTC date. Live dates and cycle reset are not enabled."
+    },
+    "legacyFixture": {
+      "browser": "153.0.8010.0",
+      "authoredSnapshot": false,
+      "completedLevel": "daily-2026-11-20",
+      "moves": 1,
+      "sameDailyStartOnTwoProfiles": true,
+      "acrossUtcMidnight": [
+        "2026-11-20",
+        "2026-11-21"
+      ],
+      "verifiedWireBytes": false,
+      "corruptUpdatePreservedArchive": false,
+      "bankPasses": [],
+      "reusedOldVersion": "v1",
+      "newVersion": "v2",
+      "offlineReplay": true,
+      "distinctWins": [
+        "2026-11-20"
+      ],
+      "limits": "Injected dated feed and trusted clock. No public source, shared rewards or native runtime."
+    }
+  },
+  "editorialReview": {
+    "repeatedTenSlotStructure": true,
+    "sameSizeNeighborsInSourceOrder": 3,
+    "sameSizeNeighborsInDraftOrder": 0,
+    "undatedDraftOrder": [
+      "gradient-daily-001",
+      "gradient-daily-002",
+      "gradient-daily-003",
+      "gradient-daily-004",
+      "gradient-daily-006",
+      "gradient-daily-005",
+      "gradient-daily-008",
+      "gradient-daily-007",
+      "gradient-daily-009",
+      "gradient-daily-010",
+      "gradient-daily-012",
+      "gradient-daily-011",
+      "gradient-daily-015",
+      "gradient-daily-020",
+      "gradient-daily-014",
+      "gradient-daily-016",
+      "gradient-daily-013",
+      "gradient-daily-017",
+      "gradient-daily-018",
+      "gradient-daily-019",
+      "gradient-daily-021",
+      "gradient-daily-024",
+      "gradient-daily-028",
+      "gradient-daily-022",
+      "gradient-daily-026",
+      "gradient-daily-027",
+      "gradient-daily-023",
+      "gradient-daily-025",
+      "gradient-daily-029",
+      "gradient-daily-030"
+    ],
+    "closestMovablePairs": [
+      {
+        "id": "gradient-daily-027",
+        "minimumNominalOklab": 0.036544753,
+        "closestMovablePair": [
+          1,
+          2
+        ]
+      },
+      {
+        "id": "gradient-daily-016",
+        "minimumNominalOklab": 0.04032124,
+        "closestMovablePair": [
+          8,
+          9
+        ]
+      },
+      {
+        "id": "gradient-daily-010",
+        "minimumNominalOklab": 0.040475707,
+        "closestMovablePair": [
+          8,
+          9
+        ]
+      }
+    ],
+    "sourceValidationSha256": "47c2706d62ee15f31a6f49fc31229522596e6ae0d206495ddf5a2d51c94d2da7"
+  },
+  "checks": {
+    "unitTests": 192,
+    "addedReaderCases": 7,
+    "publisherTests": 4,
+    "specFiles": 40,
+    "androidWebAssets": "PASS",
+    "yandexUploadCheck": "PASS",
+    "pinnedGuidanceDoctor": "PASS"
+  },
+  "livePublication": "NOT RUN",
+  "humanPlaytest": "NOT RUN",
+  "nativeRuntime": "NOT RUN",
+  "kitImpact": "REUSE"
+}
