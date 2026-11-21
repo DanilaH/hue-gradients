@@ -31,6 +31,8 @@ import { colourPrism, flashPrismEdge, victoryPrism } from './victoryPrism';
 import { browserExportFiles, type ExportFiles } from '../app/exportFiles';
 import './game.css';
 
+const clockNow = () => Math.floor(performance.timeOrigin + performance.now());
+
 type Layer = 'none' | 'secret' | 'help' | 'help-menu' | 'pin-guide' | 'result' | 'meta' | 'restart' | 'recovery' | 'settings';
 interface Activity extends Pick<GameplayActivityCoordinator, 'isBlocked' | 'onBlockedChange' | 'setGameplayDesired'> {}
 
@@ -38,6 +40,11 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   const fingerprints = new Map(await Promise.all(levels.map(async level => [level.id, await hashText(fingerprintPayload(level))] as const)));
   const session = new Session(store, fingerprints);
   await session.load();
+  // A newly mounted page resumes the last committed remaining time in its own clock.
+  const savedTimed = activeTimed(session.state.timedProgress)?.run.startedAt;
+  const savedPersonal = activePersonal(session.state.personalProgress)?.clock?.startedAt;
+  if (savedTimed != null) await session.act({ kind: 'timed-pause', now: savedTimed });
+  if (savedPersonal != null) await session.act({ kind: 'personal-pause', now: savedPersonal });
   const exportFiles = options.exportFiles ?? browserExportFiles();
   const current = () => {
     const personal = activePersonal(session.state.personalProgress);
@@ -109,8 +116,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       if (!attempt) return;
       try { options.onIntent?.({ kind: 'swap-intent', mode: gameMode(session.state) }); }
       catch { /* Analytics cannot block a puzzle gesture. */ }
-      if (personal) void run({ kind: 'personal-swap', from, to, attemptId: attempt.attemptId, now: Date.now() });
-      else if (timed) void run({ kind: 'timed-swap', from, to, attemptId: attempt.attemptId, now: Date.now() });
+      if (personal) void run({ kind: 'personal-swap', from, to, attemptId: attempt.attemptId, now: clockNow() });
+      else if (timed) void run({ kind: 'timed-swap', from, to, attemptId: attempt.attemptId, now: clockNow() });
       else void run({ kind: daily ? 'daily-swap' : challenge ? 'challenge-swap' : own ? 'author-swap' : 'swap', from, to, attemptId: attempt.attemptId });
     },
     pin: position => {
@@ -263,13 +270,13 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     return run({ kind: 'personal-issue', day: localCalendarDay() });
   }
   function playPersonal(key: string, restart: boolean): void {
-    void run({ kind: 'personal-open', key, restart, attemptId: crypto.randomUUID(), now: Date.now() }, () => {
+    void run({ kind: 'personal-open', key, restart, attemptId: crypto.randomUUID(), now: clockNow() }, () => {
       metaHistory = [];
       layer = gameLayer();
     });
   }
   function leavePersonal(): void {
-    void run({ kind: 'personal-leave', now: Date.now() }, () => {
+    void run({ kind: 'personal-leave', now: clockNow() }, () => {
       metaReturn = gameLayer();
       metaHistory = [{ kind: 'chapter', levelId: session.state.activeLevelId }];
       metaRoute = { kind: 'personal' };
@@ -278,25 +285,25 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     });
   }
   function playTimed(): void {
-    void run({ kind: 'timed-open', id: crypto.randomUUID(), now: Date.now() }, () => {
+    void run({ kind: 'timed-open', id: crypto.randomUUID(), now: clockNow() }, () => {
       metaHistory = [];
       layer = gameLayer();
     });
   }
   function leaveTimed(): void {
-    void run({ kind: 'timed-leave', now: Date.now() }, () => challengeLobby());
+    void run({ kind: 'timed-leave', now: clockNow() }, () => challengeLobby());
   }
   function updateTimedClock(): void {
     if (!alive) return;
     const timed = session.state.timedProgress?.active ? session.state.timedProgress : undefined;
     const personal = activePersonal(session.state.personalProgress);
     const timer = timed?.run ?? (personal?.status === 'playing' ? personal.clock : undefined);
-    if (!timer || timer.remainingMs === 0) return;
+    if (!timer || timer.remainingMs === 0) { pauseRequestedAt = null; return; }
     const mode = timed ? 'timed' : 'personal';
-    const now = Date.now();
+    const now = clockNow();
     const wantRunning = layer === 'none' && !activity.isBlocked() && !session.pending;
-    if (wantRunning) pauseRequestedAt = null;
-    else pauseRequestedAt ??= now;
+    if (timer.startedAt === null) pauseRequestedAt = null;
+    else if (!wantRunning) pauseRequestedAt ??= now;
     const remaining = timedRemaining(timer, pauseRequestedAt ?? now);
     if (layer === 'none') {
       const guidance = byId('guidance');
@@ -305,14 +312,15 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       if (guidance.textContent !== label) guidance.textContent = label;
     }
     if (!ready || busy || queuedClock || session.pending) return;
-    const next = !wantRunning && timer.startedAt !== null ? 'pause'
+    const next = pauseRequestedAt !== null && timer.startedAt !== null ? 'pause'
       : wantRunning && timer.startedAt === null ? 'resume'
       : wantRunning && remaining === 0 ? 'expire' : null;
     if (!next) return;
+    const at = next === 'pause' ? pauseRequestedAt ?? now : now;
     queuedClock = true;
     queueMicrotask(() => {
       queuedClock = false;
-      if (alive) void run({ kind: `${mode}-${next}`, now: pauseRequestedAt ?? Date.now() });
+      if (alive) void run({ kind: `${mode}-${next}`, now: at });
     });
   }
   function askRestart(id: string): void { restartLevelId = id; restartReturn = layer; scene.cancel(); layer = 'restart'; render(); }

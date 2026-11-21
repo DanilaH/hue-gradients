@@ -1,11 +1,12 @@
 import { challenges } from './challenges';
-import { createAttempt, proposeSwap, validateAttempt, type Attempt } from './puzzle';
+import { createAttempt, proposeSwap, validateAttempt, type Attempt, type LevelDefinition } from './puzzle';
+import { timedField } from './timedFields';
 
 export const TIME_TRIAL_MS = 10 * 60 * 1000;
 const bank = challenges.slice(0, 6).map((entry, index) => Object.freeze({
   ...entry.level, id: `timed-v1-${index + 1}`, title: `Поле ${index + 1}`,
 }));
-const definition = (round: number) => bank[round % bank.length]!;
+const legacyField = (round: number) => bank[round % bank.length]!;
 const attemptKey = (id: string, round: number) => `${id}:${round}`;
 
 interface TimedRun {
@@ -14,6 +15,7 @@ interface TimedRun {
   readonly remainingMs: number;
   readonly startedAt: number | null;
   readonly attempt: Attempt;
+  readonly field?: LevelDefinition;
 }
 export interface TimedProgress {
   readonly active: boolean;
@@ -30,12 +32,13 @@ export type TimedAction =
   | { kind: 'timed-swap'; from: number; to: number; attemptId: string; now: number };
 
 const safeCounter = (n: number) => Number.isSafeInteger(n) && n >= 0;
+const definition = (run: TimedRun) => run.field ?? legacyField(run.cleared);
 
 export function timedRemaining(run: Pick<TimedRun, 'remainingMs' | 'startedAt'>, now: number): number {
   return Math.max(0, run.remainingMs - (run.startedAt === null ? 0 : Math.max(0, now - run.startedAt)));
 }
 export function activeTimed(progress?: TimedProgress) {
-  return progress?.active ? { ...progress, level: definition(progress.run.cleared) } : null;
+  return progress?.active ? { ...progress, level: definition(progress.run) } : null;
 }
 function settleClock(progress: TimedProgress, now: number, active: boolean): TimedProgress {
   const { run } = progress;
@@ -51,9 +54,10 @@ export function applyTimed(progress: TimedProgress | undefined, action: TimedAct
     if (progress?.active) return progress;
     if (progress && progress.run.remainingMs > 0) return { ...progress, active: true, run: { ...progress.run, startedAt: action.now } };
     if (!/^[a-zA-Z0-9._-]{1,120}$/.test(action.id) || progress?.run.id === action.id) return progress;
+    const field = timedField(action.id, 0);
     return { active: true, best: progress?.best ?? 0, finished: progress?.finished ?? 0, run: {
       id: action.id, cleared: 0, remainingMs: TIME_TRIAL_MS, startedAt: action.now,
-      attempt: createAttempt(definition(0), attemptKey(action.id, 0)),
+      field, attempt: createAttempt(field, attemptKey(action.id, 0)),
     } };
   }
   if (!progress?.active) return progress;
@@ -67,11 +71,14 @@ export function applyTimed(progress: TimedProgress | undefined, action: TimedAct
   const remainingMs = timedRemaining(run, action.now);
   if (remainingMs === 0 || action.kind === 'timed-pause') return settleClock(progress, action.now, true);
   if (action.kind !== 'timed-swap' || action.attemptId !== run.attempt.attemptId) return progress;
-  const attempt = proposeSwap(definition(run.cleared), run.attempt, action.from, action.to);
+  const attempt = proposeSwap(definition(run), run.attempt, action.from, action.to);
   if (attempt === run.attempt) return progress;
-  if (!attempt.completed) return { ...progress, run: { ...run, attempt } };
+  const checkpoint = { ...run, remainingMs, startedAt: action.now };
+  if (!attempt.completed) return { ...progress, run: { ...checkpoint, attempt } };
   const cleared = run.cleared + 1;
-  return { ...progress, run: { ...run, cleared, attempt: createAttempt(definition(cleared), attemptKey(run.id, cleared)) } };
+  const field = run.field ? timedField(run.id, cleared) : legacyField(cleared);
+  return { ...progress, run: { ...checkpoint, cleared, ...(run.field ? { field } : {}),
+    attempt: createAttempt(field, attemptKey(run.id, cleared)) } };
 }
 
 export function validateTimedProgress(progress: TimedProgress): void {
@@ -84,5 +91,6 @@ export function validateTimedProgress(progress: TimedProgress): void {
       !run.attempt || run.attempt.attemptId !== attemptKey(run.id, run.cleared) || run.attempt.completed || run.attempt.assisted) {
     throw new Error('Invalid timed trial');
   }
-  validateAttempt(definition(run.cleared), run.attempt);
+  if (run.field && JSON.stringify(run.field) !== JSON.stringify(timedField(run.id, run.cleared))) throw new Error('Invalid timed field');
+  validateAttempt(definition(run), run.attempt);
 }

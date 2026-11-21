@@ -117,7 +117,7 @@ export function applyPersonal(state: Workspace, action: PersonalAction): Persona
   if (action.kind !== 'personal-swap' || action.attemptId !== task.attempt?.attemptId) return progress;
   const attempt = proposeSwap(getLevel(task.levelId), task.attempt, action.from, action.to);
   if (attempt === task.attempt) return progress;
-  return patch({ ...task, attempt, ...(clock && attempt.completed ? { clock: { remainingMs: remaining!, startedAt: null } } : {}) },
+  return patch({ ...task, attempt, ...(remaining !== undefined ? { clock: { remainingMs: remaining, startedAt: attempt.completed ? null : action.now } } : {}) },
     key, attempt.completed && !progress.earned.includes(key) ? [...progress.earned, key] : progress.earned);
 }
 export function validatePersonal(progress: PersonalProgress): void {

@@ -30,6 +30,9 @@ export function normalizedCorners(width: number, height: number, input: readonly
 /** Integer-rational bilinear interpolation in encoded sRGB bytes; half-up rounding. */
 export function fieldColors(width: number, height: number, corners: readonly string[]): string[] {
   if (!integer(width, 1, 6) || !integer(height, 1, 5) || corners.length !== 4 || corners.some(c => !rgb.test(c))) throw new Error('Invalid palette or dimensions');
+  return interpolateGradient(width, height, corners);
+}
+export function interpolateGradient(width: number, height: number, corners: readonly string[]): string[] {
   const channels = corners.map(c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16)));
   const dx = Math.max(1, width - 1), dy = Math.max(1, height - 1), denominator = dx * dy;
   return Array.from({ length: width * height }, (_, i) => {
