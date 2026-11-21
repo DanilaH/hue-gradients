@@ -11,11 +11,13 @@ jobs:
         with:
           node-version-file: .nvmrc
       - run: node tools/check-spec.mjs
+      - run: python3 tests/stage_daily_test.py -v
       - name: Install only pure-domain test dependencies
         run: |
           node --input-type=module -e "import fs from 'node:fs'; const p=JSON.parse(fs.readFileSync('package.json')); fs.writeFileSync('package.json',JSON.stringify({private:true,type:'module',devDependencies:Object.fromEntries(['vitest','typescript','vite'].map(k=>[k,p.devDependencies[k]]))}));"
           npm install --ignore-scripts --no-audit --no-fund
-      - run: npx vitest run tests/puzzle.test.ts tests/workspace.test.ts tests/campaign.test.ts
+      - name: Check puzzles, board controls and release config without private dependencies
+        run: npx vitest run tests/puzzle.test.ts tests/board-camera.test.ts tests/shapes.test.ts tests/time-trial.test.ts tests/release-config.test.ts
   host:
     runs-on: ubuntu-24.04
     steps:
