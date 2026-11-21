@@ -1,0 +1,186 @@
+{
+  "auditBranch": "feat/m0-foundation",
+  "commit": "7dfdf03cef372c4445f0c10511163ccb3907dd60",
+  "gameVersion": "0.4.12 (16)",
+  "date": "2026-11-20",
+  "sourceInventoryRows": 89,
+  "ledgerCounts": {
+    "MATCH": 11,
+    "PARTIAL": 29,
+    "MISSING": 43,
+    "UNKNOWN": 6
+  },
+  "packageCounts": {
+    "01": {
+      "MATCH": 6,
+      "PARTIAL": 7
+    },
+    "02": {
+      "PARTIAL": 8,
+      "MATCH": 2
+    },
+    "03": {
+      "MISSING": 6,
+      "MATCH": 1
+    },
+    "04": {
+      "PARTIAL": 4,
+      "MISSING": 6,
+      "UNKNOWN": 1
+    },
+    "05": {
+      "MISSING": 8,
+      "UNKNOWN": 1
+    },
+    "06": {
+      "MISSING": 3,
+      "MATCH": 1,
+      "PARTIAL": 1,
+      "UNKNOWN": 1
+    },
+    "07": {
+      "MATCH": 1,
+      "PARTIAL": 4,
+      "MISSING": 5
+    },
+    "08": {
+      "MISSING": 13,
+      "UNKNOWN": 3
+    },
+    "09": {
+      "PARTIAL": 4,
+      "MISSING": 1
+    },
+    "10": {
+      "PARTIAL": 1,
+      "MISSING": 1
+    }
+  },
+  "runtime": {
+    "TypeScript": "pass",
+    "specIntegrity": {
+      "files": 40,
+      "requirementIds": 71
+    },
+    "vitest": 162,
+    "browserScenarios": {
+      "board": 21,
+      "presentation": 12,
+      "meta": 15,
+      "help": 7,
+      "editor": 19,
+      "wallpaper": 6
+    },
+    "pngPixelChecks": 8
+  },
+  "independentBrowser": {
+    "centralPreview": {
+      "afterTap": "meta",
+      "afterButton": "none"
+    },
+    "allHelp": {
+      "levels": 60,
+      "pulseChecks": 1220,
+      "autoSwaps": 654
+    },
+    "seam": {
+      "x": 200,
+      "y": 398,
+      "canvas": {
+        "x": 9.390625,
+        "y": 52,
+        "width": 381.21875,
+        "height": 692
+      },
+      "atBoundary": {
+        "level": "gradient-001",
+        "moves": 0,
+        "completed": false
+      },
+      "twoPixelsInside": {
+        "level": "gradient-001",
+        "moves": 1,
+        "completed": true
+      }
+    },
+    "landscape": {
+      "viewport": [
+        568,
+        320
+      ],
+      "level": "gradient-003",
+      "dims": [
+        1,
+        5
+      ],
+      "canvas": {
+        "x": 10,
+        "y": 52,
+        "width": 548,
+        "height": 212
+      },
+      "cellWidth": 548,
+      "cellHeight": 40.8
+    }
+  },
+  "banks": {
+    "Poluson": {
+      "levels": 60,
+      "singleCycle": 60,
+      "multipleCycles": 0,
+      "cycleRange": [
+        1,
+        1
+      ],
+      "minimumSwapsMedian": 11.0,
+      "movableMedian": 12.0
+    },
+    "chapterMedian": [
+      7,
+      9,
+      14,
+      17
+    ],
+    "ColorPuzzle": {
+      "levels": 740,
+      "singleCycle": 38,
+      "multipleCycles": 702,
+      "cycleRange": [
+        1,
+        13
+      ],
+      "minimumSwapsMedian": 138.0,
+      "movableMedian": 144.0
+    },
+    "color13by13": 454
+  },
+  "permutationMethod": "Walk tile IDs in each shipped permutation after excluding pinned positions. Color Puzzle: read DEX string_ids, match encoded boards, validate coordinates, inspect all 740 unique strings. Poluson: immutable first15 + candidates[15:]. The 702 multi-cycle Color boards also have at least two cycles of length >=2. Math minimum for arbitrary swaps = movable tiles minus cycle count including singletons. Not a measured player score.",
+  "apkSha256": "037a4687d85013fb991b7d4b2eba03d06c4a5f8088a1d0162adfaf1f8c5e2111",
+  "apkPublicAssetsInDesktopChromium": [
+    {
+      "engine": "92.0.4512.0",
+      "state": null,
+      "screen": "Не удалось открыть сохранение. Данные сохранены; попробуй ещё раз.\n\nПовторить",
+      "errors": []
+    },
+    {
+      "engine": "141.0.7390.37",
+      "state": "ready",
+      "screen": "‹ Уровни\nУровень 1\n⋯\n\nПоменяй две плитки местами",
+      "errors": []
+    }
+  ],
+  "diagnosticSourceReplay": [
+    "92.0.4512.0",
+    [
+      "TypeError: Object.hasOwn is not a function",
+      "Не удалось открыть сохранение. Данные сохранены; попробуй ещё раз.\n\nПовторить"
+    ]
+  ],
+  "originalBuilds": {
+    "I Love Hue": "1.3.1 (176), database.json: 955 boards, 325 rect/315 hex/315 tri",
+    "I Love Hue Too": "2.1.1 (1013), Unity bundle: 1950 levels, 480 boss, 160 secret. Two lists of 25/29 native windows matched by hash.",
+    "Color Puzzle": "6.13.0 (142), classes.dex, 740 campaign board strings; 454 boards 13x13."
+  },
+  "deviceAcceptance": "No physical phone run. Browser events and actual extracted APK web assets reported independently."
+}
