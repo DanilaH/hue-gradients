@@ -1,13 +1,40 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
 
 const require = createRequire(process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES
   ? `${process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES}/package.json` : import.meta.url);
 const { chromium } = require('playwright');
 const output = '.test-output/daily';
 const base = 'http://127.0.0.1:4187';
+async function stagedFeed(directory, version) {
+  const read = async (path, hash) => {
+    const bytes = await readFile(join(directory, path));
+    if (hash) assert.equal(createHash('sha256').update(bytes).digest('hex'), hash);
+    return JSON.parse(bytes);
+  };
+  const manifest = await read('catalog.json');
+  const days = [];
+  for (const [month, digest] of Object.entries(manifest.months)) {
+    for (const entry of await read(`months/${month}.json`, digest)) {
+      const level = await read(`levels/${entry.sha256}.json`, entry.sha256);
+      assert.equal(level.id, entry.candidateId);
+      days.push({ date: entry.date, level });
+    }
+  }
+  return { source: 'Staged authored bank (test UTC clock)', version, through: manifest.through,
+    verifiedNowMs: Date.parse(`${manifest.through}T${version === 'v1' ? '23:59:59' : '00:00:00'}Z`), days };
+}
+
+const [beforeDirectory, afterDirectory] = process.argv.slice(2);
+assert.equal(Boolean(beforeDirectory), Boolean(afterDirectory), 'Supply both staged snapshots');
+const staged = beforeDirectory ? {
+  before: await stagedFeed(beforeDirectory, 'v1'),
+  after: await stagedFeed(afterDirectory, 'v2'),
+} : null;
 await mkdir(output, { recursive: true });
 const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', '--host', '127.0.0.1',
   '--port', '4187', '--strictPort'], { stdio: 'ignore' });
@@ -22,7 +49,7 @@ try {
     args: ['--no-sandbox', '--enable-unsafe-swiftshader'] });
   const viewport = { width: 390, height: 740 };
   const recording = process.env.RECORD_EPISODE === '1';
-  const first = '2026-11-20', second = '2026-11-21';
+  const first = staged?.before.through ?? '2026-11-20', second = staged?.after.through ?? '2026-11-21';
   const errors = [];
   async function profile(record) {
     const context = await browser.newContext({ viewport, hasTouch: true, isMobile: true,
@@ -33,7 +60,7 @@ try {
     const page = await context.newPage();
     page.on('pageerror', error => errors.push(error.message));
     const boot = async () => {
-      await page.evaluate(async () => {
+      await page.evaluate(async (staged) => {
         const { mountGame } = await import('/src/game/mountGame.ts');
         const { openIndexedDb } = await import('/src/local-store/indexed-db.ts');
         const { getLevel } = await import('/src/domain/levels.ts');
@@ -44,6 +71,7 @@ try {
             const phase = sessionStorage.getItem('fixture-daily') ?? 'before';
             if (phase === 'offline') throw new Error('Fixture disconnected');
             const before = phase === 'before';
+            if (staged) return before ? staged.before : staged.after;
             return {
               source: 'Dated test fixture', version: before ? 'v1' : 'v2', verifiedNowMs: before
                 ? Date.UTC(2026, 10, 20, 23, 59, 59) : Date.UTC(2026, 10, 21),
@@ -54,7 +82,7 @@ try {
             };
           },
         });
-      });
+      }, staged);
     };
     await page.goto(`${base}/daily-fixture.html`);
     await boot();
@@ -77,10 +105,26 @@ try {
     return { book: snapshot.dailyProgress, completed: snapshot.completed, rights: snapshot.rights,
       distinctWins: facts.filter(fact => fact.firstDailyWin === true).map(fact => fact.dailyDate) };
   });
-  const swap = async page => {
+  const solve = async page => {
+    const { book } = await state(page);
+    const { width, height, minimumSwaps } = book.slots[book.active].level;
+    const order = [...book.attempts[book.active].board];
     const box = await page.locator('#board-region canvas').boundingBox();
-    for (const position of [1, 2]) await page.touchscreen.tap(box.x + (position + .5) * box.width / 4, box.y + box.height / 2);
+    let moves = 0;
+    for (const [position, tile] of order.entries()) {
+      if (position === tile) continue;
+      const otherPosition = order.indexOf(position);
+      for (const target of [position, otherPosition]) {
+        await page.touchscreen.tap(box.x + (target % width + .5) * box.width / width,
+          box.y + (Math.floor(target / width) + .5) * box.height / height);
+      }
+      await idle(page);
+      [order[position], order[otherPosition]] = [order[otherPosition], order[position]];
+      moves++;
+    }
+    assert.equal(moves, minimumSwaps);
     await page.waitForSelector('#hue-app[data-layer=result]');
+    assert.equal((await state(page)).book.attempts[book.active].moves, minimumSwaps);
   };
   await opening(one.page);
   assert.equal(await slot(one.page, second).count(), 0);
@@ -93,9 +137,14 @@ try {
   const before = await state(one.page), other = await state(two.page);
   await two.context.close();
   assert.deepEqual(before.book.attempts[first].board, other.book.attempts[first].board);
+  if (staged) {
+    const level = staged.before.days.find(slot => slot.date === first).level;
+    assert.deepEqual(before.book.slots[first].level, level);
+    assert.deepEqual(before.book.attempts[first].board, level.startTileAtPosition);
+  }
   assert.equal(before.book.slots[first].version, 'v1');
   await one.page.evaluate(() => sessionStorage.setItem('fixture-daily', 'after'));
-  await swap(one.page);
+  await solve(one.page);
   assert.equal((await state(one.page)).book.active, first);
   if (recording) await one.page.waitForTimeout(500);
   await one.page.getByRole('button', { name: 'К календарю' }).tap();
@@ -114,7 +163,7 @@ try {
   await slot(one.page, first).tap();
   await idle(one.page);
   assert.deepEqual((await state(one.page)).book.attempts[first].board, before.book.attempts[first].board);
-  await swap(one.page);
+  await solve(one.page);
   const offline = await state(one.page);
   assert.deepEqual(offline.distinctWins, [first]);
   assert.deepEqual(offline.book.solved, [first]);
@@ -126,7 +175,9 @@ try {
   const video = one.page.video();
   await one.context.close();
   if (video) await video.saveAs(`${output}/daily.webm`);
-  const report = { browser: browser.version(), sameDailyStartOnTwoProfiles: true, acrossUtcMidnight: [first, second],
+  const report = { browser: browser.version(), authoredSnapshot: Boolean(staged),
+    completedLevel: offline.book.slots[first].level.id, moves: offline.book.attempts[first].moves,
+    sameDailyStartOnTwoProfiles: true, acrossUtcMidnight: [first, second],
     reusedOldVersion: 'v1', offlineReplay: true, distinctWins: offline.distinctWins, clipStartMillis, clipMillis,
     limits: 'Injected dated feed and trusted clock. No public source, shared rewards or native runtime.' };
   await writeFile(`${output}/browser.json`, JSON.stringify(report, null, 2) + '\n');
