@@ -144,16 +144,28 @@ footer { min-height: 56px; padding: 2px 12px 6px; display: flex; gap: 10px; alig
 #game-dialog[data-layer=preferences] .setting input:focus { outline: 0; }
 #game-dialog[data-victory=true] { isolation: isolate; justify-content: center; padding-bottom: clamp(80px,19vh,155px); }
 #game-dialog[data-victory=true]::backdrop { background: transparent; }
-.victory-art, .victory-effects { display: none; position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-#game-dialog[data-victory=true]:not([data-victory-phase=approach]) .victory-art { display: block; z-index: -3; }
-#game-dialog[data-victory=true]:not([data-victory-phase=approach])::before {
-  content: ''; position: absolute; inset: 0; z-index: -2; pointer-events: none;
+#game-dialog[data-victory=true]:not([data-victory-phase=still]) { opacity: var(--victory-opacity,0); }
+#game-dialog[data-victory=true][data-victory-phase]:not([data-victory-phase=still]) #dialog-actions { pointer-events: none; }
+#game-dialog[data-victory=true]:is([data-victory-phase=approach],[data-victory-phase=landed],[data-victory-phase=hold]) > * {
+  visibility: hidden;
+}
+.victory-colour {
+  position: absolute; inset: 0; z-index: 2; display: none; pointer-events: none;
+}
+#hue-app[data-victory=true]:not([data-victory-phase=approach]) .victory-colour { display: block; }
+.victory-art, .victory-effects { position: absolute; width: 100%; }
+.victory-art {
+  /* Extra image on both vertical edges covers the complete recoil without a blank strip. */
+  top: -3px; height: calc(100% + 6px);
+}
+.victory-colour::after {
+  content: ''; position: absolute; inset: -3px 0; pointer-events: none;
   background:
     repeating-conic-gradient(#200a341b 0 25%,#fff2e00e 0 50%) 0 0 / 2px 2px,
     radial-gradient(ellipse at 50% 38%,#28203e0d 10%,#1a122d4c 75%,#130d2263);
 }
-#game-dialog[data-victory-phase=landed] .victory-effects { display: block; z-index: -1; }
-#game-dialog[data-victory-phase=approach] > :is(#victory-prism,h2,#dialog-copy,#chapter-unlock) { opacity: 0; }
+.victory-effects { display: none; inset: 0; height: 100%; z-index: 1; }
+#hue-app[data-victory-phase=landed] .victory-effects { display: block; }
 #game-dialog[data-victory=true] h2 {
   font-weight: 720; letter-spacing: .15em;
   text-shadow: 0 2px 3px #1c142e,0 0 32px #200c39;
@@ -175,10 +187,6 @@ footer { min-height: 56px; padding: 2px 12px 6px; display: flex; gap: 10px; alig
 #game-dialog[data-victory=true] .result-next { text-transform: uppercase; letter-spacing: .18em; font-weight: 700; }
 #game-dialog[data-victory=true] .result-next::before { content: '→'; position: absolute; right: 18px; }
 #game-dialog[data-victory=true] #dialog-actions button:focus-visible { outline: 0; }
-#hue-app[data-motion=true] #game-dialog[data-victory-phase=landed] > :is(#victory-prism,h2,#dialog-copy,#chapter-unlock) {
-  animation: result-light-in 270ms ease-out both;
-}
-@keyframes result-light-in { from { opacity: 0; } to { opacity: 1; } }
 @media (orientation: landscape) and (max-height:450px) {
   #game-dialog[data-layer=settings] #dialog-actions, #game-dialog[data-layer=preferences] #dialog-actions {
     grid-template-columns: repeat(2,minmax(0,1fr)); column-gap: 1px; width: min(100%,380px);

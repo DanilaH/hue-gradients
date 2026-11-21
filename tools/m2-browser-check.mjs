@@ -38,7 +38,7 @@ assert all(abs(sum(p[c] for p in pixels)/len(pixels)-colour[c])<=2 for c in rang
   assert.equal(await page.evaluate(()=>window.__feedback.audio+window.__feedback.haptic.length),0);
   reports.push('lifted tile keeps a textured face with its authored mean colour, leaves a recess and Escape restores the board silently');
   await tap(1); await tap(2); await idle(); await page.waitForSelector('#hue-app[data-layer=result]');
-  assert.equal(await page.getByRole('button',{name:'Дальше',exact:true}).isEnabled(),true);
+  assert.equal(await page.getByRole('button',{name:'Дальше',exact:true}).count(),0);
   await page.waitForFunction(()=>window.__feedback.haptic.length===1); await page.waitForTimeout(200);
   const accepted=await page.evaluate(()=>window.__feedback); assert.equal(accepted.audio,1); assert.deepEqual(accepted.busy,['false']); reports.push('one victory cue after commit; CTA immediately enabled');
   const facets=()=>page.locator('#victory-prism').evaluate(prism=>Array.from({length:4},(_,i)=>prism.style.getPropertyValue('--facet-'+i)));

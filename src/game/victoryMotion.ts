@@ -11,9 +11,17 @@ const DELAY_STEP_MS = 66;
 const DELAY_BANDS = 3;
 export const LANDING_MS = LIFT_START_MS + DELAY_BANDS * DELAY_STEP_MS + CONTACT_MS;
 export const WAVE_MS = 660;
-export const VICTORY_END_MS = LANDING_MS + WAVE_MS + 390;
+export const RESULT_HOLD_MS = 250;
+export const RESULT_REVEAL_MS = 400;
+const RECOIL_PEAK_MS = 36;
+const RECOIL_RETURN_MS = 120;
 export const amount = (value: number) => Math.min(1, Math.max(0, value));
 export const ease = (t: number) => t * t * (3 - 2 * t);
+
+export function colourRecoil(age: number): number {
+  if (age <= RECOIL_PEAK_MS) return 2 * ease(amount(age / RECOIL_PEAK_MS));
+  return 2 * (1 - ease(amount((age - RECOIL_PEAK_MS) / RECOIL_RETURN_MS)));
+}
 
 export function tileDelays(points: readonly Point[], origin: Point): number[] {
   const distances = points.map(point => Math.hypot(point.x - origin.x, point.y - origin.y));

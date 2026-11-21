@@ -2,7 +2,7 @@
 
 **21 Nov · latest owner direction.** Follow the [angular menus, visible tile dither and landing sequence brief](design/dreamy-psx/README.md) for the next presentation pass. Its sampled-area colour check supersedes the historical single-centre-pixel rule for displayed tiles. Export and underlying tile data retain exact colour contracts. The original body below documents the earlier baseline.
 
-Status: EXECUTABLE OWNER-REVIEW CANDIDATE for ART-01…09. Latest playable feel preview is 0.4.30/V1.1. Timing for individual contacts, pause colours and fine grain is in the [V1.1 receipt](evidence/v11-dreamy-psx-2026-11-22.json). An original 12-second ambient loop is opt-in, controlled separately from effects and suspended in the background. [Queue G1](evidence/queue-g1-2026-11-20.json). Owner reference is docs/spec/reference/owner-art-reference.png (SHA256 872fd9800184a2e4cc52716cd258cbcb194841782745415ae6dd710aedc586ec). Its static concept establishes light, colour and texture.
+Status: EXECUTABLE OWNER-REVIEW CANDIDATE for ART-01…09. Latest playable feel preview is 0.4.31/V1.2. The 006 capture aligns the last gesture and compares the rhythm with 0.4.30. See the [V1.2 receipt](evidence/v12-dreamy-psx-2026-11-22.json). An original 12-second ambient loop is opt-in, controlled separately from effects and suspended in the background. [Queue G1](evidence/queue-g1-2026-11-20.json). Owner reference is docs/spec/reference/owner-art-reference.png (SHA256 872fd9800184a2e4cc52716cd258cbcb194841782745415ae6dd710aedc586ec). Its static concept establishes light, colour and texture.
 
 ## Confirmed gaps and implemented changes
 

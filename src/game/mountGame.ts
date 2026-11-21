@@ -29,7 +29,7 @@ import { renderAlbum, type AlbumPosition, type AlbumRoute } from './albumView';
 import { WorkCardView } from './workCardView';
 import { colourPrism, victoryPrism } from './victoryPrism';
 import { VictoryArtwork } from './victoryArtwork';
-import { LANDING_MS, VICTORY_END_MS } from './victoryMotion';
+import { amount, ease, LANDING_MS, RESULT_HOLD_MS, RESULT_REVEAL_MS } from './victoryMotion';
 import { browserExportFiles, type ExportFiles } from '../app/exportFiles';
 import './game.css';
 
@@ -98,8 +98,12 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   let shownAlbum: AlbumRoute | null = null;
   const albumPositions = new Map<AlbumRoute['tab'], AlbumPosition>();
   const prism = byId('victory-prism');
-  const artwork = new VictoryArtwork(dialog);
-  let victoryPhase: 'approach' | 'landed' | 'still' = 'still';
+  const artwork = new VictoryArtwork(root);
+  let victoryPhase: 'approach' | 'landed' | 'hold' | 'reveal' | 'still' = 'still';
+  const heldActivation = new Set<string>();
+  const blockedActivation = new Set<string>();
+  const earlyPointers = new Set<number>();
+  const victoryWaiting = () => layer === 'result' && victoryPhase !== 'still';
   let pauseFocus = 0;
   let pauseOrigin: 'none' | 'secret' | 'help' = 'none';
   const isPause = (value: string | undefined) => value === 'settings' || value === 'preferences';
@@ -113,6 +117,22 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     setVictoryPhase('still');
     scene.finishVictory();
     artwork.clearMotion();
+    dialog.style.removeProperty('--victory-opacity');
+    syncVictoryActions(true);
+  }
+  function syncVictoryActions(focus = false): void {
+    const waiting = victoryWaiting();
+    actions.toggleAttribute('inert', waiting);
+    if (waiting) actions.setAttribute('aria-hidden', 'true');
+    else actions.removeAttribute('aria-hidden');
+    if (layer !== 'result') return;
+    for (const node of actions.querySelectorAll<HTMLButtonElement>('button')) {
+      node.disabled = waiting || busy || activity.isBlocked();
+    }
+    if (focus && dialog.open) {
+      if (waiting || busy || activity.isBlocked()) dialog.focus({ preventScroll: true });
+      else actions.querySelector('button')?.focus({ preventScroll: true });
+    }
   }
   let lastFocus: HTMLElement | null = null;
   let metaRoute: MetaRoute = { kind: 'chapter', levelId: session.state.activeLevelId };
@@ -205,7 +225,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   function button(text: string, action: () => void, quiet = false): HTMLButtonElement {
     const node = document.createElement('button'); node.type = 'button'; node.textContent = text;
     node.className = quiet ? 'quiet' : ''; node.disabled = busy || activity.isBlocked();
-    node.onclick = action; actions.append(node);
+    node.onclick = () => { if (!victoryWaiting()) action(); }; actions.append(node);
     return node;
   }
   function showMeta(route: MetaRoute): void {
@@ -416,6 +436,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     dialog.dataset.picker = String(layer === 'meta' && metaRoute.kind === 'chapter');
     dialog.dataset.chapterMenu = String(layer === 'meta' && metaRoute.kind === 'chapter' && metaRoute.chapterMenu !== undefined);
     const open = layer !== 'none' && layer !== 'help' && layer !== 'secret';
+    if (layer !== 'result') earlyPointers.clear();
     if (!open) { if (dialog.open) { dialog.close(); lastFocus?.focus(); } return; }
     const draftId = layer === 'meta' && metaRoute.kind === 'draft' ? metaRoute.draftId : null;
     if (editorDraftId !== draftId) { editorView?.destroy(); editorView = null; editorDraftId = draftId; }
@@ -599,10 +620,11 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
         button('Повторить проверку', () => void recover());
       }
     }
+    syncVictoryActions();
     if (!dialog.open) { lastFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null; dialog.showModal(); }
     if (isPause(layer) && !busy && !activity.isBlocked()) {
       (actions.querySelectorAll<HTMLElement>('button, input')[pauseFocus] ?? actions.querySelector<HTMLElement>('button, input'))?.focus({ preventScroll: true });
-    } else if (switchLayer && layer === 'result') actions.querySelector<HTMLElement>('button')?.focus({ preventScroll: true });
+    } else if (layer === 'result' && (switchLayer || document.activeElement === dialog)) syncVictoryActions(true);
   }
   function render(): void {
     if (!alive) return;
@@ -708,25 +730,38 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
         next.moves === previous.moves + cost && next.board[pair.from] === previous.board[pair.to] &&
         next.board[pair.to] === previous.board[pair.from] ? pair : null;
       const won = !!(acceptedPair && next?.completed && !timed && challenge?.status !== 'lost' && personal?.status !== 'lost');
-      if (won && motionAllowed()) setVictoryPhase('approach');
+      if (won && motionAllowed()) {
+        for (const key of heldActivation) blockedActivation.add(key);
+        setVictoryPhase('approach');
+      }
       render(); resize();
       if (eligible && timedBefore && timed?.run.cleared === timedBefore.run.cleared + 1) feedback.accepted('win');
       if (acceptedPair && previous && next) {
         scene.presentSwap(previous, next, acceptedPair.from, acceptedPair.to, motionAllowed(), cost);
         if (won && victoryPhase === 'approach') {
+          let effectsEnd = 0;
           scene.presentVictory(acceptedPair.to, (elapsed, board, target) => {
             if (elapsed < LANDING_MS) return;
-            const outer = dialog.getBoundingClientRect(), inner = region.getBoundingClientRect();
+            const outer = root.getBoundingClientRect(), inner = region.getBoundingClientRect();
             const x = inner.x - outer.x, y = inner.y - outer.y;
             const origin = { x: target.x + x, y: target.y + y };
+            const age = elapsed - LANDING_MS;
             if (victoryPhase === 'approach') {
               setVictoryPhase('landed');
-              artwork.start(level, { ...board, x: board.x + x, y: board.y + y }, origin);
+              effectsEnd = artwork.start(level, { ...board, x: board.x + x, y: board.y + y }, origin);
               atmosphere.configure(false, motionAllowed());
               feedback.accepted('win');
             }
-            if (elapsed < VICTORY_END_MS) artwork.frame(elapsed - LANDING_MS, origin);
-            else { artwork.clearMotion(); setVictoryPhase('still'); }
+            if (age < effectsEnd) { artwork.frame(age, origin); return; }
+            if (victoryPhase === 'landed') {
+              artwork.clearMotion();
+              setVictoryPhase('hold');
+            }
+            const reveal = (age - effectsEnd - RESULT_HOLD_MS) / RESULT_REVEAL_MS;
+            if (reveal < 0) return;
+            if (reveal >= 1) { stopVictory(); return; }
+            setVictoryPhase('reveal');
+            dialog.style.setProperty('--victory-opacity', String(ease(amount(reveal))));
           });
         } else if (won) feedback.accepted('win');
         else {
@@ -763,6 +798,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   }
   const back = (): boolean => {
     if (busy || layer === 'recovery') return true;
+    if (victoryWaiting()) { stopVictory(); return true; }
     scene.cancel();
     if (editorView && layer === 'meta') { void editorView.back(); return true; }
     if (workCard?.handleBack()) return true;
@@ -819,6 +855,32 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     layer = 'settings'; render();
   }, { signal: listeners.signal });
   systemMotion.addEventListener('change', () => { scene.cancel(); render(); }, { signal: listeners.signal });
+  dialog.tabIndex = -1;
+  const ignoreInput = (event: Event) => { event.preventDefault(); event.stopImmediatePropagation(); };
+  dialog.addEventListener('pointerdown', event => {
+    if (victoryWaiting()) earlyPointers.add(event.pointerId);
+    else earlyPointers.delete(event.pointerId);
+  }, { signal: listeners.signal, capture: true });
+  dialog.addEventListener('click', event => {
+    if (victoryWaiting() || event instanceof PointerEvent && earlyPointers.has(event.pointerId)) ignoreInput(event);
+  }, { signal: listeners.signal, capture: true });
+  const activationKey = (event: KeyboardEvent) => ['Enter', ' '].includes(event.key);
+  window.addEventListener('keydown', event => {
+    if (activationKey(event)) {
+      const key = event.code || event.key;
+      heldActivation.add(key);
+      if (layer === 'result' && (victoryWaiting() || event.repeat || blockedActivation.has(key))) {
+        blockedActivation.add(key);
+        ignoreInput(event);
+      }
+    } else if (victoryWaiting() && event.key === 'Tab') ignoreInput(event);
+  }, { signal: listeners.signal, capture: true });
+  window.addEventListener('keyup', event => {
+    if (!activationKey(event)) return;
+    const key = event.code || event.key;
+    heldActivation.delete(key);
+    if (blockedActivation.delete(key) && layer === 'result') ignoreInput(event);
+  }, { signal: listeners.signal, capture: true });
   dialog.addEventListener('cancel', event => { event.preventDefault(); if (!back()) { layer = 'none'; render(); } }, { signal: listeners.signal });
   window.addEventListener('keydown', event => {
     if (event.key === 'Escape' && layer === 'help' && !busy) { event.preventDefault(); layer = 'none'; render(); }
@@ -834,6 +896,9 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   const unblock = activity.onBlockedChange(blocked => {
     if (blocked) {
       foregroundEpoch++;
+      heldActivation.clear();
+      blockedActivation.clear();
+      earlyPointers.clear();
       pendingHelp = null;
       clearMark();
       scene.cancel();

@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { canSwap, type Attempt, type LevelDefinition } from '../domain/puzzle';
 import { boardGeometry, cellAt, cellCenter, hitTest, type BoardGeometry, type Cell } from './geometry';
 import { TileDither } from './tileDither';
-import { amount, ease, FRAME_END_MS, FRAME_START_MS, LANDING_MS, tileDelays, tileJump, VICTORY_END_MS } from './victoryMotion';
+import { amount, ease, FRAME_END_MS, FRAME_START_MS, LANDING_MS, tileDelays, tileJump } from './victoryMotion';
 import { clampCamera, edgeVelocity, moveCamera, REST_CAMERA, revealCell, viewBoard, type Camera, type Point } from './boardCamera';
 
 export const GAME_PRESENTABLE = 'hue:presentable';
@@ -112,7 +112,6 @@ export class PuzzleScene extends Phaser.Scene {
       beat.elapsed = elapsed;
       this.draw();
       beat.frame(elapsed, this.geometry, cellCenter(cellAt(this.geometry, beat.at)));
-      if (elapsed >= VICTORY_END_MS) this.finishVictory();
       return;
     }
     if (this.settle && performance.now() - this.settle.started >= 150) this.finishSettle();

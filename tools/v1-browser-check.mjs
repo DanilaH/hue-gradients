@@ -6,27 +6,27 @@ import { mkdir, writeFile } from 'node:fs/promises';
 const require = createRequire(process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES
   ? `${process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES}/package.json` : import.meta.url);
 const { chromium } = require('playwright');
-const out = '.test-output/v11';
+const out = '.test-output/v12';
 const port = 4198, url = `http://127.0.0.1:${port}`;
 const record = process.env.RECORD_EPISODE === '1';
 const viewport = { width: 390, height: 740 };
 await mkdir(out, { recursive: true });
-const dev = spawn(process.execPath, ['node_modules/vite/bin/vite.js', '--host', '127.0.0.1',
-  '--port', String(port), '--strictPort'], { stdio: 'ignore' });
-const baselineFolder = process.env.V11_BASELINE_DIR;
+const baselineFolder = process.env.V12_BASELINE_DIR;
 const baselinePort = 4199;
 const baselineUrl = `http://127.0.0.1:${baselinePort}`;
-const baseline = baselineFolder ? spawn(process.execPath, ['node_modules/vite/bin/vite.js', '--host', '127.0.0.1',
-  '--port', String(baselinePort), '--strictPort'], { cwd: baselineFolder, stdio: 'ignore' }) : null;
-let browser;
+const serve = (port, cwd) => spawn(process.execPath, ['node_modules/vite/bin/vite.js', '--host', '127.0.0.1',
+  '--port', String(port), '--strictPort'], { cwd, stdio: 'ignore' });
+async function waitServer(address) {
+  for (let i = 0; i < 100; i++) {
+    try { if ((await fetch(address)).ok) return; } catch { /* dev server is starting */ }
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+  throw new Error(`Vite did not respond at ${address}`);
+}
+let browser, dev, baseline;
 const report = { episodes: {}, quick: {}, limits: 'Chromium CDP touch, keyboard and browser audio/haptic calls. Prepared checkpoints use legal domain swaps. Android phone not run.' };
 const errors = [];
 try {
-  for (const address of baseline ? [url, baselineUrl] : [url]) for (let i = 0; i < 100; i++) {
-    try { if ((await fetch(address)).ok) break; } catch { /* dev server is starting */ }
-    if (i === 99) throw new Error(`Vite did not respond at ${address}`);
-    await new Promise(resolve => setTimeout(resolve, 100));
-  }
   browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH ?? '/usr/bin/chromium', args: ['--no-sandbox'] });
   report.browser = browser.version();
   const app = page => page.locator('#hue-app');
@@ -49,20 +49,42 @@ try {
     await context.addInitScript(capture => {
       const root = () => document.querySelector('#hue-app');
       Object.defineProperty(window, 'showSaveFilePicker', { value: undefined, configurable: true });
-      window.v1 = { sounds: [], pulses: [], frames: [] };
+      window.v1 = { sounds: [], pulses: [], frames: [], timeline: [] };
+      const epoch = () => performance.timeOrigin + performance.now();
+      window.addEventListener('pointerup', event => {
+        if (event.target.matches('#board-region canvas')) window.v12LastGesture = epoch();
+      }, true);
       const start = AudioBufferSourceNode.prototype.start;
       AudioBufferSourceNode.prototype.start = function (...args) {
         if (!this.loop) {
           window.v1.sounds.push({ duration: this.buffer?.duration, phase: root()?.dataset.victoryPhase });
           if (capture && this.buffer?.duration >= .23) window.v11Audio = {
-            time: Date.now(), rate: this.buffer.sampleRate, samples: Array.from(this.buffer.getChannelData(0)),
+            time: epoch(), rate: this.buffer.sampleRate, samples: Array.from(this.buffer.getChannelData(0)),
           };
         }
         return start.apply(this, args);
       };
       navigator.vibrate = value => { window.v1.pulses.push({ value, phase: root()?.dataset.victoryPhase }); return true; };
       const frame = time => {
-        if (root()?.dataset.victoryPhase === 'approach') {
+        const app = root();
+        if (app?.dataset.layer === 'result' && window.v12LastGesture && window.v1.timeline.length < 280) {
+          const dialog = document.querySelector('#game-dialog');
+          const action = dialog.querySelector('button');
+          const heading = dialog.querySelector('h2');
+          const plane = app.querySelector('.victory-colour');
+          const art = app.querySelector('.victory-art');
+          const opacity = Number(getComputedStyle(dialog).opacity);
+          const actionVisible = action && getComputedStyle(action).visibility === 'visible' && opacity > 0;
+          const recoil = plane?.style.transform
+            ? new DOMMatrix(getComputedStyle(plane).transform).m42 : 0;
+          const covers = !recoil || art.getBoundingClientRect().top <= app.getBoundingClientRect().top &&
+            art.getBoundingClientRect().bottom >= app.getBoundingClientRect().bottom;
+          window.v1.timeline.push({ ms: epoch() - window.v12LastGesture, phase: app.dataset.victoryPhase,
+            recoil, covers, opacity, enabled: !!action && !action.disabled,
+            hiddenFromA11y: action?.parentElement.getAttribute('aria-hidden') === 'true',
+            headingOpacity: Number(getComputedStyle(heading).opacity), actionVisible: !!actionVisible });
+        }
+        if (app?.dataset.victoryPhase === 'approach') {
           const canvas = document.querySelector('#board-region canvas');
           if (canvas?.dataset.camera) window.v1.frames.push({ time, camera: JSON.parse(canvas.dataset.camera) });
         }
@@ -75,7 +97,7 @@ try {
     const cdp = await context.newCDPSession(page);
     const touch = (type, ...points) => cdp.send('Input.dispatchTouchEvent', { type,
       touchPoints: points.map((point, id) => ({ ...point, id })) });
-    return { context, page, touch };
+    return { context, page, touch, cdp };
   }
   const position = async (page, width, height, i) => {
     const box = await board(page).boundingBox(), view = await camera(page);
@@ -139,9 +161,9 @@ try {
       return { id: level.id, width: level.width, height: level.height, colours: level.solvedTileColors,
         startMoves: get().moves, ...last };
     }, grid);
-    await page.reload();
-    await ready(page);
-    assert.equal(await app(page).getAttribute('data-level'), level.id);
+    // Let the mounted game re-read the durable checkpoint through its normal foreground hook.
+    await page.evaluate(() => window.dispatchEvent(new Event('focus')));
+    await page.waitForSelector(`#hue-app[data-level="${level.id}"][data-busy=false]`);
     return level;
   }
   async function screenshotGrain(page, level, samplePosition, relative = { x: 0, y: 0 }) {
@@ -175,46 +197,62 @@ try {
       nodes.map(node => getComputedStyle(node).backgroundColor));
     assert(rows.length > 0 && rows.every(colour => colour.startsWith('rgb(')), JSON.stringify(rows));
   }
-  async function pauseEvidence(page, palette) {
-    await page.screenshot({ path: `${out}/${palette}-playing.png` });
-    await page.locator('#settings').tap();
-    await opaqueCommands(page);
-    await page.screenshot({ path: `${out}/pause-${palette}.png` });
-    // The same probe crosses colour boundaries in the tiles below each opaque row.
-    const row = button(page, 'Помощь').or(button(page, 'Настройки')).first();
-    await row.focus();
-    const focused = await row.evaluate(node => getComputedStyle(node).backgroundColor);
-    assert(focused.startsWith('rgb('));
-    const rect = await row.boundingBox();
-    await page.mouse.move(rect.x + rect.width - 18, rect.y + rect.height / 2);
-    await page.mouse.down();
-    const pressed = await row.evaluate(node => getComputedStyle(node).backgroundColor);
-    assert(pressed.startsWith('rgb('));
-    await page.screenshot({ path: `${out}/pause-${palette}-pressed.png` });
-    await page.mouse.move(rect.x - 3, rect.y + rect.height / 2);
-    await page.mouse.up();
-    await button(page, 'Настройки').tap();
-    await opaqueCommands(page);
-    await page.screenshot({ path: `${out}/preferences-${palette}.png` });
-    await page.keyboard.press('Escape');
-    await page.keyboard.press('Escape');
-    return { focused, pressed };
+  async function captureScreen(session, name) {
+    const frames = [];
+    const { cdp } = session;
+    cdp.on('Page.screencastFrame', event => {
+      void cdp.send('Page.screencastFrameAck', { sessionId: event.sessionId }).catch(() => {});
+      if (event.metadata.timestamp) frames.push({ time: event.metadata.timestamp * 1000, data: event.data });
+    });
+    await cdp.send('Page.startScreencast', { format: 'jpeg', quality: 88, maxWidth: viewport.width, maxHeight: viewport.height });
+    return async () => {
+      await cdp.send('Page.stopScreencast');
+      const zero = await session.page.evaluate(() => window.v12LastGesture);
+      assert(frames.length >= 12);
+      const dir = `${out}/${name}`;
+      await mkdir(dir, { recursive: true });
+      const timeline = [];
+      for (const [index, { time, data }] of frames.entries()) {
+        const relative = time - zero;
+        if (relative < -320 || relative > 3950) continue;
+        const file = `frame-${index}.jpg`;
+        timeline.push({ file, ms: relative });
+        await writeFile(`${dir}/${file}`, Buffer.from(data, 'base64'));
+      }
+      assert(timeline.some(f => f.ms < 0) && timeline.some(f => f.ms >= 1800));
+      await writeFile(`${dir}/frames.json`, JSON.stringify(timeline));
+    };
   }
-  if (baseline) {
-    const prior = await launch({ reducedMotion: 'reduce' });
-    await prior.page.goto(baselineUrl); await ready(prior.page);
+  async function finalDrag(session, level) {
+    const start = await position(session.page, level.width, level.height, level.from);
+    const end = await position(session.page, level.width, level.height, level.to);
+    await session.touch('touchStart', start);
+    for (let i = 1; i <= 5; i++) {
+      await session.touch('touchMove', { x: start.x + (end.x - start.x) * i / 5, y: start.y + (end.y - start.y) * i / 5 });
+      if (record) await session.page.waitForTimeout(45);
+    }
+    await session.touch('touchEnd');
+  }
+  if (baselineFolder && record) {
+    baseline = serve(baselinePort, baselineFolder);
+    await waitServer(baselineUrl);
+    const prior = await launch();
+    await prior.page.goto(baselineUrl, { waitUntil: 'commit' }); await ready(prior.page);
     const before = await seed(prior.page, 'campaign');
-    await prior.page.screenshot({ path: `${out}/grain-before.png`, scale: 'device' });
+    const stop = await captureScreen(prior, 'compare-before');
+    await prior.page.waitForTimeout(150);
+    await finalDrag(prior, before);
+    await wait(prior.page, 'still');
+    await prior.page.waitForTimeout(1300);
+    const seen = await observations(prior.page);
+    report.baseline = { from: before.from, to: before.to, firstButtonsMs: seen.timeline.find(frame => frame.actionVisible)?.ms };
+    await stop();
     await prior.context.close();
-    const fresh = await launch({ reducedMotion: 'reduce' });
-    await fresh.page.goto(url); await ready(fresh.page);
-    const after = await seed(fresh.page, 'campaign');
-    assert.deepEqual(after, before);
-    await fresh.page.screenshot({ path: `${out}/grain-after.png`, scale: 'device' });
-    const fixedPalette = await pauseEvidence(fresh.page, 'light');
-    report.pause = { light: fixedPalette };
-    await fresh.context.close();
+    baseline.kill();
+    baseline = undefined;
   }
+  dev = serve(port);
+  await waitServer(url);
 
   async function trackTiles(page, width) {
     await page.evaluate(async width => {
@@ -246,11 +284,10 @@ try {
   }
   const ordinary = await launch({ filming: true });
   const { page: p, touch } = ordinary, ordinaryEpoch = Date.now();
-  await p.goto(url); await ready(p);
+  await p.goto(url, { waitUntil: 'commit' }); await ready(p);
   const level = await seed(p, 'campaign');
   const clipStart = Date.now() - ordinaryEpoch;
   const start = await position(p, level.width, level.height, level.from);
-  const end = await position(p, level.width, level.height, level.to);
   const before = await read(p);
   const expectedColour = level.colours[before.attempts[level.id].board[level.from]];
   const grain = await screenshotGrain(p, level, level.from);
@@ -283,20 +320,31 @@ try {
   assert.deepEqual(await read(p), before);
   if (record) await p.waitForTimeout(200);
   const winClipStart = Date.now() - ordinaryEpoch;
+  const closeComparison = record ? await captureScreen(ordinary, 'compare-after') : null;
   await trackTiles(p, level.width);
-  await touch('touchStart', start);
-  for (let i = 1; i <= 5; i++) {
-    await touch('touchMove', { x: start.x + (end.x - start.x) * i / 5, y: start.y + (end.y - start.y) * i / 5 });
-    if (record) await p.waitForTimeout(55);
-  }
-  await touch('touchEnd');
+  await finalDrag(ordinary, level);
   await wait(p, 'approach');
-  assert(await button(p, 'Дальше').isVisible() && await button(p, 'Дальше').isEnabled());
+  assert.equal(await button(p, 'Дальше').count(), 0);
   assert.equal((await observations(p)).pulses.length, 0);
   await wait(p, 'landed');
   assert.equal(await board(p).isVisible(), false);
   await wait(p, 'still');
   const normalAudio = await observations(p);
+  const landing = normalAudio.timeline.find(f => f.phase === 'landed');
+  const hold = normalAudio.timeline.find(f => f.phase === 'hold');
+  const appears = normalAudio.timeline.find(f => f.phase === 'reveal' && f.actionVisible);
+  const readyFrame = normalAudio.timeline.find(f => f.phase === 'still' && f.enabled);
+  const peak = normalAudio.timeline.reduce((a, b) => a.recoil >= b.recoil ? a : b);
+  assert(landing && hold && appears && readyFrame);
+  assert(peak.recoil >= 1.7 && peak.recoil <= 2 && peak.ms - landing.ms <= 65);
+  assert(normalAudio.timeline.every(f => f.covers));
+  assert(appears.ms - hold.ms >= 210 && appears.ms - hold.ms <= 300);
+  assert(readyFrame.ms - appears.ms >= 350 && readyFrame.ms - appears.ms <= 430);
+  assert(normalAudio.timeline.filter(f => ['approach','landed','hold'].includes(f.phase))
+    .every(f => !f.actionVisible && !f.enabled && f.hiddenFromA11y));
+  assert(normalAudio.timeline.filter(f => f.phase === 'reveal').every(f => !f.enabled && f.hiddenFromA11y));
+  report.timing = Object.fromEntries(Object.entries({ landing, peak, hold, appears, ready: readyFrame }).map(([name, f]) =>
+    [name, { ms: Math.round(f.ms), recoil: f.recoil, opacity: f.opacity }]));
   const snapshots = await p.evaluate(() => window.v11Pair.shots);
   assert.equal(snapshots.length, 3, JSON.stringify(snapshots.map(({ image, ...rest }) => rest)));
   assert.equal(new Set(snapshots.map(({ camera }) => camera)).size, 1);
@@ -315,7 +363,7 @@ try {
     pcm.writeUInt32LE(pcm.length - 44, 40);
     played.samples.forEach((v, i) => pcm.writeInt16LE(Math.round(v * 32_767 * .32), 44 + 2 * i));
     await writeFile(`${out}/ordinary-impact.wav`, pcm);
-    report.audioStartMillis = played.time - ordinaryEpoch;
+    report.audioStartMillis = played.time - await p.evaluate(() => window.v12LastGesture);
   }
   await opaqueCommands(p);
   assert.deepEqual(normalAudio.pulses, [{ value: 22, phase: 'landed' }]);
@@ -325,14 +373,15 @@ try {
   const won = await read(p);
   assert.equal(won.attempts[level.id].moves, level.startMoves + 1);
   assert.equal(won.victories.filter(v => v.attemptId === won.attempts[level.id].attemptId).length, 1);
-  if (record) await p.waitForTimeout(400);
+  if (record) await p.waitForTimeout(550);
+  await closeComparison?.();
   await p.screenshot({ path: `${out}/victory.png` });
   const ordinaryClipEnd = Date.now() - ordinaryEpoch;
   await button(p, 'В альбом').tap();
   const download = p.waitForEvent('download');
   await button(p, 'Сохранить PNG').tap();
   await (await download).saveAs(`${out}/ordinary-wallpaper.png`);
-  await p.reload(); await wait(p, 'still');
+  await p.goto(new URL('?result=reopened', url).href, { waitUntil: 'commit' }); await wait(p, 'still');
   assert.deepEqual((await observations(p)).pulses, []);
   const ordinaryVideo = await video(ordinary, 'ordinary', ordinaryEpoch, clipStart);
   report.episodes.ordinary = { id: level.id, moves: level.startMoves + 1, stableAndMovesWithTile: true, shades: grain.shades,
@@ -341,7 +390,7 @@ try {
 
   const giant = await launch({ filming: true });
   const wide = giant.page, wideEpoch = Date.now();
-  await wide.goto(url); await ready(wide);
+  await wide.goto(url, { waitUntil: 'commit' }); await ready(wide);
   const large = await seed(wide, 'wide');
   const wideStart = Date.now() - wideEpoch;
   await wide.screenshot({ path: `${out}/field-full.png`, scale: 'device' });
@@ -409,16 +458,8 @@ try {
     naturalLight: naturalLight.mean, naturalDark: naturalDark.mean, zoomShades: zoomGrain.shades, sprayColors,
     sounds: bigAudio.sounds, vibration: bigAudio.pulses, ...giantVideo, clipEnd: wideClipEnd };
 
-  if (baseline) {
-    const fixed = await launch({ reducedMotion: 'reduce' });
-    await fixed.page.goto(url); await ready(fixed.page);
-    await seed(fixed.page, 'wide');
-    report.pause.dark = await pauseEvidence(fixed.page, 'dark');
-    await fixed.context.close();
-  }
-
   const shape = await launch();
-  await shape.page.goto(url); await ready(shape.page);
+  await shape.page.goto(url, { waitUntil: 'commit' }); await ready(shape.page);
   const triangle = await seed(shape.page, 'triangles');
   const taps = await shape.page.evaluate(async ({ from, to }) => {
     const { activeChallenge } = await import('/src/domain/challenges.ts');
@@ -443,11 +484,11 @@ try {
   report.episodes.triangles = { id: triangle.id, moves: shapeState.best[triangle.id] };
   await shape.context.close();
 
-  for (const scenario of ['before-hit', 'after-hit', 'strip', 'reduced', 'background', 'assisted']) {
+  for (const scenario of ['back-before-hit', 'back-after-hit', 'early-input', 'stale-input', 'strip', 'reduced', 'background', 'assisted']) {
     const run = await launch({ reducedMotion: scenario === 'reduced' ? 'reduce' : 'no-preference',
       deviceScaleFactor: scenario === 'reduced' ? 2 : 1 });
     const page = run.page;
-    await page.goto(url); await ready(page);
+    await page.goto(url, { waitUntil: 'commit' }); await ready(page);
     let deviceGrain;
     if (scenario === 'reduced') {
       const { colour } = await page.evaluate(async () => {
@@ -464,15 +505,43 @@ try {
       await button(page, 'Помощь').tap();
       await button(page, 'Сделать один обмен · +3 хода').tap();
     } else await finish(page, first);
-    const phase = scenario === 'reduced' ? 'still' : scenario === 'after-hit' ? 'landed' : 'approach';
+    const phase = scenario === 'reduced' ? 'still' : scenario === 'back-after-hit' ? 'landed' : 'approach';
     await wait(page, phase);
-    if (scenario === 'before-hit' || scenario === 'after-hit') {
-      const onward = button(page, 'Дальше');
-      if (scenario === 'before-hit') await page.keyboard.press('Enter');
-      else {
-        const box = await onward.boundingBox();
-        await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
+    if (scenario.startsWith('back-')) {
+      await page.keyboard.press('Escape');
+      await wait(page, 'still');
+      assert(await button(page, 'Дальше').isEnabled());
+      await page.keyboard.press('Escape');
+      await page.waitForSelector('#hue-app[data-layer=none]');
+    } else if (scenario === 'early-input' || scenario === 'stale-input') {
+      await page.keyboard.press('Tab');
+      const target = await page.locator('#dialog-actions button').first().evaluate(node => {
+        const rect = node.getBoundingClientRect();
+        return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
+      });
+      await page.touchscreen.tap(target.x, target.y);
+      await page.keyboard.press('Enter');
+      if (scenario === 'stale-input') {
+        await page.keyboard.down('Enter');
+        await run.touch('touchStart', target);
       }
+      await wait(page, 'hold');
+      await page.keyboard.press('Tab');
+      assert.equal(await button(page, 'Дальше').count(), 0);
+      await wait(page, 'reveal');
+      assert.equal(await button(page, 'Дальше').count(), 0);
+      await wait(page, 'still');
+      if (scenario === 'stale-input') {
+        await page.keyboard.down('Enter');
+        await page.keyboard.up('Enter');
+        await run.touch('touchEnd');
+        await page.waitForTimeout(70);
+      }
+      assert.equal(await app(page).getAttribute('data-level'), 'gradient-001');
+      if (scenario === 'early-input') {
+        assert.equal(await page.evaluate(() => document.activeElement.textContent), 'Дальше');
+        await page.keyboard.press('Enter');
+      } else await button(page, 'Дальше').tap();
       await page.waitForSelector('#hue-app[data-level=gradient-002][data-layer=none]');
     } else if (scenario === 'background') {
       await page.evaluate(() => window.dispatchEvent(new Event('blur')));
@@ -488,7 +557,7 @@ try {
     assert.equal(firstAttempt.moves, scenario === 'assisted' ? 3 : 1);
     assert.equal(firstAttempt.assisted, scenario === 'assisted');
     assert.equal(profile.victories.filter(v => v.attemptId === firstAttempt.attemptId).length, 1);
-    const intended = scenario === 'before-hit' || scenario === 'background' ? 0 : 1;
+    const intended = scenario === 'back-before-hit' || scenario === 'background' ? 0 : 1;
     assert.equal(seen.sounds.length, intended, scenario);
     assert.equal(seen.pulses.length, intended, scenario);
     if (scenario === 'reduced') {
@@ -505,6 +574,6 @@ try {
   console.log(JSON.stringify(report));
 } finally {
   await browser?.close();
-  dev.kill();
+  dev?.kill();
   baseline?.kill();
 }

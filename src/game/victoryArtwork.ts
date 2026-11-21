@@ -3,7 +3,7 @@ import type { Point } from './boardCamera';
 import { paintGradientThumbnail } from './exportRenderer';
 import type { BoardGeometry } from './geometry';
 import { orderedGrain } from './tileDither';
-import { amount, WAVE_MS } from './victoryMotion';
+import { amount, colourRecoil, WAVE_MS } from './victoryMotion';
 
 interface Spray extends Point {
   vx: number;
@@ -13,7 +13,10 @@ interface Spray extends Point {
   size: number;
 }
 
+const SPRAY_LIFETIME_MS = 380;
+
 export class VictoryArtwork {
+  private readonly colour = document.createElement('div');
   private readonly art = document.createElement('canvas');
   private readonly effects = document.createElement('canvas');
   private readonly ctx = this.effects.getContext('2d')!;
@@ -25,8 +28,10 @@ export class VictoryArtwork {
   constructor(private readonly host: HTMLElement) {
     this.art.className = 'victory-art';
     this.effects.className = 'victory-effects';
-    for (const layer of [this.art, this.effects]) layer.setAttribute('aria-hidden', 'true');
-    host.prepend(this.art, this.effects);
+    this.colour.className = 'victory-colour';
+    this.colour.setAttribute('aria-hidden', 'true');
+    this.colour.append(this.art, this.effects);
+    host.append(this.colour);
   }
   show(level: LevelDefinition | null): void {
     if (this.shown === level) return;
@@ -38,7 +43,7 @@ export class VictoryArtwork {
     this.art.height = Math.max(side * 2, level.height);
     paintGradientThumbnail(this.art, level);
   }
-  start(level: LevelDefinition, board: BoardGeometry, origin: Point): void {
+  start(level: LevelDefinition, board: BoardGeometry, origin: Point): number {
     const { width, height } = this.host.getBoundingClientRect();
     this.effects.width = Math.max(1, Math.round(width));
     this.effects.height = Math.max(1, Math.round(height));
@@ -60,11 +65,14 @@ export class VictoryArtwork {
       }
     }
     this.spray = from;
+    return Math.max(WAVE_MS, ...from.map(particle => particle.starts + SPRAY_LIFETIME_MS));
   }
   frame(age: number, origin: Point): void {
     const { ctx } = this;
     const w = this.effects.width, h = this.effects.height;
     ctx.clearRect(0, 0, w, h);
+    const recoil = colourRecoil(age);
+    this.colour.style.transform = recoil ? `translateY(${recoil}px)` : '';
     if (age < WAVE_MS) {
       const travel = amount(age / WAVE_MS);
       ctx.globalAlpha = .58 * (1 - travel ** 3);
@@ -75,11 +83,12 @@ export class VictoryArtwork {
       ctx.stroke();
     }
     for (const p of this.spray) {
-      const time = (age - p.starts) / 1000;
-      if (time < 0 || time >= .38) continue;
+      const life = age - p.starts;
+      if (life < 0 || life >= SPRAY_LIFETIME_MS) continue;
+      const time = life / 1000;
       const x = Math.round((p.x + p.vx * time) / 2) * 2;
       const y = Math.round((p.y + p.vy * time + 95 * time ** 2) / 2) * 2;
-      ctx.globalAlpha = Math.min(1, (1 - time / .38) * 1.8);
+      ctx.globalAlpha = Math.min(1, (1 - life / SPRAY_LIFETIME_MS) * 1.8);
       ctx.fillStyle = '#2e153b';
       ctx.fillRect(x + 1, y + 1, p.size, p.size);
       ctx.fillStyle = p.color;
@@ -89,6 +98,7 @@ export class VictoryArtwork {
   }
   clearMotion(): void {
     this.spray = [];
+    this.colour.style.transform = '';
     this.ctx.clearRect(0, 0, this.effects.width, this.effects.height);
   }
 }

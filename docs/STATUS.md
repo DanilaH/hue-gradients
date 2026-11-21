@@ -2,7 +2,7 @@
 
 All 16 available A1–G1 checkpoints were rerun against `431f06d`. This includes 192 unit tests, the signed 0.4.25 payload in Chromium 92 and 153, 30 offline daily boards and 8 independently checked wallpaper PNGs. Live services and physical device acceptance are recorded separately. [Results](evidence/queue-regression-a1-g1-2026-11-21.json)
 
-Signed Android preview **0.4.30/versionCode34** brings V1.1 to `feat/m0-foundation`. Level 006 shows one tile already seated while its neighbour is still falling. The pause leaves the surrounding board as drawn, the actions are opaque, and the tile grain is one CSS pixel. All 197 unit tests passed. The exact signed web payload passed startup and save recovery in Chromium 92 and 153. V2 starts with Personal Tasks after owner review. Physical Android feel remains open. [V1.1 evidence](evidence/v11-dreamy-psx-2026-11-22.json)
+Signed Android preview **0.4.31/versionCode35** brings V1.2 to `feat/m0-foundation`. One brief colour recoil follows the final tile contact. The finished gradient holds before the title and actions fade in together. The 006 comparison uses the exact web assets of both signed previews. All 197 unit tests passed. V2 starts with Personal Tasks after owner review, and physical Android feel remains open. [V1.2 evidence](evidence/v12-dreamy-psx-2026-11-22.json)
 
 | Stage | Actual state |
 | --- | --- |
