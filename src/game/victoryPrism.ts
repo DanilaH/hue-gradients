@@ -1,5 +1,4 @@
 import type { LevelDefinition } from '../domain/puzzle';
-import { WIN_GLINT_DELAY_MS } from './feedback';
 
 export const victoryPrism = `<div id="victory-prism" aria-hidden="true" hidden><svg viewBox="0 0 200 200">
   <defs><linearGradient id="prism-sheen" x2=".65" y2="1"><stop stop-color="#fff6e8" stop-opacity=".32"/>
@@ -10,8 +9,6 @@ export const victoryPrism = `<div id="victory-prism" aria-hidden="true" hidden><
   <path d="M100 100 180 100 100 188Z" fill="var(--facet-3)"/>
   <path d="M100 12 180 100 100 188 20 100Z" fill="url(#prism-sheen)" stroke="#fff6e4" stroke-width="1.6"/>
   <path d="M100 12V188M20 100H180" fill="none" stroke="#fff5f1" stroke-width="1.2" stroke-opacity=".77"/>
-  <path id="prism-glint" d="M100 188 20 100 100 12 180 100 100 188" pathLength="1" fill="none"
-    stroke="#fffdf2" stroke-width="3.4" stroke-linecap="round" stroke-dasharray=".11 .89" opacity="0"/>
 </svg></div>`;
 
 export function colourPrism(prism: HTMLElement, level: LevelDefinition): void {
@@ -21,11 +18,4 @@ export function colourPrism(prism: HTMLElement, level: LevelDefinition): void {
     ? [0, Math.round(last / 3), Math.round(last * 2 / 3), last]
     : [0, width - 1, width * (height - 1), last];
   positions.forEach((pos, i) => prism.style.setProperty(`--facet-${i}`, colors[pos]!));
-}
-
-export function flashPrismEdge(prism: HTMLElement): Animation {
-  return prism.querySelector('#prism-glint')!.animate([
-    { strokeDashoffset: 0, opacity: 0 }, { opacity: .95, offset: .18 },
-    { opacity: .85, offset: .72 }, { strokeDashoffset: -1, opacity: 0 },
-  ], { delay: WIN_GLINT_DELAY_MS, duration: 355 });
 }

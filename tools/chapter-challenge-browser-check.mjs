@@ -117,15 +117,21 @@ try {
   const pin = secret.pinnedPositions[0], movable = secret.startTileAtPosition.findIndex((tile, i) => tile !== i);
   const pinPoint = point(box, secret, pin);
   const movePoint = point(box, secret, movable);
-  const coords = [[Math.round(pinPoint.x - 8), Math.round(pinPoint.y)], [Math.round(movePoint.x), Math.round(movePoint.y)]];
+  const coords = [[Math.round(pinPoint.x - 12), Math.round(pinPoint.y)], [Math.round(movePoint.x), Math.round(movePoint.y)]];
   const colorAt = (path) => JSON.parse(execFileSync('python3', ['-c',
-    'from PIL import Image; import sys,json; im=Image.open(sys.argv[1]).convert("RGB"); print(json.dumps(["#%02x%02x%02x"%im.getpixel(tuple(p)) for p in json.loads(sys.argv[2])]))',
+    'from PIL import Image; import sys,json; im=Image.open(sys.argv[1]).convert("RGB"); print(json.dumps(["#%02x%02x%02x"%tuple(round(s/64) for s in map(sum,zip(*im.crop((p[0]-4,p[1]-4,p[0]+4,p[1]+4)).getdata()))) for p in json.loads(sys.argv[2])]))',
     path, JSON.stringify(coords)], { encoding: 'utf8' }));
   const hiddenPng = `${output}/concealed.png`;
   await page.waitForTimeout(recording ? 850 : 160);
   await page.screenshot({ path: hiddenPng, scale: 'css' });
   const hiddenPixels = colorAt(hiddenPng);
   assert.deepEqual(hiddenPixels, [secret.solvedTileColors[pin].toLowerCase(), '#2f263d']);
+  await page.locator('#settings').tap();
+  await layer('settings');
+  await page.keyboard.press('Escape');
+  await layer('secret');
+  await page.screenshot({ path: `${output}/concealed-after-pause.png`, scale: 'css' });
+  assert.deepEqual(colorAt(`${output}/concealed-after-pause.png`), hiddenPixels);
   await page.reload();
   await ready();
   await layer('none');

@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { canSwap, type Attempt, type LevelDefinition } from '../domain/puzzle';
 import { boardGeometry, cellAt, cellCenter, hitTest, type BoardGeometry, type Cell } from './geometry';
+import { TileDither } from './tileDither';
+import { amount, ease, LANDING_MS, tileJump, VICTORY_END_MS } from './victoryMotion';
 import { clampCamera, edgeVelocity, moveCamera, REST_CAMERA, revealCell, viewBoard, type Camera, type Point } from './boardCamera';
 
 export const GAME_PRESENTABLE = 'hue:presentable';
@@ -9,7 +11,8 @@ interface Gesture { id: number; from: number | null; x: number; y: number; lates
 interface Navigation { anchor: Point; distance: number; camera: Camera }
 
 export class PuzzleScene extends Phaser.Scene {
-  private art!: Phaser.GameObjects.Graphics;
+  private drawable = false;
+  private dither: TileDither | null = null;
   private level: LevelDefinition;
   private attempt: Attempt;
   private preview = false;
@@ -23,12 +26,17 @@ export class PuzzleScene extends Phaser.Scene {
   private camera: Camera = REST_CAMERA;
   private readonly touches = new Map<number, Point>();
   private navigation: Navigation | null = null;
-  private ratio = 1;
+  private victory: { started: number; from: Camera; at: number; frame(elapsed: number, board: BoardGeometry, origin: Point): void } | null = null;
   private released: { from: number; to: number; dx: number; dy: number } | null = null;
   private settle: { from: number; to: number; dx: number; dy: number; started: number } | null = null;
   constructor(level: LevelDefinition, attempt: Attempt, private readonly hooks: Hooks) { super('puzzle'); this.level = level; this.attempt = attempt; }
   create(): void {
-    this.art = this.add.graphics();
+    // A single Canvas renderer keeps clip paths and repeating tile ink in the same paint pass.
+    const artwork = Object.assign(new Phaser.GameObjects.GameObject(this, 'Board artwork'), {
+      renderCanvas: (renderer: Phaser.Renderer.Canvas.CanvasRenderer) => this.paintBoard(renderer.currentContext),
+    });
+    this.add.existing(artwork);
+    this.drawable = true;
     const canvas = this.game.canvas;
     canvas.tabIndex = 0; canvas.setAttribute('role', 'group');
     this.labelBoard();
@@ -37,7 +45,7 @@ export class PuzzleScene extends Phaser.Scene {
     canvas.addEventListener('lostpointercapture', this.cancel); canvas.addEventListener('keydown', this.key);
     this.scale.on('resize', this.resized, this);
     this.events.once('shutdown', () => {
-      this.cancel(); this.scale.off('resize', this.resized, this);
+      this.drawable = false; this.victory = null; this.cancel(); this.scale.off('resize', this.resized, this);
       canvas.removeEventListener('pointerdown', this.down); canvas.removeEventListener('pointermove', this.move);
       canvas.removeEventListener('pointerup', this.up); canvas.removeEventListener('pointercancel', this.cancel);
       canvas.removeEventListener('lostpointercapture', this.cancel); canvas.removeEventListener('keydown', this.key);
@@ -48,10 +56,10 @@ export class PuzzleScene extends Phaser.Scene {
   setView(level: LevelDefinition, attempt: Attempt, preview: boolean, enabled: boolean, concealed = false): void {
     const switched = this.level !== level;
     if (switched) { this.focused = null; this.camera = REST_CAMERA; }
-    if (this.level !== level || this.attempt !== attempt || preview !== this.preview || concealed !== this.concealed || !enabled) this.cancel();
+    if (this.level !== level || this.attempt !== attempt || preview !== this.preview || concealed !== this.concealed || !enabled && !this.victory) this.cancel();
     this.level = level; this.attempt = attempt; this.preview = preview; this.concealed = concealed;
     this.enabled = enabled && !attempt.completed && !preview && !concealed;
-    if (this.art) { if (switched) this.labelBoard(); this.draw(); }
+    if (this.drawable) { if (switched) this.labelBoard(); this.draw(); }
   }
   presentSwap(previous: Attempt, next: Attempt, from: number, to: number, motion: boolean, cost = 1): void {
     const release = this.released; this.released = null;
@@ -60,6 +68,17 @@ export class PuzzleScene extends Phaser.Scene {
     this.settle = { from, to, dx: release?.from === from && release.to === to ? release.dx : 0,
       dy: release?.from === from && release.to === to ? release.dy : 0, started: performance.now() };
     this.game.canvas.dataset.settling = 'true'; this.draw();
+  }
+  presentVictory(at: number, frame: NonNullable<PuzzleScene['victory']>['frame']): void {
+    this.victory = { started: this.settle?.started ?? performance.now(), from: this.camera, at, frame };
+    this.draw();
+  }
+  finishVictory(): void {
+    if (!this.victory) return;
+    this.victory = null;
+    this.finishSettle();
+    this.camera = REST_CAMERA;
+    if (this.drawable) this.draw();
   }
   private large(): boolean { return this.level.width > 6 || this.level.height > 5; }
   private labelBoard(): void {
@@ -76,11 +95,18 @@ export class PuzzleScene extends Phaser.Scene {
   }
   isAnimating(): boolean {
     const edge = this.edge();
-    return this.settle !== null || edge.x !== 0 || edge.y !== 0;
+    return this.victory !== null || this.settle !== null || edge.x !== 0 || edge.y !== 0;
   }
   update(_time: number, delta: number): void {
     const edge = this.edge();
-    if (!this.settle && !edge.x && !edge.y) return;
+    if (!this.victory && !this.settle && !edge.x && !edge.y) return;
+    if (this.victory) {
+      const beat = this.victory, elapsed = performance.now() - beat.started;
+      this.draw();
+      beat.frame(elapsed, this.geometry, cellCenter(cellAt(this.geometry, beat.at)));
+      if (elapsed >= VICTORY_END_MS) this.finishVictory();
+      return;
+    }
     if (this.settle && performance.now() - this.settle.started >= 150) this.finishSettle();
     if (edge.x || edge.y) {
       const seconds = Math.min(delta, 40) / 1000;
@@ -204,7 +230,7 @@ export class PuzzleScene extends Phaser.Scene {
     for (const id of ids) {
       if (this.game?.canvas?.hasPointerCapture(id)) this.game.canvas.releasePointerCapture(id);
     }
-    if (this.art) this.draw();
+    if (this.drawable) this.draw();
   };
   private key = (event: KeyboardEvent): void => {
     if (!this.enabled) return;
@@ -233,109 +259,127 @@ export class PuzzleScene extends Phaser.Scene {
     if (position === null || this.level.pinnedPositions.includes(position)) { this.hooks.interaction?.(null); return; }
     this.hooks.interaction?.({ x, y, color: this.level.solvedTileColors[this.attempt.board[position]!]! });
   }
-  private polygon(cell: Cell, dx = 0, dy = 0, gutter = .98) {
-    const center = cellCenter(cell);
-    return cell.points!.map(([x, y]) => new Phaser.Math.Vector2(
-      center.x + (cell.x + x - center.x) * gutter + dx,
-      center.y + (cell.y + y - center.y) * gutter + dy,
-    ));
-  }
-  private fillCell(cell: Cell, dx: number, dy: number, color: number, alpha = 1): void {
-    this.art.fillStyle(color, alpha);
-    if (cell.points) this.art.fillPoints(this.polygon(cell, dx, dy), true);
-    else this.art.fillRoundedRect(cell.x + dx, cell.y + dy, cell.width, cell.height, cell.radius);
-  }
-  private brackets(cell: Cell): void {
+  private cellPath(ctx: CanvasRenderingContext2D, cell: Cell, inset = 0): void {
+    ctx.beginPath();
     if (cell.points) {
-      this.art.lineStyle(4, 0x151020).strokePoints(this.polygon(cell, 0, 0, .86), true);
-      this.art.lineStyle(2, 0xfff3df).strokePoints(this.polygon(cell, 0, 0, .86), true);
-      return;
+      const cx = cell.width / 2, cy = cell.height / 2;
+      const scale = inset ? .86 : .99;
+      cell.points.forEach(([x, y], i) => {
+        const px = cell.x + cx + (x - cx) * scale, py = cell.y + cy + (y - cy) * scale;
+        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      });
+      ctx.closePath();
+    } else {
+      ctx.rect(cell.x + inset, cell.y + inset, Math.max(0, cell.width - 2 * inset), Math.max(0, cell.height - 2 * inset));
     }
-    const inset = 4, length = Math.min(13, cell.width * .18, cell.height * .18);
-    const art = this.art;
-    for (const [width, color] of [[4, 0x151020], [2, 0xfff3df]] as const) {
-      art.lineStyle(width, color).beginPath();
+  }
+  private brackets(ctx: CanvasRenderingContext2D, cell: Cell): void {
+    if (cell.points) this.cellPath(ctx, cell, 3);
+    else {
+      const inset = Math.min(4, cell.width / 5, cell.height / 5), length = Math.min(13, cell.width * .22, cell.height * .22);
+      ctx.beginPath();
       for (const sx of [-1, 1]) for (const sy of [-1, 1]) {
         const x = cell.x + (sx === 1 ? inset : cell.width - inset);
         const y = cell.y + (sy === 1 ? inset : cell.height - inset);
-        art.moveTo(x, y + sy * length).lineTo(x, y).lineTo(x + sx * length, y);
+        ctx.moveTo(x, y + sy * length); ctx.lineTo(x, y); ctx.lineTo(x + sx * length, y);
       }
-      art.strokePath();
     }
-  }
-  private trailingLight(cell: Cell, dx: number, dy: number, alpha: number): void {
-    if (cell.points) {
-      this.art.lineStyle(1.4, 0xfff4df, alpha * .9).strokePoints(this.polygon(cell), true);
-      return;
-    }
-    const { x, y, width, height } = cell;
-    const horizontal = Math.abs(dx) >= Math.abs(dy);
-    const left = dx >= 0 ? x + 1 : x + width - 1, top = dy >= 0 ? y + 1 : y + height - 1;
-    const art = this.art;
-    for (const [weight, color, strength] of [[4, 0xf4b8ff, .28], [1.4, 0xfff4df, .97]] as const) {
-      art.lineStyle(weight, color, alpha * strength);
-      if (horizontal) art.lineBetween(left, y + 4, left, y + height - 4);
-      else art.lineBetween(x + 4, top, x + width - 4, top);
-    }
+    ctx.lineWidth = 4; ctx.strokeStyle = '#151020'; ctx.stroke();
+    ctx.lineWidth = 2; ctx.strokeStyle = '#fff3df'; ctx.stroke();
   }
   private draw(followFocus = false): void {
     const rect = this.game.canvas.getBoundingClientRect();
-    this.ratio = this.scale.width / Math.max(1, rect.width);
     this.natural = boardGeometry(rect.width, rect.height, this.level.width, this.level.height, this.level.positions);
     this.camera = clampCamera(this.natural, this.camera);
     if (followFocus && this.camera.zoom > 1 && this.focused !== null) {
       this.camera = revealCell(this.natural, this.camera, this.focused);
     }
+    if (this.victory) {
+      const zoom = ease(amount((performance.now() - this.victory.started - 95) / 265));
+      const fit = .94, from = this.victory.from;
+      this.camera = { zoom: from.zoom + (fit - from.zoom) * zoom,
+        x: from.x * (1 - zoom) + this.natural.width * (1 - fit) / 2 * zoom,
+        y: from.y * (1 - zoom) + this.natural.height * (1 - fit) / 2 * zoom };
+    }
     this.geometry = viewBoard(this.natural, this.camera);
     if (import.meta.env.DEV) this.game.canvas.dataset.camera = JSON.stringify(this.camera);
-    this.art.clear().setScale(this.ratio);
-    const tile = (position: number, dx = 0, dy = 0, lifted = false): void => {
+    this.hooks.paint();
+  }
+  private paintBoard(ctx: CanvasRenderingContext2D): void {
+    const rect = this.game.canvas.getBoundingClientRect(), beat = this.victory;
+    const elapsed = beat ? performance.now() - beat.started : 0;
+    if (beat && elapsed >= LANDING_MS) return;
+    ctx.save();
+    ctx.setTransform(ctx.canvas.width / Math.max(1, rect.width), 0, 0, ctx.canvas.height / Math.max(1, rect.height), 0, 0);
+    ctx.imageSmoothingEnabled = false;
+    const ink = this.dither ??= new TileDither(ctx);
+    const origin = beat ? cellCenter(cellAt(this.geometry, beat.at)) : null;
+    const diagonal = Math.max(1, Math.hypot(this.geometry.width, this.geometry.height));
+    const pins = this.level.pinnedPositions;
+    const paintShape = (cell: Cell, colour: string) => {
+      this.cellPath(ctx, cell);
+      ctx.fillStyle = colour;
+      ctx.fill();
+    };
+    const tile = (position: number, dx = 0, dy = 0, held = false): void => {
       const cell = cellAt(this.geometry, position), tileId = this.preview ? position : this.attempt.board[position]!;
-      if (lifted) this.fillCell(cell, dx + 3, dy + 5, 0x100e1c, .65);
-      const pinned = this.level.pinnedPositions.includes(position);
-      const color = this.concealed && !pinned ? 0x2f263d : Number.parseInt(this.level.solvedTileColors[tileId]!.slice(1), 16);
-      this.fillCell(cell, dx, dy, color);
-      if (pinned) {
-        const { x: cx, y: cy } = cellCenter(cell);
-        this.art.fillStyle(0x101019).fillCircle(cx, cy, 5).fillStyle(0xffffff).fillCircle(cx, cy, 2.5);
+      const center = cellCenter(cell);
+      const jump = origin ? tileJump(elapsed, center, origin, diagonal) : 0;
+      const lift = jump * Math.min(18, Math.max(7, cell.height * .24));
+      const scale = 1 + jump * .03;
+      if (held || jump > 0) {
+        paintShape({ ...cell, x: cell.x + dx + 3, y: cell.y + dy + 5 + lift * .22 }, 'rgba(16,14,28,.62)');
       }
-      if (position === this.focused && !lifted) {
-        if (cell.points) this.brackets({ ...cell, x: cell.x + dx, y: cell.y + dy });
-        else {
-          this.art.lineStyle(4, 0x101019).strokeRoundedRect(cell.x + dx + 3, cell.y + dy + 3, cell.width - 6, cell.height - 6, cell.radius);
-          this.art.lineStyle(2, 0xffffff).strokeRoundedRect(cell.x + dx + 3, cell.y + dy + 3, cell.width - 6, cell.height - 6, cell.radius);
+      const pinned = pins.includes(position);
+      const colour = this.concealed && !pinned ? '#2f263d' : this.level.solvedTileColors[tileId]!;
+      ctx.save();
+      ctx.translate(cell.x + dx - cell.width * (scale - 1) / 2, cell.y + dy - lift - cell.height * (scale - 1) / 2);
+      ctx.scale(scale, scale);
+      const face = { ...cell, x: 0, y: 0 };
+      this.cellPath(ctx, face);
+      ctx.fillStyle = ink.colour(colour);
+      ctx.fill();
+      if (held) {
+        ctx.save();
+        ctx.clip();
+        const side = Math.abs(dx) >= Math.abs(dy);
+        ctx.fillStyle = ink.colour(colour, true);
+        ctx.fillRect(side && dx < 0 ? cell.width - 5 : 0, !side && dy < 0 ? cell.height - 5 : 0,
+          side ? 5 : cell.width, side ? cell.height : 5);
+        ctx.restore();
+      }
+      if (pinned) {
+        const x = center.x - cell.x, y = center.y - cell.y, radius = Math.min(5, cell.width / 8, cell.height / 8);
+        for (const [r, colour] of [[radius, '#101019'], [radius / 2, '#fff3df']] as const) {
+          ctx.beginPath(); ctx.arc(x, y, r, 0, 2 * Math.PI); ctx.fillStyle = colour; ctx.fill();
         }
       }
-      if (!lifted && (position === this.selected || (this.gesture?.from === position && !this.gesture.drag))) {
-        this.brackets({ ...cell, x: cell.x + dx, y: cell.y + dy });
-      }
+      if (!beat && !held && (position === this.focused || position === this.selected ||
+          (this.gesture?.from === position && !this.gesture.drag))) this.brackets(ctx, face);
+      ctx.restore();
     };
-    const settle = this.settle, g = this.gesture;
+    const settle = elapsed >= 150 && beat ? null : this.settle, g = this.gesture;
     const lifted = g?.drag ? g.from : null;
     for (let i = 0; i < this.attempt.board.length; i++) {
       if (i === lifted) {
         const cell = cellAt(this.geometry, i);
-        this.fillCell(cell, 0, 0, 0x282031, .83);
-        if (cell.points) this.art.lineStyle(1, 0xd9c5e2, .42).strokePoints(this.polygon(cell, 0, 0, .94), true);
-        else this.art.lineStyle(1, 0xd9c5e2, .42).strokeRoundedRect(cell.x + 2, cell.y + 2, cell.width - 4, cell.height - 4, cell.radius);
+        paintShape(cell, 'rgba(40,32,49,.83)');
+        this.cellPath(ctx, cell, 2);
+        ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(217,197,226,.42)'; ctx.stroke();
       } else if (!settle || (i !== settle.from && i !== settle.to)) tile(i);
     }
     if (settle) {
       const from = cellAt(this.geometry, settle.from), to = cellAt(this.geometry, settle.to);
-      const remaining = (1 - Math.min(1, (performance.now() - settle.started) / 150)) ** 3;
+      const remaining = (1 - amount((performance.now() - settle.started) / 150)) ** 3;
       tile(settle.from, (to.x - from.x) * remaining, (to.y - from.y) * remaining);
-      const dx = (from.x - to.x + settle.dx) * remaining, dy = (from.y - to.y + settle.dy) * remaining;
-      tile(settle.to, dx, dy);
-      if (settle.dx || settle.dy) this.trailingLight({ ...to, x: to.x + dx, y: to.y + dy }, settle.dx, settle.dy, remaining);
+      tile(settle.to, (from.x - to.x + settle.dx) * remaining, (from.y - to.y + settle.dy) * remaining);
     }
     if (g && lifted !== null) {
       const target = this.positionAt(g.latestX, g.latestY);
-      if (target !== null && canSwap(this.level, lifted, target)) this.brackets(cellAt(this.geometry, target));
-      const cell = cellAt(this.geometry, lifted), offset = this.gestureOffset(g);
-      const dx = offset.x, dy = offset.y;
-      tile(lifted, dx, dy, true);
-      this.trailingLight({ ...cell, x: cell.x + dx, y: cell.y + dy }, dx, dy, 1);
+      if (target !== null && canSwap(this.level, lifted, target)) this.brackets(ctx, cellAt(this.geometry, target));
+      const offset = this.gestureOffset(g);
+      tile(lifted, offset.x, offset.y, true);
     }
-    this.hooks.paint();
+    ctx.restore();
   }
 }

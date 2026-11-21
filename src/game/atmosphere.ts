@@ -34,8 +34,9 @@ export class Atmosphere {
   private current: RGB[] = gels;
   private level: PaletteField | null = null;
   private board: readonly number[] | null = null;
+  private blendSolution = false;
   private pointer: ColourPointer | null = null;
-  private ripple: (ColourPointer & { started: number; win: boolean }) | null = null;
+  private ripple: (ColourPointer & { started: number }) | null = null;
   private active = false;
   private motion = true;
   private frame = 0;
@@ -68,9 +69,14 @@ export class Atmosphere {
     host.prepend(this.canvas);
     this.pointer = null; this.pointerPower = 0; this.pointerHeld = false; this.ripple = null;
   }
-  setModel(level: PaletteField | null, board: readonly number[] | null): void {
-    if (this.level === level && this.board === board) return;
-    this.level = level; this.board = board; this.target = level ? spatialPalette(level, board) : gels;
+  setModel(level: PaletteField | null, board: readonly number[] | null, blendSolution = false): void {
+    if (this.level === level && this.board === board && this.blendSolution === blendSolution) return;
+    this.level = level; this.board = board; this.blendSolution = blendSolution;
+    this.target = level ? spatialPalette(level, board) : gels;
+    if (level && board && blendSolution) {
+      const solved = spatialPalette(level, null);
+      this.target = this.target.map((color, i) => color.map((value, c) => value * .76 + solved[i]![c]! * .24) as unknown as RGB);
+    }
     if (!this.active || !this.motion) { this.current = this.target; this.draw(); }
   }
   configure(active: boolean, motion: boolean): void {
@@ -87,8 +93,8 @@ export class Atmosphere {
     this.pointerHeld = pointer !== null;
     if (pointer) { this.pointer = pointer; this.pointerPower = 1; }
   }
-  accepted(pointer: ColourPointer, win: boolean): void {
-    if (this.active && this.motion) this.ripple = { ...pointer, win, started: this.elapsed };
+  accepted(pointer: ColourPointer): void {
+    if (this.active && this.motion) this.ripple = { ...pointer, started: this.elapsed };
   }
   private tick = (now: number): void => {
     this.frame = 0;
@@ -108,7 +114,7 @@ export class Atmosphere {
     const time = this.motion ? this.elapsed / 1000 : 0;
     const ripple = this.ripple;
     const age = ripple ? (this.elapsed - ripple.started) / 1000 : 0;
-    const energy = ripple ? Math.exp(-age / (ripple.win ? .68 : .29)) : 0;
+    const energy = ripple ? Math.exp(-age / .29) : 0;
     this.current.forEach((c, i) => {
       const x = ((i % 3 + .46) / 3 + Math.sin(time * .56 + i * 1.17) * .093) * w;
       const y = ((Math.floor(i / 3) + .48) / 3 + Math.cos(time * .39 + i * 1.7) * .079) * h;
@@ -137,7 +143,7 @@ export class Atmosphere {
     }
     if (ripple && energy > .02) {
       const x = ripple.x * w, y = ripple.y * h;
-      const radius = Math.max(w, h) * (.21 + Math.min(age, 1.6) * (ripple.win ? .68 : .88));
+      const radius = Math.max(w, h) * (.21 + Math.min(age, 1.6) * .88);
       const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
       gradient.addColorStop(0, ripple.color + '70'); gradient.addColorStop(.47, '#f2b5e6a0'); gradient.addColorStop(1, '#8ccfef00');
       ctx.globalAlpha = energy * .86; ctx.fillStyle = gradient; ctx.fillRect(0, 0, w, h); ctx.globalAlpha = 1;

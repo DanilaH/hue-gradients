@@ -187,7 +187,7 @@ try {
   await small.keyboard.press('Escape');
   await layer(small, 'settings');
   assert.deepEqual(await state(small), beforeBack);
-  await button(small, 'Вернуться к игре').click();
+  await button(small, 'Продолжить').click();
   await tapCell(small, 0); await idle(small);
   assert.match(await small.locator('#guidance').innerText(), /закреплены/);
   await tapCell(small, 0); await idle(small);

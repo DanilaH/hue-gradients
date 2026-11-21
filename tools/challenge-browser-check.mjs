@@ -133,7 +133,7 @@ try {
   assert.deepEqual(active(await state()).board, initial.board);
   await page.locator('#settings').tap();
   assert.equal(await button('Помощь').count(), 0);
-  await button('Вернуться к игре').tap();
+  await button('Продолжить').tap();
   assert.deepEqual(errors, []);
   checks.push('real first five campaign wins unlock one challenge', 'pin does not consume the limit',
     'leaving and resuming preserves board and attempt ID', 'sixth move wins in one replay and loses in another',

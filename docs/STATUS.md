@@ -2,7 +2,7 @@
 
 All 16 available A1–G1 checkpoints were rerun against `431f06d`. This includes 192 unit tests, the signed 0.4.25 payload in Chromium 92 and 153, 30 offline daily boards and 8 independently checked wallpaper PNGs. Live services and physical device acceptance are recorded separately. [Results](evidence/queue-regression-a1-g1-2026-11-21.json)
 
-Signed Android preview **0.4.28/versionCode32** is based on `feat/m0-foundation` and includes all three fixes requested in PR #8. All 197 unit tests passed. The signed web payload passed startup and save recovery in Chromium 92 and 153. Physical Android acceptance remains open. [Delivery queue](porting/DELIVERY_QUEUE.md)
+Signed Android preview **0.4.29/versionCode33** brings V1 to `feat/m0-foundation` with tile-bound grain, a full-screen pause and one joined victory sequence. All 197 unit tests passed. The exact signed web payload passed startup and save recovery in Chromium 92 and 153. V2 starts with Personal Tasks after owner review. Physical Android feel remains open. [V1 evidence](evidence/v1-dreamy-psx-2026-11-21.json)
 
 | Stage | Actual state |
 | --- | --- |

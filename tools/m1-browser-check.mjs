@@ -134,7 +134,7 @@ try {
   assert.equal((await readState()).activeLevelId, 'gradient-002');
   await page.locator('#settings').click(); await page.locator('#restart').click(); await page.getByRole('button', { name: 'Отмена', exact: true }).click();
   assert.equal(await page.locator('#hue-app').getAttribute('data-layer'), 'settings');
-  await page.getByRole('button', { name: 'Вернуться к игре' }).click();
+  await page.getByRole('button', { name: 'Продолжить' }).click();
   assert.equal((await readState()).activeLevelId, 'gradient-002'); reports.push('next and restart confirmation');
   // Real two-tab writes share IndexedDB. The losing action is discarded rather than rebased.
   const tab = await context.newPage(); await tab.goto(base); await tab.waitForSelector('html[data-state=ready]');
@@ -254,7 +254,7 @@ try {
   await page.setViewportSize({ width: 320, height: 568 });
   await page.locator('#settings').click();
   assert.equal(await compactDialog(), true);
-  await page.getByRole('button', { name: 'Вернуться к игре' }).click();
+  await page.getByRole('button', { name: 'Продолжить' }).click();
   await page.setViewportSize({ width: 390, height: 844 });
   reports.push('saved picker colors and assisted attempt, mouse swipe, keyboard rail and two-step Back preserve the entire save');
 

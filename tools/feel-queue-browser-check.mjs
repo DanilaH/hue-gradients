@@ -49,6 +49,7 @@ try {
   }));
   const clipStartMillis = Date.now() - captureBase;
   await page.locator('#settings').tap();
+  await button('Настройки').tap();
   assert.equal(await check('Музыка').isChecked(), false);
   await check('Музыка').check();
   await idle();
@@ -69,7 +70,7 @@ try {
   await check('Музыка').uncheck();
   await idle();
   await page.waitForFunction(() => window.queueSound.loops[0]?.context.state === 'suspended');
-  await button('Вернуться к игре').tap();
+  await button('Продолжить').tap();
 
   const box = await page.locator('#board-region canvas').boundingBox();
   const left = { x: box.x + box.width * 3 / 8, y: box.y + box.height / 2 };
@@ -98,7 +99,7 @@ try {
   assert.equal(audio.loops.length, 1);
   assert.equal(audio.loops[0].duration, 12);
   assert.equal(audio.loops[0].state, 'suspended');
-  assert(Math.abs(audio.glasses[0] - .56) < .005);
+  assert(Math.abs(audio.glasses[0] - .24) < .005);
   assert.equal(audio.vibrations, 1);
   if (recording) await page.waitForTimeout(1000);
   const font = await page.locator('#title').evaluate(node => getComputedStyle(node).fontFamily);
@@ -125,7 +126,7 @@ try {
     });
     assert(fit.scroll <= fit.visible + 1 && !fit.missed.length, JSON.stringify({ size, fit }));
     settingsFit.push(size);
-    await button('Вернуться к игре').tap();
+    await button('Продолжить').tap();
   }
   await larger.evaluate(el => el.remove());
   assert.deepEqual(errors, []);

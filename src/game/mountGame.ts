@@ -27,13 +27,15 @@ import { publishedBenchmark } from '../domain/playerProgress';
 import { EditorView } from './editorView';
 import { renderAlbum, type AlbumPosition, type AlbumRoute } from './albumView';
 import { WorkCardView } from './workCardView';
-import { colourPrism, flashPrismEdge, victoryPrism } from './victoryPrism';
+import { colourPrism, victoryPrism } from './victoryPrism';
+import { VictoryArtwork } from './victoryArtwork';
+import { LANDING_MS, VICTORY_END_MS } from './victoryMotion';
 import { browserExportFiles, type ExportFiles } from '../app/exportFiles';
 import './game.css';
 
 const clockNow = () => Math.floor(performance.timeOrigin + performance.now());
 
-type Layer = 'none' | 'secret' | 'help' | 'help-menu' | 'pin-guide' | 'result' | 'meta' | 'restart' | 'recovery' | 'settings';
+type Layer = 'none' | 'secret' | 'help' | 'help-menu' | 'pin-guide' | 'result' | 'meta' | 'restart' | 'recovery' | 'settings' | 'preferences';
 interface Activity extends Pick<GameplayActivityCoordinator, 'isBlocked' | 'onBlockedChange' | 'setGameplayDesired'> {}
 
 export async function mountGame(parent: HTMLElement, store: TransactionalLocalStore, activity: Activity, options: { haptic?: Haptic; exportFiles?: ExportFiles; dailySource?: () => Promise<DailyFeed>; onIntent?: (intent: InputIntent) => void } = {}): Promise<{ back(): boolean; destroy(): void }> {
@@ -96,7 +98,22 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   let shownAlbum: AlbumRoute | null = null;
   const albumPositions = new Map<AlbumRoute['tab'], AlbumPosition>();
   const prism = byId('victory-prism');
-  let prismGlint: Animation | null = null;
+  const artwork = new VictoryArtwork(dialog);
+  let victoryPhase: 'approach' | 'landed' | 'still' = 'still';
+  let pauseFocus = 0;
+  let pauseOrigin: 'none' | 'secret' | 'help' = 'none';
+  const isPause = (value: string | undefined) => value === 'settings' || value === 'preferences';
+  function setVictoryPhase(phase: typeof victoryPhase): void {
+    victoryPhase = phase;
+    root.dataset.victoryPhase = phase;
+    dialog.dataset.victoryPhase = phase;
+  }
+  function stopVictory(): void {
+    if (victoryPhase === 'still') return;
+    setVictoryPhase('still');
+    scene.finishVictory();
+    artwork.clearMotion();
+  }
   let lastFocus: HTMLElement | null = null;
   let metaRoute: MetaRoute = { kind: 'chapter', levelId: session.state.activeLevelId };
   let metaHistory: MetaRoute[] = [], metaReturn: Layer = 'none';
@@ -139,7 +156,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   const frame = new Promise<void>(resolve => { resolveFrame = resolve; });
   const size = () => { const rect = region.getBoundingClientRect(), dpr = getRenderPixelRatio(); return { width: Math.max(1, rect.width), height: Math.max(1, rect.height), dpr }; };
   const startSize = size();
-  const game = new Phaser.Game({ type: Phaser.AUTO, parent: region, width: Math.round(startSize.width * startSize.dpr), height: Math.round(startSize.height * startSize.dpr),
+  const game = new Phaser.Game({ type: Phaser.CANVAS, parent: region, width: Math.round(startSize.width * startSize.dpr), height: Math.round(startSize.height * startSize.dpr),
     transparent: true, scene: [scene], scale: { mode: Phaser.Scale.NONE },
     callbacks: { preBoot: g => g.events.once(GAME_PRESENTABLE, resolveFrame), postBoot: g => { g.canvas.style.width = `${startSize.width}px`; g.canvas.style.height = `${startSize.height}px`; } } });
 
@@ -383,6 +400,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   }
   function renderDialog(): void {
     rememberAlbum();
+    const switchLayer = dialog.dataset.layer !== layer;
+    if (switchLayer) pauseFocus = 0;
     shownAlbum = layer === 'meta' && metaRoute.kind === 'album' ? metaRoute : null;
     dialog.dataset.album = String(!!shownAlbum);
     const chapterUnlock = byId('chapter-unlock');
@@ -396,7 +415,6 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     dialog.dataset.workCard = String(cardKey !== null);
     dialog.dataset.picker = String(layer === 'meta' && metaRoute.kind === 'chapter');
     dialog.dataset.chapterMenu = String(layer === 'meta' && metaRoute.kind === 'chapter' && metaRoute.chapterMenu !== undefined);
-    if (layer !== 'result' || !motionAllowed()) { prismGlint?.cancel(); prismGlint = null; }
     const open = layer !== 'none' && layer !== 'help' && layer !== 'secret';
     if (!open) { if (dialog.open) { dialog.close(); lastFocus?.focus(); } return; }
     const draftId = layer === 'meta' && metaRoute.kind === 'draft' ? metaRoute.draftId : null;
@@ -405,7 +423,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     byId('dialog-copy').textContent = ''; if (!editorView && !workCard) actions.replaceChildren();
     const { level, attempt, own, challenge, timed, daily, personal } = current();
     dialog.dataset.challengeLost = String(challenge?.status === 'lost' || !!timed || personal?.status === 'lost');
-    prism.hidden = layer !== 'result' || challenge?.status === 'lost' || !!timed || personal?.status === 'lost';
+    prism.hidden = root.dataset.victory !== 'true';
     if (layer === 'result' && personal) {
       const won = personal.status === 'won';
       if (won) colourPrism(prism, level);
@@ -449,7 +467,11 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
           chapterUnlock.textContent = rewardTitle(unlocked);
           chapterUnlock.hidden = false;
         }
-        if (next) button('Дальше', () => startLevel(next));
+        if (next) {
+          const onward = button('Дальше', () => startLevel(next));
+          onward.classList.add('result-next');
+          onward.setAttribute('aria-label', 'Дальше');
+        }
         else byId('dialog-copy').textContent += '\nКампания собрана';
         button('В альбом', () => showMeta({ kind: 'card', levelId: level.id }), !!next);
       }
@@ -465,13 +487,16 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       button('Отмена', cancelRestart, true);
     } else if (layer === 'settings') {
       byId('dialog-title').textContent = 'Пауза';
-      const close = button('×', () => { layer = 'none'; render(); }, true);
-      close.className = 'quiet settings-close';
-      close.setAttribute('aria-label', 'Вернуться к игре');
-      close.autofocus = true;
-      if (attempt && !attempt.completed && !challenge && !timed && !daily && !personal) button('Помощь', () => { layer = 'help-menu'; render(); }, true);
-      if (timed) button('К испытаниям', leaveTimed, true);
-      else button('Заново', () => askRestart(session.state.activeLevelId), true).id = 'restart';
+      button('Продолжить', resumeBoard, true);
+      if (attempt && !attempt.completed && !challenge && !timed && !daily && !personal) {
+        button('Помощь', () => { layer = 'help-menu'; render(); }, true);
+      }
+      if (!timed) button('Начать заново', () => askRestart(session.state.activeLevelId), true).id = 'restart';
+      button('Настройки', () => { layer = 'preferences'; render(); }, true);
+      button(personal ? 'К заданиям' : daily ? 'К календарю' : timed || challenge ? 'К испытаниям' : own ? 'В редактор' : 'К уровням',
+        leaveBoard, true);
+    } else if (layer === 'preferences') {
+      byId('dialog-title').textContent = 'Настройки';
       for (const [key, label] of [['sound', 'Звуки'], ['music', 'Музыка'], ['haptics', 'Вибрация'], ['motion', 'Движение фона'], ['statistics', 'Статистика уровня']] as const) {
         const row = document.createElement('label'); row.className = 'setting';
         const input = document.createElement('input'); input.type = 'checkbox'; input.checked = session.state.preferences[key]; input.disabled = busy || activity.isBlocked();
@@ -482,6 +507,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
         };
         const title = document.createElement('span'); title.textContent = label; row.append(title, input); actions.append(row);
       }
+      button('Продолжить', resumeBoard, true);
     } else if (layer === 'help-menu') {
       byId('dialog-title').textContent = 'Помощь';
       byId('dialog-copy').textContent = 'Подсветка и просмотр не добавят ходов. Любая помощь отмечает результат «С помощью».';
@@ -574,16 +600,28 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       }
     }
     if (!dialog.open) { lastFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null; dialog.showModal(); }
+    if (isPause(layer) && !busy && !activity.isBlocked()) {
+      (actions.querySelectorAll<HTMLElement>('button, input')[pauseFocus] ?? actions.querySelector<HTMLElement>('button, input'))?.focus({ preventScroll: true });
+    } else if (switchLayer && layer === 'result') actions.querySelector<HTMLElement>('button')?.focus({ preventScroll: true });
   }
   function render(): void {
     if (!alive) return;
     const { level, attempt, own, challenge, timed, daily, personal } = current();
     if (!attempt && !session.pending) layer = 'recovery';
     if (layer === 'none' && (challenge && challenge.status !== 'playing' || timed?.run.remainingMs === 0 || personal && personal.status !== 'playing')) layer = 'result';
+    const victory = layer === 'result' && attempt?.completed && !timed && challenge?.status !== 'lost' && personal?.status !== 'lost';
+    if (!victory || busy || !motionAllowed()) stopVictory();
+    root.dataset.victory = dialog.dataset.victory = String(!!victory);
+    artwork.show(victory ? level : null);
+    setVictoryPhase(victoryPhase);
     root.dataset.level = level.id; root.dataset.moves = String(attempt?.moves ?? 0); root.dataset.busy = String(busy); root.dataset.layer = layer;
     root.dataset.mode = personal ? 'personal' : daily ? 'daily' : timed ? 'timed' : challenge ? 'challenge' : own ? 'author' : 'campaign';
     root.dataset.motion = String(motionAllowed());
-    root.style.setProperty('--color-a', level.solvedTileColors[0]!); root.style.setProperty('--color-b', level.solvedTileColors.at(-1)!);
+    const pausedBoard = isPause(layer) || layer === 'restart' && isPause(restartReturn);
+    const hiddenField = layer === 'secret' || pausedBoard && pauseOrigin === 'secret';
+    const preview = layer === 'help' || pausedBoard && pauseOrigin === 'help';
+    root.style.setProperty('--color-a', hiddenField ? '#392449' : level.solvedTileColors[0]!);
+    root.style.setProperty('--color-b', hiddenField ? '#164657' : level.solvedTileColors.at(-1)!);
     byId('levels').textContent = personal ? '‹ Задания' : daily ? '‹ Календарь' : timed || challenge ? '‹ Испытания' : own ? '‹ Редактор' : '‹ Уровни';
     byId('title').textContent = personal ? personalTaskName(personal) : daily ? dailyLabel(daily.date) : own || challenge || timed ? level.title : `Уровень ${level.ordinal}`;
     const guidance = byId('guidance');
@@ -594,7 +632,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     footerAction.hidden = layer !== 'help' && layer !== 'secret' && !attempt?.completed;
     footerAction.textContent = layer === 'secret' ? 'Открыть поле' : layer === 'help' ? 'К игре' : 'Результат';
     for (const node of root.querySelectorAll<HTMLButtonElement>('.hud button,footer button')) node.disabled = busy || activity.isBlocked() || !!session.pending;
-    if (attempt) scene.setView(level, attempt, layer === 'help', ready && !busy && !activity.isBlocked() && layer === 'none' && !session.pending, layer === 'secret');
+    if (attempt) scene.setView(level, attempt, preview, ready && !busy && !activity.isBlocked() && layer === 'none' && !session.pending, hiddenField);
     else scene.setView(level, initialAttempt, false, false);
     const picker = layer === 'meta' && metaRoute.kind === 'chapter' ? metaRoute : null;
     const cardId = selectedWork(), authorCard = selectedAuthorWork();
@@ -610,9 +648,9 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     } else if (gallery) {
       atmosphere.setModel(null, null);
     } else {
-      atmosphere.setModel(layer === 'secret' ? null : level, layer === 'help' || layer === 'secret' ? null : attempt?.board ?? initialAttempt.board);
+      atmosphere.setModel(hiddenField ? null : level, preview || hiddenField ? null : attempt?.board ?? initialAttempt.board, !hiddenField);
     }
-    atmosphere.configure(ready && !activity.isBlocked() && (picker !== null || cardId !== null || authorCard !== null || gallery || ['none', 'help', 'result'].includes(layer)), motionAllowed());
+    atmosphere.configure(ready && !activity.isBlocked() && (picker !== null || cardId !== null || authorCard !== null || gallery || ['none', 'help', 'settings', 'preferences'].includes(layer) || layer === 'result' && victoryPhase === 'approach'), motionAllowed());
     feedback.configure(session.state.preferences, !ready || activity.isBlocked());
     music.configure(ready && !activity.isBlocked() && session.state.preferences.music);
     activity.setGameplayDesired(ready && !busy && layer === 'none' && !attempt?.completed && !activity.isBlocked());
@@ -663,18 +701,39 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       notice = session.pending ? 'Не удалось подтвердить сохранение.' : 'Поле изменилось в другом окне. Повтори действие.';
       if (session.pending && !editorView) layer = 'recovery';
     } finally {
-      busy = false; render(); resize();
-      const { level, attempt: next } = current();
-      if (swapAccepted && timedBefore && current().timed?.run.cleared === timedBefore.run.cleared + 1 &&
-          !activity.isBlocked() && foreground === foregroundEpoch) feedback.accepted('win');
-      if (swapAccepted && pair && previous && next && previous.attemptId === next.attemptId && !activity.isBlocked() &&
-          foreground === foregroundEpoch && next.moves === previous.moves + cost &&
-          next.board[pair.from] === previous.board[pair.to] && next.board[pair.to] === previous.board[pair.from]) {
-        scene.presentSwap(previous, next, pair.from, pair.to, motionAllowed(), cost);
-        const cell = scene.boardCell(pair.to);
-        atmosphere.accepted(atmospherePoint({ ...cellCenter(cell), color: level.solvedTileColors[next.board[pair.to]!]! }), next.completed);
-        feedback.accepted(next.completed ? 'win' : 'swap');
-        if (next.completed && motionAllowed()) prismGlint = flashPrismEdge(prism);
+      busy = false;
+      const { level, attempt: next, timed, personal, challenge } = current();
+      const eligible = swapAccepted && !activity.isBlocked() && foreground === foregroundEpoch;
+      const acceptedPair = eligible && pair && previous && next && previous.attemptId === next.attemptId &&
+        next.moves === previous.moves + cost && next.board[pair.from] === previous.board[pair.to] &&
+        next.board[pair.to] === previous.board[pair.from] ? pair : null;
+      const won = !!(acceptedPair && next?.completed && !timed && challenge?.status !== 'lost' && personal?.status !== 'lost');
+      if (won && motionAllowed()) setVictoryPhase('approach');
+      render(); resize();
+      if (eligible && timedBefore && timed?.run.cleared === timedBefore.run.cleared + 1) feedback.accepted('win');
+      if (acceptedPair && previous && next) {
+        scene.presentSwap(previous, next, acceptedPair.from, acceptedPair.to, motionAllowed(), cost);
+        if (won && victoryPhase === 'approach') {
+          scene.presentVictory(acceptedPair.to, (elapsed, board, target) => {
+            if (elapsed < LANDING_MS) return;
+            const outer = dialog.getBoundingClientRect(), inner = region.getBoundingClientRect();
+            const x = inner.x - outer.x, y = inner.y - outer.y;
+            const origin = { x: target.x + x, y: target.y + y };
+            if (victoryPhase === 'approach') {
+              setVictoryPhase('landed');
+              artwork.start(level, { ...board, x: board.x + x, y: board.y + y }, origin);
+              atmosphere.configure(false, motionAllowed());
+              feedback.accepted('win');
+            }
+            if (elapsed < VICTORY_END_MS) artwork.frame(elapsed - LANDING_MS, origin);
+            else { artwork.clearMotion(); setVictoryPhase('still'); }
+          });
+        } else if (won) feedback.accepted('win');
+        else {
+          const cell = scene.boardCell(acceptedPair.to);
+          atmosphere.accepted(atmospherePoint({ ...cellCenter(cell), color: level.solvedTileColors[next.board[acceptedPair.to]!]! }));
+          feedback.accepted('swap');
+        }
       }
     }
     return succeeded;
@@ -716,7 +775,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       popMeta(); return true;
     }
     if (layer === 'restart') { cancelRestart(); return true; }
-    if (layer === 'help-menu') { layer = 'settings'; render(); return true; }
+    if (layer === 'help-menu' || layer === 'preferences') { layer = 'settings'; render(); return true; }
+    if (layer === 'settings') { resumeBoard(); return true; }
     if ((layer === 'result' || layer === 'none') && current().personal) { leavePersonal(); return true; }
     if ((layer === 'result' || layer === 'none') && current().daily) { leaveDaily(); return true; }
     if ((layer === 'result' || layer === 'none') && current().timed) { leaveTimed(); return true; }
@@ -732,15 +792,32 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (layer === 'help' || layer === 'secret') { layer = 'none'; render(); return; }
     if (current().attempt?.completed) { layer = 'result'; render(); }
   }, { signal: listeners.signal });
-  byId('levels').addEventListener('click', () => {
+  function leaveBoard(): void {
     if (current().personal) leavePersonal();
     else if (current().daily) leaveDaily();
     else if (current().timed) leaveTimed();
     else if (current().challenge) leaveChallenge();
     else if (current().own) leaveAuthor();
     else showMeta({ kind: 'chapter', levelId: session.state.activeLevelId });
+  }
+  byId('levels').addEventListener('click', leaveBoard, { signal: listeners.signal });
+  actions.addEventListener('focusin', event => {
+    if (isPause(layer)) pauseFocus = [...actions.querySelectorAll('button, input')].indexOf(event.target as HTMLElement);
   }, { signal: listeners.signal });
-  byId('settings').addEventListener('click', () => { scene.cancel(); clearMark(); layer = 'settings'; render(); }, { signal: listeners.signal });
+  actions.addEventListener('keydown', event => {
+    if (!isPause(layer) || !['ArrowUp', 'ArrowDown'].includes(event.key)) return;
+    const entries = [...actions.querySelectorAll<HTMLElement>('button:not(:disabled), input:not(:disabled)')];
+    if (!entries.length) return;
+    const index = entries.indexOf(document.activeElement as HTMLElement);
+    entries[(index + (event.key === 'ArrowDown' ? 1 : entries.length - 1)) % entries.length]?.focus();
+    event.preventDefault();
+  }, { signal: listeners.signal });
+  function resumeBoard(): void { layer = pauseOrigin; pauseOrigin = 'none'; render(); }
+  byId('settings').addEventListener('click', () => {
+    scene.cancel(); clearMark();
+    pauseOrigin = layer === 'secret' || layer === 'help' ? layer : 'none';
+    layer = 'settings'; render();
+  }, { signal: listeners.signal });
   systemMotion.addEventListener('change', () => { scene.cancel(); render(); }, { signal: listeners.signal });
   dialog.addEventListener('cancel', event => { event.preventDefault(); if (!back()) { layer = 'none'; render(); } }, { signal: listeners.signal });
   window.addEventListener('keydown', event => {
@@ -761,6 +838,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       clearMark();
       scene.cancel();
       if (layer === 'help') layer = 'none';
+      if (pauseOrigin === 'help') pauseOrigin = 'none';
       game.sound.mute = true;
       if (game.isBooted) game.loop.sleep();
     }
@@ -769,5 +847,5 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   });
   const clockTicker = setInterval(updateTimedClock, 200);
   await frame; ready = true; render(); resize();
-  return { back, destroy() { alive = false; clearInterval(clockTicker); clearMark(); editorView?.destroy(); workCard?.destroy(); prismGlint?.cancel(); exportFiles.destroy?.(); listeners.abort(); observer.disconnect(); unblock(); atmosphere.destroy(); feedback.destroy(); music.destroy(); activity.setGameplayDesired(false); store.close(); destroyRenderer(game); } };
+  return { back, destroy() { alive = false; clearInterval(clockTicker); clearMark(); editorView?.destroy(); workCard?.destroy(); stopVictory(); exportFiles.destroy?.(); listeners.abort(); observer.disconnect(); unblock(); atmosphere.destroy(); feedback.destroy(); music.destroy(); activity.setGameplayDesired(false); store.close(); destroyRenderer(game); } };
 }

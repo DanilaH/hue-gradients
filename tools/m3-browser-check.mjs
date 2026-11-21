@@ -140,6 +140,7 @@ try{
  passed.push('offline progress shows real XP, chapter completion, victory history and pending world comparison');
  await page.keyboard.press('Escape');
  await page.locator('#settings').click();
+ await page.getByRole('button',{name:'Настройки',exact:true}).click();
  await page.getByRole('checkbox',{name:'Статистика уровня',exact:true}).uncheck();
  await idle();
  await page.reload();await page.waitForSelector('html[data-state=ready]');

@@ -10,6 +10,8 @@ Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and
 
 ## Current slice
 
+V1 at signed 0.4.29/versionCode33 follows the merged brief in PR #9 at `b53e8ef`. Chromium recorded a 4×4 win and a final touch exchange from a 2.4× 13×13 checkpoint. Tile grain followed drag and kept the authored mean, pause held the save, and the landing replaced grid seams with the continuous field while firing one low cue and vibration call. Going on immediately cancels the presentation, a restored result is still, and export matches the original RGB interpolation. Physical Android sound, haptics and art approval are open. After the owner sees V1, begin V2 with the Personal Tasks comparison frame. [Evidence](evidence/v1-dreamy-psx-2026-11-21.json)
+
 PR #8 fixes shipped in order B3 (0.4.26, `58257d6`), D2 (0.4.27, `ab14dac`) and C2 (0.4.28). Chromium passed seven 7×7 rounds, clock changes and the prior signed save, four assignment dates, a 30/60 profile and the date rollback, then all four camera edges and touch input on 13×13. The final signed APK web payload passed startup and save recovery in Chromium 92 and 153. The phone pass still needs an attached Android device for lifecycle, real date changes and multitouch. [B3](evidence/pr8-b3-2026-11-21.json) · [D2](evidence/pr8-d2-2026-11-21.json) · [C2](evidence/pr8-c2-2026-11-21.json)
 
 G1 (0.4.25/versionCode29, 7b82000) closes the available local queue through G1. The signed preview contains independently controlled opt-in ambient music. Cancel leaves zero moves, the winning swap records one move, and the browser records one victory cue and one vibration API call. Resources from the exact APK passed Chromium 92 and 158 startup and save recovery. [Evidence](evidence/queue-g1-2026-11-20.json)

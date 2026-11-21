@@ -79,11 +79,13 @@ try {
     await page.screenshot({ path: screenshot, scale: 'css' });
     const { x, y } = points[to];
     const rgb = execFileSync('python3', ['-c',
-      'from PIL import Image; import sys; im=Image.open(sys.argv[1]).convert("RGB"); print("#%02x%02x%02x"%im.getpixel((int(sys.argv[2]),int(sys.argv[3]))))',
+      'from PIL import Image; import sys; im=Image.open(sys.argv[1]).convert("RGB"); x,y=map(int,sys.argv[2:]); print("#%02x%02x%02x"%tuple(round(s/64) for s in map(sum,zip(*im.crop((x-4,y-4,x+4,y+4)).getdata()))))',
       screenshot, String(Math.round(x)), String(Math.round(y))], { encoding: 'utf8' }).trim();
-    assert.equal(rgb, level.solvedTileColors[expected[to]].toLowerCase());
+    const expectedRgb = level.solvedTileColors[expected[to]];
+    assert([1, 3, 5].every(channel => Math.abs(parseInt(rgb.slice(channel, channel + 2), 16) -
+      parseInt(expectedRgb.slice(channel, channel + 2), 16)) <= 2), JSON.stringify({ rgb, expectedRgb }));
     await page.locator('#settings').tap();
-    await button('Заново').tap();
+    await page.locator('#restart').tap();
     await button('Начать заново').tap();
     await idle();
     const replay = await getAttempt();
@@ -99,7 +101,7 @@ try {
   const video = page.video();
   await context.close();
   if (video) await video.saveAs(`${out}/geometry.webm`);
-  const report = { browser: browser.version(), results, method: 'Chromium touch and Pillow pixel samples' };
+  const report = { browser: browser.version(), results, method: 'Chromium touch and Pillow 8×8 tile interiors' };
   await writeFile(`${out}/browser.json`, JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report));
 } finally {

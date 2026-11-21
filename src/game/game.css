@@ -23,7 +23,7 @@ h1 { font-size: 1rem; font-weight: 550; text-align: center; margin: 0; max-width
 #board-region {
   position: relative;
   min-width: 0; min-height: 0; margin-inline: clamp(3px,2.35vw,10px); overflow: hidden;
-  box-shadow: 0 0 25px #e6a6fc40; touch-action: none; transition: opacity 650ms ease;
+  box-shadow: 0 0 25px #e6a6fc32; touch-action: none;
 }
 .tile-mark { position: absolute; z-index: 1; pointer-events: none; border-radius: 3px; }
 .tile-mark::after {
@@ -54,24 +54,18 @@ footer { min-height: 56px; padding: 2px 12px 6px; display: flex; gap: 10px; alig
 #dialog-copy { font-size: 16px; color: #fff0e4; white-space: pre-line; }
 #dialog-copy:empty { display: none; }
 #dialog-actions { display: grid; gap: 10px; }
-#game-dialog[data-layer=settings] { padding: 16px; }
-#game-dialog[data-layer=settings] h2 { padding-right: 52px; }
-#game-dialog[data-layer=settings] #dialog-actions { gap: 1px; }
 #game-dialog[data-layer=help-menu] { width: min(94%,440px); padding: 16px; }
 #game-dialog[data-layer=help-menu] #dialog-copy { margin: 8px 0 12px; }
 #game-dialog[data-layer=help-menu] #dialog-actions { gap: 6px; }
 #game-dialog[data-layer=help-menu] #dialog-actions button { text-align: left; padding: 7px 12px; }
 @media (orientation:landscape) and (max-height:450px) {
   #game-dialog[data-layer=help-menu] #dialog-actions { grid-template-columns: repeat(2,minmax(0,1fr)); }
-  #game-dialog[data-layer=settings] { width: min(96%,620px); max-height: calc(100% - 12px); padding: 12px; }
-  #game-dialog[data-layer=settings] #dialog-actions { grid-template-columns: repeat(3,minmax(0,1fr)); }
-  #game-dialog[data-layer=settings] .setting { padding-inline: 5px; line-height: 1.2; overflow-wrap: anywhere; }
 }
-.settings-close { position: absolute; top: 12px; right: 12px; width: 48px; padding: 0; font-size: 1.5rem; }
 #restart { text-align: left; padding: 8px 0; background: transparent; border-width: 0 0 1px; border-radius: 0; }
 .setting { display: flex; justify-content: space-between; align-items: center; min-height: 48px; gap: 12px; cursor: pointer; }
 .setting input { width: 24px; height: 24px; accent-color: #e3ccf8; }
-#hue-app[data-layer=result] #board-region { opacity: 0; transition-delay: 340ms; pointer-events: none; }
+#hue-app[data-layer=result]:not([data-victory-phase=approach]) #board-region { visibility: hidden; }
+#hue-app[data-layer=result] #board-region { pointer-events: none; }
 #hue-app[data-layer=result] > .hud, #hue-app[data-layer=result] > footer { visibility: hidden; }
 #game-dialog[data-layer=result] { position: fixed; inset: 0; margin: 0; width: 100%; height: 100%; max-width: none; max-height: none; border: 0; border-radius: 0; padding: 20px; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; overflow: auto; }
 #game-dialog[data-layer=result]::backdrop { background: #12092244; backdrop-filter: none; }
@@ -83,10 +77,6 @@ footer { min-height: 56px; padding: 2px 12px 6px; display: flex; gap: 10px; alig
 #game-dialog[data-layer=result] button.quiet { background: transparent; color: #fff2de; border-color: transparent; font-weight: 400; text-shadow: 0 1px 8px #171124; }
 #victory-prism { width: clamp(96px,23vh,174px); height: clamp(96px,23vh,174px); flex-shrink: 0; margin-bottom: 8px; filter: drop-shadow(0 0 8px #fff1dca0) drop-shadow(0 0 24px var(--facet-1,#d8b5ff)); }
 #victory-prism svg { width: 100%; height: 100%; }
-[data-motion=true] #victory-prism { animation: prism-appear 380ms ease-out both, floating-prism 6s ease-in-out infinite; }
-@keyframes prism-appear { from { opacity: 0; } to { opacity: 1; } }
-@keyframes floating-prism { 0%,100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-7px) rotate(3deg); } }
-[data-motion=false] #board-region { transition: none; }
 #startup, #startup-preload { position: fixed; inset: 0; z-index: 50; background: #171324; color: #fff; display: grid; place-items: center; text-align: center; padding: 24px; }
 #startup-preload[aria-hidden=true] { display: none; }
 #rotate-gate { display: none; }
@@ -103,7 +93,95 @@ footer { min-height: 56px; padding: 2px 12px 6px; display: flex; gap: 10px; alig
   #chapter-unlock { grid-area: unlock; margin: 0; }
   #game-dialog[data-layer=result] #dialog-actions { grid-area: actions; justify-self: center; }
 }
-@media (prefers-reduced-motion:reduce) { #board-region { transition: none; } #victory-prism { animation: none !important; } }
+/* The board, pause and win share the same sharp corners and softened light. */
+#game-dialog[data-layer=settings], #game-dialog[data-layer=preferences] {
+  position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none;
+  margin: 0; border: 0; border-radius: 0; padding: 18px 24px; box-sizing: border-box;
+  background: linear-gradient(178deg,#100a1ae5,#1b112e79 33%,#21132f8e 66%,#0d0a1be8);
+  text-shadow: 0 2px 5px #0b0719; overflow: auto; overscroll-behavior: contain;
+}
+#game-dialog[data-layer=settings]::backdrop, #game-dialog[data-layer=preferences]::backdrop {
+  background: #39214940; backdrop-filter: blur(1.5px);
+}
+#game-dialog[data-layer=settings]::before, #game-dialog[data-layer=preferences]::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; opacity: .23;
+  background: repeating-conic-gradient(#1c032b74 0 25%,#feceee49 0 50%) 0 0 / 4px 4px;
+}
+#game-dialog[data-layer=settings] h2, #game-dialog[data-layer=preferences] h2 {
+  position: relative; width: min(100%,340px); margin: clamp(16px,13vh,110px) auto 15px;
+  font-size: clamp(1.35rem,7vw,2.3rem); font-weight: 650; letter-spacing: .19em; text-transform: uppercase;
+}
+#game-dialog[data-layer=settings] #dialog-actions, #game-dialog[data-layer=preferences] #dialog-actions {
+  position: relative; width: min(100%,340px); margin-inline: auto; gap: 0;
+  border-top: 1px solid #fff2de5e;
+}
+#game-dialog[data-layer=settings] #dialog-actions button, #game-dialog[data-layer=preferences] #dialog-actions > * {
+  position: relative; border: 0; border-bottom: 1px solid #fff2de3b; border-radius: 0;
+  padding: 7px 13px; min-height: 52px; background: transparent; color: #fff2de;
+  text-align: start; text-shadow: inherit; overflow-wrap: anywhere;
+}
+#game-dialog[data-layer=settings] #dialog-actions button:first-child { font-weight: 700; }
+#game-dialog[data-layer=settings] #dialog-actions button:focus,
+#game-dialog[data-layer=preferences] #dialog-actions button:focus,
+#game-dialog[data-layer=preferences] .setting:focus-within { outline: 0; background: #1a10394a; }
+#game-dialog[data-layer=settings] #dialog-actions button:focus::after,
+#game-dialog[data-layer=settings] #dialog-actions button:active::after,
+#game-dialog[data-layer=preferences] #dialog-actions > :focus-within::after,
+#game-dialog[data-victory=true] #dialog-actions button:focus-visible::after {
+  content: ''; position: absolute; inset: 3px 0; pointer-events: none;
+  background:
+    linear-gradient(#fff1db,#fff1db) top left / 12px 2px, linear-gradient(#fff1db,#fff1db) top left / 2px 12px,
+    linear-gradient(#fff1db,#fff1db) top right / 12px 2px, linear-gradient(#fff1db,#fff1db) top right / 2px 12px,
+    linear-gradient(#fff1db,#fff1db) bottom left / 12px 2px, linear-gradient(#fff1db,#fff1db) bottom left / 2px 12px,
+    linear-gradient(#fff1db,#fff1db) bottom right / 12px 2px, linear-gradient(#fff1db,#fff1db) bottom right / 2px 12px;
+  background-repeat: no-repeat;
+}
+#game-dialog[data-layer=preferences] .setting input { flex: 0 0 24px; margin: 0; }
+#game-dialog[data-layer=preferences] .setting input:focus { outline: 0; }
+#game-dialog[data-victory=true] { isolation: isolate; justify-content: center; padding-bottom: clamp(80px,19vh,155px); }
+#game-dialog[data-victory=true]::backdrop { background: transparent; }
+.victory-art, .victory-effects { display: none; position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+#game-dialog[data-victory=true]:not([data-victory-phase=approach]) .victory-art { display: block; z-index: -3; }
+#game-dialog[data-victory=true]:not([data-victory-phase=approach])::before {
+  content: ''; position: absolute; inset: 0; z-index: -2; pointer-events: none;
+  background:
+    repeating-conic-gradient(#200a3422 0 25%,#fff2e012 0 50%) 0 0 / 4px 4px,
+    radial-gradient(ellipse at 50% 38%,#28203e0d 10%,#1a122d4c 75%,#130d2263);
+}
+#game-dialog[data-victory-phase=landed] .victory-effects { display: block; z-index: -1; }
+#game-dialog[data-victory-phase=approach] > :is(#victory-prism,h2,#dialog-copy,#chapter-unlock) { opacity: 0; }
+#game-dialog[data-victory=true] h2 {
+  font-weight: 720; letter-spacing: .15em;
+  text-shadow: 0 2px 3px #1c142e,0 0 32px #200c39;
+}
+#game-dialog[data-victory=true] #dialog-copy, #game-dialog[data-victory=true] #chapter-unlock {
+  margin: 4px 0; text-shadow: 0 1px 2px #130b1b,0 0 12px #150b20;
+}
+#game-dialog[data-victory=true] #dialog-actions {
+  position: absolute; bottom: clamp(14px,5vh,52px); width: min(calc(100% - 32px),300px);
+}
+#game-dialog[data-victory=true] #dialog-actions button {
+  position: relative; border: 0; border-radius: 0; background: #211334bc; color: #fff2de;
+  box-shadow: 0 6px 20px #2113342a; text-shadow: 0 1px 4px #10051c;
+}
+#game-dialog[data-victory=true] #dialog-actions .quiet { background: #21133474; font-weight: 500; }
+#game-dialog[data-victory=true] .result-next { text-transform: uppercase; letter-spacing: .18em; font-weight: 700; }
+#game-dialog[data-victory=true] .result-next::before { content: '→'; position: absolute; right: 18px; }
+#game-dialog[data-victory=true] #dialog-actions button:focus-visible { outline: 0; }
+#hue-app[data-motion=true] #game-dialog[data-victory-phase=landed] > :is(#victory-prism,h2,#dialog-copy,#chapter-unlock) {
+  animation: result-light-in 270ms ease-out both;
+}
+@keyframes result-light-in { from { opacity: 0; } to { opacity: 1; } }
+@media (orientation: landscape) and (max-height:450px) {
+  #game-dialog[data-layer=settings] h2, #game-dialog[data-layer=preferences] h2 { margin-top: 0; }
+  #game-dialog[data-layer=settings] #dialog-actions, #game-dialog[data-layer=preferences] #dialog-actions {
+    grid-template-columns: repeat(2,minmax(0,1fr)); column-gap: 12px; width: min(100%,540px);
+  }
+  #game-dialog[data-layer=settings] h2, #game-dialog[data-layer=preferences] h2 { width: min(100%,540px); }
+  #game-dialog[data-victory=true] { padding: 14px 24px; }
+  #game-dialog[data-victory=true] #dialog-actions { position: relative; bottom: auto; }
+  #game-dialog[data-victory-phase=approach] #dialog-actions { justify-self: end; align-self: end; }
+}
 /* Chapter picker and collection. */
 #game-dialog[data-layer=meta] { width: min(94%,520px); }
 #game-dialog[data-layer=meta] #dialog-actions { gap: 10px; }
