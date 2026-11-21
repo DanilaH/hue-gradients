@@ -1,0 +1,105 @@
+{
+  "sourceCommit": "4e0ecac8eaaccb7bee6fb129feb71837deec0ea4",
+  "baseline": "3c4ba78d7f7d70af14bbd548177721801ca0ff6a",
+  "requirements": "https://github.com/DanilaH/hue-gradients/pull/2",
+  "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+  "kitImpact": "REUSE",
+  "captures": [
+    {
+      "name": "Poluson-0.4.7-victory-album.gif",
+      "size": [
+        390,
+        844
+      ],
+      "frames": 80,
+      "durationMs": 7270,
+      "bytes": 3270016,
+      "sha256": "6c5103469a487e1c99ba5ead5d909ec8c614cbb8f1c95d1005805d3b423712b3",
+      "route": [
+        "Last drag on level 8",
+        "Victory",
+        "Exact work",
+        "Wallpaper download",
+        "Album focused on level 8"
+      ]
+    },
+    {
+      "name": "Poluson-0.4.7-album-collage.gif",
+      "size": [
+        390,
+        844
+      ],
+      "frames": 76,
+      "durationMs": 6910,
+      "bytes": 2383397,
+      "sha256": "1b5b2b6fd110e9c5fda58dc68e173353999994a1bf05a9e794aa3cdef71ac5b1",
+      "route": [
+        "Album",
+        "Pick levels 2, 5 and 8 by tapping the prints",
+        "Exact strip preview",
+        "Strip download"
+      ]
+    }
+  ],
+  "actualDownloads": [
+    {
+      "name": "wallpaper-008.png",
+      "size": [
+        1080,
+        1920
+      ],
+      "sha256": "406aae8ca611c7642b3a38da987ac604af7100555e73e53eee8be4bf3f42f69b",
+      "sRGBIntent": 1
+    },
+    {
+      "name": "collage-strip.png",
+      "size": [
+        2400,
+        960
+      ],
+      "sha256": "f468f12d89e03dc608562e58af3840b7bd53c9fde13ca8f6b37c9ab5624fd266",
+      "sRGBIntent": 1
+    }
+  ],
+  "checks": {
+    "unit": 149,
+    "browser": {
+      "campaignAndMeta": 14,
+      "presentation": 12,
+      "editor": 19,
+      "export": 12
+    },
+    "independentPng": {
+      "clean": 8,
+      "tiled": 7,
+      "allPixelsAndMetadata": true
+    },
+    "captureStripPixelsAndPickOrder": "PASS",
+    "build": [
+      "standard and release web",
+      "Yandex audit",
+      "strict pinned guidance doctor",
+      "40 exact baseline spec files",
+      "Gradle debug/R8 releaseCheck",
+      "exact APK inspection"
+    ]
+  },
+  "apk": {
+    "name": "Poluson-0.4.7-preview.apk",
+    "kind": "releasecheck",
+    "package": "com.danilah.huegradients.preview3",
+    "versionName": "0.4.7",
+    "versionCode": 11,
+    "apkSha256": "afd24f2299242988acf3609fb2a4363e663bae395406bf37c8527274ad6b7c47",
+    "bytes": 1194764,
+    "certificateSha256": "3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85",
+    "nativeRuntime": "NOT RUN",
+    "testSignerMatches": "0.4.6/versionCode10"
+  },
+  "limits": [
+    "Both GIFs use the live game in Chromium. The recording cursor is an overlay showing actual pointer positions.",
+    "Local test-only compatibility shims supplied Object.hasOwn and crypto.randomUUID for Chromium 92. Palette reduction belongs to the GIF encoding.",
+    "The author revisions and failure responses in export tests use labelled fixtures. Browser download is real.",
+    "Android installation/update, system Back and native save/share were not exercised on a phone."
+  ]
+}

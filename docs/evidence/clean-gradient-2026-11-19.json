@@ -1,0 +1,150 @@
+{
+  "sourceCommit": "5e8a76d845a8ba26ad60ce6cf612ad5152274b44",
+  "requirements": "https://github.com/DanilaH/hue-gradients/issues/3",
+  "baseline": "8d95aaab9745677dd1a44ab810b094c5c95b12d3",
+  "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+  "kitImpact": "REUSE",
+  "cleanPng": {
+    "playtestSize": [
+      1080,
+      1920
+    ],
+    "colourSpace": "sRGB",
+    "downloadedFromCompletedWorkCards": [
+      {
+        "level": 2,
+        "format": "clean",
+        "file": "Poluson-002.png",
+        "dimensions": [
+          1080,
+          1920
+        ],
+        "sRGBIntent": 1,
+        "gamma": 45455,
+        "crc": "PASS",
+        "sha256": "741f78f58b5bfa5d91558b5958cd434f6978d940d01f6bda81670619c814c5ab",
+        "sourceGrid": [
+          5,
+          1
+        ],
+        "allGradientPixelsAndAnchors": "PASS",
+        "deliveryName": "Poluson-0.4.6-002.png"
+      },
+      {
+        "level": 3,
+        "format": "clean",
+        "file": "Poluson-003.png",
+        "dimensions": [
+          1080,
+          1920
+        ],
+        "sRGBIntent": 1,
+        "gamma": 45455,
+        "crc": "PASS",
+        "sha256": "ae1f6f515e36ee103c9f4c4285a4c4392d006507c128526f525ffaef2aef344c",
+        "sourceGrid": [
+          1,
+          5
+        ],
+        "allGradientPixelsAndAnchors": "PASS"
+      },
+      {
+        "level": 5,
+        "format": "clean",
+        "file": "Poluson-005.png",
+        "dimensions": [
+          1080,
+          1920
+        ],
+        "sRGBIntent": 1,
+        "gamma": 45455,
+        "crc": "PASS",
+        "sha256": "0b7393807ade0039070c35a273e5a1a90c225b42f876bcd5269cf435a7386356",
+        "sourceGrid": [
+          4,
+          4
+        ],
+        "allGradientPixelsAndAnchors": "PASS",
+        "deliveryName": "Poluson-0.4.6-005.png"
+      },
+      {
+        "level": 8,
+        "format": "clean",
+        "file": "Poluson-008.png",
+        "dimensions": [
+          1080,
+          1920
+        ],
+        "sRGBIntent": 1,
+        "gamma": 45455,
+        "crc": "PASS",
+        "sha256": "406aae8ca611c7642b3a38da987ac604af7100555e73e53eee8be4bf3f42f69b",
+        "sourceGrid": [
+          6,
+          1
+        ],
+        "allGradientPixelsAndAnchors": "PASS",
+        "deliveryName": "Poluson-0.4.6-008.png"
+      }
+    ],
+    "workCardPreviewDownloadShare": "Same SHA-256; sharing was intercepted by a browser fixture after the explicit click."
+  },
+  "checks": {
+    "unit": 149,
+    "exportBrowserScenarios": [
+      "empty profile cannot export unfinished targets; no automatic share call",
+      "first real victory uses the same PNG bytes in preview, download and share; cancellation permits retry and Back restores the result",
+      "played through levels 2\u20138 and downloaded exact horizontal, vertical and two-dimensional gradient previews from their cards",
+      "actual Chromium download is byte-identical to the preview PNG; UI does not invent an OS receipt",
+      "multi-work selection replaces another revision of the same logical work and requests missing works",
+      "actual Canvas metrics reject excess lines and wide text without truncation or font shrink; caption remains editable",
+      "share cancel/denial/success fixtures preserve preview and caption, retain click activation and never claim publication",
+      "picker cancellation, denied access, quota failure/abort and successful close retain the prepared file for retry",
+      "initial save/share/back actions remain visible and hittable across target viewports and enlarged text",
+      "all exports and OS response fixtures leave progress, rights, author proofs and workspace revision unchanged",
+      "all eight renderers execute in real Canvas; future daily rights are fixture-only, never awarded or persisted"
+    ],
+    "independentPng": {
+      "continuous": 7,
+      "originalTiledLayouts": 7,
+      "allPixelsAndMetadata": "PASS",
+      "authorFixtureRevisions": [
+        [
+          6,
+          1
+        ],
+        [
+          5,
+          4
+        ]
+      ]
+    },
+    "build": [
+      "standard web",
+      "release web",
+      "Yandex audit",
+      "strict pinned guidance doctor",
+      "40 exact baseline spec files",
+      "Gradle debug/R8 releaseCheck",
+      "exact APK inspection"
+    ],
+    "campaignMetaBrowserScenarios": 12
+  },
+  "apk": {
+    "name": "Poluson-0.4.6-preview.apk",
+    "kind": "releasecheck",
+    "package": "com.danilah.huegradients.preview3",
+    "versionName": "0.4.6",
+    "versionCode": 10,
+    "apkSha256": "9d9ca83251d3ca5c2e04680c5689eda20cb7e2cf0f2f4931f4611c980652a2a3",
+    "bytes": 1192536,
+    "certificateSha256": "3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85",
+    "nativeRuntime": "NOT RUN",
+    "testSignerMatches": "0.4.5/versionCode9"
+  },
+  "limits": [
+    "Desktop headless Chromium 92 ran the export and campaign/meta suites with local test-only Object.hasOwn and crypto.randomUUID shims. PNG encoding and download used the browser.",
+    "Save picker and share callbacks were modelled. Own revisions and daily layout rights used labelled fixtures.",
+    "Physical Android installation/update, save picker and share runtime were not run."
+  ]
+}

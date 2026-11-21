@@ -1,0 +1,467 @@
+{
+  "date": "2026-11-21",
+  "testedCodeCommit": "431f06dac66dadec23f860e7ea6c5cbabd4acfc8",
+  "branch": "feat/m0-foundation",
+  "status": "ALL_AVAILABLE_A1_TO_G1_CONTROL_EPISODES_PASSED",
+  "packages": {
+    "A1": {
+      "status": "PASS_AVAILABLE_CONTROL_EPISODE",
+      "environment": "Chromium CDP touch and simulated insets",
+      "suite": "tools/board-input-browser-check.mjs",
+      "result": {
+        "browser": "153.0.8010.0",
+        "touch": [
+          {
+            "kind": "tap",
+            "x": 199,
+            "y": 398,
+            "moves": 0,
+            "pinAndOutside": true
+          },
+          {
+            "kind": "tap",
+            "x": 200,
+            "y": 398,
+            "moves": 1,
+            "pinAndOutside": false
+          },
+          {
+            "kind": "tap",
+            "x": 201,
+            "y": 398,
+            "moves": 1,
+            "pinAndOutside": false
+          },
+          {
+            "kind": "drop",
+            "x": 199,
+            "y": 398,
+            "moves": 0,
+            "pinAndOutside": true
+          },
+          {
+            "kind": "drop",
+            "x": 200,
+            "y": 398,
+            "moves": 1,
+            "pinAndOutside": false
+          },
+          {
+            "kind": "drop",
+            "x": 201,
+            "y": 398,
+            "moves": 1,
+            "pinAndOutside": false
+          }
+        ],
+        "landscape": [
+          {
+            "width": 1,
+            "height": 5,
+            "inset": false,
+            "cellWidth": 414,
+            "cellHeight": 62.4
+          },
+          {
+            "width": 1,
+            "height": 5,
+            "inset": true,
+            "cellWidth": 366,
+            "cellHeight": 52.8
+          },
+          {
+            "width": 6,
+            "height": 5,
+            "inset": false,
+            "cellWidth": 69,
+            "cellHeight": 62.4
+          },
+          {
+            "width": 6,
+            "height": 5,
+            "inset": true,
+            "cellWidth": 61,
+            "cellHeight": 52.8
+          }
+        ],
+        "lateCheckpoint": "gradient-037",
+        "limits": "CDP touch and simulated safe insets in Chromium. 6×5 opens from a seeded saved attempt."
+      },
+      "remaining": "Repeat physical touch, drag and safe insets in G1"
+    },
+    "A2": {
+      "status": "PASS_AVAILABLE_CONTROL_EPISODE",
+      "environment": "Chromium with exact signed APK web payloads and current source",
+      "suite": "tools/first-launch-apk-check.mjs; tools/m3-browser-check.mjs",
+      "result": {
+        "versions": [
+          "92.0.4512.0",
+          "153.0.8010.0"
+        ],
+        "checks": [
+          "92: reproduced 0.4.12 clean start failure with Object.hasOwn unavailable",
+          "92.0.4512.0: exact APK starts, touch preview resumes, retained board survives reload",
+          "92.0.4512.0: packaged compatibility page leaves save unchanged",
+          "153.0.8010.0: exact APK starts, touch preview resumes, retained board survives reload",
+          "153.0.8010.0: packaged compatibility page leaves save unchanged",
+          "modern: real 0.4.12 save bytes preserved on update and capability failure"
+        ],
+        "packagedWebViewMinimum": 92,
+        "nativeRuntime": "NOT RUN",
+        "apkSha256": {
+          "0.4.12": "037a4687d85013fb991b7d4b2eba03d06c4a5f8088a1d0162adfaf1f8c5e2111",
+          "0.4.25": "92c22f70e1ee2423be56a8603b1aa6b5e424a5623b74ae6067984a53e10043ec"
+        },
+        "currentSourceSuiteOn92": 15,
+        "currentSourceSuiteOn153": 15,
+        "minimumChromiumSource": "https://github.com/alixaxel/chrome-aws-lambda/tree/v10.0.0"
+      },
+      "remaining": "Repeat native WebView startup and SQLite persistence in G1"
+    },
+    "A3": {
+      "status": "PASS_AVAILABLE_CONTROL_EPISODE",
+      "environment": "Chromium and local benchmark fixtures",
+      "suite": "tools/help-browser-check.mjs; tests/player-progress.test.ts",
+      "result": {
+        "helpScenarios": 7,
+        "benchmarkTests": 3,
+        "cases": [
+          "equality",
+          "strictly better",
+          "idempotent replay",
+          "assisted",
+          "wrong fingerprint",
+          "legacy history"
+        ],
+        "realSampleSize": 0
+      },
+      "remaining": "Published own sample with source, fingerprint, rules version and counts"
+    },
+    "B1": {
+      "status": "PASS_AVAILABLE_CONTROL_EPISODE",
+      "environment": "Chromium CDP touch and domain suite",
+      "suite": "tools/challenge-browser-check.mjs; tests/challenges.test.ts",
+      "result": {
+        "checks": [
+          "real first five campaign wins unlock one challenge",
+          "pin does not consume the limit",
+          "leaving and resuming preserves board and attempt ID",
+          "sixth move wins in one replay and loses in another",
+          "campaign board, history and rights remain identical",
+          "loss persists after reload and replay restores the fixed start"
+        ],
+        "browser": "153.0.8010.0",
+        "bankPair": [
+          [
+            5
+          ],
+          [
+            3,
+            3
+          ]
+        ],
+        "exactCamera": "CDP touch inside Chromium",
+        "unitThresholdProfiles": 10
+      },
+      "remaining": "Compare difficulty and touch feel on a phone"
+    },
+    "B2": {
+      "status": "PASS_AVAILABLE_CONTROL_EPISODE",
+      "environment": "Chromium CDP touch and pixel check",
+      "suite": "tools/chapter-challenge-browser-check.mjs",
+      "result": {
+        "browser": "153.0.8010.0",
+        "chapter": 1,
+        "campaignClearsViaUI": 15,
+        "firstFinaleGrantAfterRepeat": 1,
+        "lockedAt14": true,
+        "hiddenPixels": [
+          "#d9c8de",
+          "#2f263d"
+        ],
+        "resumedPixels": [
+          "#d9c8de",
+          "#9f7955"
+        ],
+        "savedAttemptSame": true,
+        "limits": "Actual touch in Chromium, independent PNG pixel decoding; physical device not run."
+      },
+      "remaining": "First reveal and Android Back in G1"
+    },
+    "B3": {
+      "status": "PASS_AVAILABLE_CONTROL_EPISODE",
+      "environment": "Chromium with injected lifecycle and clock",
+      "suite": "tools/timed-trial-browser-check.mjs",
+      "result": {
+        "browser": "153.0.8010.0",
+        "roundsViaTouch": 1,
+        "pausedRemainingMs": 589000,
+        "backgroundSimulatedMs": 60000,
+        "timedFinishFactsAfterReloadAndReplay": 1,
+        "score": 1,
+        "limits": "Real browser touch and IndexedDB. Test clock and blur/focus injected. Native app suspension not run."
+      },
+      "remaining": "Real Android background and sleep"
+    },
+    "C1": {
+      "status": "PASS_AVAILABLE_CONTROL_EPISODE",
+      "environment": "Chromium CDP touch and decoded pixels",
+      "suite": "tools/shape-browser-check.mjs",
+      "result": {
+        "browser": "153.0.8010.0",
+        "results": [
+          {
+            "id": "geometry-v1-rect",
+            "moveCount": 1,
+            "incompatibleFieldPair": false,
+            "rejectedPin": true,
+            "renderedRgb": "#738cac",
+            "fixedReplay": true,
+            "generated": "authored"
+          },
+          {
+            "id": "geometry-v1-triangles",
+            "moveCount": 1,
+            "incompatibleFieldPair": true,
+            "rejectedPin": true,
+            "renderedRgb": "#c2cbed",
+            "fixedReplay": true,
+            "generated": "group-cycle"
+          },
+          {
+            "id": "geometry-v1-hexagons",
+            "moveCount": 1,
+            "incompatibleFieldPair": false,
+            "rejectedPin": true,
+            "renderedRgb": "#8f75b9",
+            "fixedReplay": true,
+            "generated": "repair-fixed"
+          },
+          {
+            "id": "geometry-v1-mixed",
+            "moveCount": 1,
+            "incompatibleFieldPair": true,
+            "rejectedPin": true,
+            "renderedRgb": "#d6d29f",
+            "fixedReplay": true,
+            "generated": "group-cycle"
+          },
+          {
+            "id": "geometry-v1-wide",
+            "moveCount": 1,
+            "incompatibleFieldPair": false,
+            "rejectedPin": true,
+            "renderedRgb": "#8443ae",
+            "fixedReplay": true,
+            "generated": "authored"
+          }
+        ],
+        "method": "Chromium touch and Pillow pixel samples"
+      },
+      "remaining": "Phone readability and touch on mixed fields"
+    },
+    "C2": {
+      "status": "PASS_AVAILABLE_CONTROL_EPISODE",
+      "environment": "Chromium CDP multitouch and A1 geometry rerun",
+      "suite": "tools/large-board-browser-check.mjs; tools/board-input-browser-check.mjs",
+      "result": {
+        "browser": "153.0.8010.0",
+        "cells": 169,
+        "secondFingerCanceled": true,
+        "zoom": 2.2000005503112927,
+        "pan": {
+          "x": 34,
+          "y": 45
+        },
+        "hitPin": 84,
+        "swapped": [
+          83,
+          85
+        ],
+        "edgePan": -152.47104166664462,
+        "outsideDropUnchanged": true
+      },
+      "remaining": "Physical multitouch and edge-scroll speed"
+    },
+    "D1": {
+      "status": "PASS_AVAILABLE_CONTROL_EPISODE",
+      "environment": "Chromium, verified staged files and injected UTC",
+      "suite": "tools/daily-browser-check.mjs; tests/stage_daily_test.py",
+      "result": {
+        "browser": "153.0.8010.0",
+        "authoredSnapshot": true,
+        "completedLevel": "gradient-daily-001",
+        "moves": 4,
+        "sameDailyStartOnTwoProfiles": true,
+        "acrossUtcMidnight": [
+          "2026-01-31",
+          "2026-02-01"
+        ],
+        "verifiedWireBytes": true,
+        "corruptUpdatePreservedArchive": true,
+        "reusedOldVersion": "5e53be4bc30c83fbcf0a1b829d697cefe9ac0b8de5b8066af35599efac7a32d2",
+        "newVersion": "cf74ffee78a7c7f7c01526cd7c270800255d9a4a409a05d1e953786896b3c6b6",
+        "offlineReplay": true,
+        "distinctWins": [
+          "2026-01-31"
+        ],
+        "limits": "Injected dated feed and trusted clock. No public source, shared rewards or native runtime.",
+        "authoredFieldsSolvedOffline": 30
+      },
+      "remaining": "Editorial playtest, published dates, independently trusted UTC and live shared rewards"
+    },
+    "D2": {
+      "status": "PASS_AVAILABLE_CONTROL_EPISODE",
+      "environment": "Chromium with local task state and injected timer",
+      "suite": "tools/personal-browser-check.mjs",
+      "result": {
+        "browser": "153.0.8010.0",
+        "emptyProfileSlots": 2,
+        "experiencedProfileSlots": 3,
+        "earlierBest": 3,
+        "acceptedPersonalMoves": 1,
+        "awardsAfterReplay": 1,
+        "future": "gradient-016",
+        "presentTimerFixture": "45 seconds, injected time"
+      },
+      "remaining": "Capture actual three-result share in I Love Hue Too and verify timer pause on phone"
+    },
+    "E1": {
+      "status": "PASS_AVAILABLE_CONTROL_EPISODE",
+      "environment": "Chromium, verified staged event and offline play",
+      "suite": "tools/books-browser-check.mjs",
+      "result": {
+        "browser": "153.0.8010.0",
+        "lastGoalChangedFrom": "3/4",
+        "lastGoalChangedTo": "4/4",
+        "firstBookClaimsAfterReplay": 1,
+        "curatedOccasionOffline": true,
+        "stagedAuthoredEvent": true,
+        "eventDate": "2026-02-01",
+        "eventMoves": 3,
+        "eventWins": 1,
+        "cycleCancellationPreservedSnapshot": true,
+        "limits": "Actual book and event play with a test UTC date. Live dates and cycle reset are not enabled."
+      },
+      "remaining": "Live dated events need D1 and starting a new cycle needs the owner counters/recognition decision"
+    },
+    "E2": {
+      "status": "PASS_AVAILABLE_CONTROL_EPISODE",
+      "environment": "Chromium and independent PNG decoder",
+      "suite": "tools/transfer-browser-check.mjs; npm run test:export",
+      "result": {
+        "browser": "153.0.8010.0",
+        "exactOldRevision": true,
+        "editedSource": true,
+        "badImportPreservedSnapshot": true,
+        "importedProofOnlyAfterPlay": true,
+        "png": [
+          390,
+          740,
+          "#f9bc92"
+        ],
+        "nativeChooser": "NOT RUN",
+        "independentlyDecodedWallpaperPngs": 8
+      },
+      "remaining": "Android chooser, system file picking and system wallpaper"
+    },
+    "E3": {
+      "status": "PASS_AVAILABLE_CONTROL_EPISODE",
+      "environment": "Local service fixture",
+      "suite": "tests/publication.test.ts",
+      "result": {
+        "tests": 2,
+        "cases": [
+          "retry immutable revision after lost response",
+          "daily quota",
+          "withdrawal",
+          "report"
+        ]
+      },
+      "remaining": "Published service, moderation and feed"
+    },
+    "F1": {
+      "status": "PASS_AVAILABLE_CONTROL_EPISODE",
+      "environment": "Local provider fixture",
+      "suite": "tests/monetization.test.ts",
+      "result": {
+        "tests": 3,
+        "cases": [
+          "no fill",
+          "additive background blocker",
+          "cancel",
+          "duplicate callbacks",
+          "restore"
+        ]
+      },
+      "remaining": "Live SDK and product configuration. Owner decides gift, voluntary reward and item"
+    },
+    "F2": {
+      "status": "PASS_AVAILABLE_CONTROL_EPISODE",
+      "environment": "Local replay fixtures and Chromium IndexedDB",
+      "suite": "tests/replay.test.ts; tools/m1-browser-check.mjs",
+      "result": {
+        "tests": 2,
+        "browserScenarios": 21,
+        "cases": [
+          "comparable replay",
+          "dedup",
+          "accepted input versus intent",
+          "transaction rollback and retry"
+        ]
+      },
+      "remaining": "Live rating/event delivery needs a provider. Cloud/account M5 remains on hold"
+    },
+    "G1": {
+      "status": "PASS_AVAILABLE_CONTROL_EPISODE",
+      "environment": "Chromium CDP touch and audio instrumentation",
+      "suite": "tools/feel-queue-browser-check.mjs; tools/m2-browser-check.mjs",
+      "result": {
+        "browser": "153.0.8010.0",
+        "cancelledMoves": 0,
+        "acceptedMoves": 1,
+        "independentAudio": true,
+        "backgroundPause": true,
+        "audio": {
+          "loops": [
+            {
+              "duration": 12,
+              "state": "suspended"
+            }
+          ],
+          "glasses": [
+            0.5600226757369614
+          ],
+          "vibrations": 1
+        },
+        "font": "system-ui, sans-serif",
+        "settingsFit": [
+          {
+            "width": 320,
+            "height": 568
+          },
+          {
+            "width": 568,
+            "height": 320
+          }
+        ],
+        "limits": "Chromium touch and Web Audio instrumentation; GIF is silent. Phone sound, haptics and font judgment remain pending.",
+        "presentationScenarios": 12
+      },
+      "remaining": "Two physical Android profiles for input, lifecycle, storage, sound, haptics, Back, files and wallpaper. Owner decides font/art"
+    }
+  },
+  "checks": {
+    "unitTests": 192,
+    "publisherTests": 4,
+    "specFiles": 40,
+    "androidWebAssets": "PASS",
+    "yandexAudit": "PASS",
+    "pinnedGuidanceDoctor": "PASS"
+  },
+  "physicalAndroid": {
+    "attachedDevices": 0,
+    "runtime": "NOT RUN"
+  },
+  "kitImpact": "NONE"
+}

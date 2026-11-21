@@ -1,0 +1,64 @@
+{
+  "source": "960c8304eb82ce4675d914296c3263d05f6674e9",
+  "kitImpact": "REUSE",
+  "checks": {
+    "unit": 162,
+    "helpChromium": 7,
+    "metaChromium": 15,
+    "androidDebug": true,
+    "androidReleaseCheck": true,
+    "androidExactApk": true
+  },
+  "personalResult": "Minimum, separate bests and earned perfect mark are on the work card before opening any menu. Verified clean 1, assisted 3, both bests, reload and compact card.",
+  "comparisonFixtures": [
+    "Tie does not earn a point",
+    "One move better earns one point",
+    "Duplicate action/attempt cannot earn twice",
+    "Assisted replay remains separate",
+    "Exact definition and rules; version change does not regrade earlier results"
+  ],
+  "publishedBenchmark": {
+    "source": null,
+    "version": null,
+    "sampleSize": 0,
+    "status": "WAITING_FOR_MEASURED_SAMPLE",
+    "returnWhen": "Accepted publication of actual clean Poluson runs for exact fingerprint and help rules, with provenance, version and count. Then verify real comparison and first earned stage."
+  },
+  "apk": {
+    "kind": "releasecheck",
+    "package": "com.danilah.huegradients.preview3",
+    "versionName": "0.4.15",
+    "versionCode": 19,
+    "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+    "source": "960c8304eb82ce4675d914296c3263d05f6674e9",
+    "apkSha256": "1854e40a03f88dd3de6e54026b46aefc8c4133e499e565089bfbd8267e19d8b8",
+    "bytes": 1197844,
+    "certificateSha256": "3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85",
+    "productionSigner": false,
+    "v2": true,
+    "zipalign16k": true,
+    "debuggable": false,
+    "webViewDebuggingConfigured": false,
+    "nativeInsetOwner": "content-root",
+    "webPayload": {
+      "start-error.html": "22cc22f670fac501b781a7e27ee2b38842839e03f47bfb72c199768b5c709598",
+      "index.html": "e7fe523dbb2fc74936b51a944d2e1bbc96cba76d078a50e32c4e0bded8648f0d",
+      "native-build.json": "d6776c22b4d785acafac6f324de6e51d9700f8d00340e5638b59090fc0a0fc70",
+      "assets/native-ttWVwMFk.js": "a77e2538e2c6cea787fc6d1ac82c4828eec2f8a3c3244eb1c14751fef8ea6102",
+      "assets/nativeFeedback-BdXlsEx8.js": "aa12bc0f39307f8a86d95c5b93e428317c5282ed05069350ea7ef8fd1ad69648",
+      "assets/web-BM7xF5pS.js": "874bbd026b2a3757b6c7bedc1bd163f0c735a3e0a943605c9853f660d828d658",
+      "assets/nativeExport-CqbPFgKE.js": "5810d391885079b04fe08fbd9075ad787560ad4f04d814f2b7faac850fb46b8b",
+      "assets/command-BzJMFn4z.js": "56f6750bc40b8fb2c1a76c2cfb70085b2719545adc9b46739cdf944861ab6655",
+      "assets/index-HFJVeCnR.css": "988d69ab4d8c206f2a627cc7559fecc505203d9f33ac05aab9e28a06dbc407da",
+      "assets/dist-CMedSjkm.js": "067d9ca66629f984cf538346471032b4b24f9acd1cb914834126e2b88d3250fe",
+      "assets/index-B9zPvJCh.js": "bce1eba1c9d1d468640fe24028e74c9b16e60b87c9078db348671453d3737084"
+    },
+    "nativeRuntime": "NOT RUN",
+    "liveServices": "NOT INSTALLED BY THIS HOST TEMPLATE"
+  },
+  "gif": {
+    "name": "Poluson-A3-record.gif",
+    "sha256": "8189f767fe7cf6e6c6d7c950cbf208289777d928014a383669230cfb361763bc",
+    "environment": "Actual Chromium victory and automatic work card rendering"
+  }
+}

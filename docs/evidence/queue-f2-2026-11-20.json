@@ -1,0 +1,19 @@
+{
+  "source": [
+    "src/domain/replay.ts",
+    "src/app/gameTelemetry.ts"
+  ],
+  "controls": {
+    "model": "tests/replay.test.ts",
+    "browser": "tools/help-browser-check.mjs"
+  },
+  "checks": [
+    "same exact definition, start and help policy; impossible replay rejected",
+    "stable rank within comparable results and duplicate result IDs ignored",
+    "Chromium write abort and retry: one win and one stable accepted-input fact",
+    "old workspace migrations and mode-resume browser evidence in A2, B1\u2013B3 and D1\u2013D2"
+  ],
+  "unitChecksAcrossProject": 185,
+  "helpChromium": 7,
+  "blocked": "Public submission, authoritative timing and ranking lack a live service. Cloud and accounts remain on owner hold."
+}

@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-11-18",
+  "status": "RESEARCH_CONTRACT_NOT_DEPLOYED",
+  "kit": {
+    "repository": "DanilaH/mini-games-kit",
+    "sha": "4e826ff378dfd2f4705a31a894400ae6268ca6f9",
+    "paths": [
+      "docs/agent-workflows/TASK_ROUTER.md",
+      "docs/API.md",
+      "docs/platform/STORAGE.md",
+      "docs/platform/REVISION_SNAPSHOT_QUEUE.md",
+      "docs/platform/DURABLE_RECEIPT_QUEUE.md",
+      "docs/android/ADS_AND_LIFECYCLE.md",
+      "docs/yandex/MIRRORED_STORAGE.md",
+      "docs/yandex/ADS.md",
+      "docs/extraction/SUDOKU_017.md",
+      "docs/platform/INTERSTITIAL_GATE.md",
+      "docs/agent-workflows/NEW_PROJECT_SETUP.md",
+      "docs/core/DAILY_STREAK.md",
+      "src/platform/activity.ts",
+      "src/platform/interstitial-gate.ts",
+      "src/yandex/mirrored-storage.ts"
+    ],
+    "bootstrapPackageRead": true
+  },
+  "donor": {
+    "repository": "DanilaH/sudoku-doku",
+    "sha": "f97cc1ed1c32e7d2f438fbaea6671530b1a5fc59",
+    "paths": [
+      "src/platform/accounts.ts",
+      "src/platform/rustore.ts",
+      "src/core/profile.ts",
+      "package.json"
+    ],
+    "finding": "RuStoreProfiles is a declared native boundary, not an implemented cloud. Current donor release was not claimed."
+  },
+  "primarySources": [
+    {
+      "id": "S01",
+      "url": "https://www.yandex.ru/dev/games/doc/ru/sdk/sdk-player",
+      "read": true,
+      "claim": "Player Data max 200 KB; flush=false acknowledgement is not confirmed delivery; signed Player authentication requires secret available after IAP connection.",
+      "limit": "Our app console and key are not inspected."
+    },
+    {
+      "id": "S02",
+      "url": "https://yandex.ru/dev/games/doc/ru/requirements/1/2",
+      "read": true,
+      "claim": "Guest play; explicit user action for login through Yandex Games SDK; no unrelated login form.",
+      "limit": "No store submission performed."
+    },
+    {
+      "id": "S03",
+      "url": "https://yandex.ru/dev/id/doc/ru/codes/code-url",
+      "read": true,
+      "claim": "Code flow supports state and PKCE S256; code_verifier permits public client without embedded secret.",
+      "limit": "Registered app and redirect are not configured."
+    },
+    {
+      "id": "S04",
+      "url": "https://www.yandex.ru/dev/id/doc/en/user-information",
+      "read": true,
+      "claim": "Server may obtain id/client_id/psuid through provider user-info API; psuid is scoped to client/user.",
+      "limit": "No real token exchange executed."
+    },
+    {
+      "id": "S05",
+      "url": "https://ads.yandex.com/helpcenter/en/dev/android/interstitial",
+      "read": true,
+      "claim": "Native interstitial load/show/callback integration and resource lifecycle.",
+      "limit": "No native SDK run in this pass; no income evidence."
+    },
+    {
+      "id": "S06",
+      "url": "https://ads.yandex.com/helpcenter/en/dev/android/adaptive-inline-banner",
+      "read": true,
+      "claim": "Adaptive banner layout and main-thread SDK integration; bounded load failures.",
+      "limit": "50 dp is our donor-informed proposal, not a normative size in this page."
+    },
+    {
+      "id": "S07",
+      "url": "https://yandex.ru/dev/games/doc/ru/sdk/sdk-adv",
+      "read": true,
+      "claim": "Fullscreen onOpen/onClose(wasShown)/onError; sticky API requires console enablement; platform controls fullscreen delivery.",
+      "limit": "No invented web creative preload API."
+    },
+    {
+      "id": "S08",
+      "url": "https://www.postgresql.org/docs/current/explicit-locking.html",
+      "read": true,
+      "claim": "SELECT FOR UPDATE row lock supplies server serialization boundary.",
+      "limit": "PostgreSQL not run; SQLite experiment is separate."
+    },
+    {
+      "id": "S09",
+      "url": "https://developer.android.com/reference/android/database/sqlite/SQLiteDatabase",
+      "read": true,
+      "claim": "Native Android SQLite transaction API is available for an application-owned storage bridge.",
+      "limit": "Mobile SQLite bridge not implemented/tested."
+    },
+    {
+      "id": "S10",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB",
+      "read": true,
+      "claim": "Web storage can group object-store writes into transactions.",
+      "limit": "No browser transaction or persistence test in this pass."
+    }
+  ],
+  "decisions": {
+    "auth": "Optional Yandex ID on Android; SDK signed Player on Yandex Games, separate namespaces.",
+    "cloud": "Application-owned HTTPS service and PostgreSQL, not existing kit functionality.",
+    "monetization": "Banner and transition interstitial, own chosen 180 s / 3 new wins policy; no energy, rewarded or paid currency."
+  },
+  "execution": {
+    "script": "../tools/check_technical_contracts.py",
+    "report": "technical-contract-checks-2026-11-18.json",
+    "cases": 54,
+    "realSubprocessTerminations": 2,
+    "postgres": false,
+    "mobile": false,
+    "liveAuth": false,
+    "liveAds": false,
+    "retention": false
+  },
+  "openGates": [
+    "art direction and key screens",
+    "OAuth app/redirect",
+    "Yandex Games signed Player secret and real exchange",
+    "hosting/domain/backup/privacy operations",
+    "target SDK adapters",
+    "phone and human content validation"
+  ]
+}

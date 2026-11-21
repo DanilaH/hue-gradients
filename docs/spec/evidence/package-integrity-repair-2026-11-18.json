@@ -1,0 +1,29 @@
+{
+  "date": "2026-11-18",
+  "kind": "provenance metadata repair; no level definition changes",
+  "oldSourceCommit": "a8c819da32f64001cfba570f02c1d75fac2215f3",
+  "observedFailure": "validate_release_candidates.py failed baselineSha256 assertion against pinned repository prototype/levels-0.1.json",
+  "cause": "earlier working copy had a second trailing LF; parsed JSON is identical",
+  "changedJsonPaths": [
+    "baselineSha256"
+  ],
+  "oldRecordedBaselineSha256": "a31363761141e9c78ad85d0f459262c2eb7895fbe25e3d0d1ccb89463775d820",
+  "repositoryBaselineSha256": "55efdbd17d6e77c23753ea5f6b494de25e02c3c8a05459a92fbbcee8eb34ae51",
+  "oldCandidateSha256": "8a294f23073b6c58b6fa042fe9e8ae59394c57171afb9d7f68fb7c46a5961bd4",
+  "newCandidateSha256": "6c283226eecc9b92846c182328d9491880588ab420d67e62bcb0ecf36d67aa2a",
+  "definitionsEqual": true,
+  "dailyScheduleUnchanged": true,
+  "recheck": {
+    "legalOptimalReplays": 90,
+    "exhaustiveBfs": 26,
+    "editorCases": 33,
+    "colorWarnings": [
+      "gradient-027",
+      "gradient-037",
+      "gradient-053",
+      "gradient-060"
+    ],
+    "humanPlaytest": false,
+    "phoneValidation": false
+  }
+}

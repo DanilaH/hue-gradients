@@ -1,0 +1,56 @@
+{
+  "sourceCommit": "0d20c48247e28fd26e6f0016a07100dd04de19cd",
+  "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+  "slice": "Brighter reactive low-resolution atmosphere",
+  "apk": {
+    "name": "Poluson-0.4.4-preview.apk",
+    "package": "com.danilah.huegradients.preview3",
+    "versionName": "0.4.4",
+    "versionCode": 8,
+    "bytes": 1189900,
+    "apkSha256": "7084e1387097c1f34b93325e78bb16b9dee9bb99110d502a24a234450f4a2f03",
+    "certificateSha256": "3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85",
+    "nativeRuntime": "NOT RUN",
+    "kind": "releaseCheck",
+    "packageAndTestCertificateMatchedTo": "0.4.3/versionCode7"
+  },
+  "checks": {
+    "unit": 149,
+    "chromium": {
+      "core": 21,
+      "presentation": 10,
+      "meta": 12
+    },
+    "presentation": [
+      "exact compositor pixels per tile",
+      "unchanged locked palette under reduced motion",
+      "picker and board share one canvas",
+      "animation stops in the background and with reduced motion",
+      "swipe moves preview during input and preserves the saved attempt"
+    ],
+    "builds": [
+      "standard and release web",
+      "Yandex audit",
+      "strict guidance doctor",
+      "40 exact spec files",
+      "Gradle debug and R8 releaseCheck",
+      "exact APK inspection"
+    ]
+  },
+  "captures": [
+    {
+      "file": "poluson-dream-comparison.png",
+      "evidence": "Level 5 picker on 0.4.3 and 0.4.4 with the same visible configuration, plus the 0.4.4 result."
+    },
+    {
+      "file": "poluson-dream-motion.mp4",
+      "evidence": "12.625 seconds of actual Chromium picker and gameplay recordings. The player finishes levels 1\u20134 normally before recording each level 5 segment."
+    }
+  ],
+  "limits": [
+    "Chromium emulation",
+    "Android install, system Back, physical performance and hosted runtime NOT RUN",
+    "Owner art acceptance pending"
+  ],
+  "kitImpact": "REUSE"
+}

@@ -1,0 +1,86 @@
+{
+  "date": "2026-11-21",
+  "package": "G1",
+  "testedRuntimeCommit": "7b8200062ab6398980827fd27d884506ca3eb786",
+  "apk": {
+    "package": "com.danilah.huegradients.preview3",
+    "certificateSha256": "3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85",
+    "apkSignatureSchemeV2": "PASS",
+    "zipAlignment16k": "PASS",
+    "old": {
+      "versionName": "0.4.24",
+      "versionCode": 28,
+      "sha256": "f60cd8eec6616df848596fc838dad36322e82211bfe0aece7e5b57889789e4ab"
+    },
+    "latest": {
+      "versionName": "0.4.25",
+      "versionCode": 29,
+      "sha256": "92c22f70e1ee2423be56a8603b1aa6b5e424a5623b74ae6067984a53e10043ec"
+    }
+  },
+  "browser": {
+    "browser": "153.0.8010.0",
+    "cancelledMoves": 0,
+    "acceptedMoves": 1,
+    "independentAudio": true,
+    "backgroundPause": true,
+    "audio": {
+      "loops": [
+        {
+          "duration": 12,
+          "state": "suspended"
+        }
+      ],
+      "glasses": [
+        0.5600226757369614
+      ],
+      "vibrations": 1
+    },
+    "font": "system-ui, sans-serif",
+    "settingsFit": [
+      {
+        "width": 320,
+        "height": 568
+      },
+      {
+        "width": 568,
+        "height": 320
+      }
+    ],
+    "limits": "Chromium touch and Web Audio instrumentation; GIF is silent. Phone sound, haptics and font judgment remain pending."
+  },
+  "localRegression": {
+    "unitTests": 185,
+    "gameBuild": "PASS",
+    "yandexAudit": "PASS"
+  },
+  "actions": {
+    "run": 44896131558,
+    "publicDomainJob": "PASS",
+    "domainUnitTests": 42,
+    "publisherTests": 4,
+    "hostJob": "BLOCKED: KIT_READ_TOKEN unavailable at setup step"
+  },
+  "androidEmulator": {
+    "androidApi": 34,
+    "webView": "com.android.webview 113.0.5672.136",
+    "execution": "TCG software emulation",
+    "boot": "PASS",
+    "oldInstalled": "PASS",
+    "initialOldLaunch": "am start -W timed out",
+    "updateInPlace": "PASS: Android package manager accepted adb install -r",
+    "installedVersionName": "0.4.25",
+    "installedVersionCode": 29,
+    "playthroughAndSaveRestoration": "NOT RUN",
+    "latestLaunch": "am start -W timed out",
+    "screenAfterLaunch": "System dialog: Process system isn't responding",
+    "screenSha256": "a84021b7922dfbf75186cb540c0248e6e21e34becbc689b9d38bba0941bba221",
+    "applicationProcess": "Started with WebView renderer process",
+    "recoveryAttempt": "System UI ANR also appeared after choosing Wait",
+    "androidLogAnrs": [
+      "com.android.providers.media.module",
+      "com.android.phone"
+    ]
+  },
+  "physicalDevices": "NOT RUN"
+}

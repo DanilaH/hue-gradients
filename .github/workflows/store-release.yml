@@ -1,0 +1,64 @@
+name: Store release APK
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    env:
+      ANDROID_RELEASE_KEYSTORE_BASE64: ${{ secrets.ANDROID_RELEASE_KEYSTORE_BASE64 }}
+      ANDROID_RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_STORE_PASSWORD }}
+      ANDROID_RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_RELEASE_KEY_ALIAS }}
+      ANDROID_RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+      - uses: actions/checkout@v6
+        with:
+          repository: DanilaH/mini-games-kit
+          ref: 469928d03f4bae5053e23db26e82187bedbc252e
+          path: .test-output/kit
+          token: ${{ secrets.KIT_READ_TOKEN || github.token }}
+          persist-credentials: false
+      - name: Pack exact private kit checkout
+        working-directory: .test-output/kit
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run build
+          npm pack --ignore-scripts --pack-destination ..
+      - run: |
+          node tools/use-ci-kit.mjs .test-output/danilah-mini-games-kit-0.2.0-experimental.0.tgz 469928d03f4bae5053e23db26e82187bedbc252e
+          npm install --no-audit --no-fund
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+      - name: Restore existing signer privately
+        run: |
+          export ANDROID_RELEASE_KEYSTORE="$RUNNER_TEMP/production.keystore"
+          python3 tools/prepare-signing.py
+          printf 'ANDROID_RELEASE_KEYSTORE=%s\n' "$ANDROID_RELEASE_KEYSTORE" >> "$GITHUB_ENV"
+      - run: npm run release:config
+      - run: npm run check
+      - run: npm run android:sync:release
+      - run: ./gradlew --no-daemon assembleRelease
+        working-directory: native/android
+      - run: python3 tools/verify-apk.py native/android/app/build/outputs/apk/release/app-release.apk --kind release --out .test-output/apk-verification
+      - uses: actions/upload-artifact@v4
+        with:
+          name: store-release-build-ONLY
+          path: |
+            native/android/app/build/outputs/apk/release/app-release.apk
+            .test-output/apk-verification/
+            native/android/app/build/outputs/mapping/release/
+      - name: Remove temporary signing material
+        if: always()
+        run: rm -f "$RUNNER_TEMP/production.keystore"

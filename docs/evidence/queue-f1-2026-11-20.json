@@ -1,0 +1,18 @@
+{
+  "source": "src/app/monetizationClient.ts",
+  "controls": "tests/monetization.test.ts",
+  "kitImpact": "NONE",
+  "passed": 3,
+  "fixtureChecks": [
+    "paid placements require foreground committed new result, explicit transition and measured non-conflicting geometry",
+    "protected start and milestones, 180 seconds and 3 new results, no-fill consumes request",
+    "campaign and challenge placement separated; additive background blocker",
+    "voluntary cancel grants nothing; duplicate callback earns one receipt",
+    "provider unknown after 10s retains the block until verified terminal",
+    "cancelled store return grants nothing; restore survives durable reload and hides ads"
+  ],
+  "blocked": {
+    "production": "configured native/hosted provider, verified SDK callbacks and device checks",
+    "owner": "define voluntary reward and gift item, and select product to sell. No real IDs or commerce configured."
+  }
+}

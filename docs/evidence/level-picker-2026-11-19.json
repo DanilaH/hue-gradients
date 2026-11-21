@@ -1,0 +1,32 @@
+{
+  "sourceCommit": "5f365586eef032f1989ccb6ab233e74988f03ac3",
+  "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+  "slice": "UI refinement step 1: level and chapter selection",
+  "apk": {
+    "name": "Poluson-0.4.3-preview.apk",
+    "package": "com.danilah.huegradients.preview3",
+    "versionName": "0.4.3",
+    "versionCode": 7,
+    "bytes": 1189108,
+    "sha256": "a96756879f1a1951d559ec153def9cfa3c419021ea26e63ff985237a498498ef",
+    "certificateSha256": "3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85",
+    "packageAndTestCertificateMatchedTo": "0.4.2/versionCode6",
+    "kind": "releaseCheck",
+    "nativeRuntime": "NOT RUN"
+  },
+  "checks": {
+    "unit": 149,
+    "chromium": {"core": 21, "meta": 12, "presentation": 9, "editor": 19, "export": 9},
+    "webBuilds": ["standard", "release", "Yandex upload audit"],
+    "specIntegrity": "40 exact files, 71 requirements",
+    "guidanceDoctor": "strict, exact pinned revision",
+    "gradle": ["assembleDebug", "assembleReleaseCheck", "verify-apk.py on delivered file"],
+    "independentPngChecks": 8
+  },
+  "captures": [
+    {"file": "poluson-picker-before-after.png", "evidence": "0.4.2 and 0.4.3 Chromium views at 412×884, captured at different progress checkpoints"},
+    {"file": "poluson-picker.gif", "evidence": "Chromium 412×884 with emulated touch. First four levels solved through normal input. One exchange on level 5, swipe to level 6, inspect closed chapter, return and resume level 5. IndexedDB snapshot and revision identical before and after browsing."}
+  ],
+  "limitations": ["Browser touch and viewport emulation", "Android install/update and system Back NOT RUN", "Hosted Yandex runtime NOT RUN"],
+  "kitImpact": "REUSE"
+}

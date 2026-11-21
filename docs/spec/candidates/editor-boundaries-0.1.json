@@ -1,0 +1,308 @@
+{
+  "status": "PASS",
+  "cases": 33,
+  "scope": "Pure field and fingerprint oracle; no UI, durable storage, account or cloud execution.",
+  "allWhitePlayable": false,
+  "transposeAmbiguityDetected": true,
+  "closeColorsAreWarning": true,
+  "rows": [
+    {
+      "case": "valid baseline",
+      "passed": true,
+      "expectedError": null,
+      "expectedWarning": null,
+      "actualErrors": [],
+      "actualWarnings": []
+    },
+    {
+      "case": "not an object",
+      "passed": true,
+      "expectedError": "FIELD_OBJECT",
+      "expectedWarning": null,
+      "actualErrors": [
+        "FIELD_OBJECT"
+      ],
+      "actualWarnings": []
+    },
+    {
+      "case": "boolean is not width",
+      "passed": true,
+      "expectedError": "DIMENSIONS",
+      "expectedWarning": null,
+      "actualErrors": [
+        "DIMENSIONS"
+      ],
+      "actualWarnings": []
+    },
+    {
+      "case": "zero width",
+      "passed": true,
+      "expectedError": "DIMENSIONS",
+      "expectedWarning": null,
+      "actualErrors": [
+        "DIMENSIONS"
+      ],
+      "actualWarnings": []
+    },
+    {
+      "case": "seven columns",
+      "passed": true,
+      "expectedError": "DIMENSIONS",
+      "expectedWarning": null,
+      "actualErrors": [
+        "DIMENSIONS"
+      ],
+      "actualWarnings": []
+    },
+    {
+      "case": "six rows",
+      "passed": true,
+      "expectedError": "DIMENSIONS",
+      "expectedWarning": null,
+      "actualErrors": [
+        "DIMENSIONS"
+      ],
+      "actualWarnings": []
+    },
+    {
+      "case": "duplicate pin",
+      "passed": true,
+      "expectedError": "DUPLICATE_PIN",
+      "expectedWarning": null,
+      "actualErrors": [
+        "DUPLICATE_PIN"
+      ],
+      "actualWarnings": []
+    },
+    {
+      "case": "negative pin",
+      "passed": true,
+      "expectedError": "PIN_INDEX",
+      "expectedWarning": null,
+      "actualErrors": [
+        "PIN_INDEX"
+      ],
+      "actualWarnings": []
+    },
+    {
+      "case": "boolean pin",
+      "passed": true,
+      "expectedError": "PIN_INDEX",
+      "expectedWarning": null,
+      "actualErrors": [
+        "PIN_INDEX"
+      ],
+      "actualWarnings": []
+    },
+    {
+      "case": "invalid RGB",
+      "passed": true,
+      "expectedError": "COLORS",
+      "expectedWarning": null,
+      "actualErrors": [
+        "COLORS"
+      ],
+      "actualWarnings": []
+    },
+    {
+      "case": "short color array",
+      "passed": true,
+      "expectedError": "COLORS",
+      "expectedWarning": null,
+      "actualErrors": [
+        "COLORS"
+      ],
+      "actualWarnings": []
+    },
+    {
+      "case": "duplicate permutation",
+      "passed": true,
+      "expectedError": "PERMUTATION",
+      "expectedWarning": null,
+      "actualErrors": [
+        "PERMUTATION"
+      ],
+      "actualWarnings": []
+    },
+    {
+      "case": "moving a pinned tile",
+      "passed": true,
+      "expectedError": "PIN_MOVED",
+      "expectedWarning": null,
+      "actualErrors": [
+        "PIN_MOVED"
+      ],
+      "actualWarnings": []
+    },
+    {
+      "case": "no anchors",
+      "passed": true,
+      "expectedError": "ANCHOR_COUNT",
+      "expectedWarning": null,
+      "actualErrors": [
+        "ANCHOR_COUNT",
+        "ANCHOR_COLORS",
+        "ORIENTATION_AMBIGUITY"
+      ],
+      "actualWarnings": []
+    },
+    {
+      "case": "one movable tile",
+      "passed": true,
+      "expectedError": "MOVABLE_COUNT",
+      "expectedWarning": null,
+      "actualErrors": [
+        "MOVABLE_COUNT",
+        "ALREADY_SOLVED_START"
+      ],
+      "actualWarnings": []
+    },
+    {
+      "case": "solved initial board",
+      "passed": true,
+      "expectedError": "ALREADY_SOLVED_START",
+      "expectedWarning": null,
+      "actualErrors": [
+        "ALREADY_SOLVED_START"
+      ],
+      "actualWarnings": []
+    },
+    {
+      "case": "malformed corner colors",
+      "passed": true,
+      "expectedError": "CORNERS",
+      "expectedWarning": null,
+      "actualErrors": [
+        "CORNERS"
+      ],
+      "actualWarnings": []
+    },
+    {
+      "case": "rendered RGB disagrees with corners",
+      "passed": true,
+      "expectedError": "COLOR_RECONSTRUCTION",
+      "expectedWarning": null,
+      "actualErrors": [
+        "COLOR_RECONSTRUCTION"
+      ],
+      "actualWarnings": []
+    },
+    {
+      "case": "white board rejected",
+      "passed": true,
+      "expectedError": "DUPLICATE_MOVABLE_RGB",
+      "expectedWarning": null,
+      "actualErrors": [
+        "DUPLICATE_MOVABLE_RGB",
+        "ANCHOR_COLORS"
+      ],
+      "actualWarnings": [
+        "CLOSE_COLORS_REVIEW"
+      ]
+    },
+    {
+      "case": "white anchors rejected",
+      "passed": true,
+      "expectedError": "ANCHOR_COLORS",
+      "expectedWarning": null,
+      "actualErrors": [
+        "DUPLICATE_MOVABLE_RGB",
+        "ANCHOR_COLORS"
+      ],
+      "actualWarnings": [
+        "CLOSE_COLORS_REVIEW"
+      ]
+    },
+    {
+      "case": "diagonal anchors allow transpose",
+      "passed": true,
+      "expectedError": "ORIENTATION_AMBIGUITY",
+      "expectedWarning": null,
+      "actualErrors": [
+        "ORIENTATION_AMBIGUITY"
+      ],
+      "actualWarnings": []
+    },
+    {
+      "case": "four distinct corners remove transpose ambiguity",
+      "passed": true,
+      "expectedError": null,
+      "expectedWarning": null,
+      "actualErrors": [],
+      "actualWarnings": []
+    },
+    {
+      "case": "different anchors but duplicate movable RGB",
+      "passed": true,
+      "expectedError": "DUPLICATE_MOVABLE_RGB",
+      "expectedWarning": null,
+      "actualErrors": [
+        "DUPLICATE_MOVABLE_RGB"
+      ],
+      "actualWarnings": [
+        "CLOSE_COLORS_REVIEW"
+      ]
+    },
+    {
+      "case": "close colors warn but do not reject",
+      "passed": true,
+      "expectedError": null,
+      "expectedWarning": "CLOSE_COLORS_REVIEW",
+      "actualErrors": [],
+      "actualWarnings": [
+        "CLOSE_COLORS_REVIEW"
+      ]
+    },
+    {
+      "case": "one row with distinct endpoints",
+      "passed": true,
+      "expectedError": null,
+      "expectedWarning": null,
+      "actualErrors": [],
+      "actualWarnings": []
+    },
+    {
+      "case": "metadata is not gameplay revision",
+      "passed": true,
+      "fingerprintEqual": true
+    },
+    {
+      "case": "pin order is not gameplay revision",
+      "passed": true,
+      "fingerprintEqual": true
+    },
+    {
+      "case": "hex case is not gameplay revision",
+      "passed": true,
+      "fingerprintEqual": true
+    },
+    {
+      "case": "unused corners do not affect one-row reconstruction",
+      "passed": true,
+      "expectedError": null,
+      "expectedWarning": null,
+      "actualErrors": [],
+      "actualWarnings": []
+    },
+    {
+      "case": "unused corner parameters are not gameplay revision",
+      "passed": true,
+      "fingerprintEqual": true
+    },
+    {
+      "case": "different start invalidates completion",
+      "passed": true,
+      "fingerprintEqual": false
+    },
+    {
+      "case": "visible RGB invalidates completion",
+      "passed": true,
+      "fingerprintEqual": false
+    },
+    {
+      "case": "pin mask invalidates completion",
+      "passed": true,
+      "fingerprintEqual": false
+    }
+  ]
+}

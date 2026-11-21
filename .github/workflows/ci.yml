@@ -1,0 +1,76 @@
+name: CI
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  domain:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+      - run: node tools/check-spec.mjs
+      - run: python3 tests/stage_daily_test.py -v
+      - name: Install only pure-domain test dependencies
+        run: |
+          node --input-type=module -e "import fs from 'node:fs'; const p=JSON.parse(fs.readFileSync('package.json')); fs.writeFileSync('package.json',JSON.stringify({private:true,type:'module',devDependencies:Object.fromEntries(['vitest','typescript','vite'].map(k=>[k,p.devDependencies[k]]))}));"
+          npm install --ignore-scripts --no-audit --no-fund
+      - name: Check puzzles, board controls and release config without private dependencies
+        run: npx vitest run tests/puzzle.test.ts tests/board-camera.test.ts tests/shapes.test.ts tests/time-trial.test.ts tests/release-config.test.ts
+  host:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+      - name: Check read-only private kit access configuration
+        env:
+          KIT_READ_TOKEN: ${{ secrets.KIT_READ_TOKEN }}
+        run: |
+          if [ -z "$KIT_READ_TOKEN" ]; then
+            echo "::error::Configure repository secret KIT_READ_TOKEN with read-only access to DanilaH/mini-games-kit. This is a setup gate, not a game test failure."
+            exit 1
+          fi
+      - uses: actions/checkout@v6
+        with:
+          repository: DanilaH/mini-games-kit
+          ref: 469928d03f4bae5053e23db26e82187bedbc252e
+          path: .test-output/kit
+          token: ${{ secrets.KIT_READ_TOKEN || github.token }}
+          persist-credentials: false
+      - name: Pack exact private kit checkout
+        working-directory: .test-output/kit
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run build
+          npm pack --ignore-scripts --pack-destination ..
+      - run: node .test-output/kit/tools/bootstrap/doctor-game-guidance.mjs . --strict --json
+      - run: node tools/check-spec.mjs
+      - name: Install without persisting a repository credential
+        run: |
+          node tools/use-ci-kit.mjs .test-output/danilah-mini-games-kit-0.2.0-experimental.0.tgz 469928d03f4bae5053e23db26e82187bedbc252e
+          npm install --no-audit --no-fund
+      - run: npm run check
+      - run: npm run yandex:check
+      - run: python3 tests/signing_safety.py
+      - run: npm run android:sync:release
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+      - run: ./gradlew --no-daemon assembleDebug assembleReleaseCheck
+        working-directory: native/android
+      - run: python3 tools/verify-apk.py native/android/app/build/outputs/apk/releaseCheck/app-releaseCheck.apk --kind releasecheck --out .test-output/apk-verification
+      - uses: actions/upload-artifact@v4
+        with:
+          name: host-releasecheck-NOT-PRODUCTION
+          path: |
+            native/android/app/build/outputs/apk/releaseCheck/app-releaseCheck.apk
+            .test-output/apk-verification/
+            dist-yandex/

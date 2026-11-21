@@ -1,0 +1,32 @@
+{
+  "date": "2026-11-21",
+  "package": "E1",
+  "testedRuntimeCommit": "7b8200062ab6398980827fd27d884506ca3eb786",
+  "catalogPlan": "Authored candidate gradient-daily-002, test UTC date 2026-02-01, optional feature metadata",
+  "publisherTests": {
+    "passed": 4,
+    "eventChecks": [
+      "future metadata withheld",
+      "published event title cannot be overwritten",
+      "empty event identity rejected"
+    ]
+  },
+  "browser": {
+    "browser": "153.0.8010.0",
+    "lastGoalChangedFrom": "3/4",
+    "lastGoalChangedTo": "4/4",
+    "firstBookClaimsAfterReplay": 1,
+    "curatedOccasionOffline": true,
+    "stagedAuthoredEvent": true,
+    "eventDate": "2026-02-01",
+    "eventMoves": 3,
+    "eventWins": 1,
+    "cycleCancellationPreservedSnapshot": true,
+    "limits": "Actual book and event play with a test UTC date. Live dates and cycle reset are not enabled."
+  },
+  "kitImpact": "REUSE",
+  "sourceFeatureIds": {
+    "bookGoals": "mt-m04",
+    "calendarEvent": "mt-m05"
+  }
+}

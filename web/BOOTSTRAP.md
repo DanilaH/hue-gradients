@@ -1,0 +1,42 @@
+# Mandatory Yandex + Phaser bootstrap
+
+This directory is the minimum production baseline for a new small Yandex Games project using Phaser. It composes already-extracted `mini-games-kit` primitives; it is intentionally not a game architecture or design template.
+
+## Included by default
+
+- Phaser 4.2.1 + Vite + strict TypeScript;
+- production Yandex runtime and local mock runtime behind one seam;
+- `LoadingAPI.ready()` only after a semantic presentable event and paint settling;
+- GameplayAPI desired-state ownership through the shared activity coordinator;
+- Phaser sound muted while aggregate platform/visibility/ad/orientation blockers are active;
+- startup preload/failure shell and generic startup timeline;
+- AVIF capability detection with WebP fallback request resolution;
+- debug JSON export that survives hosted iframe clipboard restrictions;
+- coherent mobile viewport/orientation observation, portrait gate and landscape backing-store refresh;
+- CI for typecheck, tests and production build;
+- upload-root audit and hosted Yandex DRAFT release checklist;
+- explicit asset-production and project-decision documents.
+
+## Automatic task-guided agent context
+
+This bootstrap also installs four small local guides in docs/kit-guidance/: TASK_ROUTER, REFERENCE_PROTOCOL, KIT_FEEDBACK_LOOP and NEW_PROJECT_SETUP. They are copied from mini-games-kit at generator time, while links to the **full research/API source** are rewritten to the exact pinned commit. AGENTS.md instructs agents to route every substantive task, inspect original references and report reusable upstream improvements — without importing the entire research library or duplicating the runtime.
+
+The bundled agents guidance is a **snapshot**. An intentional kit dependency upgrade should also review guidance drift; never silently rewrite project policy or assume current main is compatible with a pinned consumer.
+
+## After creation
+
+Do **not** start by deleting baseline files. First inspect the whole current `mini-games-kit` repository from `docs/API.md` and identify additional primitives relevant to the game: persistence, durable pending transactions, audio, ads, rendering density, game feel, image tooling, runtime loading, etc.
+
+Then replace the placeholder `BootstrapScene` with the first real presentable scene. Move the `GAME_PRESENTABLE_EVENT` emission to the point where the player can actually see/use the first correct frame. `LoadingAPI.ready()` must continue to follow that semantic signal rather than JS/module load.
+
+If the game adds a custom WebAudio mixer, subscribe it to the same activity coordinator instead of creating a second pause/resume truth. The bootstrap only mutes Phaser's built-in sound manager.
+
+Fill `docs/PROJECT_DECISIONS.md` before locking architecture. In particular, decide asset reachability/loading policy, save semantics, orientation/layout behavior, ad boundaries and onboarding durability from the new game's requirements.
+
+## Visual preproduction, consumer-owned
+
+After the core loop is understood and **before full art production**, review the kit's Visual Preproduction methodology and compare a small set of meaningful concepts with gameplay-accurate UI. The player experience, setting, possible mascot, visual language, icon and cost must be selected **for this game**, then approved by its owner. Record the choice in the generated project's decisions and an Art Bible. This is documentation guidance, not a theme, UI framework or mascot bundled with the bootstrap. Do not delay throwaway mechanical prototype work for visual polish.
+
+## What is deliberately not universal
+
+The bootstrap does not choose art dimensions, AVIF/WebP quality, loader concurrency, zero-runtime-loading, save schema, RNG, economy, onboarding engine or content structure. Those values were intentionally kept out because previous production evidence showed they must be measured per game.

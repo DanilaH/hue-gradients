@@ -1,0 +1,54 @@
+{
+  "date": "2026-11-20",
+  "commit": "7e18212668d613cafbb1ff24be8a9e6ae779caa7",
+  "version": "0.4.10",
+  "unit": 146,
+  "kitImport": {
+    "manifestEntries": 40,
+    "requirements": 71,
+    "csvParsedEqual": true,
+    "consumerRegisterStatus": "71 NOT RUN; frozen release acceptance template"
+  },
+  "browser": {
+    "version": "141.0.7390.37",
+    "core": 21,
+    "presentation": 12,
+    "meta": 13,
+    "editor": 19,
+    "wallpaper": 6,
+    "wallpaperFullPixelComparisons": 8
+  },
+  "ui": {
+    "viewport": "390x844",
+    "browser": "141.0.7390.37",
+    "scenarios": [
+      {
+        "useHelp": false,
+        "level": "gradient-001",
+        "beforeHelp": "Подсказка",
+        "result": "СОБРАНО\n\n1 ход\n\nДальше\nВ альбом",
+        "mastery": [
+          "no-assist",
+          "perfect-no-assist"
+        ],
+        "cardMenu": "⋯\n\nБез помощи — 1\n\nПовторить работу\nСохранить копию"
+      },
+      {
+        "useHelp": true,
+        "level": "gradient-001",
+        "beforeHelp": "Подсказка",
+        "assistedOnFirstClick": true,
+        "result": "СОБРАНО\n\n1 ход\n\nДальше\nВ альбом",
+        "mastery": [],
+        "cardMenu": "⋯\n\nС помощью — 1\n\nПовторить работу\nСохранить копию"
+      }
+    ]
+  },
+  "compatibilityDiagnostic": {
+    "browser": "Chromium 92.0.4512.0 headless",
+    "result": "startup error reported as save error",
+    "actualError": "TypeError: Object.hasOwn is not a function",
+    "method": "Original startup reproduced; local network interception only added error recording in existing catch. Physical Android impact and minimum supported WebView unknown."
+  },
+  "deviceRuntimeThisPass": false
+}

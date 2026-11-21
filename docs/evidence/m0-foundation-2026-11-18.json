@@ -1,0 +1,51 @@
+{
+  "date": "2026-11-18",
+  "stage": "M0 PARTIAL; M1 pure rules STARTED",
+  "runtimeCommit": "469928d03f4bae5053e23db26e82187bedbc252e",
+  "guidanceCommit": "469928d03f4bae5053e23db26e82187bedbc252e",
+  "specCommit": "812b926ebfc82c6b0e5f3c6506145de2331028a0",
+  "localChecks": {
+    "unchangedAndroidBootstrap": "PASS: typecheck,7 tests, standard/release web,Capacitor sync",
+    "unchangedYandexBootstrap": "PASS: typecheck,1 test,production build,upload audit",
+    "consumerTests": {
+      "passed": 26,
+      "host": 7,
+      "domain": 19
+    },
+    "guidanceDoctor": {
+      "status": "READY_FOR_AGENT_DISCOVERY",
+      "errors": 0,
+      "warnings": 0
+    },
+    "specManifest": {
+      "exactFiles": 40,
+      "requirements": 71
+    },
+    "gradle": {
+      "version": "8.14.3",
+      "jdk": "21",
+      "debug": "PASS",
+      "releaseCheckR8": "PASS",
+      "launcher": "SHA256-verified local bin distribution and isolated offline dependency cache; wrapper declares same8.14.3 all distribution"
+    },
+    "apkInspection": {
+      "signatureV2": true,
+      "zipalign16k": true,
+      "nonDebuggable": true,
+      "webViewInspectionConfigured": false,
+      "bridgeSurvivesR8": true,
+      "exactWebPayload": true
+    },
+    "signingSafetyTests": 4
+  },
+  "notExecuted": [
+    "consumer Android runtime/emulator",
+    "physical touch/phone performance",
+    "hosted Yandex draft/SDK",
+    "real OAuth/signed-player exchange",
+    "SQLite/IndexedDB game transactions",
+    "production cloud/live ads/retention"
+  ],
+  "productionAcceptance": "All71 NOT RUN",
+  "kitImpact": "REUSE"
+}
