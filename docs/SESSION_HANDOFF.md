@@ -1,4 +1,4 @@
-# Resume — 20 November 2026
+# Resume — 21 November 2026
 
 **Owner scope update, 20 Nov.** All 89 audited rows have delivery packages in the [full porting roadmap](porting/FULL_ROADMAP.md). Package 01 was brought into `feat/m0-foundation` before package 02. Specific owner decisions on energy, single wallpaper and the M5 hold still govern.
 
@@ -85,6 +85,8 @@ D1 publication staging is available in [the runbook](DAILY_STAGING.md). All 30 a
 Resume at the first resolved external dependency in the [delivery queue](porting/DELIVERY_QUEUE.md). No locally runnable packet remains in A1–G1. Phone checks, benchmark/calendar data, providers and owner decisions are listed there. M5 cloud/account remains on hold.
 
 E1 staged one authored event in the same calendar. Chromium read the hashed month, opened the event from Books, played it twice offline and kept one win. Live dates and cycle reset policy remain open. [Evidence](evidence/queue-e1-staging-2026-11-21.json)
+
+An Android 14 software emulator with WebView 113 accepted the signed 0.4.24 → 0.4.25 update. Launch timed out while the Android system process showed an ANR. The saved game and native gameplay were not exercised. Chromium reproduced cancel 0, win 1 and independent music. [Evidence](evidence/queue-g1-runtime-2026-11-21.json)
 
 ## Campaign contracts retained
 

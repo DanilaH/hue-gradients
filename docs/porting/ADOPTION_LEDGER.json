@@ -760,7 +760,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 06",
-      "currentImplementation": "Разнородные цели открывают отдельную задачу; повтор сохраняет одну отметку. | https://github.com/DanilaH/hue-gradients/blob/36df8036981c4d91685ce133878b1719de318437/tools/books-browser-check.mjs В E1 авторская карточка из месячного снимка открылась в книгах; два прохода офлайн оставили одну отметку.",
+      "currentImplementation": "Разнородные цели открывают отдельную задачу; повтор сохраняет одну отметку. | https://github.com/DanilaH/hue-gradients/blob/36df8036981c4d91685ce133878b1719de318437/tools/books-browser-check.mjs",
       "nextAction": "Проверить реальный каталог событий после D1 и показать книгу на телефоне (G1).",
       "deliveryPackage": "06",
       "sourceNextCheck": "Проверить интерес к двум разным действиям и конечной награде."
@@ -770,7 +770,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 06",
-      "currentImplementation": "На доверенной датированной фикстуре кешированное тематическое событие завершается офлайн и оставляет отметку. | https://github.com/DanilaH/hue-gradients/blob/36df8036981c4d91685ce133878b1719de318437/tools/books-browser-check.mjs",
+      "currentImplementation": "На доверенной датированной фикстуре кешированное тематическое событие завершается офлайн и оставляет отметку. | https://github.com/DanilaH/hue-gradients/blob/36df8036981c4d91685ce133878b1719de318437/tools/books-browser-check.mjs В E1 авторская карточка из месячного снимка открылась в книгах; два прохода офлайн оставили одну отметку.",
       "nextAction": "Проверить реальный каталог событий после D1 и показать книгу на телефоне (G1).",
       "deliveryPackage": "06",
       "sourceNextCheck": "Развести постоянный архив, ограниченную тему и сохранение права."
