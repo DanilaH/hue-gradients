@@ -1,5 +1,7 @@
 # Project decisions — 18 November 2026
 
+**21 ноября · художественное направление.** Владелец выбрал прямоугольную композицию меню, видимый дизеринг на плитках, полноэкранный итоговый градиент и победу с отъездом камеры, подъёмом плиток, общей посадкой, волной фактуры и брызгами от краёв. Серии V1/V2, источники и исключения для игровых режимов — в [ТЗ](design/dreamy-psx/README.md). Прежнее требование точного цвета отдельного пикселя заменяется проверкой базового sRGB, среднего цвета и различимости соседних плиток в игровом рендере. Чистые обои проверяются попиксельно. Приёмка эпизода и конкретной гарнитуры ещё предстоит.
+
 **20 November, after the transfer audit.** Owner directs delivery of the complete audited feature program. [Packages and dependencies](porting/FULL_ROADMAP.md) and [ledger](porting/ADOPTION_LEDGER.json) govern new implementation briefs. Earlier baseline exclusions of modes, zoom, social and commercial systems are superseded for the corresponding new packages. Preserve the existing fixed-start campaign and core rules for its saved attempts. No energy or paid entry, one device-sized wallpaper per chosen work, cloud/account M5 on hold.
 Guidance snapshot SHA: 469928d03f4bae5053e23db26e82187bedbc252e
 Runtime snapshot SHA: 469928d03f4bae5053e23db26e82187bedbc252e

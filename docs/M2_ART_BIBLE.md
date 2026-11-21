@@ -1,5 +1,7 @@
 # M2 presentation slice — 18 November 2026
 
+**21 Nov · latest owner direction.** Follow the [angular menus, visible tile dither and landing sequence brief](design/dreamy-psx/README.md) for the next presentation pass. Its sampled-area colour check supersedes the historical single-centre-pixel rule for displayed tiles. Export and underlying tile data retain exact colour contracts. The original body below documents the earlier baseline.
+
 Status: EXECUTABLE OWNER-REVIEW CANDIDATE for ART-01…09. Latest playable feel preview is 0.4.25. An original 12-second ambient loop is opt-in, controlled separately from effects and suspended in the background. [Queue G1](evidence/queue-g1-2026-11-20.json). Owner reference is docs/spec/reference/owner-art-reference.png (SHA256 872fd9800184a2e4cc52716cd258cbcb194841782745415ae6dd710aedc586ec). Its static concept establishes light, colour and texture.
 
 ## Confirmed gaps and implemented changes
