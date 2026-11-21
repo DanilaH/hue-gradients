@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { stagedFeed } from './staged-daily-browser-fixture.mjs';
 
 const require = createRequire(process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES
   ? `${process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES}/package.json` : import.meta.url);
@@ -9,6 +10,11 @@ const { chromium } = require('playwright');
 const output = '.test-output/books', base = 'http://127.0.0.1:4189';
 const { levels } = JSON.parse(await readFile('docs/spec/prototype/levels-0.1.json', 'utf8'));
 const { rows } = JSON.parse(await readFile('docs/spec/prototype/validation-0.1.json', 'utf8'));
+const [stagedDirectory] = process.argv.slice(2);
+const staged = stagedDirectory ? await stagedFeed(stagedDirectory, 'event-v1') : null;
+const featured = staged?.days.find(slot => slot.feature);
+assert(!staged || featured, 'The staged catalog must contain a visible event');
+const eventDate = featured?.date ?? '2026-11-20';
 await mkdir(output, { recursive: true });
 const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', '--host', '127.0.0.1',
   '--port', '4189', '--strictPort'], { stdio: 'ignore' });
@@ -35,7 +41,7 @@ try {
   const books = async () => { await page.locator('#levels').tap(); await button('Альбом').tap(); await button('Книги').tap(); };
   const back = async () => { for (let i = 0; i < 3; i++) await button('‹ Назад').tap(); };
   const dawn = page.locator('[data-book=book-v1-dawn]'), special = dawn.locator('[data-book-challenge]');
-  const state = () => page.evaluate(async () => {
+  const state = () => page.evaluate(async (eventDate) => {
     const { openIndexedDb } = await import('/src/local-store/indexed-db.ts');
     const store = await openIndexedDb();
     const row = await store.load('guest-local-v1');
@@ -43,8 +49,8 @@ try {
     store.close();
     return { row, snapshot: JSON.parse(row.snapshotJson),
       claimCount: facts.filter(f => f.challengeId === 'book-v1-dawn' && f.firstChallengeWin).length,
-      eventCount: facts.filter(f => f.dailyDate === '2026-11-20' && f.firstDailyWin).length };
-  });
+      eventCount: facts.filter(f => f.dailyDate === eventDate && f.firstDailyWin).length };
+  }, eventDate);
   const swap = async (level, from, to) => {
     const box = await page.locator('#board-region canvas').boundingBox();
     for (const i of [from, to]) {
@@ -52,6 +58,16 @@ try {
         box.y + 4 + (Math.floor(i / level.width) + .5) * (box.height - 8) / level.height);
     }
     await idle();
+  };
+  const solve = async level => {
+    const board = [...level.startTileAtPosition];
+    for (const i of board.keys()) {
+      const from = board.indexOf(i);
+      if (from === i) continue;
+      await swap(level, from, i);
+      [board[from], board[i]] = [board[i], board[from]];
+    }
+    await page.waitForSelector('#hue-app[data-layer=result]');
   };
   await page.goto(base);
   await ready();
@@ -75,14 +91,7 @@ try {
   async function claim() {
     await special.tap();
     await idle();
-    const board = [...chapter.startTileAtPosition];
-    for (let i = 0; i < board.length; i++) {
-      const from = board.indexOf(i);
-      if (from === i) continue;
-      await swap(chapter, from, i);
-      [board[from], board[i]] = [board[i], board[from]];
-    }
-    await page.waitForSelector('#hue-app[data-layer=result]');
+    await solve(chapter);
     if (recording) await page.waitForTimeout(600);
     await button('К книгам').tap();
     await dawn.waitFor();
@@ -94,8 +103,8 @@ try {
   await claim();
   assert.equal((await state()).claimCount, 1);
 
-  // Install one already-verified event fixture. The shipped host has no catalog adapter or network route.
-  await page.evaluate(async () => {
+  // Cache the verified staging snapshot or the legacy fixture before disconnecting.
+  await page.evaluate(async (staged) => {
     const { Session } = await import('/src/app/session.ts');
     const { openIndexedDb } = await import('/src/local-store/indexed-db.ts');
     const { hashText } = await import('/src/local-store/command.ts');
@@ -105,23 +114,31 @@ try {
     const store = await openIndexedDb();
     const session = new Session(store, new Map(await Promise.all(levels.map(async level => [level.id, await hashText(fingerprintPayload(level))]))));
     await session.load();
-    await session.act({ kind: 'daily-cache', feed: { source: 'Verified event fixture', version: 'event-v1',
+    await session.act({ kind: 'daily-cache', feed: staged ?? { source: 'Verified event fixture', version: 'event-v1',
       verifiedNowMs: Date.UTC(2026, 10, 20, 12), days: [{ date: '2026-11-20', feature: { id: 'warm-day', title: 'Мягкий свет' },
         level: { ...levels[0], id: 'daily-event-fixture', contentVersion: DAILY_CONTENT_VERSION } }] } });
     store.close();
-  });
+  }, staged);
   await page.reload();
   await ready();
   await books();
-  const event = page.locator('[data-event=warm-day]');
+  const event = page.locator('[data-event]').filter({ hasText: featured?.feature.title ?? 'Мягкий свет' });
+  if (featured) assert.equal(await event.getAttribute('data-event'), featured.feature.id);
   await context.route('**/*', route => route.request().resourceType() === 'fetch' ? route.abort() : route.fallback());
   await event.tap();
   await idle();
-  await swap(levels[0], 1, 2);
+  await solve(featured?.level ?? levels[0]);
   await button('К книгам').tap();
   await event.waitFor();
   assert.match(await event.innerText(), /Собрано/);
-  assert.equal((await state()).eventCount, 1);
+  await event.tap();
+  await idle();
+  await solve(featured?.level ?? levels[0]);
+  await button('К книгам').tap();
+  await event.waitFor();
+  const eventState = await state();
+  assert.equal(eventState.eventCount, 1);
+  if (featured) assert.deepEqual(eventState.snapshot.dailyProgress.slots[eventDate].feature, featured.feature);
   await context.unroute('**/*');
 
   // Populate a full legacy checkpoint through campaign rules and retain a legacy earned right.
@@ -170,8 +187,10 @@ try {
   await context.close();
   if (video) await video.saveAs(`${output}/books.webm`);
   const report = { browser: browser.version(), lastGoalChangedFrom: '3/4', lastGoalChangedTo: '4/4',
-    firstBookClaimsAfterReplay: 1, curatedOccasionOffline: true, cycleCancellationPreservedSnapshot: true,
-    clipStartMillis, clipMillis, limits: 'Actual book play. Event and 60-work legacy checkpoint are fixtures. Live dates and cycle reset are not enabled.' };
+    firstBookClaimsAfterReplay: 1, curatedOccasionOffline: true, stagedAuthoredEvent: Boolean(featured),
+    eventDate, eventMoves: eventState.snapshot.dailyProgress.attempts[eventDate].moves, eventWins: eventState.eventCount,
+    cycleCancellationPreservedSnapshot: true, clipStartMillis, clipMillis,
+    limits: 'Actual book and event play with a test UTC date. Live dates and cycle reset are not enabled.' };
   await writeFile(`${output}/browser.json`, JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report));
 } finally {

@@ -84,6 +84,8 @@ D1 publication staging is available in [the runbook](DAILY_STAGING.md). All 30 a
 
 Resume at the first resolved external dependency in the [delivery queue](porting/DELIVERY_QUEUE.md). No locally runnable packet remains in A1–G1. Phone checks, benchmark/calendar data, providers and owner decisions are listed there. M5 cloud/account remains on hold.
 
+E1 staged one authored event in the same calendar. Chromium read the hashed month, opened the event from Books, played it twice offline and kept one win. Live dates and cycle reset policy remain open. [Evidence](evidence/queue-e1-staging-2026-11-21.json)
+
 ## Campaign contracts retained
 
 First15 SHA25655efdbd17d6e77c23753ea5f6b494de25e02c3c8a05459a92fbbcee8eb34ae51 and legacy attempt contentVersion remain unchanged. New45 are authored candidates; colour decisions027/037/053/060 unresolved. First five sequential, then free choice. The later chapter opens at10, and the album keeps all earned work cards. Recommendations are not locks. All60 has no fake next chapter. Album never reveals unfinished targets. Copies inherit neither proof nor campaign credit.
@@ -94,7 +96,7 @@ First15 SHA25655efdbd17d6e77c23753ea5f6b494de25e02c3c8a05459a92fbbcee8eb34ae51 a
 
 Native: android:sync:release; Gradle debug/R8 releaseCheck; verify-apk.py on the exact artifact. Browser suites start Vite themselves; do not sync native concurrently because it may reload their pages. CHROMIUM_PATH accepts headless shell. Normalize generated capacitor.settings.gradle to ../../node_modules if symlink resolves into another scratch project; never commit that external path.
 
-Runtime/guidance469928d03f4bae5053e23db26e82187bedbc252e, kit archive SHA256ba9088a0b937b3e86084666c36361ba47627ce833f4594aaf94e10eac62f1cc9. No silent update. Kit API inspected: consumer Session owns multi-table facts/receipt/CAS, not RevisionSnapshotQueue. KIT IMPACT: REUSE; no upstream/other-game edits. Actions host needs KIT_READ_TOKEN despite connected access; local builds use the verified cached pin.
+Runtime/guidance469928d03f4bae5053e23db26e82187bedbc252e, kit archive SHA256ba9088a0b937b3e86084666c36361ba47627ce833f4594aaf94e10eac62f1cc9. No silent update. Kit API inspected: consumer Session owns multi-table facts/receipt/CAS, not RevisionSnapshotQueue. KIT IMPACT: REUSE; no upstream/other-game edits. Actions host needs KIT_READ_TOKEN despite connected access. The credential-free domain job passed on [run 144](https://github.com/DanilaH/hue-gradients/actions/runs/44895812285), including the staging regression. The local host check built the exact pinned kit sources and passed the full unit suite, Android web-assets build and Yandex audit.
 
 ## Preview signing/artifact
 

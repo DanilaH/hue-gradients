@@ -1,38 +1,18 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
-import { createHash } from 'node:crypto';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { stagedFeed } from './staged-daily-browser-fixture.mjs';
 
 const require = createRequire(process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES
   ? `${process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES}/package.json` : import.meta.url);
 const { chromium } = require('playwright');
 const output = '.test-output/daily';
 const base = 'http://127.0.0.1:4187';
-async function stagedFeed(directory, version) {
-  const read = async (path, hash) => {
-    const bytes = await readFile(join(directory, path));
-    if (hash) assert.equal(createHash('sha256').update(bytes).digest('hex'), hash);
-    return JSON.parse(bytes);
-  };
-  const manifest = await read('catalog.json');
-  const days = [];
-  for (const [month, digest] of Object.entries(manifest.months)) {
-    for (const entry of await read(`months/${month}.json`, digest)) {
-      const level = await read(`levels/${entry.sha256}.json`, entry.sha256);
-      assert.equal(level.id, entry.candidateId);
-      days.push({ date: entry.date, level });
-    }
-  }
-  return { source: 'Staged authored bank (test UTC clock)', version, through: manifest.through,
-    verifiedNowMs: Date.parse(`${manifest.through}T${version === 'v1' ? '23:59:59' : '00:00:00'}Z`), days };
-}
-
 const [beforeDirectory, afterDirectory] = process.argv.slice(2);
 assert.equal(Boolean(beforeDirectory), Boolean(afterDirectory), 'Supply both staged snapshots');
 const staged = beforeDirectory ? {
-  before: await stagedFeed(beforeDirectory, 'v1'),
+  before: await stagedFeed(beforeDirectory, 'v1', '23:59:59'),
   after: await stagedFeed(afterDirectory, 'v2'),
 } : null;
 await mkdir(output, { recursive: true });

@@ -16,7 +16,7 @@ Signed Android preview **0.4.25/versionCode29** is based on `feat/m0-foundation`
 | Queue F1 | Local monetization policy and provider fixtures. Live SDK and commerce unconfigured. [Checks](evidence/queue-f1-2026-11-20.json) |
 | Queue E3 | Local publication protocol and retry fixtures pass. Public entry waits for a service. [Checks](evidence/queue-e3-2026-11-20.json) |
 | Queue E2 | Exact verified editor revision file, import and its original wallpaper tested in Chromium. [Checks](evidence/queue-e2-2026-11-20.json) |
-| Queue E1 | Themed books, event cache fixture and cycle cancellation. Live dates and reset policy pending. [Checks](evidence/queue-e1-2026-11-20.json) |
+| Queue E1 | Themed books and cycle cancellation. The authored event from the staged catalog opened from Books and kept one win after two offline completions. Live dates and reset rules pending. [Checks](evidence/queue-e1-staging-2026-11-21.json) |
 | Queue D2 | Offline personal assignments, timer, future chapter preview and one completion mark per task. [Checks](evidence/queue-d2-2026-11-20.json) |
 | Queue D1 | Offline publisher staging and the 30 authored candidates checked. Two Chromium profiles received the same authored board, crossed the UTC month boundary and replayed the old slot offline. Published feed, human review and trusted clock pending. [Checks](evidence/queue-d1-staging-2026-11-21.json) |
 | Queue C2 | 13×13 field, pinch, pan, visible edges and canceled drop verified in Chromium. [Checks](evidence/queue-c2-2026-11-20.json) |

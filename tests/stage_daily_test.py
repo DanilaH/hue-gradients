@@ -88,6 +88,22 @@ class DailyStagingTest(unittest.TestCase):
         self.assertIn('Review fingerprint mismatch', bad_future.stderr)
         self.assertFalse((self.root / 'rejected').exists())
 
+    def test_event_appears_with_its_date_and_remains_immutable(self):
+        self.plan['slots'][2]['feature'] = {'id': 'warm-day', 'title': 'Мягкий свет'}
+        self.stage('before-event', '2026-01-31')
+        self.assertNotIn(b'warm-day', b''.join(self.snapshot('before-event').values()))
+        self.stage('event', '2026-02-01', previous='before-event')
+        entries = json.loads((self.root / 'event/months/2026-02.json').read_bytes())
+        self.assertEqual(entries[0]['feature'], self.plan['slots'][2]['feature'])
+
+        self.plan['slots'][2]['feature']['title'] = 'Другая тема'
+        rejected = self.stage('changed', '2026-02-02', previous='event', check=False)
+        self.assertIn('Published slot would change', rejected.stderr)
+        self.plan['slots'][2]['feature']['id'] = ' '
+        invalid = self.stage('invalid', '2026-01-31', check=False)
+        self.assertIn('Invalid event metadata', invalid.stderr)
+        self.assertFalse((self.root / 'invalid').exists())
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -67,7 +67,15 @@ def prepare(levels, review, plan, through):
         used_ids.add(candidate)
         raw = json_bytes(levels[candidate])
         digest = sha256(raw)
-        slots[slot] = {'date': slot, 'candidateId': candidate, 'fingerprint': row['fingerprint'], 'sha256': digest}
+        entry = {'date': slot, 'candidateId': candidate, 'fingerprint': row['fingerprint'], 'sha256': digest}
+        if 'feature' in row:
+            feature = row['feature']
+            if not isinstance(feature, dict) or set(feature) != {'id', 'title'} or not all(
+                isinstance(value, str) and value.strip() for value in feature.values()
+            ):
+                raise ValueError(f'Invalid event metadata: {slot}')
+            entry['feature'] = {key: value.strip() for key, value in feature.items()}
+        slots[slot] = entry
         if slot <= through:
             blobs[digest] = raw
     published = {key: value for key, value in sorted(slots.items()) if key <= through}
