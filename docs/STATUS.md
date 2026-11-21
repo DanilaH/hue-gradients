@@ -1,5 +1,7 @@
 # Status — 21 November 2026
 
+All 16 available A1–G1 checkpoints were rerun against `431f06d`. This includes 192 unit tests, the signed 0.4.25 payload in Chromium 92 and 153, 30 offline daily boards and 8 independently checked wallpaper PNGs. Live services and physical device acceptance are recorded separately. [Results](evidence/queue-regression-a1-g1-2026-11-21.json)
+
 Signed Android preview **0.4.25/versionCode29** is based on `feat/m0-foundation`. That branch includes the full audit roadmap from PR #4 and package 01 from PR #5.
 
 | Stage | Actual state |

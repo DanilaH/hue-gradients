@@ -80,6 +80,8 @@ Author activeTest persists work/node/frozen Attempt; creative.playing controls c
 
 ## Next work
 
+On 21 November the requested restart at A1 reran all 16 locally available control episodes A1–G1 on `431f06d`. The current source passed the picker suite in both Chromium engines, and the signed 0.4.25 payload passed startup and save recovery in both. Network/provider evidence remains fixture-only, and no physical Android phone was attached. Resume from the first resolved condition in the queue. [Per-package results](evidence/queue-regression-a1-g1-2026-11-21.json)
+
 D1 verifies the raw catalog, month and level files before handing a feed to the existing save path. Browser tests rejected a damaged update, admitted the repaired UTC day and solved each of the 30 authored boards offline. The editorial order is undated and the closest palettes still need human play. Use the provider and trusted-time gates recorded below to resume the live calendar. [Evidence](evidence/queue-d1-client-2026-11-21.json)
 
 D1 publication staging is available in [the runbook](DAILY_STAGING.md). All 30 authored candidates pass technical checks. The browser solved the first authored slot in four moves on both online and offline routes, preserving one dated win across UTC midnight. Real editorial acceptance, the dated publication and the authoritative clock remain pending. [Evidence](evidence/queue-d1-staging-2026-11-21.json)
