@@ -62,9 +62,48 @@ try {
     const { x, y } = await point(index);
     await page.touchscreen.tap(x, y);
   };
-  const initial = await attempt();
-  assert.equal(initial.board.length, 169);
+  const beforeKeyboard = await attempt();
+  assert.equal(beforeKeyboard.board.length, 169);
   if (recording) await page.waitForTimeout(400);
+  await canvas.focus();
+  for (let i = 0; i < 4; i++) await page.keyboard.press('=');
+  const keyboardZoom = (await camera()).zoom;
+  assert(Math.abs(keyboardZoom - 2.4) < .07);
+  const visible = async index => {
+    const center = await point(index);
+    const view = await camera();
+    const halfWidth = (bounds.width * view.zoom / 13 - 1) / 2;
+    const halfHeight = ((bounds.height - 8) * view.zoom / 13 - 1) / 2;
+    assert(center.x - halfWidth >= bounds.x - .02 && center.x + halfWidth <= bounds.x + bounds.width + .02, JSON.stringify({ index, center, view }));
+    assert(center.y - halfHeight >= bounds.y + 4 - .02 && center.y + halfHeight <= bounds.y + bounds.height - 4 + .02, JSON.stringify({ index, center, view }));
+  };
+  const corners = [];
+  await visible(0);
+  corners.push(0);
+  let focus = 0;
+  for (const [key, delta] of [['ArrowRight', 1], ['ArrowDown', 13], ['ArrowLeft', -1], ['ArrowUp', -13]]) {
+    for (let step = 0; step < 12; step++) {
+      await page.keyboard.press(key);
+      focus += delta;
+      await visible(focus);
+    }
+    corners.push(focus);
+    if (recording) await page.waitForTimeout(160);
+  }
+  await page.keyboard.press('ArrowRight');
+  await visible(1);
+  await page.keyboard.press('Enter');
+  await page.keyboard.press('ArrowRight');
+  await visible(1); await visible(2);
+  await page.keyboard.press('Enter');
+  await idle();
+  const initial = await attempt();
+  assert.equal(initial.moves, beforeKeyboard.moves + 1);
+  assert.equal(initial.board[1], beforeKeyboard.board[2]);
+  assert.equal(initial.board[2], beforeKeyboard.board[1]);
+  if (recording) await page.waitForTimeout(380);
+  for (let i = 0; i < 4; i++) await page.keyboard.press('-');
+  assert.equal((await camera()).zoom, 1);
   const movable = await point(83);
   const dragged = { x: movable.x - 13, y: center.y };
   await touch('touchStart', movable);
@@ -92,9 +131,14 @@ try {
   assert.equal(await page.locator('.tile-mark').getAttribute('data-position'), '84');
   assert.deepEqual(await attempt(), initial);
   if (recording) await page.waitForTimeout(650);
-  await tap(83); await tap(85); await idle();
+  const dragFrom = await point(83), dragTo = await point(85);
+  await touch('touchStart', dragFrom);
+  await touch('touchMove', { x: (dragFrom.x + dragTo.x) / 2, y: dragTo.y });
+  await touch('touchMove', dragTo);
+  await touch('touchEnd');
+  await idle();
   const swapped = await attempt();
-  assert.equal(swapped.moves, 1);
+  assert.equal(swapped.moves, initial.moves + 1);
   assert.equal(swapped.board[83], initial.board[85]);
   assert.equal(swapped.board[85], initial.board[83]);
   if (recording) await page.waitForTimeout(350);
@@ -115,7 +159,8 @@ try {
   const video = page.video();
   await context.close();
   if (video) await video.saveAs(`${out}/zoom.webm`);
-  const report = { browser: browser.version(), cells: 169, secondFingerCanceled: true, zoom: afterPan.zoom,
+  const report = { browser: browser.version(), cells: 169, keyboardZoom, visibleCorners: corners,
+    keyboardSwap: [1, 2], secondFingerCanceled: true, zoom: afterPan.zoom,
     pan: { x: afterPan.x - beforePan.x, y: afterPan.y - beforePan.y }, hitPin: 84, swapped: [83, 85],
     edgePan: afterEdge.x - cameraBeforeEdge.x, outsideDropUnchanged: true, clipStartMillis, clipMillis };
   await writeFile(`${out}/browser.json`, JSON.stringify(report, null, 2) + '\n');

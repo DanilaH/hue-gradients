@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { canSwap, type Attempt, type LevelDefinition } from '../domain/puzzle';
 import { boardGeometry, cellAt, cellCenter, hitTest, type BoardGeometry, type Cell } from './geometry';
-import { clampCamera, edgeVelocity, moveCamera, REST_CAMERA, viewBoard, type Camera, type Point } from './boardCamera';
+import { clampCamera, edgeVelocity, moveCamera, REST_CAMERA, revealCell, viewBoard, type Camera, type Point } from './boardCamera';
 
 export const GAME_PRESENTABLE = 'hue:presentable';
 interface Hooks { swap(from: number, to: number): void; pin(position: number): void; paint(): void; interaction?(value: { x: number; y: number; color: string } | null): void }
@@ -220,9 +220,13 @@ export class PuzzleScene extends Phaser.Scene {
     else if (event.key === 'ArrowLeft') position = Math.max(0, position - 1);
     else if (event.key === 'ArrowDown') position = Math.min(this.attempt.board.length - 1, position + this.level.width);
     else if (event.key === 'ArrowUp') position = Math.max(0, position - this.level.width);
-    else if (event.key === 'Enter' || event.key === ' ') this.tap(position);
+    else if (event.key === 'Enter' || event.key === ' ') {
+      // Pointer pan can move the last keyboard focus off-screen. Reveal it before using it.
+      if (this.camera.zoom > 1) this.camera = revealCell(this.natural, this.camera, position);
+      this.tap(position);
+    }
     else return;
-    event.preventDefault(); this.focused = position; this.draw();
+    event.preventDefault(); this.focused = position; this.draw(event.key !== 'Escape');
   };
   private resized(): void { this.cancel(); this.draw(); }
   private respond(position: number | null, x: number, y: number): void {
@@ -274,11 +278,14 @@ export class PuzzleScene extends Phaser.Scene {
       else art.lineBetween(x + 4, top, x + width - 4, top);
     }
   }
-  private draw(): void {
+  private draw(followFocus = false): void {
     const rect = this.game.canvas.getBoundingClientRect();
     this.ratio = this.scale.width / Math.max(1, rect.width);
     this.natural = boardGeometry(rect.width, rect.height, this.level.width, this.level.height, this.level.positions);
     this.camera = clampCamera(this.natural, this.camera);
+    if (followFocus && this.camera.zoom > 1 && this.focused !== null) {
+      this.camera = revealCell(this.natural, this.camera, this.focused);
+    }
     this.geometry = viewBoard(this.natural, this.camera);
     if (import.meta.env.DEV) this.game.canvas.dataset.camera = JSON.stringify(this.camera);
     this.art.clear().setScale(this.ratio);

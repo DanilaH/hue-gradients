@@ -2,7 +2,7 @@
 
 All 16 available A1–G1 checkpoints were rerun against `431f06d`. This includes 192 unit tests, the signed 0.4.25 payload in Chromium 92 and 153, 30 offline daily boards and 8 independently checked wallpaper PNGs. Live services and physical device acceptance are recorded separately. [Results](evidence/queue-regression-a1-g1-2026-11-21.json)
 
-Signed Android preview **0.4.25/versionCode29** is based on `feat/m0-foundation`. That branch includes the full audit roadmap from PR #4 and package 01 from PR #5.
+Signed Android preview **0.4.28/versionCode32** is based on `feat/m0-foundation` and includes all three fixes requested in PR #8. All 197 unit tests passed. The signed web payload passed startup and save recovery in Chromium 92 and 153. Physical Android acceptance remains open. [Delivery queue](porting/DELIVERY_QUEUE.md)
 
 | Stage | Actual state |
 | --- | --- |
@@ -19,11 +19,11 @@ Signed Android preview **0.4.25/versionCode29** is based on `feat/m0-foundation`
 | Queue E3 | Local publication protocol and retry fixtures pass. Public entry waits for a service. [Checks](evidence/queue-e3-2026-11-20.json) |
 | Queue E2 | Exact verified editor revision file, import and its original wallpaper tested in Chromium. [Checks](evidence/queue-e2-2026-11-20.json) |
 | Queue E1 | Themed books and cycle cancellation. The authored event from the staged catalog opened from Books and kept one win after two offline completions. Live dates and reset rules pending. [Checks](evidence/queue-e1-staging-2026-11-21.json) |
-| Queue D2 | Offline personal assignments, timer, future chapter preview and one completion mark per task. [Checks](evidence/queue-d2-2026-11-20.json) |
+| Queue D2 | Personal assignments rotate by date and progress. Perfect records can be repeated. Difficult unplayed fields and chapter finale limits passed in Chromium, including a Dec 1 to Nov 25 correction with one reward. [Checks](evidence/pr8-d2-2026-11-21.json) |
 | Queue D1 | Offline publisher staging and the 30 authored candidates checked. Two Chromium profiles received the same authored board, crossed the UTC month boundary and replayed the old slot offline. The client verified catalog, month and level bytes, rejected a damaged update and solved all 30 authored boards offline in Chromium. Published feed, human review and trusted clock pending. [Checks](evidence/queue-d1-client-2026-11-21.json) |
-| Queue C2 | 13×13 field, pinch, pan, visible edges and canceled drop verified in Chromium. [Checks](evidence/queue-c2-2026-11-20.json) |
+| Queue C2 | Keyboard focus stays visible at 2.44× on all four edges of the 13×13 field. Keyboard swap, touch pinch, drag, edge pan and canceled outside drop passed in Chromium. [Checks](evidence/pr8-c2-2026-11-21.json) |
 | Queue C1 | Four original shape boards, deterministic generated starts and exact RGB verified. [Checks](evidence/queue-c1-2026-11-20.json) |
-| Queue B3 | Ten-minute local series and score; save, pause and duplicate finish checked in Chromium. [Checks](evidence/queue-b3-2026-11-20.json) |
+| Queue B3 | The ten-minute series has shuffled 7×7 fields, pins that change with score and a monotonic clock. Seven rounds, a second run, pause and a migrated 0.4.25 save passed in Chromium. [Checks](evidence/pr8-b3-2026-11-21.json) |
 | Queue B2 | Chapter finales and one-time secret reveal. First chapter and replay checked in Chromium. [Checks](evidence/queue-b2-2026-11-20.json) |
 | Queue B1 | Ten local move-limit challenges, fixed replay and last-move win/loss verified. [Checks](evidence/queue-b1-2026-11-20.json) |
 | Queue A3 | Personal best visible on the work card. Comparison awaits a measured published sample. [Checks](evidence/queue-a3-2026-11-20.json) |

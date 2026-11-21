@@ -1,4 +1,4 @@
-import type { BoardGeometry } from './geometry';
+import { cellAt, type BoardGeometry } from './geometry';
 
 export interface Point { x: number; y: number }
 export interface Camera extends Point { zoom: number }
@@ -20,6 +20,16 @@ export function moveCamera(board: BoardGeometry, from: Camera, anchor: Point, at
 export function viewBoard(board: BoardGeometry, camera: Camera): BoardGeometry {
   return { ...board, x: board.x + camera.x, y: board.y + camera.y,
     width: board.width * camera.zoom, height: board.height * camera.zoom };
+}
+
+export function revealCell(board: BoardGeometry, camera: Camera, position: number): Camera {
+  const cell = cellAt(viewBoard(board, camera), position);
+  const reveal = (start: number, length: number, frameStart: number, frameLength: number) => {
+    if (length > frameLength) return frameStart + (frameLength - length) / 2 - start;
+    return Math.max(0, frameStart - start) + Math.min(0, frameStart + frameLength - start - length);
+  };
+  return clampCamera(board, { zoom: camera.zoom, x: camera.x + reveal(cell.x, cell.width, board.x, board.width),
+    y: camera.y + reveal(cell.y, cell.height, board.y, board.height) });
 }
 
 export function edgeVelocity(board: BoardGeometry, camera: Camera, at: Point): Point {

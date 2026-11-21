@@ -10,6 +10,8 @@ Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and
 
 ## Current slice
 
+PR #8 fixes shipped in order B3 (0.4.26, `58257d6`), D2 (0.4.27, `ab14dac`) and C2 (0.4.28). Chromium passed seven 7×7 rounds, clock changes and the prior signed save, four assignment dates, a 30/60 profile and the date rollback, then all four camera edges and touch input on 13×13. The final signed APK web payload passed startup and save recovery in Chromium 92 and 153. The phone pass still needs an attached Android device for lifecycle, real date changes and multitouch. [B3](evidence/pr8-b3-2026-11-21.json) · [D2](evidence/pr8-d2-2026-11-21.json) · [C2](evidence/pr8-c2-2026-11-21.json)
+
 G1 (0.4.25/versionCode29, 7b82000) closes the available local queue through G1. The signed preview contains independently controlled opt-in ambient music. Cancel leaves zero moves, the winning swap records one move, and the browser records one victory cue and one vibration API call. Resources from the exact APK passed Chromium 92 and 158 startup and save recovery. [Evidence](evidence/queue-g1-2026-11-20.json)
 
 F2 separates swap intent from the atomic accepted event. The injected write failure/test replay produced one win and one input receipt. Local score replay verifies rules/start/help and rejects mismatches. Network competition and cloud stay unconfigured/on owner hold. G1 verification is recorded above. [Evidence](evidence/queue-f2-2026-11-20.json)
