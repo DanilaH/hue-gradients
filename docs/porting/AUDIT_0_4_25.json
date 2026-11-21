@@ -1,0 +1,202 @@
+{
+  "engine": "141.0.7390.37",
+  "clockRollback": [
+    "5:00 · Собрано 0",
+    "10:00 · Собрано 0"
+  ],
+  "timed": {
+    "rounds": [
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        5,
+        5
+      ],
+      [
+        5,
+        5
+      ],
+      [
+        5,
+        5
+      ],
+      [
+        6,
+        4
+      ],
+      [
+        4,
+        4
+      ]
+    ],
+    "moves": 39,
+    "firstEqualsSeventh": true,
+    "guidance": "10:00 · Собрано 6"
+  },
+  "personalDates": [
+    {
+      "deviceDay": "2026-11-21",
+      "issued": "2026-11-21",
+      "present": "gradient-001",
+      "future": "gradient-016",
+      "presentTime": 45000
+    },
+    {
+      "deviceDay": "2026-11-22",
+      "issued": "2026-11-22",
+      "present": "gradient-001",
+      "future": "gradient-017",
+      "presentTime": 45000
+    },
+    {
+      "deviceDay": "2026-11-23",
+      "issued": "2026-11-23",
+      "present": "gradient-001",
+      "future": "gradient-016",
+      "presentTime": 45000
+    },
+    {
+      "deviceDay": "2026-11-24",
+      "issued": "2026-11-24",
+      "present": "gradient-001",
+      "future": "gradient-017",
+      "presentTime": 45000
+    },
+    {
+      "deviceDay": "2026-12-01",
+      "issued": "2026-12-01",
+      "present": "gradient-001",
+      "future": "gradient-016",
+      "presentTime": 45000
+    },
+    {
+      "deviceDay": "2026-11-25",
+      "issued": "2026-12-01",
+      "present": "gradient-001",
+      "future": "gradient-016",
+      "presentTime": 45000
+    }
+  ],
+  "corpus": {
+    "campaign": {
+      "1": 60
+    },
+    "geometry": [
+      {
+        "id": "geometry-v1-rect",
+        "cycles": 1,
+        "changed": 4,
+        "pins": 12,
+        "minimum": 3,
+        "cells": 16
+      },
+      {
+        "id": "geometry-v1-triangles",
+        "cycles": 2,
+        "changed": 8,
+        "pins": 8,
+        "minimum": 6,
+        "cells": 16
+      },
+      {
+        "id": "geometry-v1-hexagons",
+        "cycles": 2,
+        "changed": 9,
+        "pins": 16,
+        "minimum": 7,
+        "cells": 25
+      },
+      {
+        "id": "geometry-v1-mixed",
+        "cycles": 4,
+        "changed": 20,
+        "pins": 5,
+        "minimum": 16,
+        "cells": 25
+      },
+      {
+        "id": "geometry-v1-wide",
+        "cycles": 6,
+        "changed": 42,
+        "pins": 5,
+        "minimum": 36,
+        "cells": 169
+      }
+    ]
+  },
+  "keyboard": {
+    "viewport": [
+      390,
+      740
+    ],
+    "canvas": {
+      "x": 9.15625,
+      "y": 52,
+      "width": 371.6875,
+      "height": 632
+    },
+    "before": {
+      "zoom": 2.44140625,
+      "x": -267.8763427734375,
+      "y": -449.71875
+    },
+    "after": {
+      "zoom": 2.44140625,
+      "x": -267.8763427734375,
+      "y": -449.71875
+    },
+    "cell1": {
+      "x": -163.17170597956732,
+      "y": -387.125
+    },
+    "cell2": {
+      "x": -93.36861478365384,
+      "y": -387.125
+    },
+    "moves": "1"
+  },
+  "progressedModel": {
+    "campaignWins": 30,
+    "unplayed": 30,
+    "swaps": 232,
+    "openChapters": [
+      true,
+      true,
+      true,
+      true
+    ],
+    "tasks": [
+      "present"
+    ]
+  },
+  "scope": {
+    "commit": "fe5a7f23a12d1aa8cdb95572bff49b4e23e0fbe4",
+    "version": "0.4.25 (29)",
+    "clock": "Playwright fixed Date, real browser input and browser timers; isolated profile, UTC. Six boards solved by touchscreen with civil time frozen to isolate the bank.",
+    "keyboard": "Real keyboard on Chromium 141; centers relative to canvas (CSS px).",
+    "progressedModel": "Domain actions only: 232 manual-swap actions, first ten tasks in each of the first three chapters, no saved-state edits; not a recorded human playthrough.",
+    "originals": "Pinned research evidence, not newly executed original APKs on handsets.",
+    "phone": "not run"
+  },
+  "rerun": {
+    "vitest": 192,
+    "browserSuites": [
+      "board-input",
+      "challenge",
+      "chapter-challenge",
+      "shape",
+      "large-board",
+      "personal",
+      "help",
+      "m4-export",
+      "feel-queue"
+    ],
+    "pngPixelChecks": 8
+  }
+}
