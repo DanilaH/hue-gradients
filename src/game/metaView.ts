@@ -6,7 +6,7 @@ import type { AlbumRoute } from './albumView';
 import { chapterChallenges, challengeAvailable, challenges, challengeStatus, geometryChallenges } from '../domain/challenges';
 import { bookProgress, books, goalLabel } from '../domain/books';
 import { gradientThumbnail } from './exportRenderer';
-import { TASK_KINDS, taskKey, taskNames, taskStatus } from '../domain/personal';
+import { personalLevel, personalTaskName, TASK_KINDS, taskKey, taskStatus } from '../domain/personal';
 import { renderProgress } from './progressView';
 
 type PickerRoute = { kind: 'chapter'; levelId: string; chapterMenu?: number };
@@ -281,6 +281,7 @@ export function renderMeta(v: MetaView): void {
     button('‹ Назад', v.back).className = 'quiet challenge-back';
     const progress = state.personalProgress;
     if (!progress) return;
+    label(dailyLabel(progress.day));
     const list = document.createElement('div');
     list.className = 'challenge-list';
     actions.append(list);
@@ -293,11 +294,11 @@ export function renderMeta(v: MetaView): void {
       card.className = 'quiet challenge-card';
       card.dataset.personal = kind;
       const name = document.createElement('span');
-      name.textContent = taskNames[kind];
+      name.textContent = personalTaskName(task);
       const info = document.createElement('small');
       info.textContent = [
-        getLevel(task.levelId).title,
-        task.limit !== undefined ? `До ${task.limit} ходов` : task.durationMs ? `${task.durationMs / 1000} с` : '',
+        personalLevel(task.levelId).title,
+        task.limit !== undefined ? `Лимит: ${task.limit}` : task.durationMs ? `${task.durationMs / 1000} с` : '',
         progress.earned.includes(key) ? 'Выполнено' : task.attempt && !finished ? 'Продолжить' : '',
       ].filter(Boolean).join(' · ');
       card.append(name, info);
@@ -310,7 +311,7 @@ export function renderMeta(v: MetaView): void {
       for (const key of [...progress.earned].reverse()) {
         const task = progress.tasks[key]!;
         const row = document.createElement('li');
-        row.textContent = `${dailyLabel(task.date)} · ${taskNames[task.kind]}`;
+        row.textContent = `${dailyLabel(task.date)} · ${personalTaskName(task)}`;
         list.append(row);
       }
       history.append(title, list);

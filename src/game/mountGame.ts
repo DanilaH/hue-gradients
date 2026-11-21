@@ -19,7 +19,7 @@ import { authorBests, authorView, findDraft, hasAuthorProof, type CreativeAction
 import { makePuzzleFile, parsePuzzleFile } from '../domain/puzzleTransfer';
 import { makeField, playableField } from '../domain/editor';
 import { AUTO_HELP_COST, autoHelpSwap, pulsePosition, type Assistance } from '../domain/puzzle';
-import { activePersonal, taskNames } from '../domain/personal';
+import { activePersonal, personalTaskName } from '../domain/personal';
 import { activeDaily, validateDailyFeed, type DailyFeed } from '../domain/daily';
 import { activeTimed, timedRemaining } from '../domain/timeTrial';
 import { activeChallenge } from '../domain/challenges';
@@ -409,8 +409,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (layer === 'result' && personal) {
       const won = personal.status === 'won';
       if (won) colourPrism(prism, level);
-      byId('dialog-title').textContent = won ? 'Задание выполнено' : personal.clock ? 'Время вышло' : 'Рекорд не улучшен';
-      byId('dialog-copy').textContent = taskNames[personal.kind];
+      byId('dialog-title').textContent = won ? 'Задание выполнено' : personal.clock ? 'Время вышло' : personal.repeatRecord ? 'Рекорд не повторён' : 'Рекорд не улучшен';
+      byId('dialog-copy').textContent = personalTaskName(personal);
       button('К заданиям', leavePersonal);
     } else if (layer === 'result' && daily) {
       colourPrism(prism, level);
@@ -585,7 +585,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     root.dataset.motion = String(motionAllowed());
     root.style.setProperty('--color-a', level.solvedTileColors[0]!); root.style.setProperty('--color-b', level.solvedTileColors.at(-1)!);
     byId('levels').textContent = personal ? '‹ Задания' : daily ? '‹ Календарь' : timed || challenge ? '‹ Испытания' : own ? '‹ Редактор' : '‹ Уровни';
-    byId('title').textContent = personal ? taskNames[personal.kind] : daily ? dailyLabel(daily.date) : own || challenge || timed ? level.title : `Уровень ${level.ordinal}`;
+    byId('title').textContent = personal ? personalTaskName(personal) : daily ? dailyLabel(daily.date) : own || challenge || timed ? level.title : `Уровень ${level.ordinal}`;
     const guidance = byId('guidance');
     guidance.textContent = layer === 'secret' ? '' : personal?.limit !== undefined ? `Ходов осталось · ${personal.limit - personal.attempt.moves}` : challenge ? `Ходов осталось · ${challenge.moveLimit - challenge.attempt.moves}` : layer === 'help' ? 'Готовое поле' : notice || (!own && !session.state.onboarding.firstSwapDone ? 'Поменяй две плитки местами' : '');
     guidance.setAttribute('aria-live', timed || personal?.clock ? 'off' : 'polite');

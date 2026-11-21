@@ -390,7 +390,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 05",
-      "currentImplementation": "D1: фиксированный старт по доверенной дате, версия кеша, офлайн-архив и одна отметка о победе подтверждены на датированных фикстурах. | https://github.com/DanilaH/hue-gradients/blob/7341192f984b0a4a7a75a6d78d5017349eb28d14/tools/daily-browser-check.mjs Для D1 готовы проверка 30 авторских кандидатов и сборка датированного каталога. Два профиля в Chromium получили авторское поле, пережили UTC-полночь и сохранили одну победу после повтора офлайн. Клиент сверяет байты каталога, месяца и поля, а также отпечаток. Повреждённое обновление сохраняет старую партию. Все 30 кандидатов пройдены в Chromium офлайн.",
+      "currentImplementation": "D1: фиксированный старт по доверенной дате, версия кеша, офлайн-архив и одна отметка о победе подтверждены на датированных фикстурах. | https://github.com/DanilaH/hue-gradients/blob/7341192f984b0a4a7a75a6d78d5017349eb28d14/tools/daily-browser-check.mjs Для D1 готовы проверка 30 авторских кандидатов и сборка датированного каталога. Два профиля в Chromium получили авторское поле, пережили UTC-полночь и сохранили одну победу после повтора офлайн. Клиент сверяет байты каталога, месяца и поля, а также отпечаток. Повреждённое обновление сохраняет старую партию. Все 30 кандидатов пройдены в Chromium офлайн. PR №8/D2: В Chromium открыт локальный день 25 ноября при переводе с 1 декабря.",
       "nextAction": "Пройти редакционный игровой просмотр, назначить даты, подключить проверенный UTC и опубликованный каталог, затем проверить живой архив.",
       "deliveryPackage": "05",
       "sourceNextCheck": "Проверить две зоны и перевод часов на опубликованном слоте."
@@ -400,7 +400,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 05",
-      "currentImplementation": "Отдельная задача предлагает прежний уровень с достижимой целью на ход лучше. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs",
+      "currentImplementation": "Отдельная задача предлагает прежний уровень с достижимой целью на ход лучше. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs PR №8/D2: Для идеального результата добавлена цель «Повторить рекорд» с удержанием математического минимума.",
       "nextAction": "Проверить смысл трёх целей и время на физическом телефоне (G1).",
       "deliveryPackage": "05",
       "sourceNextCheck": "Прототип из уже решённой работы, последний допустимый ход засчитывается."
@@ -410,7 +410,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 05",
-      "currentImplementation": "Поле без помощи с локальным лимитом времени. Истечение проверено в Chromium. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs",
+      "currentImplementation": "Поле без помощи с локальным лимитом времени. Истечение проверено в Chromium. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs PR №8/D2: Лимит зависит от минимума, числа подвижных плиток и отдельного коэффициента для финала главы.",
       "nextAction": "Проверить смысл трёх целей и время на физическом телефоне (G1).",
       "deliveryPackage": "05",
       "sourceNextCheck": "Проверить границу таймера и возобновление после паузы."
@@ -420,7 +420,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 05",
-      "currentImplementation": "Первое поле будущей закрытой главы доступно отдельно; в кампании оно не открывается. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs",
+      "currentImplementation": "Первое поле будущей закрытой главы доступно отдельно; в кампании оно не открывается. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs PR №8/D2: Сложное задание выбирается из непройденных полей, в том числе после открытия всех глав.",
       "nextAction": "Проверить смысл трёх целей и время на физическом телефоне (G1).",
       "deliveryPackage": "05",
       "sourceNextCheck": "Проверить выдачу на профилях с разным прогрессом."
@@ -430,7 +430,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 05",
-      "currentImplementation": "История личных заданий сохраняет одну отметку на задание и дату, повтор не дублирует. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs",
+      "currentImplementation": "История личных заданий сохраняет одну отметку на задание и дату, повтор не дублирует. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs PR №8/D2: После коррекции даты сохраняются история, выданные поля и одна отметка за повтор.",
       "nextAction": "Проверить смысл трёх целей и время на физическом телефоне (G1).",
       "deliveryPackage": "05",
       "sourceNextCheck": "Проверить на двух разных профилях, если вводится личная подборка."
