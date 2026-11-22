@@ -106,6 +106,22 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   let workCard: WorkCardView | null = null, workCardId: string | null = null;
   let shownAlbum: AlbumRoute | null = null;
   const albumPositions = new Map<AlbumRoute['tab'], AlbumPosition>();
+  let printAnimation: Animation | undefined;
+  function movePrint(source: HTMLCanvasElement, from: DOMRect, to: DOMRect): void {
+    if (!motionAllowed() || !from.width || !from.height || !to.width || !to.height) return;
+    printAnimation?.cancel();
+    const image = document.createElement('img');
+    image.alt = '';
+    image.className = 'album-flight';
+    image.src = source.toDataURL();
+    const frame = (box: DOMRect) => ({
+      left: `${box.left}px`, top: `${box.top}px`, width: `${box.width}px`, height: `${box.height}px`,
+    });
+    dialog.append(image);
+    const animation = image.animate([frame(from), frame(to)], { duration: 300, easing: 'cubic-bezier(.22,.66,.29,1)' });
+    printAnimation = animation;
+    animation.finished.catch(() => {}).finally(() => { image.remove(); if (printAnimation === animation) printAnimation = undefined; });
+  }
   const prism = byId('victory-prism');
   const artwork = new VictoryArtwork(root);
   let victoryPhase: 'approach' | 'landed' | 'reveal' | 'still' = 'still';
@@ -242,7 +258,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     node.onclick = () => { if (!victoryWaiting()) action(); }; actions.append(node);
     return node;
   }
-  function showMeta(route: MetaRoute): void {
+  function showMeta(route: MetaRoute, origin?: HTMLCanvasElement): void {
+    const from = origin?.getBoundingClientRect();
     scene.cancel();
     if (layer === 'meta' && metaRoute.kind === 'book') finishInsertion();
     if (layer !== 'meta') { metaReturn = layer; metaHistory = []; }
@@ -256,6 +273,10 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     }
     if (route.kind === 'chapter') chosenLevels.set(chapterIndexFor(route.levelId),route.levelId);
     metaRoute = route; layer = 'meta'; render();
+    if (origin && from) {
+      const view = actions.querySelector('.work-card-art');
+      if (view) movePrint(origin,from,view.getBoundingClientRect());
+    }
     if (route.kind === 'daily') {
       if (!route.date && !route.month) void refreshDaily();
       else if (route.date) actions.querySelector<HTMLElement>(`[data-daily-date="${route.date}"]`)?.focus({ preventScroll: true });
@@ -481,9 +502,14 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   function popMeta(): void {
     finishInsertion();
     const previous = metaHistory.pop();
+    const from = previous?.kind === 'album' ? actions.querySelector('.work-card-art')?.getBoundingClientRect() : undefined;
     if (previous) metaRoute = previous;
     else layer = metaReturn;
     render();
+    if (from) {
+      const cover = actions.querySelector<HTMLCanvasElement>('[data-album-selected] canvas');
+      if (cover) movePrint(cover,from,cover.getBoundingClientRect());
+    }
   }
   function createWork(): void {
     const draftId = crypto.randomUUID();
@@ -1008,7 +1034,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     pauseOrigin = layer === 'secret' || layer === 'help' ? layer : 'none';
     layer = 'settings'; render();
   }, { signal: listeners.signal });
-  systemMotion.addEventListener('change', () => { scene.cancel(); if (!motionAllowed()) finishInsertion(); render(); }, { signal: listeners.signal });
+  systemMotion.addEventListener('change', () => { scene.cancel(); if (!motionAllowed()) { finishInsertion(); printAnimation?.cancel(); } render(); }, { signal: listeners.signal });
   dialog.tabIndex = -1;
   const ignoreInput = (event: Event) => { event.preventDefault(); event.stopImmediatePropagation(); };
   dialog.addEventListener('pointerdown', event => {
@@ -1056,6 +1082,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   const unblock = activity.onBlockedChange(blocked => {
     if (blocked) {
       finishInsertion();
+      printAnimation?.cancel();
       foregroundEpoch++;
       heldActivation.clear();
       blockedActivation.clear();
@@ -1077,5 +1104,5 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
         session.state.personalProgress?.day !== localCalendarDay()) void issuePersonal();
   }, 1000);
   await frame; ready = true; render(); resize();
-  return { back, destroy() { alive = false; clearTimeout(insertionTimer); clearInterval(clockTicker); clearInterval(personalTicker); clearMark(); editorView?.destroy(); workCard?.destroy(); stopVictory(); exportFiles.destroy?.(); listeners.abort(); observer.disconnect(); unblock(); atmosphere.destroy(); feedback.destroy(); music.destroy(); activity.setGameplayDesired(false); store.close(); destroyRenderer(game); } };
+  return { back, destroy() { alive = false; printAnimation?.cancel(); clearTimeout(insertionTimer); clearInterval(clockTicker); clearInterval(personalTicker); clearMark(); editorView?.destroy(); workCard?.destroy(); stopVictory(); exportFiles.destroy?.(); listeners.abort(); observer.disconnect(); unblock(); atmosphere.destroy(); feedback.destroy(); music.destroy(); activity.setGameplayDesired(false); store.close(); destroyRenderer(game); } };
 }

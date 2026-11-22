@@ -126,7 +126,8 @@ try{
  await albumButton('Прогресс').click();
  const progress=page.locator('[data-meta=progress]');
  assert.match(await progress.innerText(),/Собрано 15 из 60 · 15 XP/);
- assert.match(await progress.getByLabel('Главы').innerText(),/Глава 1 · 15\/15 · Собрана/);
+ assert.match(await progress.locator('[data-chapter="1"]').innerText(),/Глава 1 · 15\/15/);
+ assert.equal(await progress.locator('[data-finale="1"]').getAttribute('data-locked'),'false');
  await progress.getByText(/^История побед ·/).click();
  assert.equal(await progress.locator('[data-attempt-id]').count(),current.victories.length);
  await progress.getByText('Ступени мастерства',{exact:true}).click();

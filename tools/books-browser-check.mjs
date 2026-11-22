@@ -38,8 +38,8 @@ try {
   const button = name => page.getByRole('button', { name, exact: true });
   const idle = () => page.waitForSelector('#hue-app[data-busy=false]');
   const ready = () => page.waitForSelector('html[data-state=ready]');
-  const books = async () => { await page.locator('#levels').tap(); await button('Альбом').tap(); await button('Книги').tap(); };
-  const back = async () => { for (let i = 0; i < 3; i++) await button('‹ Назад').tap(); };
+  const shelf = async () => { await page.locator('#levels').tap(); await button('Альбом').tap(); await button('Книги').tap(); };
+  const books = async () => { await shelf(); await page.locator('[data-book-cover=book-v1-dawn]').tap(); };
   const dawn = page.locator('[data-book=book-v1-dawn]'), special = dawn.locator('[data-book-challenge]');
   const state = () => page.evaluate(async (eventDate) => {
     const { openIndexedDb } = await import('/src/local-store/indexed-db.ts');
@@ -71,30 +71,32 @@ try {
   };
   await page.goto(base);
   await ready();
-  for (const level of levels.slice(0, 6)) {
-    if (level.ordinal === 6) {
-      await books();
-      assert.match(await dawn.innerText(), /3\/4/);
-      assert.equal(await special.count(), 0);
-      await back();
-    }
+  for (const level of levels.slice(0, 5)) {
     for (const [from, to] of rows.find(row => row.id === level.id).legal_optimal_witness) await swap(level, from, to);
     await button('Дальше').tap();
     await idle();
   }
   await books();
-  assert.match(await dawn.innerText(), /4\/4/);
-  assert.equal(await dawn.locator('li[data-earned=true]').count(), 4);
+  assert.match(await dawn.innerText(), /3\/4/);
+  assert.equal(await special.count(), 0);
   const clipStartMillis = Date.now() - captureBase;
   if (recording) await page.waitForTimeout(550);
+  await dawn.locator('[data-slot="3"]').tap();
+  await idle();
+  const sixth = levels[5];
+  for (const [from, to] of rows.find(row => row.id === sixth.id).legal_optimal_witness) await swap(sixth, from, to);
+  await button('К книге').tap();
+  await special.waitFor();
+  assert.match(await dawn.innerText(), /4\/4/);
+  assert.equal(await dawn.locator('.book-slot[data-earned=true]').count(), 4);
   const chapter = await page.evaluate(async () => (await import('/src/domain/books.ts')).books[0].level);
   async function claim() {
     await special.tap();
     await idle();
-    assert.equal(await page.locator('#levels').innerText(), '‹ Книги');
+    assert.equal(await page.locator('#levels').innerText(), '‹ Книга');
     await solve(chapter);
     if (recording) await page.waitForTimeout(600);
-    await button('К книгам').tap();
+    await button('К книге').tap();
     await dawn.waitFor();
   }
   await claim();
@@ -106,7 +108,7 @@ try {
   await special.tap();
   await idle();
   await page.locator('#settings').tap();
-  assert(await button('К книгам').isVisible());
+  assert(await button('К книге').isVisible());
   await button('Продолжить').tap();
   const movable = chapter.startTileAtPosition.flatMap((_, index) => chapter.pinnedPositions.includes(index) ? [] : [index]);
   const limit = Number((await page.locator('#guidance').textContent()).match(/\d+$/)?.[0]);
@@ -114,7 +116,7 @@ try {
   for (let step = 0; step < limit; step++) await swap(chapter, movable[0], movable[1]);
   await page.waitForSelector('#hue-app[data-layer=result]');
   assert.equal(await page.locator('#dialog-title').textContent(), 'Ходы закончились');
-  await button('К книгам').tap();
+  await button('К книге').tap();
   await dawn.waitFor();
   assert.equal((await state()).claimCount, 1);
 
@@ -139,7 +141,8 @@ try {
   }, staged && { publication: staged.publication, files: staged.files });
   await page.reload();
   await ready();
-  await books();
+  await page.keyboard.press('Escape');
+  await shelf();
   const event = page.locator('[data-event]').filter({ hasText: featured?.feature.title ?? 'Мягкий свет' });
   if (featured) assert.equal(await event.getAttribute('data-event'), featured.feature.id);
   await context.route('**/*', route => route.request().resourceType() === 'fetch' ? route.abort() : route.fallback());

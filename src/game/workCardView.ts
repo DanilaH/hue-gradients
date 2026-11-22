@@ -66,7 +66,7 @@ export class WorkCardView {
       button.onclick = handler; parent.append(button);
       return button;
     };
-    add(nav, '‹ Назад', actions.back);
+    add(nav, '‹ Назад', () => { if (!this.handleBack()) actions.back(); });
     this.options.className = 'work-card-options';
     this.summary.textContent = '⋯';
     this.summary.setAttribute('aria-label', 'Действия с работой');
@@ -106,6 +106,7 @@ export class WorkCardView {
     if (actions.copy) add(choices, 'Сохранить копию', actions.copy);
     if (actions.edit) add(choices, 'Редактировать', actions.edit);
     if (actions.sharePuzzle) add(choices, 'Поделиться задачей', () => void this.sendPuzzle(actions.sharePuzzle!));
+    if (records.childElementCount) choices.prepend(records);
     this.options.append(this.summary, choices);
     nav.append(this.options);
     this.saveButton.type = 'button';
@@ -119,10 +120,6 @@ export class WorkCardView {
     art.className = 'work-card-art';
     art.append(this.image);
     this.panel.append(nav, art);
-    if (records.childElementCount) {
-      this.panel.classList.add('with-records');
-      this.panel.append(records);
-    }
     this.panel.append(footer, this.note);
     parent.append(this.panel);
     window.addEventListener('resize', this.refresh);

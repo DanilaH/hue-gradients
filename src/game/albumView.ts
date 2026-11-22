@@ -14,7 +14,7 @@ interface Props {
   state: Workspace;
   disabled: boolean;
   position: AlbumPosition | undefined;
-  navigate(route: MetaRoute): void;
+  navigate(route: MetaRoute, origin?: HTMLCanvasElement): void;
   back(): void;
   createWork(): void;
   importPuzzle(file: File): void;
@@ -71,15 +71,16 @@ export function renderAlbum(parent: HTMLElement, props: Props): void {
     scroll.append(node);
     return node;
   };
-  const print = (parent: HTMLElement, field: ExportField, title: string, id: string, action: () => void) => {
+  const print = (parent: HTMLElement, field: ExportField, title: string, id: string, action: (canvas: HTMLCanvasElement) => void) => {
+    const canvas = gradientThumbnail(field);
     const node = button(parent, '', () => {
       node.focus({ preventScroll: true });
-      action();
+      action(canvas);
     });
     node.dataset.albumFocus = id;
     if (position?.focus === id) node.dataset.albumSelected = '';
     node.className = 'album-print';
-    node.append(gradientThumbnail(field));
+    node.append(canvas);
     const name = document.createElement('span');
     name.textContent = title;
     node.append(name);
@@ -91,15 +92,13 @@ export function renderAlbum(parent: HTMLElement, props: Props): void {
     chapters.forEach((chapter, index) => {
       const collected = chapter.levelIds.filter(id => completed.has(id));
       if (!collected.length) return;
-      if (state.completed.length > collected.length || collected.length === chapter.levelIds.length) {
-        const heading = document.createElement('h3');
-        heading.textContent = `Глава ${index + 1}`;
-        scroll.append(heading);
-      }
+      const heading = document.createElement('h3');
+      heading.textContent = `Глава ${index + 1}`;
+      scroll.append(heading);
       const prints = grid();
       for (const id of collected) {
         const level = getLevel(id);
-        print(prints, level, level.title, id, () => navigate({ kind: 'card', levelId: id })).dataset.albumLevel = id;
+        print(prints, level, level.title, id, canvas => navigate({ kind: 'card', levelId: id },canvas)).dataset.albumLevel = id;
       }
     });
     button(footer, 'Книги', () => navigate({ kind: 'books' })).dataset.albumFocus = 'books';
@@ -112,10 +111,10 @@ export function renderAlbum(parent: HTMLElement, props: Props): void {
     if (works.length) {
       const prints = grid();
       for (const work of works) {
-        const node = print(prints, work.nodes[work.headNodeId]!.field, work.name, work.draftId, () => {
+        const node = print(prints, work.nodes[work.headNodeId]!.field, work.name, work.draftId, canvas => {
           navigate(hasAuthorProof(work, work.headNodeId)
             ? { kind: 'own-card', workId: work.workId, nodeId: work.headNodeId }
-            : { kind: 'draft', draftId: work.draftId });
+            : { kind: 'draft', draftId: work.draftId },canvas);
         });
         node.dataset.draftId = work.draftId;
       }

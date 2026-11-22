@@ -107,6 +107,7 @@ export class EditorView {
     this.canvas.height = 192;
     this.canvas.setAttribute('role', 'img');
     this.canvas.setAttribute('aria-label', 'Градиент работы');
+    this.status.id = 'editor-state';
     this.status.setAttribute('role', 'status');
     this.panel.append(this.header, this.content, this.status, this.controls);
     parent.append(this.panel);
@@ -150,7 +151,9 @@ export class EditorView {
         this.button('Остаться', () => { this.exitPrompt = false; this.drawControls(); }, this.controls);
         this.button('Выйти без этих изменений', this.props.back, this.controls);
       } else if (this.mode === 'main') {
-        this.button('Испытать', () => void this.perform(() => this.play()), this.controls, !!check.errors.length).dataset.authorPlay = '';
+        const play = this.button('Испытать', () => void this.perform(() => this.play()), this.controls, !!check.errors.length);
+        play.dataset.authorPlay = '';
+        if (check.errors.length) play.setAttribute('aria-describedby',this.status.id);
       } else if (['color', 'size', 'pins', 'start'].includes(this.mode)) {
         this.button('Отмена', () => void this.perform(() => this.cancel()), this.controls).className = 'quiet';
         this.button(this.mode === 'color' ? 'Готово' : 'Применить', () => void this.perform(() => this.finishTool()), this.controls).dataset.editorApply = '';
@@ -307,7 +310,10 @@ export class EditorView {
         : grid.appendChild(document.createElement('div'));
       cell.className = 'editor-cell';
       cell.style.setProperty('--tile', this.field.solvedTileColors[tile]!);
-      if (mode === 'pins') cell.setAttribute('aria-label', `Плитка ${index + 1}${pinned ? ', закреплена' : ''}`);
+      if (mode === 'pins') {
+        cell.setAttribute('aria-label', `Плитка ${index + 1}${pinned ? ', закреплена' : ''}`);
+        cell.setAttribute('aria-pressed',String(pinned));
+      }
       if (pinned) {
         const marker = element('span', 'editor-pin');
         marker.setAttribute('aria-hidden', 'true');
