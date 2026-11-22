@@ -1,5 +1,7 @@
 # Проверка игровых меню из PR №13
 
+[Повторная приёмка 0.4.42](../audits/menu-0.4.41/RECHECK-0.4.42.md) закрыла пять замечаний №14 в Chromium. На экране личных заданий остаются попадание по пустому фону и перенос боковых подписей при 150%.
+
 [Аудит 0.4.41](https://github.com/DanilaH/hue-gradients/blob/6191b1a78e88731f547b087bbfbede227339b013/docs/audits/menu-0.4.41/README.md) воспроизвёл пять расхождений. Ниже обновлённая браузерная приёмка 0.4.42.
 
 [Исходное задание и основания сверки](https://github.com/DanilaH/hue-gradients/pull/13) · [очередь](../porting/DELIVERY_QUEUE.md#игровые-меню--pr-13) · [реестр переноса](../porting/ADOPTION_LEDGER.json).
