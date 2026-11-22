@@ -8,6 +8,8 @@ import { bookProgress, books } from '../domain/books';
 import { gradientThumbnail } from './exportRenderer';
 import { personalLevel, personalTaskName, TASK_KINDS, taskKey, taskStatus } from '../domain/personal';
 import { renderProgress } from './progressView';
+import { boardGeometry, cellAt, cellCenter } from './geometry';
+import { personalArt } from './personalArt';
 
 type PickerRoute = { kind: 'chapter'; levelId: string; chapterMenu?: number };
 export type MetaRoute = PickerRoute | AlbumRoute | { kind: 'card' | 'copy'; levelId: string } |
@@ -157,11 +159,12 @@ function renderChallengeDemo(parent: HTMLElement, level: LevelDefinition, moveLi
   const tiles = document.createElement('div'); tiles.className = 'challenge-demo-tiles';
   const note = document.createElement('p'); note.setAttribute('role','status');
   let selected: number | undefined, remaining = moveLimit;
+  const board = boardGeometry(100, 108, level.width, level.height, level.positions);
   const elements = positions.map((position, index) => {
     const tile = actionButton(tiles, String(index+1), () => {
       if (selected === undefined || selected === index) { selected = selected === index ? undefined : index; }
       else if (!canSwap(level,positions[selected]!,position)) {
-        note.textContent = 'Можно обменять плитки одинаковой формы'; selected = undefined;
+        note.textContent = 'Можно обменять плитки одинаковой формы и ориентации'; selected = undefined;
       } else if (geometry || remaining > 0) {
         [values[selected],values[index]] = [values[index]!,values[selected]!];
         if (!geometry) remaining--;
@@ -171,6 +174,21 @@ function renderChallengeDemo(parent: HTMLElement, level: LevelDefinition, moveLi
       paint();
     }, false);
     tile.dataset.shape = level.positions?.[position]?.shape ?? 'rect';
+    tile.dataset.position = String(position);
+    const cell = cellAt(board, position);
+    const shape = document.createElement('span');
+    const number = document.createElement('span');
+    shape.className = 'challenge-demo-shape';
+    number.className = 'challenge-demo-number';
+    number.textContent = String(index + 1);
+    if (cell.points) {
+      shape.style.clipPath = `polygon(${cell.points.map(([x,y]) => `${100*x/cell.width}% ${100*y/cell.height}%`).join(',')})`;
+      const center = cellCenter(cell);
+      number.style.left = `${100*(center.x-cell.x)/cell.width}%`;
+      number.style.top = `${100*(center.y-cell.y)/cell.height}%`;
+    }
+    shape.append(number);
+    tile.replaceChildren(shape);
     return tile;
   });
   function paint(): void {
@@ -476,16 +494,18 @@ export function renderMeta(v: MetaView): void {
       stage.className = 'personal-objects';
       stage.dataset.count = String(tasks.length);
       actions.append(stage);
-      for (const item of tasks) {
-        const { id, task, level } = item;
+      const selectedIndex = tasks.indexOf(selected);
+      for (const [index,item] of tasks.entries()) {
+        const { id, task } = item;
         const object = button('', () => v.navigate({ kind: 'personal', key: id }), stage);
         object.dataset.personal = task.kind;
         object.dataset.taskKey = id;
+        object.style.gridColumn = String(index === selectedIndex ? 2 : index === (selectedIndex+1)%tasks.length ? 3 : 1);
         object.setAttribute('aria-pressed', String(selected.id === id));
         const icon = document.createElement('span');
         icon.className = 'personal-object';
         icon.setAttribute('aria-hidden', 'true');
-        icon.append(gradientThumbnail(level));
+        icon.append(personalArt(task.kind));
         const caption = document.createElement('strong');
         caption.textContent = personalTaskName(task);
         object.append(icon, caption);
@@ -496,7 +516,7 @@ export function renderMeta(v: MetaView): void {
         }
         object.onkeydown = event => {
           if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
-          const next = tasks[(tasks.indexOf(item) + (event.key === 'ArrowRight' ? 1 : tasks.length - 1)) % tasks.length]!;
+          const next = tasks[(index + (event.key === 'ArrowRight' ? 1 : tasks.length - 1)) % tasks.length]!;
           event.preventDefault();
           v.navigate({ kind: 'personal', key: next.id });
         };
@@ -510,8 +530,10 @@ export function renderMeta(v: MetaView): void {
       detail.append(name);
       if (task.limit !== undefined || task.durationMs !== undefined) {
         const text = document.createElement('p');
-        text.textContent = task.limit !== undefined ? `Цель · ${task.limit} ход.`
-          : task.clock && !finished ? `Осталось · ${Math.ceil(task.clock.remainingMs / 1000)} с` : `Время · ${task.durationMs! / 1000} с`;
+        const moves = task.limit;
+        const form = moves === undefined ? undefined : new Intl.PluralRules('ru').select(moves);
+        text.textContent = moves !== undefined ? `${moves} ${form === 'one' ? 'ход' : form === 'few' ? 'хода' : 'ходов'}`
+          : task.clock && !finished ? `Осталось · ${Math.ceil(task.clock.remainingMs / 1000)} с` : `${task.durationMs! / 1000} с`;
         detail.append(text);
       }
       const start = button(finished ? 'Повторить' : task.attempt ? 'Продолжить' : 'Играть', () => v.playPersonal(id, finished), detail);

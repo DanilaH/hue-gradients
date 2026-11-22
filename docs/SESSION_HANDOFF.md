@@ -10,6 +10,8 @@ Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and
 
 ## Current slice
 
+PR #14 is implemented in 0.4.42. Browser checks cover result reveal on 001 and 006, shape and orientation in the challenge preview, both Daily restart sources, same-day and stale personal retries, and opaque controls. Personal Tasks captures show two and three objects on real profiles. Owner typography, physical Android, signed APK and the production Daily endpoint are pending. [Acceptance](evidence/pr14-menu-0.4.42.json).
+
 PR #13 is in 0.4.36–0.4.41. Each package has an individually built browser release and a continuous control recording. On 006, final landing, reveal and input gating follow V1.4. A distinct cue plays when the fragment seats; the 4/4 cover launches its special challenge. Remaining checks are a signed APK and physical device, the public Daily source, and the owner’s typeface selection. [Queue](porting/DELIVERY_QUEUE.md#игровые-меню--pr-13) · [Trace](evidence/pr13-menu-trace.md).
 
 PR #12 fixes are in 0.4.35. The displayed countdown follows a durable monotonic checkpoint tied to the snapshot revision. Reopening folds that checkpoint into the same attempt before resuming. The SQLite migration still needs Android runtime acceptance. Daily takes VITE_DAILY_PUBLICATION_URL on both entries. Staging passed with fresh IndexedDB, source failure and retry, today and yesterday, offline restart with local shell assets, and one reward per day. The live endpoint is pending. Books and calendar record the entry route, and the completed campaign has no cycle command pending the owner decision. [Acceptance](evidence/pr12-audit-followup-2026-11-22.json)

@@ -384,8 +384,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     } catch { dailyUnavailable = true; /* The trusted archive remains available. */ }
     finally { dailyLoading = false; if (alive && layer === 'meta' && (metaRoute.kind === 'daily' || metaRoute.kind === 'books')) render(); }
   }
-  function playDaily(date: string, replay: boolean): void {
-    const entry = metaRoute.kind === 'books' ? 'books' : 'daily';
+  function playDaily(date: string, replay: boolean, entry: 'books' | 'daily' = metaRoute.kind === 'books' ? 'books' : 'daily'): void {
     void run({ kind: 'daily-open', date, replay, entry, attemptId: crypto.randomUUID() }, () => {
       metaHistory = [];
       layer = gameLayer();
@@ -406,8 +405,10 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     return run({ kind: 'personal-issue', day: localCalendarDay() });
   }
   function playPersonal(key: string, restart: boolean): void {
-    if (layer === 'meta' && metaRoute.kind === 'personal' && session.state.personalProgress?.day !== localCalendarDay()) {
-      void issuePersonal();
+    const task = session.state.personalProgress?.tasks[key];
+    if (!task || task.date !== localCalendarDay()) {
+      if (current().personal) leavePersonal();
+      else void issuePersonal();
       return;
     }
     void run({ kind: 'personal-open', key, restart, attemptId: crypto.randomUUID(), now: clockNow() }, () => {
@@ -653,7 +654,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       button('Начать заново', () => {
         if (challenge) { playChallenge(level.id, true, currentBook(), session.state.challengeProgress?.entry); return; }
         if (personal) { playPersonal(personal.key, true); return; }
-        if (daily) { playDaily(daily.date, true); return; }
+        if (daily) { playDaily(daily.date, true, daily.entry); return; }
         const book = restartReturn === 'settings' ? currentBook() : undefined;
         void run(own ? { kind: 'author-start', workId: own.work.workId, nodeId: own.node.nodeId, attemptId: crypto.randomUUID(), restart: true }
           : { kind: 'restart', levelId: restartLevelId ?? level.id, attemptId: crypto.randomUUID(), ...(book ? { book } : {}) },
@@ -844,7 +845,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     guidance.setAttribute('aria-live', timed || personal?.clock ? 'off' : 'polite');
     guidance.hidden = !timed && !personal?.clock && !guidance.textContent;
     const footerAction = byId<HTMLButtonElement>('help');
-    footerAction.hidden = layer !== 'help' && layer !== 'secret' && !attempt?.completed;
+    footerAction.hidden = layer !== 'help' && layer !== 'secret' && (layer !== 'none' || !attempt?.completed);
     footerAction.textContent = layer === 'secret' ? 'Открыть поле' : layer === 'help' ? 'К игре' : 'Результат';
     for (const node of root.querySelectorAll<HTMLButtonElement>('.hud button,footer button')) node.disabled = busy || activity.isBlocked() || !!session.pending;
     if (attempt) scene.setView(level, attempt, preview, ready && !busy && !activity.isBlocked() && layer === 'none' && !session.pending, hiddenField);

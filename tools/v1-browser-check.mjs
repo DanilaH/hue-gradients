@@ -82,8 +82,10 @@ try {
           const covers = zoom < 1 || transform.d < 1 || art.getBoundingClientRect().top <= app.getBoundingClientRect().top &&
             art.getBoundingClientRect().bottom >= app.getBoundingClientRect().bottom;
           const hud = getComputedStyle(app.querySelector('.hud'));
+          const footerResult = app.querySelector('footer #help');
           window.v1.timeline.push({ ms: epoch() - window.v12LastGesture, phase: app.dataset.victoryPhase,
             zoom, wave: Number(effects?.dataset.wave ?? 0), covers, opacity, enabled: !!action && !action.disabled,
+            footerResult: footerResult?.textContent === 'Результат' && !footerResult.hidden,
             chrome: hud.visibility === 'visible' ? Number(hud.opacity) : 0,
             tileOpacity: tiles ? Number(getComputedStyle(tiles).opacity) : 0,
             hiddenFromA11y: action?.parentElement.getAttribute('aria-hidden') === 'true',
@@ -368,6 +370,7 @@ try {
   assert(burst.some(f => f.ms > peak.ms && Math.abs(f.zoom - 1) < .001));
   assert(burst.every(f => f.covers));
   assert(appears.wave >= .81 && appears.wave < 1 && appears.tileOpacity === 0, JSON.stringify(appears));
+  assert(normalAudio.timeline.every(frame => !frame.footerResult), 'The HUD result must stay hidden during victory');
   const approach = normalAudio.timeline.filter(f => f.phase === 'approach');
   assert(approach.some(f => f.chrome === 1) && approach.some(f => f.chrome > 0 && f.chrome < .5));
   assert(approach.at(-1).chrome === 0);

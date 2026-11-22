@@ -224,13 +224,31 @@ try {
   await finale.page.waitForSelector('#hue-app[data-layer=result]');
   assert.equal(await finale.page.locator('#dialog-title').textContent(), 'Время вышло');
   assert.deepEqual((await state(finale.page)).awards, [originalDay + ':present']);
+  const sameDayKey = originalDay + ':present';
+  const expired = (await state(finale.page)).snapshot.personalProgress.tasks[sameDayKey].attempt;
+  await button(finale.page, 'Повторить').tap();
+  await idle(finale.page);
+  const replay = (await state(finale.page)).snapshot.personalProgress;
+  assert.equal(replay.active, sameDayKey);
+  assert.equal(replay.tasks[sameDayKey].levelId, present.levelId);
+  assert.notEqual(replay.tasks[sameDayKey].attempt.attemptId, expired.attemptId);
+  await finale.page.evaluate(duration => sessionStorage.setItem('personal-elapsed', String(1_000 + 2 * duration)), present.durationMs);
+  await finale.page.waitForSelector('#hue-app[data-layer=result]');
+  const nextDay = '2026-11-26';
+  await finale.page.evaluate(day => sessionStorage.setItem('personal-date', String(Date.parse(day + 'T12:00:00Z'))), nextDay);
+  await button(finale.page, 'Повторить').tap();
+  await finale.page.locator(`[data-task-key="${nextDay}:present"]`).waitFor();
+  const afterMidnight = await state(finale.page);
+  assert.equal(afterMidnight.snapshot.personalProgress.active, null);
+  assert.equal(afterMidnight.snapshot.personalProgress.tasks[sameDayKey].attempt.attemptId, replay.tasks[sameDayKey].attempt.attemptId);
+  assert.deepEqual(afterMidnight.awards, [sameDayKey]);
   await finale.context.close();
   assert.deepEqual(errors, []);
   const report = { browser: browser.version(), starterDays, perfectCampaignWins: perfectCount,
     personalGoal: 'repeat-record', targetMoves: assignment.limit, unplayedFuture: future.levelId,
     correctedDay: [futureDay, originalDay], updatedWhileOpen: true, refreshedOnForeground: true, retainedHistory: true, awardsAfterReplay: 1,
     durationMs: { easy: ordinaryMs[0], ordinaryFinalField: ordinaryMs[1], finale: present.durationMs },
-    finaleId: present.levelId, finaleWonViaTouch: true, finaleExpiryVerified: true, civilClockDidNotChangeTimer: true,
+    finaleId: present.levelId, finaleWonViaTouch: true, finaleExpiryVerified: true, sameDayRetry: true, staleRetryReturnedToToday: true, civilClockDidNotChangeTimer: true,
     clipStartMillis, clipMillis, limits: 'Actual Chromium input. Campaign history made with domain actions and fixed civil/monotonic test clocks. Physical Android not run.' };
   await writeFile(`${output}/browser.json`, JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report));
