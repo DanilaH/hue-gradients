@@ -3,7 +3,7 @@ import type { Point } from './boardCamera';
 import { paintGradientThumbnail } from './exportRenderer';
 import type { BoardGeometry } from './geometry';
 import { orderedGrain } from './tileDither';
-import { amount, colourRecoil, WAVE_MS } from './victoryMotion';
+import { amount, CAMERA_SETTLE_MS, landingCamera, WAVE_MS } from './victoryMotion';
 
 interface Spray extends Point {
   vx: number;
@@ -24,6 +24,7 @@ export class VictoryArtwork {
   private shown: LevelDefinition | null = null;
   private spray: Spray[] = [];
   private waveEnd = 0;
+  private fromFrame: Pick<BoardGeometry, 'x' | 'y' | 'width' | 'height'> | null = null;
 
   constructor(private readonly host: HTMLElement) {
     this.art.className = 'victory-art';
@@ -43,18 +44,19 @@ export class VictoryArtwork {
     this.art.height = Math.max(side * 2, level.height);
     paintGradientThumbnail(this.art, level);
   }
-  start(level: LevelDefinition, board: BoardGeometry, origin: Point): number {
+  start(level: LevelDefinition, board: Pick<BoardGeometry, 'x' | 'y' | 'width' | 'height'>): void {
     const { width, height } = this.host.getBoundingClientRect();
     this.effects.width = Math.max(1, Math.round(width));
     this.effects.height = Math.max(1, Math.round(height));
-    this.waveEnd = Math.hypot(
-      Math.max(origin.x, width - origin.x),
-      Math.max(origin.y, height - origin.y),
-    );
+    this.fromFrame = board;
+    const origin = { x: this.effects.width / 2, y: this.effects.height / 2 };
+    this.waveEnd = Math.hypot(origin.x, origin.y);
     const from: Spray[] = [];
     for (const [nx, ny] of [[-1, 0], [1, 0], [0, -1], [0, 1]] as const) for (const t of [.22, .51, .79]) {
       const u = nx ? (nx + 1) / 2 : t, v = ny ? (ny + 1) / 2 : t;
-      const x = board.x + board.width * u, y = board.y + board.height * v;
+      // Keep the sprays just inside the screen so they cross the visible edges.
+      const x = (nx ? .08 + .84 * u : u) * this.effects.width;
+      const y = (ny ? .08 + .84 * v : v) * this.effects.height;
       const colour = level.solvedTileColors[Math.round(v * (level.height - 1)) * level.width + Math.round(u * (level.width - 1))]!;
       const starts = WAVE_MS * Math.hypot(x - origin.x, y - origin.y) / Math.max(1, this.waveEnd);
       for (let i = 0; i < 3; i++) {
@@ -65,19 +67,25 @@ export class VictoryArtwork {
       }
     }
     this.spray = from;
-    return Math.max(WAVE_MS, ...from.map(particle => particle.starts + SPRAY_LIFETIME_MS));
   }
-  frame(age: number, origin: Point): void {
+  frame(age: number): void {
     const { ctx } = this;
     const w = this.effects.width, h = this.effects.height;
     ctx.clearRect(0, 0, w, h);
-    const recoil = colourRecoil(age);
-    this.colour.style.transform = recoil ? `translateY(${recoil}px)` : '';
+    if (this.fromFrame && age < CAMERA_SETTLE_MS) {
+      const { approach, overshoot } = landingCamera(age);
+      const board = this.fromFrame, rest = 1 - approach;
+      const x = (board.x + (board.width - w) / 2) * rest, y = (board.y + (board.height - h) / 2) * rest;
+      const zoomX = 1 + (board.width / w - 1) * rest + overshoot;
+      const zoomY = 1 + (board.height / h - 1) * rest + overshoot;
+      this.colour.style.transform = `translate(${x}px, ${y}px) scale(${zoomX}, ${zoomY})`;
+    } else if (this.colour.style.transform) this.colour.style.transform = '';
+    if (import.meta.env.DEV) this.effects.dataset.wave = String(amount(age / WAVE_MS));
     if (age < WAVE_MS) {
       const travel = amount(age / WAVE_MS);
       ctx.globalAlpha = .58 * (1 - travel ** 3);
       ctx.beginPath();
-      ctx.arc(origin.x, origin.y, Math.max(1, travel * this.waveEnd), 0, 2 * Math.PI);
+      ctx.arc(w / 2, h / 2, Math.max(1, travel * this.waveEnd), 0, 2 * Math.PI);
       ctx.lineWidth = 7 + 10 * travel;
       ctx.strokeStyle = this.grain;
       ctx.stroke();
@@ -98,6 +106,7 @@ export class VictoryArtwork {
   }
   clearMotion(): void {
     this.spray = [];
+    this.fromFrame = null;
     this.colour.style.transform = '';
     this.ctx.clearRect(0, 0, this.effects.width, this.effects.height);
   }

@@ -29,7 +29,7 @@ import { renderAlbum, type AlbumPosition, type AlbumRoute } from './albumView';
 import { WorkCardView } from './workCardView';
 import { colourPrism, victoryPrism } from './victoryPrism';
 import { VictoryArtwork } from './victoryArtwork';
-import { amount, ease, LANDING_MS, RESULT_HOLD_MS, RESULT_REVEAL_MS } from './victoryMotion';
+import { amount, ease, LANDING_MS, RESULT_REVEAL_AT_MS, RESULT_REVEAL_MS } from './victoryMotion';
 import { browserExportFiles, type ExportFiles } from '../app/exportFiles';
 import './game.css';
 
@@ -99,7 +99,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   const albumPositions = new Map<AlbumRoute['tab'], AlbumPosition>();
   const prism = byId('victory-prism');
   const artwork = new VictoryArtwork(root);
-  let victoryPhase: 'approach' | 'landed' | 'hold' | 'reveal' | 'still' = 'still';
+  let victoryPhase: 'approach' | 'landed' | 'reveal' | 'still' = 'still';
   const heldActivation = new Set<string>();
   const blockedActivation = new Set<string>();
   const earlyPointers = new Set<number>();
@@ -739,28 +739,21 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       if (acceptedPair && previous && next) {
         scene.presentSwap(previous, next, acceptedPair.from, acceptedPair.to, motionAllowed(), cost);
         if (won && victoryPhase === 'approach') {
-          let effectsEnd = 0;
-          scene.presentVictory(acceptedPair.to, (elapsed, board, target) => {
+          scene.presentVictory(acceptedPair.to, (elapsed, board) => {
             if (elapsed < LANDING_MS) return;
-            const outer = root.getBoundingClientRect(), inner = region.getBoundingClientRect();
-            const x = inner.x - outer.x, y = inner.y - outer.y;
-            const origin = { x: target.x + x, y: target.y + y };
             const age = elapsed - LANDING_MS;
             if (victoryPhase === 'approach') {
+              const outer = root.getBoundingClientRect(), inner = region.getBoundingClientRect();
+              artwork.start(level, { ...board, x: board.x + inner.x - outer.x, y: board.y + inner.y - outer.y });
               setVictoryPhase('landed');
-              effectsEnd = artwork.start(level, { ...board, x: board.x + x, y: board.y + y }, origin);
               atmosphere.configure(false, motionAllowed());
               feedback.accepted('win');
             }
-            if (age < effectsEnd) { artwork.frame(age, origin); return; }
-            if (victoryPhase === 'landed') {
-              artwork.clearMotion();
-              setVictoryPhase('hold');
-            }
-            const reveal = (age - effectsEnd - RESULT_HOLD_MS) / RESULT_REVEAL_MS;
-            if (reveal < 0) return;
+            const reveal = (age - RESULT_REVEAL_AT_MS) / RESULT_REVEAL_MS;
             if (reveal >= 1) { stopVictory(); return; }
-            setVictoryPhase('reveal');
+            artwork.frame(age);
+            if (reveal < 0) return;
+            if (victoryPhase === 'landed') setVictoryPhase('reveal');
             dialog.style.setProperty('--victory-opacity', String(ease(amount(reveal))));
           });
         } else if (won) feedback.accepted('win');

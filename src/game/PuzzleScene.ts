@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { canSwap, type Attempt, type LevelDefinition } from '../domain/puzzle';
 import { boardGeometry, cellAt, cellCenter, hitTest, type BoardGeometry, type Cell } from './geometry';
 import { TileDither } from './tileDither';
-import { amount, ease, FRAME_END_MS, FRAME_START_MS, LANDING_MS, tileDelays, tileJump } from './victoryMotion';
+import { airborneFraming, amount, ease, FRAME_END_MS, FRAME_START_MS, LANDING_MS, tileDelays, tileJump } from './victoryMotion';
 import { clampCamera, edgeVelocity, moveCamera, REST_CAMERA, revealCell, viewBoard, type Camera, type Point } from './boardCamera';
 
 export const GAME_PRESENTABLE = 'hue:presentable';
@@ -27,7 +27,7 @@ export class PuzzleScene extends Phaser.Scene {
   private camera: Camera = REST_CAMERA;
   private readonly touches = new Map<number, Point>();
   private navigation: Navigation | null = null;
-  private victory: { started: number; from: Camera; at: number; delays: number[]; elapsed: number; frame(elapsed: number, board: BoardGeometry, origin: Point): void } | null = null;
+  private victory: { started: number; from: Camera; at: number; delays: number[]; elapsed: number; frame(elapsed: number, board: BoardGeometry): void } | null = null;
   private released: { from: number; to: number; dx: number; dy: number } | null = null;
   private settle: { from: number; to: number; dx: number; dy: number; started: number } | null = null;
   constructor(level: LevelDefinition, attempt: Attempt, private readonly hooks: Hooks) { super('puzzle'); this.level = level; this.attempt = attempt; }
@@ -111,7 +111,7 @@ export class PuzzleScene extends Phaser.Scene {
       const beat = this.victory, elapsed = performance.now() - beat.started;
       beat.elapsed = elapsed;
       this.draw();
-      beat.frame(elapsed, this.geometry, cellCenter(cellAt(this.geometry, beat.at)));
+      beat.frame(elapsed, this.geometry);
       return;
     }
     if (this.settle && performance.now() - this.settle.started >= 150) this.finishSettle();
@@ -305,7 +305,8 @@ export class PuzzleScene extends Phaser.Scene {
       const zoom = ease(amount((this.victory.elapsed - FRAME_START_MS) / (FRAME_END_MS - FRAME_START_MS)));
       const from = this.victory.from, top = cellAt(this.natural, 0);
       const headroom = Math.max(0, liftHeight(top) + top.height * .015 - this.natural.y);
-      const fit = Math.min(from.zoom > 1 ? .94 : 1, Math.max(.8, 1 - 2 * headroom / this.natural.height));
+      const fit = Math.min(from.zoom > 1 ? .94 : 1, Math.max(.8, 1 - 2 * headroom / this.natural.height))
+        * airborneFraming(this.victory.elapsed);
       this.camera = { zoom: from.zoom + (fit - from.zoom) * zoom,
         x: from.x * (1 - zoom) + this.natural.width * (1 - fit) / 2 * zoom,
         y: from.y * (1 - zoom) + this.natural.height * (1 - fit) / 2 * zoom };

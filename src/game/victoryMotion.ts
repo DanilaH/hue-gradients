@@ -11,18 +11,27 @@ const DELAY_STEP_MS = 66;
 const DELAY_BANDS = 3;
 export const LANDING_MS = LIFT_START_MS + DELAY_BANDS * DELAY_STEP_MS + CONTACT_MS;
 export const WAVE_MS = 660;
-export const RESULT_HOLD_MS = 250;
+export const RESULT_REVEAL_AT_MS = WAVE_MS * .82;
 export const RESULT_REVEAL_MS = 400;
-const RECOIL_PEAK_MS = 36;
-const RECOIL_RETURN_MS = 120;
+const PUSH_IN_MS = 126;
+const RECOIL_RETURN_MS = 112;
+export const CAMERA_SETTLE_MS = PUSH_IN_MS + RECOIL_RETURN_MS;
 export const amount = (value: number) => Math.min(1, Math.max(0, value));
 export const ease = (t: number) => t * t * (3 - 2 * t);
 
-export function colourRecoil(age: number): number {
-  if (age <= RECOIL_PEAK_MS) return 2 * ease(amount(age / RECOIL_PEAK_MS));
-  return 2 * (1 - ease(amount((age - RECOIL_PEAK_MS) / RECOIL_RETURN_MS)));
+// A second, gentle pullback runs across the tile jumps.
+export function airborneFraming(elapsed: number): number {
+  return 1 - .09 * ease(amount((elapsed - LIFT_START_MS) / (LANDING_MS - LIFT_START_MS)));
 }
 
+export function landingCamera(age: number): { approach: number; overshoot: number } {
+  return {
+    approach: 1 - (1 - amount(age / PUSH_IN_MS)) ** 3,
+    overshoot: .022 * (age <= PUSH_IN_MS
+      ? ease(amount((age - 75) / (PUSH_IN_MS - 75)))
+      : 1 - ease(amount((age - PUSH_IN_MS) / RECOIL_RETURN_MS))),
+  };
+}
 export function tileDelays(points: readonly Point[], origin: Point): number[] {
   const distances = points.map(point => Math.hypot(point.x - origin.x, point.y - origin.y));
   const farthest = Math.max(1, ...distances);

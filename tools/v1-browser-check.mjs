@@ -6,7 +6,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 const require = createRequire(process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES
   ? `${process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES}/package.json` : import.meta.url);
 const { chromium } = require('playwright');
-const out = '.test-output/v12';
+const out = '.test-output/v13';
 const port = 4198, url = `http://127.0.0.1:${port}`;
 const record = process.env.RECORD_EPISODE === '1';
 const viewport = { width: 390, height: 740 };
@@ -75,12 +75,13 @@ try {
           const art = app.querySelector('.victory-art');
           const opacity = Number(getComputedStyle(dialog).opacity);
           const actionVisible = action && getComputedStyle(action).visibility === 'visible' && opacity > 0;
-          const recoil = plane?.style.transform
-            ? new DOMMatrix(getComputedStyle(plane).transform).m42 : 0;
-          const covers = !recoil || art.getBoundingClientRect().top <= app.getBoundingClientRect().top &&
+          const transform = new DOMMatrix(plane?.style.transform ? getComputedStyle(plane).transform : undefined);
+          const zoom = transform.a;
+          const effects = app.querySelector('.victory-effects');
+          const covers = zoom < 1 || transform.d < 1 || art.getBoundingClientRect().top <= app.getBoundingClientRect().top &&
             art.getBoundingClientRect().bottom >= app.getBoundingClientRect().bottom;
           window.v1.timeline.push({ ms: epoch() - window.v12LastGesture, phase: app.dataset.victoryPhase,
-            recoil, covers, opacity, enabled: !!action && !action.disabled,
+            zoom, wave: Number(effects?.dataset.wave ?? 0), covers, opacity, enabled: !!action && !action.disabled,
             hiddenFromA11y: action?.parentElement.getAttribute('aria-hidden') === 'true',
             headingOpacity: Number(getComputedStyle(heading).opacity), actionVisible: !!actionVisible });
         }
@@ -331,23 +332,26 @@ try {
   await wait(p, 'still');
   const normalAudio = await observations(p);
   const landing = normalAudio.timeline.find(f => f.phase === 'landed');
-  const hold = normalAudio.timeline.find(f => f.phase === 'hold');
   const appears = normalAudio.timeline.find(f => f.phase === 'reveal' && f.actionVisible);
   const readyFrame = normalAudio.timeline.find(f => f.phase === 'still' && f.enabled);
-  const peak = normalAudio.timeline.reduce((a, b) => a.recoil >= b.recoil ? a : b);
-  assert(landing && hold && appears && readyFrame);
-  assert(peak.recoil >= 1.7 && peak.recoil <= 2 && peak.ms - landing.ms <= 65);
-  assert(normalAudio.timeline.every(f => f.covers));
-  assert(appears.ms - hold.ms >= 210 && appears.ms - hold.ms <= 300);
+  const burst = normalAudio.timeline.filter(f => f.phase === 'landed');
+  const peak = burst.reduce((a, b) => a.zoom >= b.zoom ? a : b);
+  assert(landing && appears && readyFrame);
+  assert(landing.zoom < .9, JSON.stringify(landing));
+  assert(peak.zoom >= 1.01 && peak.zoom <= 1.023 && peak.ms - landing.ms <= 180, JSON.stringify(peak));
+  assert(burst.some(f => f.ms > peak.ms && Math.abs(f.zoom - 1) < .001));
+  assert(burst.every(f => f.covers));
+  assert(appears.wave >= .81 && appears.wave < 1, JSON.stringify(appears));
   assert(readyFrame.ms - appears.ms >= 350 && readyFrame.ms - appears.ms <= 430);
-  assert(normalAudio.timeline.filter(f => ['approach','landed','hold'].includes(f.phase))
+  assert(normalAudio.timeline.filter(f => ['approach','landed'].includes(f.phase))
     .every(f => !f.actionVisible && !f.enabled && f.hiddenFromA11y));
   assert(normalAudio.timeline.filter(f => f.phase === 'reveal').every(f => !f.enabled && f.hiddenFromA11y));
-  report.timing = Object.fromEntries(Object.entries({ landing, peak, hold, appears, ready: readyFrame }).map(([name, f]) =>
-    [name, { ms: Math.round(f.ms), recoil: f.recoil, opacity: f.opacity }]));
+  report.timing = Object.fromEntries(Object.entries({ landing, peak, appears, ready: readyFrame }).map(([name, f]) =>
+    [name, { ms: Math.round(f.ms), zoom: f.zoom, wave: f.wave, opacity: f.opacity }]));
   const snapshots = await p.evaluate(() => window.v11Pair.shots);
   assert.equal(snapshots.length, 3, JSON.stringify(snapshots.map(({ image, ...rest }) => rest)));
-  assert.equal(new Set(snapshots.map(({ camera }) => camera)).size, 1);
+  const hopZoom = snapshots.map(shot => JSON.parse(shot.camera).zoom);
+  assert(hopZoom[0] > hopZoom[1] && hopZoom[1] > hopZoom[2], JSON.stringify(hopZoom));
   const pair = [];
   for (const [index, { image, ...metadata }] of snapshots.entries()) {
     pair.push(metadata);
@@ -441,7 +445,9 @@ try {
   const bigAudio = await observations(wide);
   assert.deepEqual(bigAudio.pulses, [{ value: 22, phase: 'landed' }]);
   const bigTimes = bigAudio.frames.filter(f => f.camera.zoom <= .951);
-  assert(bigTimes.length >= 10 && new Set(bigTimes.slice(-14).map(f => JSON.stringify(f.camera))).size === 1);
+  assert(bigTimes.length >= 10 && bigTimes.at(-1).camera.zoom < bigTimes[0].camera.zoom - .055);
+  const bigBurst = bigAudio.timeline.filter(f => f.phase === 'landed');
+  assert(Math.min(...bigBurst.map(f => f.zoom)) < .91 && Math.max(...bigBurst.map(f => f.zoom)) > 1.01);
   const active = (await read(wide)).challengeProgress;
   assert.equal(active.best[large.id], large.startMoves + 1);
   assert.equal(active.attempts[large.id].completed, true);
@@ -525,7 +531,7 @@ try {
         await page.keyboard.down('Enter');
         await run.touch('touchStart', target);
       }
-      await wait(page, 'hold');
+      await wait(page, 'landed');
       await page.keyboard.press('Tab');
       assert.equal(await button(page, 'Дальше').count(), 0);
       await wait(page, 'reveal');
