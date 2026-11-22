@@ -1,9 +1,9 @@
 import type { LevelDefinition } from '../domain/puzzle';
 import type { Point } from './boardCamera';
 import { paintGradientThumbnail } from './exportRenderer';
-import type { BoardGeometry } from './geometry';
-import { orderedGrain } from './tileDither';
-import { amount, CAMERA_SETTLE_MS, landingCamera, WAVE_MS } from './victoryMotion';
+import { cellAt, type BoardGeometry } from './geometry';
+import { orderedGrain, TileDither } from './tileDither';
+import { amount, CAMERA_SETTLE_MS, landingCamera, landingTileOpacity, WAVE_MS } from './victoryMotion';
 
 interface Spray extends Point {
   vx: number;
@@ -18,6 +18,9 @@ const SPRAY_LIFETIME_MS = 380;
 export class VictoryArtwork {
   private readonly colour = document.createElement('div');
   private readonly art = document.createElement('canvas');
+  private readonly seated = document.createElement('canvas');
+  private readonly seatedContext = this.seated.getContext('2d')!;
+  private readonly tileInk = new TileDither(this.seatedContext);
   private readonly effects = document.createElement('canvas');
   private readonly ctx = this.effects.getContext('2d')!;
   private readonly grain = orderedGrain(this.ctx, rank => rank >= 11 ? [255, 240, 223, 225] : [40, 18, 52, 95]);
@@ -28,10 +31,11 @@ export class VictoryArtwork {
 
   constructor(private readonly host: HTMLElement) {
     this.art.className = 'victory-art';
+    this.seated.className = 'victory-seated';
     this.effects.className = 'victory-effects';
     this.colour.className = 'victory-colour';
     this.colour.setAttribute('aria-hidden', 'true');
-    this.colour.append(this.art, this.effects);
+    this.colour.append(this.art, this.seated, this.effects);
     host.append(this.colour);
   }
   show(level: LevelDefinition | null): void {
@@ -44,11 +48,41 @@ export class VictoryArtwork {
     this.art.height = Math.max(side * 2, level.height);
     paintGradientThumbnail(this.art, level);
   }
-  start(level: LevelDefinition, board: Pick<BoardGeometry, 'x' | 'y' | 'width' | 'height'>): void {
+  private paintSeatedTiles(level: LevelDefinition, board: BoardGeometry): void {
+    const { width, height, gap } = board;
+    this.seated.width = Math.max(1, Math.round(width));
+    this.seated.height = Math.max(1, Math.round(height));
+    const ctx = this.seatedContext;
+    ctx.setTransform(this.seated.width / width, 0, 0, this.seated.height / height, 0, 0);
+    const localBoard = { ...board, x: 0, y: 0 };
+    for (const [index, colour] of level.solvedTileColors.entries()) {
+      const cell = cellAt(localBoard, index);
+      ctx.save();
+      // The grain keeps its tile-local origin as the faces close over their seams.
+      ctx.translate(cell.x, cell.y);
+      ctx.fillStyle = this.tileInk.colour(colour);
+      if (cell.points) {
+        ctx.beginPath();
+        cell.points.forEach(([x, y], i) => i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y));
+        ctx.closePath();
+        ctx.fill();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = ctx.fillStyle;
+        ctx.stroke();
+      } else {
+        const bleed = gap / 2 + 1;
+        ctx.fillRect(-bleed, -bleed, cell.width + 2 * bleed, cell.height + 2 * bleed);
+      }
+      ctx.restore();
+    }
+  }
+
+  start(level: LevelDefinition, board: BoardGeometry): void {
     const { width, height } = this.host.getBoundingClientRect();
     this.effects.width = Math.max(1, Math.round(width));
     this.effects.height = Math.max(1, Math.round(height));
     this.fromFrame = board;
+    this.paintSeatedTiles(level, board);
     const origin = { x: this.effects.width / 2, y: this.effects.height / 2 };
     this.waveEnd = Math.hypot(origin.x, origin.y);
     const from: Spray[] = [];
@@ -80,6 +114,12 @@ export class VictoryArtwork {
       const zoomY = 1 + (board.height / h - 1) * rest + overshoot;
       this.colour.style.transform = `translate(${x}px, ${y}px) scale(${zoomX}, ${zoomY})`;
     } else if (this.colour.style.transform) this.colour.style.transform = '';
+    const tileOpacity = landingTileOpacity(age);
+    const tileInk = tileOpacity ? String(tileOpacity) : '';
+    if (this.colour.style.getPropertyValue('--victory-tile-ink') !== tileInk) {
+      if (tileInk) this.colour.style.setProperty('--victory-tile-ink', tileInk);
+      else this.colour.style.removeProperty('--victory-tile-ink');
+    }
     if (import.meta.env.DEV) this.effects.dataset.wave = String(amount(age / WAVE_MS));
     if (age < WAVE_MS) {
       const travel = amount(age / WAVE_MS);
@@ -108,6 +148,7 @@ export class VictoryArtwork {
     this.spray = [];
     this.fromFrame = null;
     this.colour.style.transform = '';
+    this.colour.style.removeProperty('--victory-tile-ink');
     this.ctx.clearRect(0, 0, this.effects.width, this.effects.height);
   }
 }

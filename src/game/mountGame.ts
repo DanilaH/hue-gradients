@@ -29,7 +29,7 @@ import { renderAlbum, type AlbumPosition, type AlbumRoute } from './albumView';
 import { WorkCardView } from './workCardView';
 import { colourPrism, victoryPrism } from './victoryPrism';
 import { VictoryArtwork } from './victoryArtwork';
-import { amount, ease, LANDING_MS, RESULT_REVEAL_AT_MS, RESULT_REVEAL_MS } from './victoryMotion';
+import { amount, ease, LANDING_MS, LIFT_START_MS, RESULT_REVEAL_AT_MS, RESULT_REVEAL_MS, victoryChromeOpacity } from './victoryMotion';
 import { browserExportFiles, type ExportFiles } from '../app/exportFiles';
 import './game.css';
 
@@ -117,6 +117,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     setVictoryPhase('still');
     scene.finishVictory();
     artwork.clearMotion();
+    root.style.removeProperty('--victory-chrome');
     dialog.style.removeProperty('--victory-opacity');
     syncVictoryActions(true);
   }
@@ -740,7 +741,10 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
         scene.presentSwap(previous, next, acceptedPair.from, acceptedPair.to, motionAllowed(), cost);
         if (won && victoryPhase === 'approach') {
           scene.presentVictory(acceptedPair.to, (elapsed, board) => {
-            if (elapsed < LANDING_MS) return;
+            if (elapsed < LANDING_MS) {
+              if (elapsed >= LIFT_START_MS) root.style.setProperty('--victory-chrome', String(victoryChromeOpacity(elapsed)));
+              return;
+            }
             const age = elapsed - LANDING_MS;
             if (victoryPhase === 'approach') {
               const outer = root.getBoundingClientRect(), inner = region.getBoundingClientRect();

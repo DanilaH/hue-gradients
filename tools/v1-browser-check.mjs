@@ -6,7 +6,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 const require = createRequire(process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES
   ? `${process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES}/package.json` : import.meta.url);
 const { chromium } = require('playwright');
-const out = '.test-output/v13';
+const out = '.test-output/v14';
 const port = 4198, url = `http://127.0.0.1:${port}`;
 const record = process.env.RECORD_EPISODE === '1';
 const viewport = { width: 390, height: 740 };
@@ -73,6 +73,7 @@ try {
           const heading = dialog.querySelector('h2');
           const plane = app.querySelector('.victory-colour');
           const art = app.querySelector('.victory-art');
+          const tiles = app.querySelector('.victory-seated');
           const opacity = Number(getComputedStyle(dialog).opacity);
           const actionVisible = action && getComputedStyle(action).visibility === 'visible' && opacity > 0;
           const transform = new DOMMatrix(plane?.style.transform ? getComputedStyle(plane).transform : undefined);
@@ -80,8 +81,11 @@ try {
           const effects = app.querySelector('.victory-effects');
           const covers = zoom < 1 || transform.d < 1 || art.getBoundingClientRect().top <= app.getBoundingClientRect().top &&
             art.getBoundingClientRect().bottom >= app.getBoundingClientRect().bottom;
+          const hud = getComputedStyle(app.querySelector('.hud'));
           window.v1.timeline.push({ ms: epoch() - window.v12LastGesture, phase: app.dataset.victoryPhase,
             zoom, wave: Number(effects?.dataset.wave ?? 0), covers, opacity, enabled: !!action && !action.disabled,
+            chrome: hud.visibility === 'visible' ? Number(hud.opacity) : 0,
+            tileOpacity: tiles ? Number(getComputedStyle(tiles).opacity) : 0,
             hiddenFromA11y: action?.parentElement.getAttribute('aria-hidden') === 'true',
             headingOpacity: Number(getComputedStyle(heading).opacity), actionVisible: !!actionVisible });
         }
@@ -113,6 +117,26 @@ try {
   }
   const first = { width: 4, height: 1, from: 1, to: 2 };
   const observations = page => page.evaluate(() => window.v1);
+  async function seatedTiles(page, level) {
+    return page.locator('.victory-seated').evaluate((surface, { width, height, colours }) => {
+      const ctx = surface.getContext('2d');
+      const pixels = ctx.getImageData(0, 0, surface.width, surface.height).data;
+      let clearPixels = 0;
+      for (let i = 3; i < pixels.length; i += 4) if (pixels[i] < 250) clearPixels++;
+      let maxChannelError = 0;
+      for (const [index, colour] of colours.entries()) {
+        const x = Math.floor((index % width + .5) * surface.width / width);
+        const y = Math.floor((Math.floor(index / width) + .5) * surface.height / height);
+        const data = ctx.getImageData(x - 4, y - 4, 8, 8).data;
+        for (let c = 0; c < 3; c++) {
+          let sum = 0;
+          for (let offset = c; offset < data.length; offset += 4) sum += data[offset];
+          maxChannelError = Math.max(maxChannelError, Math.abs(sum / 64 - Number.parseInt(colour.slice(1 + c * 2, 3 + c * 2), 16)));
+        }
+      }
+      return { clearPixels, maxChannelError };
+    }, level);
+  }
   async function seed(page, grid) {
     const level = await page.evaluate(async grid => {
       const { Session } = await import('/src/app/session.ts'), { levels } = await import('/src/domain/levels.ts');
@@ -337,17 +361,24 @@ try {
   const burst = normalAudio.timeline.filter(f => f.phase === 'landed');
   const peak = burst.reduce((a, b) => a.zoom >= b.zoom ? a : b);
   assert(landing && appears && readyFrame);
-  assert(landing.zoom < .9, JSON.stringify(landing));
-  assert(peak.zoom >= 1.01 && peak.zoom <= 1.023 && peak.ms - landing.ms <= 180, JSON.stringify(peak));
+  assert(landing.zoom < .9 && landing.tileOpacity > .98, JSON.stringify(landing));
+  assert(peak.zoom >= 1.01 && peak.zoom <= 1.023 && peak.ms - landing.ms <= 200, JSON.stringify(peak));
+  const fortyMs = burst.filter(f => f.ms <= landing.ms + 42).at(-1);
+  assert(fortyMs && fortyMs.zoom - landing.zoom < (1 - landing.zoom) * .4);
   assert(burst.some(f => f.ms > peak.ms && Math.abs(f.zoom - 1) < .001));
   assert(burst.every(f => f.covers));
-  assert(appears.wave >= .81 && appears.wave < 1, JSON.stringify(appears));
+  assert(appears.wave >= .81 && appears.wave < 1 && appears.tileOpacity === 0, JSON.stringify(appears));
+  const approach = normalAudio.timeline.filter(f => f.phase === 'approach');
+  assert(approach.some(f => f.chrome === 1) && approach.some(f => f.chrome > 0 && f.chrome < .5));
+  assert(approach.at(-1).chrome === 0);
+  const ordinarySeated = await seatedTiles(p, level);
+  assert(ordinarySeated.clearPixels === 0 && ordinarySeated.maxChannelError < 2, JSON.stringify(ordinarySeated));
   assert(readyFrame.ms - appears.ms >= 350 && readyFrame.ms - appears.ms <= 430);
   assert(normalAudio.timeline.filter(f => ['approach','landed'].includes(f.phase))
     .every(f => !f.actionVisible && !f.enabled && f.hiddenFromA11y));
   assert(normalAudio.timeline.filter(f => f.phase === 'reveal').every(f => !f.enabled && f.hiddenFromA11y));
-  report.timing = Object.fromEntries(Object.entries({ landing, peak, appears, ready: readyFrame }).map(([name, f]) =>
-    [name, { ms: Math.round(f.ms), zoom: f.zoom, wave: f.wave, opacity: f.opacity }]));
+  report.timing = Object.fromEntries(Object.entries({ landing, fortyMs, peak, appears, ready: readyFrame }).map(([name, f]) =>
+    [name, { ms: Math.round(f.ms), zoom: f.zoom, wave: f.wave, opacity: f.opacity, chrome: f.chrome, tileOpacity: f.tileOpacity }]));
   const snapshots = await p.evaluate(() => window.v11Pair.shots);
   assert.equal(snapshots.length, 3, JSON.stringify(snapshots.map(({ image, ...rest }) => rest)));
   const hopZoom = snapshots.map(shot => JSON.parse(shot.camera).zoom);
@@ -390,7 +421,7 @@ try {
   const ordinaryVideo = await video(ordinary, 'ordinary', ordinaryEpoch, clipStart);
   report.episodes.ordinary = { id: level.id, moves: level.startMoves + 1, stableAndMovesWithTile: true, shades: grain.shades,
     mean: grain.mean, source: expectedColour, quietReplay: true, pauseKeyboardAndTouch: true, resultWallpaper: true,
-    sounds: normalAudio.sounds, vibration: normalAudio.pulses, pair, ...ordinaryVideo, winClipStart, clipEnd: ordinaryClipEnd };
+    sounds: normalAudio.sounds, vibration: normalAudio.pulses, pair, seated: ordinarySeated, ...ordinaryVideo, winClipStart, clipEnd: ordinaryClipEnd };
 
   const giant = await launch({ filming: true });
   const wide = giant.page, wideEpoch = Date.now();

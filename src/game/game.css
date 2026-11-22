@@ -67,8 +67,11 @@ footer { min-height: 56px; padding: 2px 12px 6px; display: flex; gap: 10px; alig
 #hue-app[data-layer=result]:not([data-victory-phase=approach]) #board-region { visibility: hidden; }
 #hue-app[data-layer=result] #board-region { pointer-events: none; }
 #hue-app[data-layer=result]:not([data-victory-phase=approach]) > .hud,
-#hue-app[data-layer=result]:not([data-victory-phase=approach]) > footer,
-#hue-app[data-victory-phase=approach] #help { visibility: hidden; }
+#hue-app[data-layer=result]:not([data-victory-phase=approach]) > footer { visibility: hidden; }
+#hue-app[data-victory-phase=approach] > :is(.hud,footer) { opacity: var(--victory-chrome,1); }
+#hue-app[data-victory-phase=approach] #board-region {
+  box-shadow: 0 0 25px rgb(230 166 252 / calc(.196 * var(--victory-chrome,1)));
+}
 #game-dialog[data-layer=result] { position: fixed; inset: 0; margin: 0; width: 100%; height: 100%; max-width: none; max-height: none; border: 0; border-radius: 0; padding: 20px; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; overflow: auto; }
 #game-dialog[data-layer=result]::backdrop { background: #12092244; backdrop-filter: none; }
 #game-dialog[data-layer=result] h2 { font-size: clamp(1.875rem,8vw,3.25rem); letter-spacing: .09em; text-transform: uppercase; text-shadow: 0 0 28px #fff2de70, 0 2px 6px #201432; margin: 12px 0 4px; }
@@ -153,9 +156,11 @@ footer { min-height: 56px; padding: 2px 12px 6px; display: flex; gap: 10px; alig
   position: absolute; inset: 0; z-index: 2; display: none; pointer-events: none;
 }
 #hue-app[data-victory=true]:not([data-victory-phase=approach]) .victory-colour { display: block; }
-.victory-art, .victory-effects { position: absolute; inset: 0; width: 100%; height: 100%; }
+.victory-art, .victory-seated, .victory-effects { position: absolute; inset: 0; width: 100%; height: 100%; }
+.victory-seated { opacity: var(--victory-tile-ink,0); image-rendering: pixelated; }
 .victory-colour::after {
   content: ''; position: absolute; inset: 0; pointer-events: none;
+  opacity: calc(1 - var(--victory-tile-ink,0));
   background:
     repeating-conic-gradient(#200a341b 0 25%,#fff2e00e 0 50%) 0 0 / 2px 2px,
     radial-gradient(ellipse at 50% 38%,#28203e0d 10%,#1a122d4c 75%,#130d2263);

@@ -2,6 +2,8 @@
 
 All 16 available A1–G1 checkpoints were rerun against `431f06d`. This includes 192 unit tests, the signed 0.4.25 payload in Chromium 92 and 153, 30 offline daily boards and 8 independently checked wallpaper PNGs. Live services and physical device acceptance are recorded separately. [Results](evidence/queue-regression-a1-g1-2026-11-21.json)
 
+Web preview **0.4.33** carries the seated tile colours and their grain past the final contact so the camera has a continuous picture to move. Seams close and the centre-out wave starts on the impact. The tile colours blend into the smooth gradient during the push-in. Chromium replayed 006, 13×13 after 2.4× zoom, reduced motion and the result routes. The downloaded PNG matches 0.4.32 byte for byte. [V1.4 evidence](evidence/v14-dreamy-psx-2026-11-22.json)
+
 Web preview **0.4.32** on `feat/m0-foundation` updates V1 after owner feedback. The camera pulls back during the hops and snaps into the full-screen gradient at the final landing, with a small recoil. The centre-out wave is already moving when the result menu starts its fade at 82% of the wave timeline. Checked at 1× on 006 and after a 2.4× touch zoom on 13×13 in Chromium. The latest signed APK is 0.4.31/versionCode35. [V1.3 evidence](evidence/v13-dreamy-psx-2026-11-22.json)
 
 Signed Android preview **0.4.31/versionCode35** brings V1.2 to `feat/m0-foundation`. One brief colour recoil follows the final tile contact. The finished gradient holds before the title and actions fade in together. The 006 comparison uses the exact web assets of both signed previews. All 197 unit tests passed. V2 starts with Personal Tasks after owner review, and physical Android feel remains open. [V1.2 evidence](evidence/v12-dreamy-psx-2026-11-22.json)

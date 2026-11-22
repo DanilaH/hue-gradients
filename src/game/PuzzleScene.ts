@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { canSwap, type Attempt, type LevelDefinition } from '../domain/puzzle';
 import { boardGeometry, cellAt, cellCenter, hitTest, type BoardGeometry, type Cell } from './geometry';
 import { TileDither } from './tileDither';
-import { airborneFraming, amount, ease, FRAME_END_MS, FRAME_START_MS, LANDING_MS, tileDelays, tileJump } from './victoryMotion';
+import { airborneFraming, amount, ease, FRAME_END_MS, FRAME_START_MS, LANDING_MS, tileDelays, tileJump, victoryChromeOpacity } from './victoryMotion';
 import { clampCamera, edgeVelocity, moveCamera, REST_CAMERA, revealCell, viewBoard, type Camera, type Point } from './boardCamera';
 
 export const GAME_PRESENTABLE = 'hue:presentable';
@@ -325,6 +325,7 @@ export class PuzzleScene extends Phaser.Scene {
     const ink = this.dither ??= new TileDither(ctx);
     const flights = beat?.delays.map(delay => tileJump(elapsed, delay));
     const pins = this.level.pinnedPositions;
+    const pinOpacity = beat ? victoryChromeOpacity(elapsed) : 1;
     const paintShape = (cell: Cell, colour: string) => {
       this.cellPath(ctx, cell);
       ctx.fillStyle = colour;
@@ -355,11 +356,13 @@ export class PuzzleScene extends Phaser.Scene {
           side ? 5 : cell.width, side ? cell.height : 5);
         ctx.restore();
       }
-      if (pinned) {
+      if (pinned && pinOpacity > 0) {
         const x = (center.x - cell.x) * scale, y = (center.y - cell.y) * scale, radius = Math.min(5, cell.width / 8, cell.height / 8);
+        ctx.globalAlpha = pinOpacity;
         for (const [r, colour] of [[radius, '#101019'], [radius / 2, '#fff3df']] as const) {
           ctx.beginPath(); ctx.arc(x, y, r, 0, 2 * Math.PI); ctx.fillStyle = colour; ctx.fill();
         }
+        ctx.globalAlpha = 1;
       }
       if (!beat && !held && (position === this.focused || position === this.selected ||
           (this.gesture?.from === position && !this.gesture.drag))) this.brackets(ctx, face);
