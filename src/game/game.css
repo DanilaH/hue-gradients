@@ -695,3 +695,39 @@ html[data-host=browser] .editor-panel {
   .book-slots { width: min(65vh,100%); }
 }
 @media (prefers-reduced-motion: reduce) { .book-fragment-arriving { animation: none; } }
+
+#game-dialog[data-menu=personal] > .atmosphere { opacity: .7; }
+.personal-objects {
+  display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0,1fr); align-items: start;
+  gap: clamp(6px,2vw,16px); margin-block: clamp(4px,4vh,32px) 2px;
+}
+.personal-objects button {
+  position: relative; display: grid; align-content: start; justify-items: center;
+  padding: 7px 3px; gap: 6px; min-width: 0; color: #fff1dd;
+  background: #21152ddd; border: 1px solid transparent; border-radius: 0;
+  text-align: center; font-size: .81rem; line-height: 1.18; overflow-wrap: anywhere;
+}
+.personal-objects button[aria-pressed=true] { border-color: #f7d49e; background: #37233de8; }
+.personal-objects button small { font-size: .68rem; color: #ffdc9f; }
+.personal-object { display: block; width: min(100%,104px); aspect-ratio: 1; filter: drop-shadow(0 3px 6px #1d0e31); }
+.personal-object canvas { width: 100%; height: 100%; display: block; filter: saturate(1.18) brightness(1.15); }
+[data-personal=past] .personal-object canvas {
+  clip-path: polygon(8% 54%,29% 11%,51% 36%,71% 15%,94% 58%,72% 91%,51% 70%,30% 94%);
+}
+[data-personal=present] .personal-object canvas {
+  clip-path: polygon(17% 13%,83% 13%,79% 24%,69% 38%,56% 50%,69% 62%,79% 76%,83% 87%,17% 87%,21% 76%,31% 62%,44% 50%,31% 38%,21% 24%);
+}
+[data-personal=future] .personal-object canvas {
+  clip-path: polygon(16% 16%,56% 16%,56% 25%,85% 25%,85% 55%,76% 55%,76% 83%,46% 83%,46% 75%,16% 75%);
+}
+[data-personal=future] .personal-object::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg,transparent 48%,#25183275 48% 51%,transparent 51%),
+    linear-gradient(transparent 48%,#25183275 48% 51%,transparent 51%);
+  clip-path: polygon(16% 16%,56% 16%,56% 25%,85% 25%,85% 55%,76% 55%,76% 83%,46% 83%,46% 75%,16% 75%);
+}
+.personal-detail { display: grid; gap: 5px; align-items: center; padding: 12px; background: #24172ce6; }
+.personal-detail h3, .personal-detail p { margin: 0; }
+.personal-detail h3 { font-size: 1rem; }
+.personal-detail p { font-size: .85rem; color: #ead9e3; }
+.personal-detail button { border-radius: 0; margin-top: 7px; font-weight: 700; }

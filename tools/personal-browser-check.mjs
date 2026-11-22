@@ -159,6 +159,7 @@ try {
   assert.equal(assignment.limit, field.minimumSwaps);
   const finishRecord = async () => {
     await card(page, 'past').tap();
+    await page.locator('[data-personal-play]').tap();
     await idle(page);
     await solve(page, field);
     await hold(420);
@@ -206,6 +207,7 @@ try {
   });
   assert(ordinaryMs[0] < ordinaryMs[1] && ordinaryMs[1] < present.durationMs);
   await card(finale.page, 'present').tap();
+    await finale.page.locator('[data-personal-play]').tap();
   await idle(finale.page);
   const presentLabel = await finale.page.locator('#guidance').innerText();
   await finale.page.evaluate(() => sessionStorage.setItem('personal-date', String(Date.parse('2026-12-30T12:00:00Z'))));
@@ -216,6 +218,7 @@ try {
   await finale.page.evaluate(day => sessionStorage.setItem('personal-date', String(Date.parse(day + 'T12:00:00Z'))), originalDay);
   await button(finale.page, 'К заданиям').tap();
   await card(finale.page, 'present').tap();
+    await finale.page.locator('[data-personal-play]').tap();
   await idle(finale.page);
   await finale.page.evaluate(duration => sessionStorage.setItem('personal-elapsed', String(1000 + duration)), present.durationMs);
   await finale.page.waitForSelector('#hue-app[data-layer=result]');

@@ -1,0 +1,59 @@
+{
+  "browser": "141.0.7390.37",
+  "starterDays": [
+    {
+      "day": "2026-11-21",
+      "present": "gradient-001",
+      "future": "gradient-021",
+      "durationMs": 15000
+    },
+    {
+      "day": "2026-11-22",
+      "present": "gradient-004",
+      "future": "gradient-030",
+      "durationMs": 24000
+    },
+    {
+      "day": "2026-11-23",
+      "present": "gradient-003",
+      "future": "gradient-029",
+      "durationMs": 17000
+    },
+    {
+      "day": "2026-11-24",
+      "present": "gradient-002",
+      "future": "gradient-027",
+      "durationMs": 17000
+    }
+  ],
+  "perfectCampaignWins": 30,
+  "personalGoal": "repeat-record",
+  "targetMoves": 15,
+  "unplayedFuture": "gradient-060",
+  "correctedDay": [
+    "2026-12-01",
+    "2026-11-25"
+  ],
+  "updatedWhileOpen": true,
+  "refreshedOnForeground": true,
+  "retainedHistory": true,
+  "awardsAfterReplay": 1,
+  "durationMs": {
+    "easy": 15000,
+    "ordinaryFinalField": 74000,
+    "finale": 131000
+  },
+  "finaleId": "finale-v1-1",
+  "finaleWonViaTouch": true,
+  "finaleExpiryVerified": true,
+  "civilClockDidNotChangeTimer": true,
+  "clipStartMillis": 1189,
+  "clipMillis": 4070,
+  "limits": "Actual Chromium input. Campaign history made with domain actions and fixed civil/monotonic test clocks. Physical Android not run.",
+  "pr": 13,
+  "package": 2,
+  "build": "0.4.37",
+  "episode": "02-personal-tasks.mp4",
+  "recordedLevel": "gradient-001",
+  "pausedRemainingMs": 16416
+}

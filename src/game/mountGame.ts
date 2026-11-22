@@ -13,7 +13,7 @@ import { Atmosphere, type ColourPointer } from './atmosphere';
 import { cellCenter } from './geometry';
 import { AmbientMusic } from './music';
 import { GameFeedback, type Haptic } from './feedback';
-import { dailyLabel, isMenuList, levelPreview, renderMeta, type MetaRoute } from './metaView';
+import { dailyLabel, isMenuList, levelPreview, personalObjects, renderMeta, type MetaRoute } from './metaView';
 import { chapterIndexFor, recommendedLevel, rewardTitle } from '../domain/progression';
 import { authorBests, authorView, findDraft, hasAuthorProof, type CreativeAction } from '../domain/creative';
 import { makePuzzleFile, parsePuzzleFile } from '../domain/puzzleTransfer';
@@ -244,13 +244,17 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (layer !== 'meta') { metaReturn = layer; metaHistory = []; }
     else {
       const samePicker = route.kind === 'chapter' && metaRoute.kind === 'chapter'
+        || route.kind === 'personal' && metaRoute.kind === 'personal'
         || route.kind === 'album' && metaRoute.kind === 'album'
         || route.kind === 'challenges' && metaRoute.kind === 'challenges';
       if (!samePicker && JSON.stringify(route) !== JSON.stringify(metaRoute)) metaHistory.push(metaRoute);
     }
     metaRoute = route; layer = 'meta'; render();
     if (route.kind === 'daily' || route.kind === 'books') void refreshDaily();
-    if (route.kind === 'personal') void issuePersonal();
+    if (route.kind === 'personal') {
+      if (!route.key || session.state.personalProgress?.day !== localCalendarDay()) void issuePersonal();
+      if (route.key) actions.querySelector<HTMLElement>(`[data-task-key="${route.key}"]`)?.focus({ preventScroll: true });
+    }
   }
   function startLevel(id: string, book?: BookTarget, restart = false): void {
     if (current().own) { void run({ kind: 'author-exit' }, () => queueMicrotask(() => startLevel(id, book, restart))); return; }
@@ -375,10 +379,11 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     });
   }
   function leavePersonal(): void {
+    const key = current().personal?.key;
     void run({ kind: 'personal-leave', now: clockNow() }, () => {
       metaReturn = gameLayer();
       metaHistory = [{ kind: 'chapter', levelId: session.state.activeLevelId }];
-      metaRoute = { kind: 'personal' };
+      metaRoute = { kind: 'personal', ...(key ? { key } : {}) };
       layer = 'meta';
       queueMicrotask(() => void issuePersonal());
     });
@@ -785,6 +790,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       atmosphere.setModel(getLevel(cardId), null);
     } else if (authorCard) {
       atmosphere.setModel(authorCard.work.nodes[authorCard.nodeId]!.field, null);
+    } else if (layer === 'meta' && metaRoute.kind === 'personal') {
+      atmosphere.setModel(personalObjects(session.state, metaRoute.key).selected?.level ?? null, null);
     } else if (menuBackdrop) {
       atmosphere.setModel(null, null);
     } else {

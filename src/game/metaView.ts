@@ -12,7 +12,7 @@ import { renderProgress } from './progressView';
 type PickerRoute = { kind: 'chapter'; levelId: string; chapterMenu?: number };
 export type MetaRoute = PickerRoute | AlbumRoute | { kind: 'card' | 'copy'; levelId: string } |
   { kind: 'own-card'; workId: string; nodeId: string } | { kind: 'draft'; draftId: string; nodeId?: string } |
-  { kind: 'progress' | 'personal' | 'books' } | { kind: 'book'; bookId: string; slot?: number } | { kind: 'daily'; date?: string } | { kind: 'challenges'; group?: 'chapter' | 'geometry' };
+  { kind: 'progress' | 'books' } | { kind: 'personal'; key?: string } | { kind: 'book'; bookId: string; slot?: number } | { kind: 'daily'; date?: string } | { kind: 'challenges'; group?: 'chapter' | 'geometry' };
 interface MetaView {
   route: MetaRoute; state: Workspace; disabled: boolean;
   title: HTMLElement; copy: HTMLElement; actions: HTMLElement;
@@ -27,6 +27,16 @@ interface MetaView {
   retryDaily?: () => void;
   playDaily(date: string, replay: boolean): void;
   playPersonal(key: string, restart: boolean): void;
+}
+
+export function personalObjects(state: Workspace, key?: string) {
+  const progress = state.personalProgress;
+  const tasks = progress ? TASK_KINDS.flatMap(kind => {
+    const id = taskKey(progress.day, kind);
+    const task = progress.tasks[id];
+    return task ? [{ id, task, level: personalLevel(task.levelId) }] : [];
+  }) : [];
+  return { tasks, selected: tasks.find(item => item.id === key) ?? tasks[0] };
 }
 
 export function isMenuList(route: MetaRoute): boolean {
@@ -371,25 +381,54 @@ export function renderMeta(v: MetaView): void {
     const progress = state.personalProgress;
     if (!progress) return;
     label(dailyLabel(progress.day), 'menu-date');
-    const list = document.createElement('div');
-    list.className = 'menu-list';
-    actions.append(list);
-    for (const kind of TASK_KINDS) {
-      const key = taskKey(progress.day, kind);
-      const task = progress.tasks[key];
-      if (!task) continue;
+    const { tasks, selected } = personalObjects(state, route.key);
+    if (!selected) label('Сегодня нет доступных заданий.', 'menu-note');
+    else {
+      const stage = document.createElement('div');
+      stage.className = 'personal-objects';
+      stage.dataset.count = String(tasks.length);
+      actions.append(stage);
+      for (const item of tasks) {
+        const { id, task, level } = item;
+        const object = button('', () => v.navigate({ kind: 'personal', key: id }), stage);
+        object.dataset.personal = task.kind;
+        object.dataset.taskKey = id;
+        object.setAttribute('aria-pressed', String(selected.id === id));
+        const icon = document.createElement('span');
+        icon.className = 'personal-object';
+        icon.setAttribute('aria-hidden', 'true');
+        icon.append(gradientThumbnail(level));
+        const caption = document.createElement('strong');
+        caption.textContent = personalTaskName(task);
+        object.append(icon, caption);
+        if (progress.earned.includes(id)) {
+          const mark = document.createElement('small');
+          mark.textContent = '✓ Выполнено';
+          object.append(mark);
+        }
+        object.onkeydown = event => {
+          if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+          const next = tasks[(tasks.indexOf(item) + (event.key === 'ArrowRight' ? 1 : tasks.length - 1)) % tasks.length]!;
+          event.preventDefault();
+          v.navigate({ kind: 'personal', key: next.id });
+        };
+      }
+      const { task, level, id } = selected;
       const finished = taskStatus(task) !== 'playing';
-      const card = button('', () => v.playPersonal(key, finished), list);
-      const level = personalLevel(task.levelId);
-      const earned = progress.earned.includes(key);
-      card.dataset.personal = kind;
-      card.dataset.earned = String(earned);
-      menuRow(card, personalTaskName(task), [
-        level.title,
-        task.limit !== undefined ? `Лимит: ${task.limit}` : task.durationMs ? `${task.durationMs / 1000} с` : '',
-      ].filter(Boolean).join(' · '),
-      earned ? 'Выполнено' : task.attempt ? finished ? 'Повторить' : 'Продолжить' : undefined,
-      [level.solvedTileColors[0]!, level.solvedTileColors[level.width - 1]!, level.solvedTileColors.at(-1)!]);
+      const detail = document.createElement('section');
+      detail.className = 'personal-detail';
+      const name = document.createElement('h3');
+      name.textContent = level.title;
+      detail.append(name);
+      if (task.limit !== undefined || task.durationMs !== undefined) {
+        const text = document.createElement('p');
+        text.textContent = task.limit !== undefined ? `Цель · ${task.limit} ход.`
+          : task.clock && !finished ? `Осталось · ${Math.ceil(task.clock.remainingMs / 1000)} с` : `Время · ${task.durationMs! / 1000} с`;
+        detail.append(text);
+      }
+      const start = button(finished ? 'Повторить' : task.attempt ? 'Продолжить' : 'Играть', () => v.playPersonal(id, finished), detail);
+      start.dataset.personalPlay = id;
+      actions.append(detail);
     }
     if (progress.earned.length) {
       const history = document.createElement('details');
