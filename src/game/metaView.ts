@@ -12,7 +12,7 @@ import { renderProgress } from './progressView';
 type PickerRoute = { kind: 'chapter'; levelId: string; chapterMenu?: number };
 export type MetaRoute = PickerRoute | AlbumRoute | { kind: 'card' | 'copy'; levelId: string } |
   { kind: 'own-card'; workId: string; nodeId: string } | { kind: 'draft'; draftId: string; nodeId?: string } |
-  { kind: 'progress' | 'books' } | { kind: 'personal'; key?: string } | { kind: 'book'; bookId: string; slot?: number } | { kind: 'daily'; date?: string } | { kind: 'challenges'; group?: 'chapter' | 'geometry' };
+  { kind: 'progress' } | { kind: 'books'; eventDate?: string } | { kind: 'personal'; key?: string } | { kind: 'book'; bookId: string; slot?: number } | { kind: 'daily'; date?: string; month?: string } | { kind: 'challenges'; group?: 'chapter' | 'geometry' };
 interface MetaView {
   route: MetaRoute; state: Workspace; disabled: boolean;
   title: HTMLElement; copy: HTMLElement; actions: HTMLElement;
@@ -37,6 +37,16 @@ export function personalObjects(state: Workspace, key?: string) {
     return task ? [{ id, task, level: personalLevel(task.levelId) }] : [];
   }) : [];
   return { tasks, selected: tasks.find(item => item.id === key) ?? tasks[0] };
+}
+
+export function calendarSelection(state: Workspace, date?: string, month?: string) {
+  const catalog = state.dailyProgress;
+  const dates = Object.keys(catalog?.slots ?? {}).filter(day => day <= catalog!.through).sort();
+  const months = [...new Set(dates.map(day => day.slice(0,7)))];
+  const fallback = dates.at(-1);
+  const visibleMonth = month && months.includes(month) ? month : date && dates.includes(date) ? date.slice(0,7) : fallback?.slice(0,7);
+  const selected = date && dates.includes(date) && date.startsWith(visibleMonth!) ? date : dates.filter(day => day.startsWith(visibleMonth!)).at(-1);
+  return { selected, month: visibleMonth, months };
 }
 
 export function isMenuList(route: MetaRoute): boolean {
@@ -316,10 +326,14 @@ export function renderMeta(v: MetaView): void {
     const featured = Object.values(state.dailyProgress?.slots ?? {}).filter(slot => slot.feature).sort((a,b) => b.date.localeCompare(a.date));
     for (const slot of featured) {
       const won = state.dailyProgress?.solved.includes(slot.date);
-      const card = button(`${slot.feature!.title} · ${dailyLabel(slot.date)}${won ? ' · Собрано' : ''}`,
-        () => v.playDaily(slot.date, state.dailyProgress?.attempts[slot.date]?.completed === true), actions);
-      card.className = 'quiet';
+      const attempt = state.dailyProgress?.attempts[slot.date];
+      const card = button('', () => v.playDaily(slot.date, attempt?.completed === true), actions);
+      card.className = 'quiet menu-row';
       card.dataset.event = slot.feature!.id;
+      card.dataset.eventDate = slot.date;
+      menuRow(card, slot.feature!.title, dailyLabel(slot.date),
+        won ? 'Собрано' : attempt ? 'Начато' : undefined,
+        [slot.level.solvedTileColors[0]!,slot.level.solvedTileColors[slot.level.width-1]!,slot.level.solvedTileColors.at(-1)!]);
     }
   } else if (route.kind === 'book') {
     const book = books.find(item => item.id === route.bookId);
@@ -450,9 +464,10 @@ export function renderMeta(v: MetaView): void {
     v.title.textContent = 'Задача дня';
     menuBack();
     const catalog = state.dailyProgress;
-    const dates = Object.keys(catalog?.slots ?? {}).sort().reverse();
-    if (!dates.length) {
-      label(v.dailyLoading ? 'Проверяем календарь…' : 'Календарь пока недоступен.', 'menu-note').setAttribute('role', 'status');
+    const { selected, month, months } = calendarSelection(state, route.date, route.month);
+    if (!catalog || !selected || !month) {
+      label(v.dailyLoading ? 'Проверяем календарь…' : v.retryDaily ? 'Календарь не загрузился.'
+        : catalog ? 'В опубликованном архиве пока нет задач.' : 'Календарь пока недоступен.', 'menu-note').setAttribute('role', 'status');
       if (v.retryDaily) button('Повторить загрузку', v.retryDaily, actions, v.dailyLoading).className = 'quiet';
       return;
     }
@@ -460,17 +475,57 @@ export function renderMeta(v: MetaView): void {
       label('Показан сохранённый календарь.', 'menu-note').setAttribute('role', 'status');
       button('Повторить загрузку', v.retryDaily, actions, v.dailyLoading).className = 'quiet';
     }
-    const list = document.createElement('div');
-    list.className = 'menu-list';
-    actions.append(list);
-    for (const date of dates) {
-      const attempt = catalog!.attempts[date];
-      const replay = attempt?.completed === true;
-      const card = button('', () => v.playDaily(date, replay), list);
-      card.dataset.dailyDate = date;
-      menuRow(card, dailyLabel(date), date === catalog!.through ? 'Общая задача' : 'Архив',
-        replay ? 'Собрано · Повторить' : attempt ? 'Продолжить' : undefined);
+    const switchMonth = (target: string) => v.navigate({ kind: 'daily', month: target });
+    const header = document.createElement('div'); header.className = 'calendar-heading';
+    const monthIndex = months.indexOf(month);
+    const previous = button('‹', () => switchMonth(months[monthIndex-1]!), header, monthIndex <= 0);
+    previous.setAttribute('aria-label', 'Предыдущий месяц');
+    const name = document.createElement('h3');
+    name.textContent = new Intl.DateTimeFormat('ru', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(month+'-01T00:00:00Z'));
+    header.append(name);
+    const next = button('›', () => switchMonth(months[monthIndex+1]!), header, monthIndex === months.length-1);
+    next.setAttribute('aria-label', 'Следующий месяц');
+    const grid = document.createElement('div'); grid.className = 'calendar-grid';
+    grid.setAttribute('aria-label', name.textContent);
+    const first = new Date(month+'-01T00:00:00Z'), [year, number] = month.split('-').map(Number);
+    for (const weekday of ['Пн','Вт','Ср','Чт','Пт','Сб','Вс']) {
+      const heading = document.createElement('span'); heading.className = 'calendar-weekday'; heading.textContent = weekday; grid.append(heading);
     }
+    for (let offset = 0; offset < (first.getUTCDay()+6)%7; offset++) grid.append(document.createElement('span'));
+    const count = new Date(Date.UTC(year!, number!, 0)).getUTCDate();
+    for (let day = 1; day <= count; day++) {
+      const date = month+'-'+String(day).padStart(2,'0');
+      const slot = catalog.slots[date], available = !!slot && date <= catalog.through;
+      const solved = catalog.solved.includes(date), attempt = catalog.attempts[date];
+      const node = available ? button(String(day), () => v.navigate({ kind: 'daily', date, month }), grid) : document.createElement('span');
+      node.className = 'calendar-day';
+      if (available) {
+        node.dataset.dailyDate = date;
+        node.setAttribute('aria-pressed', String(date === selected));
+        node.setAttribute('aria-label', dailyLabel(date)+(solved ? ', собрано' : attempt ? ', начато' : ''));
+        if (solved) {
+          const caption = document.createElement('span');
+          caption.className = 'calendar-number'; caption.textContent = String(day);
+          node.replaceChildren(gradientThumbnail(slot.level), caption);
+        }
+        if (attempt) {
+          const mark = document.createElement('small'); mark.textContent = solved ? '✓' : '◐'; mark.setAttribute('aria-hidden','true'); node.append(mark);
+        }
+      } else {
+        node.textContent = String(day); node.setAttribute('aria-disabled','true'); grid.append(node);
+      }
+    }
+    actions.append(header, grid);
+    const details = document.createElement('section'); details.className = 'calendar-selection';
+    const date = document.createElement('strong'); date.textContent = dailyLabel(selected);
+    const attempt = catalog.attempts[selected];
+    const status = document.createElement('p');
+    status.textContent = catalog.solved.includes(selected) ? attempt?.completed ? 'Собрано' : 'Собрано · повтор начат'
+      : attempt ? 'Начато' : selected === catalog.through ? 'Задача дня' : 'Архив';
+    details.append(date,status);
+    button(attempt?.completed ? 'Повторить' : attempt ? 'Продолжить' : 'Играть',
+      () => v.playDaily(selected, attempt?.completed === true), details).dataset.dailyPlay = selected;
+    actions.append(details);
   } else if (route.kind === 'challenges') {
     v.title.textContent = 'Испытания';
     menuBack();

@@ -122,12 +122,15 @@ try {
     await row(page, today).waitFor({ timeout: 6000 }).catch(error => {
       throw new Error(`Staged publication did not arrive: ${JSON.stringify(trace)}`, { cause: error });
     });
-    assert.match(await row(page, today).innerText(), /Общая задача/);
+    assert.equal(await row(page, today).getAttribute('aria-pressed'), 'true');
+    assert.match(await page.locator('.calendar-selection').innerText(), /Задача дня/);
     await row(page, today).tap();
+    await page.locator('[data-daily-play]').tap();
     await idle(page);
     await solve(page, today);
     await button(page, 'К календарю').tap();
     await row(page, yesterday).tap();
+    await page.locator('[data-daily-play]').tap();
     await idle(page);
     assert.equal(await page.locator('#levels').innerText(), '‹ Календарь');
     await page.locator('#settings').tap();

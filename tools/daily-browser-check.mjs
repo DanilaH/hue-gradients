@@ -104,7 +104,7 @@ try {
   const empty = await profile(false, 'offline');
   await empty.page.locator('#levels').tap();
   await empty.page.getByRole('button', { name: 'Задача дня', exact: true }).tap();
-  await empty.page.getByRole('status').filter({ hasText: 'Календарь пока недоступен.' }).waitFor();
+  await empty.page.getByRole('status').filter({ hasText: /Календарь (пока недоступен|не загрузился)/ }).waitFor();
   assert.equal(await empty.page.locator('[data-daily-date]').count(), 0);
   await empty.page.getByRole('button', { name: '‹ Назад', exact: true }).tap();
   await empty.page.locator('.level-stage').waitFor();
@@ -144,9 +144,11 @@ try {
   assert.equal(await slot(one.page, second).count(), 0);
   const clipStartMillis = Date.now() - one.captureBase;
   await slot(one.page, first).tap();
+  await one.page.locator('[data-daily-play]').tap();
   await idle(one.page);
   await opening(two.page);
   await slot(two.page, first).tap();
+  await two.page.locator('[data-daily-play]').tap();
   await idle(two.page);
   const before = await state(one.page), other = await state(two.page);
   await two.context.close();
@@ -175,8 +177,8 @@ try {
     await one.page.getByRole('button', { name: 'Задача дня', exact: true }).tap();
   }
   await slot(one.page, second).waitFor();
-  assert.match(await slot(one.page, first).innerText(), /Архив.*Собрано/s);
-  assert.match(await slot(one.page, second).innerText(), /Общая задача/);
+  assert.equal(await slot(one.page, first).locator('canvas').count(), 1);
+  assert.equal(await slot(one.page, second).isEnabled(), true);
   const refreshed = await state(one.page);
   assert.equal(refreshed.book.slots[first].version, versions.before);
   assert.equal(refreshed.book.slots[second].version, versions.after);
@@ -187,6 +189,7 @@ try {
   await opening(one.page);
   assert(await slot(one.page, second).isVisible());
   await slot(one.page, first).tap();
+  await one.page.locator('[data-daily-play]').tap();
   await idle(one.page);
   assert.deepEqual((await state(one.page)).book.attempts[first].board, before.book.attempts[first].board);
   await solve(one.page);
@@ -211,6 +214,7 @@ try {
     await bank.page.evaluate(() => sessionStorage.setItem('fixture-daily', 'offline'));
     for (const { date, level } of staged.bank.days) {
       await slot(bank.page, date).tap();
+      await bank.page.locator('[data-daily-play]').tap();
       await idle(bank.page);
       const opened = (await state(bank.page)).book;
       assert.deepEqual(opened.slots[date].level, level);

@@ -13,7 +13,7 @@ import { Atmosphere, type ColourPointer } from './atmosphere';
 import { cellCenter } from './geometry';
 import { AmbientMusic } from './music';
 import { GameFeedback, type Haptic } from './feedback';
-import { dailyLabel, isMenuList, levelPreview, personalObjects, renderMeta, type MetaRoute } from './metaView';
+import { calendarSelection, dailyLabel, isMenuList, levelPreview, personalObjects, renderMeta, type MetaRoute } from './metaView';
 import { chapterIndexFor, recommendedLevel, rewardTitle } from '../domain/progression';
 import { authorBests, authorView, findDraft, hasAuthorProof, type CreativeAction } from '../domain/creative';
 import { makePuzzleFile, parsePuzzleFile } from '../domain/puzzleTransfer';
@@ -244,13 +244,17 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (layer !== 'meta') { metaReturn = layer; metaHistory = []; }
     else {
       const samePicker = route.kind === 'chapter' && metaRoute.kind === 'chapter'
+        || route.kind === 'daily' && metaRoute.kind === 'daily'
         || route.kind === 'personal' && metaRoute.kind === 'personal'
         || route.kind === 'album' && metaRoute.kind === 'album'
         || route.kind === 'challenges' && metaRoute.kind === 'challenges';
       if (!samePicker && JSON.stringify(route) !== JSON.stringify(metaRoute)) metaHistory.push(metaRoute);
     }
     metaRoute = route; layer = 'meta'; render();
-    if (route.kind === 'daily' || route.kind === 'books') void refreshDaily();
+    if (route.kind === 'daily') {
+      if (!route.date && !route.month) void refreshDaily();
+      else if (route.date) actions.querySelector<HTMLElement>(`[data-daily-date="${route.date}"]`)?.focus({ preventScroll: true });
+    } else if (route.kind === 'books') void refreshDaily();
     if (route.kind === 'personal') {
       if (!route.key || session.state.personalProgress?.day !== localCalendarDay()) void issuePersonal();
       if (route.key) actions.querySelector<HTMLElement>(`[data-task-key="${route.key}"]`)?.focus({ preventScroll: true });
@@ -342,8 +346,9 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     render();
     try {
       const feed = await options.dailySource();
-      validateDailyFeed(feed);
-      if (alive) dailyUnavailable = !(await run({ kind: 'daily-cache', feed }));
+      const cutoff = validateDailyFeed(feed);
+      dailyUnavailable = (session.state.dailyProgress?.through ?? '') > cutoff;
+      if (alive && !dailyUnavailable) dailyUnavailable = !(await run({ kind: 'daily-cache', feed }));
     } catch { dailyUnavailable = true; /* The trusted archive remains available. */ }
     finally { dailyLoading = false; if (alive && layer === 'meta' && (metaRoute.kind === 'daily' || metaRoute.kind === 'books')) render(); }
   }
@@ -360,7 +365,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     void run({ kind: 'daily-leave' }, () => {
       metaReturn = gameLayer();
       metaHistory = daily.entry === 'books' ? [{ kind: 'album', tab: 'campaign' }] : [{ kind: 'chapter', levelId: session.state.activeLevelId }];
-      metaRoute = daily.entry === 'books' ? { kind: 'books' } : { kind: 'daily', date: daily.date };
+      metaRoute = daily.entry === 'books' ? { kind: 'books', eventDate: daily.date } : { kind: 'daily', date: daily.date };
       layer = 'meta';
       queueMicrotask(() => void refreshDaily());
     });
@@ -734,7 +739,9 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
         node.open = openDisclosures.includes(node.dataset.menuDisclosure);
       }
       dialog.scrollTop = menuScroll;
-      const selected = dailyFocus && actions.querySelector<HTMLButtonElement>(`[data-daily-date="${dailyFocus}"]`);
+      const eventDate = metaRoute.kind === 'books' ? metaRoute.eventDate : undefined;
+      const selected = eventDate ? actions.querySelector<HTMLButtonElement>(`[data-event-date="${eventDate}"]`)
+        : dailyFocus && actions.querySelector<HTMLButtonElement>(`[data-daily-date="${dailyFocus}"]`);
       if (selected && !selected.disabled) {
         selected.focus({ preventScroll: true });
         if (switchMenu) selected.scrollIntoView({ block: 'nearest' });
@@ -792,6 +799,9 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       atmosphere.setModel(authorCard.work.nodes[authorCard.nodeId]!.field, null);
     } else if (layer === 'meta' && metaRoute.kind === 'personal') {
       atmosphere.setModel(personalObjects(session.state, metaRoute.key).selected?.level ?? null, null);
+    } else if (layer === 'meta' && metaRoute.kind === 'daily') {
+      const { selected } = calendarSelection(session.state, metaRoute.date, metaRoute.month);
+      atmosphere.setModel(selected ? session.state.dailyProgress?.slots[selected]?.level ?? null : null, null);
     } else if (menuBackdrop) {
       atmosphere.setModel(null, null);
     } else {
