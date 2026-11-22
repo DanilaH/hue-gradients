@@ -1,5 +1,6 @@
 import { createStartupPreloadDomView, StartupPreloadController } from '@danilah/mini-games-kit/startup';
 import { mountGame } from '../../src/game/mountGame';
+import { configuredDailySource } from '../../src/app/dailyCatalog';
 import { openIndexedDb } from '../../src/local-store/indexed-db';
 import { createPlatformRuntime } from './app/platform';
 import { installDebugPanel } from './app/debug';
@@ -11,7 +12,9 @@ const platform = createPlatformRuntime();
 try {
   startupTimeline.mark('platformReady');
   const store = await openIndexedDb();
-  const app = await mountGame(document.querySelector<HTMLElement>('#game-root')!, store, platform.activity);
+  const dailySource = configuredDailySource(import.meta.env.VITE_DAILY_PUBLICATION_URL);
+  const app = await mountGame(document.querySelector<HTMLElement>('#game-root')!, store, platform.activity,
+    dailySource ? { dailySource } : {});
   startupTimeline.mark('gamePresentable');
   await afterPaintFrames(2);
   startupTimeline.mark('ready'); platform.markReady(); preload.complete();

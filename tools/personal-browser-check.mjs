@@ -166,12 +166,17 @@ try {
     await card(page, 'past').waitFor();
   };
   await finishRecord();
-  await date(page, futureDay);
+  const setCivilDay = date => page.evaluate(day => sessionStorage.setItem('personal-date', String(Date.parse(day + 'T12:00:00Z'))), date);
+  await setCivilDay(futureDay);
   await page.getByText(/1 декабря/).waitFor();
   const afterAdvance = (await state(page)).snapshot.personalProgress;
   assert.equal(afterAdvance.day, futureDay);
   await hold(820);
-  await date(page, originalDay);
+  await page.evaluate(() => window.dispatchEvent(new Event('blur')));
+  await setCivilDay(originalDay);
+  await page.waitForTimeout(1100);
+  assert.equal((await state(page)).snapshot.personalProgress.day, futureDay);
+  await page.evaluate(() => window.dispatchEvent(new Event('focus')));
   await page.getByText('25 ноября 2026 г.', { exact: true }).waitFor();
   const restored = await state(page);
   assert.equal(restored.snapshot.personalProgress.day, originalDay);
@@ -220,7 +225,7 @@ try {
   assert.deepEqual(errors, []);
   const report = { browser: browser.version(), starterDays, perfectCampaignWins: perfectCount,
     personalGoal: 'repeat-record', targetMoves: assignment.limit, unplayedFuture: future.levelId,
-    correctedDay: [futureDay, originalDay], retainedHistory: true, awardsAfterReplay: 1,
+    correctedDay: [futureDay, originalDay], updatedWhileOpen: true, refreshedOnForeground: true, retainedHistory: true, awardsAfterReplay: 1,
     durationMs: { easy: ordinaryMs[0], ordinaryFinalField: ordinaryMs[1], finale: present.durationMs },
     finaleId: present.levelId, finaleWonViaTouch: true, finaleExpiryVerified: true, civilClockDidNotChangeTimer: true,
     clipStartMillis, clipMillis, limits: 'Actual Chromium input. Campaign history made with domain actions and fixed civil/monotonic test clocks. Physical Android not run.' };

@@ -4,6 +4,7 @@ import { StoreError, type CommittedWorkspace, type OperationReceipt, type Stored
 
 interface SQLiteBridge {
   load(input: { vaultId: string }): Promise<{ workspace: CommittedWorkspace | null }>;
+  checkpointClock(input: { vaultId: string; revision: number; elapsedMs: number }): Promise<{ accepted: boolean }>;
   commit(input: { commandJson: string; payloadHash: string }): Promise<OperationReceipt>;
   readOperation(input: { vaultId: string; operationId: string }): Promise<{ receipt: OperationReceipt | null }>;
   listFacts(input: { vaultId: string }): Promise<{ facts: StoredFact[] }>;
@@ -19,6 +20,7 @@ async function call<T>(action: () => Promise<T>): Promise<T> {
 export function openNativeStore(): TransactionalLocalStore {
   return {
     load: async vaultId => (await call(() => bridge.load({ vaultId }))).workspace,
+    checkpointClock: async (vaultId, revision, elapsedMs) => (await call(() => bridge.checkpointClock({ vaultId, revision, elapsedMs }))).accepted,
     commit: async command => { await validateCommand(command); return call(() => bridge.commit({ commandJson: commandJson(command), payloadHash: command.payloadHash })); },
     readOperation: async (vaultId, operationId) => (await call(() => bridge.readOperation({ vaultId, operationId }))).receipt,
     listFacts: async vaultId => (await call(() => bridge.listFacts({ vaultId }))).facts,

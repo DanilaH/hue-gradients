@@ -91,6 +91,7 @@ try {
   async function claim() {
     await special.tap();
     await idle();
+    assert.equal(await page.locator('#levels').innerText(), '‹ Книги');
     await solve(chapter);
     if (recording) await page.waitForTimeout(600);
     await button('К книгам').tap();
@@ -101,6 +102,20 @@ try {
   if (recording) await page.waitForTimeout(550);
   const clipMillis = Date.now() - captureBase - clipStartMillis;
   await claim();
+  assert.equal((await state()).claimCount, 1);
+  await special.tap();
+  await idle();
+  await page.locator('#settings').tap();
+  assert(await button('К книгам').isVisible());
+  await button('Продолжить').tap();
+  const movable = chapter.startTileAtPosition.flatMap((_, index) => chapter.pinnedPositions.includes(index) ? [] : [index]);
+  const limit = Number((await page.locator('#guidance').textContent()).match(/\d+$/)?.[0]);
+  assert(limit > 0);
+  for (let step = 0; step < limit; step++) await swap(chapter, movable[0], movable[1]);
+  await page.waitForSelector('#hue-app[data-layer=result]');
+  assert.equal(await page.locator('#dialog-title').textContent(), 'Ходы закончились');
+  await button('К книгам').tap();
+  await dawn.waitFor();
   assert.equal((await state()).claimCount, 1);
 
   // Cache the verified staging snapshot or the legacy fixture before disconnecting.
@@ -182,8 +197,7 @@ try {
   assert.equal(complete.snapshot.completed.length, 60);
   assert.equal(complete.snapshot.creative.works['keep-work'].headNodeId, 'keep-revision');
   assert(complete.snapshot.rights.includes('export-strip'));
-  await button('Новый цикл').tap();
-  await button('Отмена').tap();
+  assert.equal(await button('Новый цикл').count(), 0);
   assert.deepEqual((await state()).row, complete.row);
   assert.deepEqual(errors, []);
   const video = page.video();
@@ -192,7 +206,7 @@ try {
   const report = { browser: browser.version(), lastGoalChangedFrom: '3/4', lastGoalChangedTo: '4/4',
     firstBookClaimsAfterReplay: 1, curatedOccasionOffline: true, stagedAuthoredEvent: Boolean(featured),
     eventDate, eventMoves: eventState.snapshot.dailyProgress.attempts[eventDate].moves, eventWins: eventState.eventCount,
-    cycleCancellationPreservedSnapshot: true, clipStartMillis, clipMillis,
+    cycleUnavailablePreservedSnapshot: true, bookReturnsOnLoss: true, clipStartMillis, clipMillis,
     limits: 'Actual book and event play with a test UTC date. Live dates and cycle reset are not enabled.' };
   await writeFile(`${output}/browser.json`, JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report));

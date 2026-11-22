@@ -66,14 +66,14 @@ assert all(abs(sum(p[c] for p in pixels)/len(pixels)-colour[c])<=2 for c in rang
   await page.getByRole('button',{name:'Настройки',exact:true}).click();
   await page.getByRole('checkbox',{name:'Звуки',exact:true}).uncheck(); await idle();
   await page.getByRole('checkbox',{name:'Вибрация',exact:true}).uncheck(); await idle();
-  await page.getByRole('checkbox',{name:'Движение фона',exact:true}).uncheck(); await idle();
+  await page.getByRole('checkbox',{name:'Анимации',exact:true}).uncheck(); await idle();
   await page.getByRole('button',{name:'Продолжить'}).click();
   const muted=await page.evaluate(()=>window.__feedback.audio+window.__feedback.haptic.length);
   await tap(1); await tap(2); await idle(); assert.equal(await page.evaluate(()=>window.__feedback.audio+window.__feedback.haptic.length),muted);
   assert.equal(await page.locator('#hue-app').getAttribute('data-motion'),'false');
   const frame=await page.locator('.atmosphere').getAttribute('data-frames'); await page.waitForTimeout(200); assert.equal(await page.locator('.atmosphere').getAttribute('data-frames'),frame);
   await page.reload(); await page.waitForSelector('html[data-state=ready]'); assert.deepEqual((await state()).preferences,{sound:false,haptics:false,motion:false,statistics:true,music:false}); reports.push('sound/haptic/motion settings persist; muted actions stay silent');
-  await page.locator('#settings').click(); await page.getByRole('button',{name:'Настройки',exact:true}).click(); await page.getByRole('checkbox',{name:'Движение фона',exact:true}).check(); await idle(); await page.getByRole('button',{name:'Продолжить'}).click();
+  await page.locator('#settings').click(); await page.getByRole('button',{name:'Настройки',exact:true}).click(); await page.getByRole('checkbox',{name:'Анимации',exact:true}).check(); await idle(); await page.getByRole('button',{name:'Продолжить'}).click();
   await page.emulateMedia({reducedMotion:'reduce'}); await page.waitForSelector('#hue-app[data-motion=false]'); assert.equal(await page.locator('#hue-app').getAttribute('data-motion'),'false');
   const reduced=await page.locator('.atmosphere').getAttribute('data-frames'); await page.waitForTimeout(200); assert.equal(await page.locator('.atmosphere').getAttribute('data-frames'),reduced); reports.push('system reduced motion overrides the animation preference');
   // Sample actual compositor pixels, away from pin/selection markers, against authored RGB.

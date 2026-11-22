@@ -52,11 +52,29 @@ public class HueSQLitePlugin extends Plugin {
     }
     @PluginMethod public void load(PluginCall call) { run(call, db -> {
         String vault = id(call.getString("vaultId")); JSObject result = new JSObject();
-        try (Cursor cursor = db.rawQuery("SELECT revision,snapshot FROM workspaces WHERE vault=?", new String[]{vault})) {
+        try (Cursor cursor = db.rawQuery("SELECT w.revision,w.snapshot,c.elapsed FROM workspaces w " +
+                "LEFT JOIN clock_checkpoints c ON c.vault=w.vault AND c.revision=w.revision WHERE w.vault=?", new String[]{vault})) {
             if (!cursor.moveToFirst()) { result.put("workspace", JSONObject.NULL); return result; }
             JSObject value = new JSObject(); value.put("schemaVersion", 1); value.put("vaultId", vault);
             value.put("localRevision", cursor.getLong(0)); value.put("snapshotJson", cursor.getString(1));
+            if (!cursor.isNull(2)) value.put("clockElapsedMs", cursor.getLong(2));
             result.put("workspace", value); return result;
+        }
+    }); }
+    @PluginMethod public void checkpointClock(PluginCall call) { run(call, db -> {
+        String vault = id(call.getString("vaultId"));
+        JSONObject data = call.getData();
+        long revision = data.getLong("revision"), elapsed = data.getLong("elapsedMs");
+        if (revision < 1 || revision > 9007199254740991L || elapsed < 0 || elapsed > 9007199254740991L ||
+                data.getDouble("revision") != revision || data.getDouble("elapsedMs") != elapsed) throw new Rejected("CORRUPT");
+        db.execSQL("INSERT OR REPLACE INTO clock_checkpoints(vault,revision,elapsed) " +
+                "SELECT w.vault,w.revision,? FROM workspaces w LEFT JOIN clock_checkpoints c " +
+                "ON c.vault=w.vault AND c.revision=w.revision WHERE w.vault=? AND w.revision=? " +
+                "AND (c.elapsed IS NULL OR c.elapsed<?)", new Object[]{elapsed, vault, revision, elapsed});
+        JSObject result = new JSObject();
+        try (Cursor cursor = db.rawQuery("SELECT 1 FROM workspaces WHERE vault=? AND revision=?",
+                new String[]{vault, Long.toString(revision)})) {
+            result.put("accepted", cursor.moveToFirst()); return result;
         }
     }); }
     @PluginMethod public void readOperation(PluginCall call) { run(call, db -> {
@@ -124,14 +142,21 @@ public class HueSQLitePlugin extends Plugin {
     }); }
 
     private static class Database extends SQLiteOpenHelper {
-        Database(Context context) { super(context, new File(context.getNoBackupFilesDir(), "hue-workspace-v1.db").getAbsolutePath(), null, 1,
+        Database(Context context) { super(context, new File(context.getNoBackupFilesDir(), "hue-workspace-v1.db").getAbsolutePath(), null, 2,
             db -> { throw new SQLiteDatabaseCorruptException("Preserve damaged database for recovery"); }); }
         @Override public void onConfigure(SQLiteDatabase db) { db.execSQL("PRAGMA synchronous=FULL"); }
         @Override public void onCreate(SQLiteDatabase db) {
             db.execSQL("CREATE TABLE workspaces(vault TEXT PRIMARY KEY,revision INTEGER NOT NULL,snapshot TEXT NOT NULL)");
             db.execSQL("CREATE TABLE operations(vault TEXT NOT NULL,operation TEXT NOT NULL,payload_hash TEXT NOT NULL,revision INTEGER NOT NULL,PRIMARY KEY(vault,operation))");
             db.execSQL("CREATE TABLE facts(vault TEXT NOT NULL,id TEXT NOT NULL,destination TEXT NOT NULL,payload TEXT NOT NULL,PRIMARY KEY(vault,id))");
+            createClockCheckpoints(db);
         }
-        @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) { throw new IllegalStateException("Explicit validated migration required"); }
+        private void createClockCheckpoints(SQLiteDatabase db) {
+            db.execSQL("CREATE TABLE clock_checkpoints(vault TEXT PRIMARY KEY,revision INTEGER NOT NULL,elapsed INTEGER NOT NULL)");
+        }
+        @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            if (oldVersion != 1 || newVersion != 2) throw new IllegalStateException("Explicit validated migration required");
+            createClockCheckpoints(db);
+        }
     }
 }

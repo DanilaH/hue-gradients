@@ -20,6 +20,8 @@ jobs:
         run: npx vitest run tests/puzzle.test.ts tests/board-camera.test.ts tests/shapes.test.ts tests/time-trial.test.ts tests/release-config.test.ts
   host:
     runs-on: ubuntu-24.04
+    env:
+      VITE_DAILY_PUBLICATION_URL: ${{ vars.DAILY_PUBLICATION_URL }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6

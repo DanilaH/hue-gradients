@@ -7,7 +7,7 @@ import { fingerprintPayload, type Action } from '../domain/workspace';
 import { hashText } from '../local-store/command';
 import type { TransactionalLocalStore } from '../local-store/contracts';
 import { gameMode, type InputIntent } from '../app/gameTelemetry';
-import { Session } from '../app/session';
+import { GUEST_VAULT, Session } from '../app/session';
 import { PuzzleScene, GAME_PRESENTABLE } from './PuzzleScene';
 import { Atmosphere, type ColourPointer } from './atmosphere';
 import { cellCenter } from './geometry';
@@ -42,11 +42,13 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   const fingerprints = new Map(await Promise.all(levels.map(async level => [level.id, await hashText(fingerprintPayload(level))] as const)));
   const session = new Session(store, fingerprints);
   await session.load();
-  // A newly mounted page resumes the last committed remaining time in its own clock.
-  const savedTimed = activeTimed(session.state.timedProgress)?.run.startedAt;
-  const savedPersonal = activePersonal(session.state.personalProgress)?.clock?.startedAt;
-  if (savedTimed != null) await session.act({ kind: 'timed-pause', now: savedTimed });
-  if (savedPersonal != null) await session.act({ kind: 'personal-pause', now: savedPersonal });
+  const savedTimed = activeTimed(session.state.timedProgress)?.run;
+  const savedPersonal = activePersonal(session.state.personalProgress)?.clock;
+  const savedClock = savedTimed ?? savedPersonal;
+  if (savedClock?.startedAt != null) {
+    const elapsed = Math.min(savedClock.remainingMs, Math.max(0, session.clockElapsedMs));
+    await session.act({ kind: savedTimed ? 'timed-pause' : 'personal-pause', now: savedClock.startedAt + elapsed });
+  }
   const exportFiles = options.exportFiles ?? browserExportFiles();
   const current = () => {
     const personal = activePersonal(session.state.personalProgress);
@@ -88,9 +90,12 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   let foregroundEpoch = 0;
   let queuedClock = false;
   let dailyLoading = false;
+  let dailyUnavailable = false;
+  let dailyFocus: string | undefined;
   let importing = false, importNote = '';
   let pendingImport: Awaited<ReturnType<typeof parsePuzzleFile>> | null = null;
   let pauseRequestedAt: number | null = null;
+  let checkpointingRevision: number | null = null;
   const timeCaption = (seconds: number) => `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
   let layer = gameLayer();
   let editorView: EditorView | null = null, editorDraftId: string | null = null;
@@ -284,22 +289,24 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     try {
       const feed = await options.dailySource();
       validateDailyFeed(feed);
-      if (alive) await run({ kind: 'daily-cache', feed });
-    } catch { /* An offline or unverified response never modifies the trusted archive. */ }
+      if (alive) dailyUnavailable = !(await run({ kind: 'daily-cache', feed }));
+    } catch { dailyUnavailable = true; /* The trusted archive remains available. */ }
     finally { dailyLoading = false; if (alive && layer === 'meta' && (metaRoute.kind === 'daily' || metaRoute.kind === 'books')) render(); }
   }
   function playDaily(date: string, replay: boolean): void {
-    void run({ kind: 'daily-open', date, replay, attemptId: crypto.randomUUID() }, () => {
+    const entry = metaRoute.kind === 'books' ? 'books' : 'daily';
+    void run({ kind: 'daily-open', date, replay, entry, attemptId: crypto.randomUUID() }, () => {
       metaHistory = [];
       layer = gameLayer();
     });
   }
   function leaveDaily(): void {
-    const feature = current().daily?.feature;
+    const daily = current().daily;
+    if (!daily) return;
     void run({ kind: 'daily-leave' }, () => {
       metaReturn = gameLayer();
-      metaHistory = feature ? [{ kind: 'album', tab: 'campaign' }] : [{ kind: 'chapter', levelId: session.state.activeLevelId }];
-      metaRoute = feature ? { kind: 'books' } : { kind: 'daily' };
+      metaHistory = daily.entry === 'books' ? [{ kind: 'album', tab: 'campaign' }] : [{ kind: 'chapter', levelId: session.state.activeLevelId }];
+      metaRoute = daily.entry === 'books' ? { kind: 'books' } : { kind: 'daily', date: daily.date };
       layer = 'meta';
       queueMicrotask(() => void refreshDaily());
     });
@@ -308,6 +315,10 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     return run({ kind: 'personal-issue', day: localCalendarDay() });
   }
   function playPersonal(key: string, restart: boolean): void {
+    if (layer === 'meta' && metaRoute.kind === 'personal' && session.state.personalProgress?.day !== localCalendarDay()) {
+      void issuePersonal();
+      return;
+    }
     void run({ kind: 'personal-open', key, restart, attemptId: crypto.randomUUID(), now: clockNow() }, () => {
       metaHistory = [];
       layer = gameLayer();
@@ -331,6 +342,18 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   function leaveTimed(): void {
     void run({ kind: 'timed-leave', now: clockNow() }, () => challengeLobby());
   }
+  function activeClock() {
+    return activeTimed(session.state.timedProgress)?.run ?? activePersonal(session.state.personalProgress)?.clock;
+  }
+  function checkpointClock(elapsed: number, final = false): void {
+    const revision = session.revision;
+    if (!final && checkpointingRevision === revision) return;
+    checkpointingRevision = revision;
+    void store.checkpointClock(GUEST_VAULT, revision, elapsed).then(saved => {
+      if (saved && session.revision === revision) session.clockElapsedMs = Math.max(session.clockElapsedMs, elapsed);
+    }).catch(() => { /* Retry on the next clock tick; the previously committed observation remains valid. */ })
+      .finally(() => { if (checkpointingRevision === revision) checkpointingRevision = null; });
+  }
   function updateTimedClock(): void {
     if (!alive) return;
     const timed = session.state.timedProgress?.active ? session.state.timedProgress : undefined;
@@ -343,9 +366,14 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (timer.startedAt === null) pauseRequestedAt = null;
     else if (!wantRunning) pauseRequestedAt ??= now;
     const remaining = timedRemaining(timer, pauseRequestedAt ?? now);
+    const persisted = timer.startedAt === null ? remaining : Math.max(0, timer.remainingMs - session.clockElapsedMs);
+    if (ready && wantRunning && timer.startedAt !== null && !busy &&
+        Math.ceil(remaining / 1000) < Math.ceil(persisted / 1000)) {
+      checkpointClock(timer.remainingMs - remaining);
+    }
     if (layer === 'none') {
       const guidance = byId('guidance');
-      const time = timeCaption(Math.ceil(remaining / 1000));
+      const time = timeCaption(Math.ceil(persisted / 1000));
       const label = timed ? `${time} · Собрано ${timed.run.cleared}` : time;
       if (guidance.textContent !== label) guidance.textContent = label;
     }
@@ -424,6 +452,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     const switchLayer = dialog.dataset.layer !== layer;
     const menu = layer === 'meta' && isMenuList(metaRoute) ? metaRoute.kind : undefined;
     const switchMenu = dialog.dataset.menu !== menu;
+    if (switchMenu) dailyFocus = menu === 'daily' && metaRoute.kind === 'daily' ? metaRoute.date : undefined;
     const menuScroll = !switchMenu && menu ? dialog.scrollTop : 0;
     const openDisclosures = !switchMenu && menu
       ? [...actions.querySelectorAll<HTMLDetailsElement>('details[open][data-menu-disclosure]')].map(node => node.dataset.menuDisclosure)
@@ -467,7 +496,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       colourPrism(prism, level);
       byId('dialog-title').textContent = 'Задача собрана';
       byId('dialog-copy').textContent = dailyLabel(daily.date);
-      button(daily.feature ? 'К книгам' : 'К календарю', leaveDaily);
+      button(daily.entry === 'books' ? 'К книгам' : 'К календарю', leaveDaily);
     } else if (layer === 'result' && timed) {
       byId('dialog-title').textContent = 'Время вышло';
       byId('dialog-copy').textContent = `Собрано · ${timed.run.cleared} · Рекорд · ${timed.best}`;
@@ -477,17 +506,19 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       if (won) colourPrism(prism, level);
       byId('dialog-title').textContent = won ? 'Испытание пройдено' : 'Ходы закончились';
       byId('dialog-copy').textContent = `Ходы · ${challenge.attempt.moves} из ${challenge.moveLimit}`;
-      if (won) button(challenge.book ? 'К книгам' : 'К испытаниям', leaveChallenge);
+      const challengeBack = challenge.book ? 'К книгам' : 'К испытаниям';
+      if (won) button(challengeBack, leaveChallenge);
       else {
         button('Повторить', () => playChallenge(level.id, true));
-        button('К испытаниям', leaveChallenge, true);
+        button(challengeBack, leaveChallenge, true);
       }
     } else if (layer === 'result') {
       colourPrism(prism, level);
       byId('dialog-title').textContent = own ? 'Проверка пройдена' : 'Собрано';
       const count = attempt?.moves ?? 0, form = new Intl.PluralRules('ru').select(count);
       const word = form === 'one' ? 'ход' : form === 'few' ? 'хода' : 'ходов';
-      byId('dialog-copy').textContent = session.state.preferences.statistics ? `${count} ${word}` : '';
+      const assist = attempt?.assisted ? ' · С помощью' : '';
+      byId('dialog-copy').textContent = session.state.preferences.statistics ? `${count} ${word}${assist}` : '';
       if (own) {
         button('В редактор', leaveAuthor);
       } else {
@@ -526,11 +557,12 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       }
       if (!timed) button('Начать заново', () => askRestart(session.state.activeLevelId), true).id = 'restart';
       button('Настройки', () => { layer = 'preferences'; render(); }, true);
-      button(personal ? 'К заданиям' : daily ? 'К календарю' : timed || challenge ? 'К испытаниям' : own ? 'В редактор' : 'К уровням',
+      button(personal ? 'К заданиям' : daily?.entry === 'books' || challenge?.book ? 'К книгам' : daily ? 'К календарю'
+        : timed || challenge ? 'К испытаниям' : own ? 'В редактор' : 'К уровням',
         leaveBoard, true);
     } else if (layer === 'preferences') {
       byId('dialog-title').textContent = 'Настройки';
-      for (const [key, label] of [['sound', 'Звуки'], ['music', 'Музыка'], ['haptics', 'Вибрация'], ['motion', 'Движение фона'], ['statistics', 'Статистика уровня']] as const) {
+      for (const [key, label] of [['sound', 'Звуки'], ['music', 'Музыка'], ['haptics', 'Вибрация'], ['motion', 'Анимации'], ['statistics', 'Статистика уровня']] as const) {
         const row = document.createElement('label'); row.className = 'setting';
         const input = document.createElement('input'); input.type = 'checkbox'; input.checked = session.state.preferences[key]; input.disabled = busy || activity.isBlocked();
         input.setAttribute('aria-label', label);
@@ -549,7 +581,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       }, true);
       button('Показать готовое поле', () => askHelp({ kind: 'preview' }), true);
       button(`Сделать один обмен · +${AUTO_HELP_COST} хода`, () => askHelp({ kind: 'auto' }), true);
-      button('Отмена', () => { layer = 'none'; render(); }, true);
+      button('Отмена', () => { back(); }, true);
     } else if (layer === 'pin-guide') {
       byId('dialog-title').textContent = 'Закреплённые плитки';
       byId('dialog-copy').textContent = 'Плитки с точкой стоят на своих местах. По их цветам можно собрать остальные.';
@@ -613,8 +645,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       renderMeta({ route: metaRoute, state: session.state, disabled: busy || activity.isBlocked() || !!session.pending,
         title: byId('dialog-title'), copy: byId('dialog-copy'), actions, navigate: showMeta, back: () => { back(); },
         play: startLevel, repeat: repeatLevel, playChallenge, playTimed, playDaily, playPersonal,
-        dailyAvailable: !!options.dailySource || !!session.state.dailyProgress,
         dailyLoading,
+        ...(dailyUnavailable && options.dailySource ? { retryDaily: () => void refreshDaily() } : {}),
         saveCopy: (levelId, name) => {
           const draftId = crypto.randomUUID();
           void run({ kind: 'copy', levelId, name, draftId, workId: crypto.randomUUID(), nodeId: crypto.randomUUID() }, () => {
@@ -639,7 +671,11 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
         node.open = openDisclosures.includes(node.dataset.menuDisclosure);
       }
       dialog.scrollTop = menuScroll;
-      if (switchMenu) dialogTitle.focus({ preventScroll: true });
+      const selected = dailyFocus && actions.querySelector<HTMLButtonElement>(`[data-daily-date="${dailyFocus}"]`);
+      if (selected && !selected.disabled) {
+        selected.focus({ preventScroll: true });
+        if (switchMenu) selected.scrollIntoView({ block: 'nearest' });
+      } else if (switchMenu) dialogTitle.focus({ preventScroll: true });
     }
     if (isPause(layer) && !busy && !activity.isBlocked()) {
       (actions.querySelectorAll<HTMLElement>('button, input')[pauseFocus] ?? actions.querySelector<HTMLElement>('button, input'))?.focus({ preventScroll: true });
@@ -663,7 +699,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     const preview = layer === 'help' || pausedBoard && pauseOrigin === 'help';
     root.style.setProperty('--color-a', hiddenField ? '#392449' : level.solvedTileColors[0]!);
     root.style.setProperty('--color-b', hiddenField ? '#164657' : level.solvedTileColors.at(-1)!);
-    byId('levels').textContent = personal ? '‹ Задания' : daily ? '‹ Календарь' : timed || challenge ? '‹ Испытания' : own ? '‹ Редактор' : '‹ Уровни';
+    byId('levels').textContent = personal ? '‹ Задания' : daily?.entry === 'books' || challenge?.book ? '‹ Книги'
+      : daily ? '‹ Календарь' : timed || challenge ? '‹ Испытания' : own ? '‹ Редактор' : '‹ Уровни';
     byId('title').textContent = personal ? personalTaskName(personal) : daily ? dailyLabel(daily.date) : own || challenge || timed ? level.title : `Уровень ${level.ordinal}`;
     const guidance = byId('guidance');
     guidance.textContent = layer === 'secret' ? '' : personal?.limit !== undefined ? `Ходов осталось · ${personal.limit - personal.attempt.moves}` : challenge ? `Ходов осталось · ${challenge.moveLimit - challenge.attempt.moves}` : layer === 'help' ? 'Готовое поле' : notice || (!own && !session.state.onboarding.firstSwapDone ? 'Поменяй две плитки местами' : '');
@@ -854,6 +891,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   byId('levels').addEventListener('click', leaveBoard, { signal: listeners.signal });
   actions.addEventListener('focusin', event => {
     if (isPause(layer)) pauseFocus = [...actions.querySelectorAll('button, input')].indexOf(event.target as HTMLElement);
+    if (layer === 'meta' && metaRoute.kind === 'daily') dailyFocus = (event.target as HTMLElement).dataset.dailyDate;
   }, { signal: listeners.signal });
   actions.addEventListener('keydown', event => {
     if (!isPause(layer) || !['ArrowUp', 'ArrowDown'].includes(event.key)) return;
@@ -902,6 +940,12 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   }, { signal: listeners.signal });
   const observer = new ResizeObserver(resize); observer.observe(region);
   window.addEventListener('resize', resize, { signal: listeners.signal });
+  window.addEventListener('pagehide', () => {
+    const timer = activeClock();
+    if (timer?.startedAt != null && timer.remainingMs > 0) {
+      checkpointClock(timer.remainingMs - timedRemaining(timer, pauseRequestedAt ?? clockNow()), true);
+    }
+  }, { signal: listeners.signal });
   window.addEventListener('focus', () => {
     if (busy || session.pending || !ready) return;
     busy = true;
@@ -926,6 +970,10 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     render();
   });
   const clockTicker = setInterval(updateTimedClock, 200);
+  const personalTicker = setInterval(() => {
+    if (ready && !busy && !activity.isBlocked() && !session.pending && layer === 'meta' && metaRoute.kind === 'personal' &&
+        session.state.personalProgress?.day !== localCalendarDay()) void issuePersonal();
+  }, 1000);
   await frame; ready = true; render(); resize();
-  return { back, destroy() { alive = false; clearInterval(clockTicker); clearMark(); editorView?.destroy(); workCard?.destroy(); stopVictory(); exportFiles.destroy?.(); listeners.abort(); observer.disconnect(); unblock(); atmosphere.destroy(); feedback.destroy(); music.destroy(); activity.setGameplayDesired(false); store.close(); destroyRenderer(game); } };
+  return { back, destroy() { alive = false; clearInterval(clockTicker); clearInterval(personalTicker); clearMark(); editorView?.destroy(); workCard?.destroy(); stopVictory(); exportFiles.destroy?.(); listeners.abort(); observer.disconnect(); unblock(); atmosphere.destroy(); feedback.destroy(); music.destroy(); activity.setGameplayDesired(false); store.close(); destroyRenderer(game); } };
 }

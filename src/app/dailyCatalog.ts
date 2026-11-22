@@ -99,3 +99,31 @@ export async function readPublishedDailyCatalog(publication: DailyPublication, r
   validateDailyFeed(verified);
   return verified;
 }
+
+/** The deployer configures one trusted publication endpoint independently of the snapshots. */
+export function configuredDailySource(address: string | undefined): (() => Promise<DailyFeed>) | undefined {
+  if (!address) return undefined;
+  return async () => {
+    const endpoint = new URL(address);
+    const loopback = ['localhost', '127.0.0.1', '[::1]'].includes(endpoint.hostname);
+    if ((endpoint.protocol !== 'https:' && !(loopback && endpoint.protocol === 'http:')) ||
+        endpoint.username || endpoint.password) throw new Error('Invalid daily publication endpoint');
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    try {
+      const get = async (url: URL, cache: RequestCache) => {
+        const response = await fetch(url, { cache, credentials: 'omit', redirect: 'error', signal: controller.signal });
+        if (!response.ok) throw new Error('Daily publication unavailable');
+        return response;
+      };
+      const info: unknown = await (await get(endpoint, 'no-store')).json();
+      if (!record(info) || !named(info.source) || !sha256(info.catalogSha256) || typeof info.verifiedNowMs !== 'number') {
+        throw new Error('Invalid daily publication');
+      }
+      const snapshot = new URL(`snapshots/${info.catalogSha256}/`, endpoint);
+      return await readPublishedDailyCatalog({
+        source: info.source, catalogSha256: info.catalogSha256, verifiedNowMs: info.verifiedNowMs,
+      }, async path => (await get(new URL(path, snapshot), 'default')).arrayBuffer());
+    } finally { clearTimeout(timeout); }
+  };
+}

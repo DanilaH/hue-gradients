@@ -94,12 +94,15 @@ try {
   assert.match(await page.locator('#dialog-copy').innerText(), /«С помощью»/);
   await record(page, 'clean', 14);
   await button(page, 'Отмена').click();
+  await layer(page, 'settings');
   assert.deepEqual(await state(page), first);
+  await button(page, 'Продолжить').click();
   await record(page, 'clean', 7);
   await tapCell(page, 1);
   await record(page, 'clean', 4);
   await tapCell(page, 2);
   await layer(page, 'result');
+  assert.equal(await page.locator('#dialog-copy').textContent(), '1 ход');
   assert(await button(page, 'Дальше').isEnabled());
   await record(page, 'clean', 11);
   const details = await cardDetails(page);
@@ -123,6 +126,10 @@ try {
   await button(page, 'К игре').click();
   assert.deepEqual(await state(page), preview);
   await solveFirst(page);
+  assert.equal(await page.locator('#dialog-copy').textContent(), '1 ход · С помощью');
+  await page.reload();
+  await layer(page, 'result');
+  assert.equal(await page.locator('#dialog-copy').textContent(), '1 ход · С помощью');
   const mixed = await cardDetails(page);
   assert.match(await mixed.innerText(), /Рекорд без помощи — 1.*Рекорд с помощью — 1/s);
   assert(await mixed.getByText('Идеально без помощи', { exact: true }).isVisible());
@@ -148,6 +155,7 @@ try {
   await record(soft, 'assisted', 7);
   await button(soft, 'Сделать один обмен · +3 хода').click();
   await layer(soft, 'result');
+  assert.equal(await soft.locator('#dialog-copy').textContent(), '3 хода · С помощью');
   const auto = await state(soft);
   assert.deepEqual(attempt(auto).board, [0,1,2,3]);
   assert.equal(attempt(auto).moves, 3);
@@ -201,6 +209,7 @@ try {
   await staticSpot.waitFor();
   assert.equal(await staticSpot.evaluate(e => getComputedStyle(e, '::after').animationName), 'none');
   await solveFirst(small);
+  assert.equal(await small.locator('#dialog-copy').textContent(), '1 ход · С помощью');
   await cardDetails(small);
   assert.match(await small.locator('.work-card-records').innerText(), /Рекорд с помощью — 1/);
   passed.push('320×568 at enlarged text, Back, static outlines, repeat pin feedback and dismissible tutorial');

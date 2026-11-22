@@ -4,6 +4,7 @@ export interface CommittedWorkspace {
   readonly vaultId: string;
   readonly localRevision: number;
   readonly snapshotJson: string;
+  readonly clockElapsedMs?: number;
 }
 
 export interface PreparedCommit {
@@ -36,6 +37,8 @@ export class StoreError extends Error {
 
 export interface TransactionalLocalStore {
   load(vaultId: string): Promise<CommittedWorkspace | null>;
+  /** Replace a monotonic observation for this exact snapshot revision, without emitting a game fact. */
+  checkpointClock(vaultId: string, revision: number, elapsedMs: number): Promise<boolean>;
   /** Snapshot + facts/outbox + operation receipt in ONE native/IndexedDB transaction. */
   commit(command: PreparedCommit): Promise<OperationReceipt>;
   readOperation(vaultId: string, operationId: string): Promise<OperationReceipt | null>;

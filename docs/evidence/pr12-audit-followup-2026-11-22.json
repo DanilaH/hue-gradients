@@ -1,0 +1,196 @@
+{
+  "version": "0.4.35 (39)",
+  "date": "2026-11-22",
+  "baseCommit": "6bbea80961b3abd22c009761517ce7249c639a0d",
+  "audit": "https://github.com/DanilaH/hue-gradients/pull/12",
+  "timer": {
+    "scenarios": {
+      "timed": {
+        "initial": "10:00 · Собрано 0",
+        "restarts": [
+          {
+            "before": "9:57 · Собрано 0",
+            "after": "9:57 · Собрано 0",
+            "remainingMs": 596870,
+            "moves": 0
+          },
+          {
+            "before": "9:54 · Собрано 0",
+            "after": "9:54 · Собрано 0",
+            "remainingMs": 593886,
+            "moves": 1
+          }
+        ],
+        "pausedMs": 593690,
+        "backgroundMs": 593653,
+        "sameAttempt": true
+      },
+      "personal": {
+        "initial": "0:17",
+        "restarts": [
+          {
+            "before": "0:14",
+            "after": "0:14",
+            "remainingMs": 13859,
+            "moves": 0
+          },
+          {
+            "before": "0:11",
+            "after": "0:11",
+            "remainingMs": 10882,
+            "moves": 1
+          }
+        ],
+        "pausedMs": 10700,
+        "backgroundMs": 10661,
+        "sameAttempt": true
+      }
+    },
+    "limits": "Real Chromium monotonic time, touch and IndexedDB. Fixed civil date for the personal task. No physical Android run."
+  },
+  "timerImageSha256": "5e13af2a46d0b87701f0bbf1411c95b8afa326775f220f4cf37e4c971f147395",
+  "dailyEntrypoints": {
+    "dates": [
+      "2026-11-22",
+      "2026-11-21"
+    ],
+    "snapshot": "423754bb9136b80522b3b7bbb9256c30a4e9969b9598577179d7f0d70735a411",
+    "hosts": {
+      "android": {
+        "cleanProfile": true,
+        "retry": true,
+        "bothDatesSolved": true,
+        "offlineReopen": true,
+        "activeAttemptRetained": true,
+        "calendarFocusRestored": true,
+        "eventBothOrigins": true,
+        "distinctWins": [
+          "2026-11-21",
+          "2026-11-22"
+        ]
+      },
+      "yandex": {
+        "cleanProfile": true,
+        "retry": true,
+        "bothDatesSolved": true,
+        "offlineReopen": true,
+        "activeAttemptRetained": true,
+        "calendarFocusRestored": true,
+        "eventBothOrigins": true,
+        "distinctWins": [
+          "2026-11-21",
+          "2026-11-22"
+        ]
+      }
+    },
+    "limits": "Production app entrypoints and separately served staging publication. Offline restart uses local packaged shell bytes; browser network is disabled. No live publication or native binary."
+  },
+  "dailyVerifiedSnapshot": {
+    "browser": "141.0.7390.37",
+    "authoredSnapshot": true,
+    "emptyArchiveBack": true,
+    "completedLevel": "gradient-daily-001",
+    "moves": 4,
+    "sameDailyStartOnTwoProfiles": true,
+    "acrossUtcMidnight": [
+      "2026-11-21",
+      "2026-11-22"
+    ],
+    "verifiedWireBytes": true,
+    "corruptUpdatePreservedArchive": true,
+    "bankPasses": [],
+    "reusedOldVersion": "3bf12ec2967c1dc8f125b17a3116a544ba5a51eb58664aee723a9b1076866aab",
+    "newVersion": "423754bb9136b80522b3b7bbb9256c30a4e9969b9598577179d7f0d70735a411",
+    "offlineReplay": true,
+    "distinctWins": [
+      "2026-11-21"
+    ],
+    "clipStartMillis": 4104,
+    "clipMillis": 4030,
+    "limits": "Injected dated feed and trusted clock. No public source, shared rewards or native runtime."
+  },
+  "personal": {
+    "browser": "141.0.7390.37",
+    "starterDays": [
+      {
+        "day": "2026-11-21",
+        "present": "gradient-001",
+        "future": "gradient-021",
+        "durationMs": 15000
+      },
+      {
+        "day": "2026-11-22",
+        "present": "gradient-004",
+        "future": "gradient-030",
+        "durationMs": 24000
+      },
+      {
+        "day": "2026-11-23",
+        "present": "gradient-003",
+        "future": "gradient-029",
+        "durationMs": 17000
+      },
+      {
+        "day": "2026-11-24",
+        "present": "gradient-002",
+        "future": "gradient-027",
+        "durationMs": 17000
+      }
+    ],
+    "perfectCampaignWins": 30,
+    "personalGoal": "repeat-record",
+    "targetMoves": 15,
+    "unplayedFuture": "gradient-060",
+    "correctedDay": [
+      "2026-12-01",
+      "2026-11-25"
+    ],
+    "updatedWhileOpen": true,
+    "refreshedOnForeground": true,
+    "retainedHistory": true,
+    "awardsAfterReplay": 1,
+    "durationMs": {
+      "easy": 15000,
+      "ordinaryFinalField": 74000,
+      "finale": 131000
+    },
+    "finaleId": "finale-v1-1",
+    "finaleWonViaTouch": true,
+    "finaleExpiryVerified": true,
+    "civilClockDidNotChangeTimer": true,
+    "clipStartMillis": 2188,
+    "clipMillis": 5278,
+    "limits": "Actual Chromium input. Campaign history made with domain actions and fixed civil/monotonic test clocks. Physical Android not run."
+  },
+  "books": {
+    "browser": "141.0.7390.37",
+    "lastGoalChangedFrom": "3/4",
+    "lastGoalChangedTo": "4/4",
+    "firstBookClaimsAfterReplay": 1,
+    "curatedOccasionOffline": true,
+    "stagedAuthoredEvent": true,
+    "eventDate": "2026-11-21",
+    "eventMoves": 4,
+    "eventWins": 1,
+    "cycleUnavailablePreservedSnapshot": true,
+    "bookReturnsOnLoss": true,
+    "clipStartMillis": 19406,
+    "clipMillis": 3081,
+    "limits": "Actual book and event play with a test UTC date. Live dates and cycle reset are not enabled."
+  },
+  "checks": {
+    "unitTestsPassed": 197,
+    "yandexBuild": "PASS",
+    "spec": "PASS",
+    "pinnedGuidance": "PASS",
+    "sqliteQuerySmoke": "PASS, SQLite SQL only; migration added in native plugin, APK runtime pending",
+    "helpBrowserScenarios": 7,
+    "m2BrowserScenarios": 12
+  },
+  "kitImpact": "REUSE",
+  "limits": {
+    "productionDaily": "Pending independently trusted publication endpoint. No live source used.",
+    "apk": "Not built or run on this executor. No Android SDK.",
+    "newCycle": "Owner decision pending; activation absent."
+  }
+}

@@ -22,12 +22,13 @@ export interface DailyProgress {
   readonly through: string;
   readonly slots: Readonly<Record<string, DailySlot>>;
   readonly active: string | null;
+  readonly entry?: 'daily' | 'books';
   readonly attempts: Readonly<Record<string, Attempt>>;
   readonly solved: readonly string[];
 }
 export type DailyAction =
   | { kind: 'daily-cache'; feed: DailyFeed }
-  | { kind: 'daily-open'; date: string; attemptId: string; replay: boolean }
+  | { kind: 'daily-open'; date: string; attemptId: string; replay: boolean; entry?: 'daily' | 'books' }
   | { kind: 'daily-swap'; from: number; to: number; attemptId: string }
   | { kind: 'daily-leave' };
 
@@ -52,7 +53,7 @@ export function validateDailyFeed(feed: DailyFeed): string {
 export function activeDaily(progress?: DailyProgress) {
   if (!progress?.active) return null;
   const slot = progress.slots[progress.active]!;
-  return { ...slot, attempt: progress.attempts[slot.date]! };
+  return { ...slot, attempt: progress.attempts[slot.date]!, entry: progress.entry ?? (slot.feature ? 'books' : 'daily') };
 }
 
 export function applyDaily(progress: DailyProgress | undefined, action: DailyAction): DailyProgress | undefined {
@@ -67,18 +68,24 @@ export function applyDaily(progress: DailyProgress | undefined, action: DailyAct
       slots[day.date] = { ...day, source: feed.source, version: feed.version };
       changed = true;
     }
-    return changed ? { through: cutoff, slots, active: progress?.active ?? null, attempts: progress?.attempts ?? {},
+    return changed ? { ...progress, through: cutoff, slots, active: progress?.active ?? null, attempts: progress?.attempts ?? {},
       solved: progress?.solved ?? [] } : progress;
   }
   if (!progress) return progress;
-  if (action.kind === 'daily-leave') return progress.active ? { ...progress, active: null } : progress;
+  if (action.kind === 'daily-leave') {
+    if (!progress.active) return progress;
+    const { entry, ...cached } = progress;
+    return { ...cached, active: null };
+  }
   if (action.kind === 'daily-open') {
     const slot = progress.slots[action.date];
     if (!slot || slot.date !== action.date || action.date > progress.through) return progress;
     const saved = progress.attempts[slot.date];
-    if (saved && !action.replay) return progress.active === slot.date ? progress : { ...progress, active: slot.date };
+    const entry = action.entry ?? (slot.feature ? 'books' : 'daily');
+    if (saved && !action.replay) return progress.active === slot.date && progress.entry === entry
+      ? progress : { ...progress, active: slot.date, entry };
     if (!action.attemptId || Object.values(progress.attempts).some(a => a.attemptId === action.attemptId)) return progress;
-    return { ...progress, active: slot.date,
+    return { ...progress, active: slot.date, entry,
       attempts: { ...progress.attempts, [slot.date]: createAttempt(slot.level, action.attemptId) } };
   }
   const active = activeDaily(progress);
@@ -94,6 +101,7 @@ export function validateDailyProgress(progress: DailyProgress): void {
       typeof progress.slots !== 'object' || typeof progress.attempts !== 'object' ||
       Array.isArray(progress.slots) || Array.isArray(progress.attempts) ||
       !Array.isArray(progress.solved) || new Set(progress.solved).size !== progress.solved.length ||
+      (progress.entry !== undefined && (progress.active === null || (progress.entry !== 'daily' && progress.entry !== 'books'))) ||
       (progress.active !== null && (!progress.slots[progress.active] || !progress.attempts[progress.active]))) {
     throw new Error('Invalid daily save');
   }

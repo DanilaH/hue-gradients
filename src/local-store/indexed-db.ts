@@ -12,13 +12,16 @@ const finished = (tx: IDBTransaction): Promise<void> => new Promise((resolve, re
 });
 
 export async function openIndexedDb(name = 'hue-workspace-v1'): Promise<TransactionalLocalStore> {
-  const opening = indexedDB.open(name, 1);
-  opening.onupgradeneeded = () => {
+  const opening = indexedDB.open(name, 2);
+  opening.onupgradeneeded = event => {
     const db = opening.result;
-    db.createObjectStore('workspaces', { keyPath: 'vaultId' });
-    db.createObjectStore('operations', { keyPath: ['vaultId', 'operationId'] });
-    const facts = db.createObjectStore('facts', { keyPath: ['vaultId', 'id'] });
-    facts.createIndex('vault', 'vaultId');
+    if (event.oldVersion === 0) {
+      db.createObjectStore('workspaces', { keyPath: 'vaultId' });
+      db.createObjectStore('operations', { keyPath: ['vaultId', 'operationId'] });
+      const facts = db.createObjectStore('facts', { keyPath: ['vaultId', 'id'] });
+      facts.createIndex('vault', 'vaultId');
+    }
+    db.createObjectStore('clocks', { keyPath: 'vaultId' });
   };
   const db = await new Promise<IDBDatabase>((resolve, reject) => {
     let rejected = false;
@@ -27,6 +30,11 @@ export async function openIndexedDb(name = 'hue-workspace-v1'): Promise<Transact
     opening.onblocked = () => { rejected = true; reject(new StoreError('UNAVAILABLE', 'Database upgrade blocked by another tab')); };
   });
   db.onversionchange = () => db.close();
+  function durable(tables: string[]): IDBTransaction {
+    try { return db.transaction(tables, 'readwrite', { durability: 'strict' }); }
+    catch { return db.transaction(tables, 'readwrite'); }
+  }
+  type Clock = { vaultId: string; revision: number; elapsedMs: number };
 
   async function read<T>(table: string, key: IDBValidKey): Promise<T | null> {
     const tx = db.transaction(table, 'readonly'), done = finished(tx);
@@ -34,7 +42,32 @@ export async function openIndexedDb(name = 'hue-workspace-v1'): Promise<Transact
     catch (error) { await done.catch(() => {}); throw error; }
   }
   return {
-    load: vault => read<CommittedWorkspace>('workspaces', vault),
+    async load(vault) {
+      const tx = db.transaction(['workspaces', 'clocks'], 'readonly'), done = finished(tx);
+      try {
+        const [workspace, clock] = await Promise.all([
+          request<CommittedWorkspace | undefined>(tx.objectStore('workspaces').get(vault)),
+          request<Clock | undefined>(tx.objectStore('clocks').get(vault)),
+        ]);
+        await done;
+        if (!workspace) return null;
+        return clock?.revision === workspace.localRevision ? { ...workspace, clockElapsedMs: clock.elapsedMs } : workspace;
+      } catch (error) { await done.catch(() => {}); throw error; }
+    },
+    async checkpointClock(vaultId, revision, elapsedMs) {
+      if (!Number.isSafeInteger(elapsedMs) || elapsedMs < 0) return false;
+      const tx = durable(['workspaces', 'clocks']), done = finished(tx);
+      try {
+        const clocks = tx.objectStore('clocks');
+        const [workspace, clock] = await Promise.all([
+          request<CommittedWorkspace | undefined>(tx.objectStore('workspaces').get(vaultId)),
+          request<Clock | undefined>(clocks.get(vaultId)),
+        ]);
+        if (workspace?.localRevision !== revision) { await done; return false; }
+        if (clock?.revision !== revision || elapsedMs > clock.elapsedMs) clocks.put({ vaultId, revision, elapsedMs });
+        await done; return true;
+      } catch (error) { await done.catch(() => {}); throw error; }
+    },
     readOperation: (vault, id) => read<OperationReceipt>('operations', [vault, id]),
     async listFacts(vault) {
       const tx = db.transaction('facts', 'readonly'), done = finished(tx);
@@ -44,9 +77,7 @@ export async function openIndexedDb(name = 'hue-workspace-v1'): Promise<Transact
     async commit(command) {
       // All hashing/validation happens BEFORE opening the transaction. No network awaits inside it.
       await validateCommand(command);
-      let tx: IDBTransaction;
-      try { tx = db.transaction(['workspaces', 'operations', 'facts'], 'readwrite', { durability: 'strict' }); }
-      catch { tx = db.transaction(['workspaces', 'operations', 'facts'], 'readwrite'); }
+      const tx = durable(['workspaces', 'operations', 'facts']);
       const done = finished(tx);
       try {
         const operations = tx.objectStore('operations');

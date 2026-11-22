@@ -1,6 +1,7 @@
 import { Capacitor } from '@capacitor/core';
 import { StartupTimeline } from '@danilah/mini-games-kit/startup';
 import { createPlatform } from './app/platform';
+import { configuredDailySource } from './app/dailyCatalog';
 import { openIndexedDb } from './local-store/indexed-db';
 import { mountGame } from './game/mountGame';
 
@@ -33,7 +34,9 @@ async function start(): Promise<void> {
       : await openIndexedDb();
     startup.mark('storageReady');
     const feedback = Capacitor.isNativePlatform() ? { haptic: (await import('./app/nativeFeedback')).nativeHaptic, exportFiles: (await import('./app/nativeExport')).nativeExportFiles } : {};
-    app = await mountGame(document.querySelector<HTMLElement>('#game-root')!, store, platform.activity, feedback);
+    const dailySource = configuredDailySource(import.meta.env.VITE_DAILY_PUBLICATION_URL);
+    app = await mountGame(document.querySelector<HTMLElement>('#game-root')!, store, platform.activity,
+      dailySource ? { ...feedback, dailySource } : feedback);
     startup.mark('firstFrame');
     cover.hidden = true;
     for (let i = 0; i < 2; i++) await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));

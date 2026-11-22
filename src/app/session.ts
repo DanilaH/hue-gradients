@@ -14,6 +14,7 @@ export const GUEST_VAULT = 'guest-local-v1';
 export class Session {
   state!: Workspace;
   revision = 0;
+  clockElapsedMs = 0;
   pending: PreparedCommit | null = null;
   private readonly hashes = new Map<string, Promise<string>>();
   private readonly digest = (payload: string): Promise<string> => {
@@ -27,6 +28,7 @@ export class Session {
     if (saved) {
       if (saved.schemaVersion !== 1 || saved.vaultId !== GUEST_VAULT || !Number.isSafeInteger(saved.localRevision) || saved.localRevision < 1) throw new StoreError('CORRUPT', 'Invalid workspace envelope');
       this.state = decodeWorkspace(saved.snapshotJson, this.fingerprints); this.revision = saved.localRevision;
+      this.clockElapsedMs = saved.clockElapsedMs ?? 0;
       if (this.state.creative) await validateCreativeHashes(this.state.creative, this.digest);
       const upgraded = upgradeWorkspace(this.state, this.fingerprints);
       if (upgraded !== this.state) {
@@ -102,7 +104,7 @@ export class Session {
     if (!saved || saved.localRevision < command.expectedRevision + 1) throw new StoreError('CORRUPT', 'Committed snapshot unavailable');
     const decoded = decodeWorkspace(saved.snapshotJson, this.fingerprints);
     if (decoded.creative) await validateCreativeHashes(decoded.creative, this.digest);
-    this.state = decoded; this.revision = saved.localRevision; this.pending = null;
+    this.state = decoded; this.revision = saved.localRevision; this.clockElapsedMs = saved.clockElapsedMs ?? 0; this.pending = null;
   }
   async act(action: Action | CreativeAction): Promise<boolean> {
     const creativeAction = action.kind.startsWith('editor-') || action.kind.startsWith('author-') ? action as CreativeAction : undefined;

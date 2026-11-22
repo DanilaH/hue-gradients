@@ -11,7 +11,8 @@ import { renderProgress } from './progressView';
 
 type PickerRoute = { kind: 'chapter'; levelId: string; chapterMenu?: number };
 export type MetaRoute = PickerRoute | AlbumRoute | { kind: 'card' | 'copy'; levelId: string } |
-  { kind: 'own-card'; workId: string; nodeId: string } | { kind: 'draft'; draftId: string; nodeId?: string } | { kind: 'progress' | 'daily' | 'personal' | 'books' | 'cycle-review' } | { kind: 'challenges'; group?: 'chapter' | 'geometry' };
+  { kind: 'own-card'; workId: string; nodeId: string } | { kind: 'draft'; draftId: string; nodeId?: string } |
+  { kind: 'progress' | 'personal' | 'books' } | { kind: 'daily'; date?: string } | { kind: 'challenges'; group?: 'chapter' | 'geometry' };
 interface MetaView {
   route: MetaRoute; state: Workspace; disabled: boolean;
   title: HTMLElement; copy: HTMLElement; actions: HTMLElement;
@@ -20,8 +21,8 @@ interface MetaView {
   repeat(id: string): void;
   playChallenge(id: string, restart: boolean): void;
   playTimed(): void;
-  dailyAvailable: boolean;
   dailyLoading: boolean;
+  retryDaily?: () => void;
   playDaily(date: string, replay: boolean): void;
   playPersonal(key: string, restart: boolean): void;
 }
@@ -227,11 +228,9 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
   const personalLink = button('Задания', () => v.navigate({ kind: 'personal' }), links);
   personalLink.className = 'quiet level-chapter-link';
   personalLink.setAttribute('aria-label', 'Задания');
-  if (v.dailyAvailable) {
-    const dailyLink = button('Задача дня', () => v.navigate({ kind: 'daily' }), links);
-    dailyLink.className = 'quiet level-chapter-link';
-    dailyLink.setAttribute('aria-label', 'Задача дня');
-  }
+  const dailyLink = button('Задача дня', () => v.navigate({ kind: 'daily' }), links);
+  dailyLink.className = 'quiet level-chapter-link';
+  dailyLink.setAttribute('aria-label', 'Задача дня');
 }
 
 const russianDate = new Intl.DateTimeFormat('ru', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
@@ -320,11 +319,6 @@ export function renderMeta(v: MetaView): void {
       card.className = 'quiet';
       card.dataset.event = slot.feature!.id;
     }
-    if (state.completed.length === levels.length) button('Новый цикл', () => v.navigate({ kind: 'cycle-review' })).className = 'quiet';
-  } else if (route.kind === 'cycle-review') {
-    v.title.textContent = 'Новый цикл';
-    label('Правила переноса прогресса в новый цикл ещё не утверждены. Коллекция и права сохраняются.');
-    button('Отмена', v.back);
   } else if (route.kind === 'personal') {
     v.title.textContent = 'Личные задания';
     menuBack();
@@ -374,7 +368,12 @@ export function renderMeta(v: MetaView): void {
     const dates = Object.keys(catalog?.slots ?? {}).sort().reverse();
     if (!dates.length) {
       label(v.dailyLoading ? 'Проверяем календарь…' : 'Календарь пока недоступен.', 'menu-note').setAttribute('role', 'status');
+      if (v.retryDaily) button('Повторить загрузку', v.retryDaily, actions, v.dailyLoading).className = 'quiet';
       return;
+    }
+    if (v.retryDaily) {
+      label('Показан сохранённый календарь.', 'menu-note').setAttribute('role', 'status');
+      button('Повторить загрузку', v.retryDaily, actions, v.dailyLoading).className = 'quiet';
     }
     const list = document.createElement('div');
     list.className = 'menu-list';
@@ -401,8 +400,11 @@ export function renderMeta(v: MetaView): void {
     list.className = 'menu-list';
     const timed = state.timedProgress;
     const timedButton = button('', v.playTimed);
-    menuRow(timedButton, timed && timed.run.remainingMs > 0 ? 'Продолжить заезд' : 'Заезд на время',
-      timed?.finished ? `10 минут · Рекорд · ${timed.best}` : '10 минут');
+    const remainingSeconds = Math.ceil((timed?.run.remainingMs ?? 0) / 1000);
+    const continuing = remainingSeconds > 0;
+    const duration = continuing ? `${Math.floor(remainingSeconds / 60)}:${String(remainingSeconds % 60).padStart(2, '0')} осталось` : '10 минут';
+    menuRow(timedButton, continuing ? 'Продолжить заезд' : 'Заезд на время',
+      timed?.finished ? `${duration} · Рекорд · ${timed.best}` : duration);
     actions.append(tabs, list);
     for (const definition of route.group === 'chapter' ? chapterChallenges : route.group === 'geometry' ? geometryChallenges : challenges) {
       const { level, requiredWorks, moveLimit } = definition;
