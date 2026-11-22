@@ -55,3 +55,11 @@ test('expiration takes priority over a late swap and the next run does not dupli
   expect(replay.run).toMatchObject({ id: 'second', cleared: 0, remainingMs: 600_000 });
   expect(replay.run.attempt.board).not.toEqual(start.run.attempt.board);
 });
+
+test('the result can start a new run directly and retain its source tab', () => {
+  const start = applyTimed(undefined, { kind: 'timed-open', id: 'first', now: 1_000, entry: 'geometry' })!;
+  const end = applyTimed(start, { kind: 'timed-expire', now: 601_000 })!;
+  expect(end).toMatchObject({ active: true, finished: 1, entry: 'geometry' });
+  const replay = applyTimed(end, { kind: 'timed-open', id: 'second', now: 602_000, entry: end.entry! })!;
+  expect(replay).toMatchObject({ active: true, finished: 1, entry: 'geometry', run: { id: 'second', remainingMs: 600_000 } });
+});

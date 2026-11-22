@@ -17,14 +17,17 @@ interface TimedRun {
   readonly attempt: Attempt;
   readonly field?: LevelDefinition;
 }
+type TimedEntry = 'chapter' | 'geometry';
+
 export interface TimedProgress {
   readonly active: boolean;
+  readonly entry?: TimedEntry;
   readonly best: number;
   readonly finished: number;
   readonly run: TimedRun;
 }
 export type TimedAction =
-  | { kind: 'timed-open'; id: string; now: number }
+  | { kind: 'timed-open'; id: string; now: number; entry?: TimedEntry }
   | { kind: 'timed-pause'; now: number }
   | { kind: 'timed-resume'; now: number }
   | { kind: 'timed-leave'; now: number }
@@ -44,18 +47,21 @@ function settleClock(progress: TimedProgress, now: number, active: boolean): Tim
   const { run } = progress;
   const remainingMs = timedRemaining(run, now);
   const justFinished = remainingMs === 0 && run.remainingMs > 0;
-  return { active, best: justFinished ? Math.max(progress.best, run.cleared) : progress.best,
+  return { ...progress, active, best: justFinished ? Math.max(progress.best, run.cleared) : progress.best,
     finished: progress.finished + Number(justFinished), run: { ...run, remainingMs, startedAt: null } };
 }
 
 export function applyTimed(progress: TimedProgress | undefined, action: TimedAction): TimedProgress | undefined {
   if (!safeCounter(action.now)) return progress;
   if (action.kind === 'timed-open') {
-    if (progress?.active) return progress;
-    if (progress && progress.run.remainingMs > 0) return { ...progress, active: true, run: { ...progress.run, startedAt: action.now } };
+    if (progress?.active && progress.run.remainingMs > 0) return progress;
+    const source = action.entry ? { entry: action.entry } : {};
+    if (progress && progress.run.remainingMs > 0) return {
+      ...source, active: true, best: progress.best, finished: progress.finished, run: { ...progress.run, startedAt: action.now },
+    };
     if (!/^[a-zA-Z0-9._-]{1,120}$/.test(action.id) || progress?.run.id === action.id) return progress;
     const field = timedField(action.id, 0);
-    return { active: true, best: progress?.best ?? 0, finished: progress?.finished ?? 0, run: {
+    return { ...source, active: true, best: progress?.best ?? 0, finished: progress?.finished ?? 0, run: {
       id: action.id, cleared: 0, remainingMs: TIME_TRIAL_MS, startedAt: action.now,
       field, attempt: createAttempt(field, attemptKey(action.id, 0)),
     } };
@@ -83,7 +89,7 @@ export function applyTimed(progress: TimedProgress | undefined, action: TimedAct
 
 export function validateTimedProgress(progress: TimedProgress): void {
   const run = progress?.run;
-  if (!run || typeof progress.active !== 'boolean' || !safeCounter(progress.best) || !safeCounter(progress.finished) ||
+  if (!run || (progress.entry !== undefined && progress.entry !== 'chapter' && progress.entry !== 'geometry') || typeof progress.active !== 'boolean' || !safeCounter(progress.best) || !safeCounter(progress.finished) ||
       typeof run.id !== 'string' || !/^[a-zA-Z0-9._-]{1,120}$/.test(run.id) || !safeCounter(run.cleared) ||
       !safeCounter(run.remainingMs) || run.remainingMs > TIME_TRIAL_MS ||
       (run.startedAt !== null && (!progress.active || run.remainingMs === 0 || !safeCounter(run.startedAt))) ||

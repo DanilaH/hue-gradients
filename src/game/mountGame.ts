@@ -332,7 +332,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   }
   function showBook(bookId: string, slot?: number): void {
     metaReturn = gameLayer();
-    metaHistory = [{ kind: 'album', tab: 'campaign' }, { kind: 'books' }];
+    metaHistory = [{ kind: 'chapter', levelId: session.state.activeLevelId }, { kind: 'album', tab: 'campaign' }, { kind: 'books' }];
     metaRoute = { kind: 'book', bookId, ...(slot !== undefined ? { slot } : {}) };
     layer = 'meta';
     if (newlyFilled?.bookId === bookId && newlyFilled.slot === slot) {
@@ -426,13 +426,15 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     });
   }
   function playTimed(): void {
-    void run({ kind: 'timed-open', id: crypto.randomUUID(), now: clockNow() }, () => {
+    const entry = layer === 'meta' && metaRoute.kind === 'challenges' ? metaRoute.group : current().timed?.entry;
+    void run({ kind: 'timed-open', id: crypto.randomUUID(), now: clockNow(), ...(entry ? { entry } : {}) }, () => {
       metaHistory = [];
       layer = gameLayer();
     });
   }
   function leaveTimed(): void {
-    void run({ kind: 'timed-leave', now: clockNow() }, () => challengeLobby());
+    const entry = current().timed?.entry;
+    void run({ kind: 'timed-leave', now: clockNow() }, () => challengeLobby(entry));
   }
   function activeClock() {
     return activeTimed(session.state.timedProgress)?.run ?? activePersonal(session.state.personalProgress)?.clock;
@@ -591,7 +593,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       if (won) colourPrism(prism, level);
       byId('dialog-title').textContent = won ? 'Задание выполнено' : personal.clock ? 'Время вышло' : personal.repeatRecord ? 'Рекорд не повторён' : 'Рекорд не улучшен';
       byId('dialog-copy').textContent = personalTaskName(personal);
-      button('К заданиям', leavePersonal);
+      if (!won && personal.date === localCalendarDay()) button('Повторить', () => playPersonal(personal.key, true));
+      button('К заданиям', leavePersonal, !won && personal.date === localCalendarDay());
     } else if (layer === 'result' && daily) {
       colourPrism(prism, level);
       byId('dialog-title').textContent = 'Задача собрана';
@@ -600,7 +603,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     } else if (layer === 'result' && timed) {
       byId('dialog-title').textContent = 'Время вышло';
       byId('dialog-copy').textContent = `Собрано · ${timed.run.cleared} · Рекорд · ${timed.best}`;
-      button('К испытаниям', leaveTimed);
+      button('Новый заезд', playTimed);
+      button('К испытаниям', leaveTimed, true);
     } else if (layer === 'result' && challenge) {
       const won = challenge.status === 'won';
       if (won) colourPrism(prism, level);
@@ -650,7 +654,10 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
         if (challenge) { playChallenge(level.id, true, currentBook(), session.state.challengeProgress?.entry); return; }
         if (personal) { playPersonal(personal.key, true); return; }
         if (daily) { playDaily(daily.date, true); return; }
-        void run(own ? { kind: 'author-start', workId: own.work.workId, nodeId: own.node.nodeId, attemptId: crypto.randomUUID(), restart: true } : { kind: 'restart', levelId: restartLevelId ?? level.id, attemptId: crypto.randomUUID(), ...(currentBook() ? { book: currentBook()! } : {}) }, () => { metaHistory = []; layer = 'none'; });
+        const book = restartReturn === 'settings' ? currentBook() : undefined;
+        void run(own ? { kind: 'author-start', workId: own.work.workId, nodeId: own.node.nodeId, attemptId: crypto.randomUUID(), restart: true }
+          : { kind: 'restart', levelId: restartLevelId ?? level.id, attemptId: crypto.randomUUID(), ...(book ? { book } : {}) },
+          () => { metaHistory = []; layer = 'none'; });
       });
       button('Отмена', cancelRestart, true);
     } else if (layer === 'settings') {
@@ -674,17 +681,35 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
           if (key === 'music' && input.checked) music.unlock();
           void run({ kind: 'preferences', key, value: input.checked });
         };
-        const title = document.createElement('span'); title.textContent = label; row.append(title, input); actions.append(row);
+        const title = document.createElement('span'); title.textContent = label;
+        const status = document.createElement('small');
+        status.textContent = input.checked ? 'Вкл.' : 'Выкл.';
+        status.setAttribute('aria-hidden','true');
+        row.append(title, status, input); actions.append(row);
       }
       button('Продолжить', resumeBoard, true);
     } else if (layer === 'help-menu') {
       byId('dialog-title').textContent = 'Помощь';
-      byId('dialog-copy').textContent = 'Подсветка и просмотр не добавят ходов. Любая помощь отмечает результат «С помощью».';
-      button('Показать одну плитку', () => {
+      byId('dialog-copy').textContent = 'Любая помощь даёт отметку «С помощью».';
+      const helpAction = (title: string, kind: 'pulse' | 'preview' | 'auto', detail: string, invoke: () => void) => {
+        const action = button(title, invoke, true);
+        action.classList.add('help-option');
+        action.setAttribute('aria-label', kind === 'auto' ? `${title} · ${detail}` : title);
+        const example = document.createElement('span');
+        example.className = 'help-example'; example.dataset.sample = kind; example.setAttribute('aria-hidden','true');
+        for (let index = 0; index < 4; index++) example.append(document.createElement('i'));
+        const caption = document.createElement('span'); caption.textContent = title;
+        const cost = document.createElement('small'); cost.textContent = detail;
+        action.replaceChildren(example, caption, cost);
+        const id = `help-cost-${kind}`;
+        cost.id = id;
+        action.setAttribute('aria-describedby',id);
+      };
+      helpAction('Показать одну плитку', 'pulse', '0 ходов', () => {
         if (attempt) askHelp({ kind: 'pulse', scanFrom: Math.floor(Math.random() * attempt.board.length) });
-      }, true);
-      button('Показать готовое поле', () => askHelp({ kind: 'preview' }), true);
-      button(`Сделать один обмен · +${AUTO_HELP_COST} хода`, () => askHelp({ kind: 'auto' }), true);
+      });
+      helpAction('Показать готовое поле', 'preview', '0 ходов', () => askHelp({ kind: 'preview' }));
+      helpAction('Сделать один обмен', 'auto', `+${AUTO_HELP_COST} хода`, () => askHelp({ kind: 'auto' }));
       button('Отмена', () => { back(); }, true);
     } else if (layer === 'pin-guide') {
       byId('dialog-title').textContent = 'Закреплённые плитки';
@@ -886,13 +911,14 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     const pair = ordinarySwap ? action : autoSwap && previous ? autoHelpSwap(previousLevel, previous) : null;
     const cost = autoSwap ? AUTO_HELP_COST : 1;
     const foreground = foregroundEpoch;
-    let swapAccepted = false, succeeded = false;
+    let swapAccepted = false, succeeded = false, saved = false;
     busy = true; render();
     try {
       const changed = await session.act(action);
       if (!alive) return false;
       succeeded = true;
       if (changed) {
+        saved = true;
         notice = '';
         if (pair) clearMark();
         if (origin && book && unfilled && bookProgress(book, session.state).goals[origin.slot]?.completed) newlyFilled = origin;
@@ -916,6 +942,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
         setVictoryPhase('approach');
       }
       render(); resize();
+      if (saved && action.kind === 'preferences' && action.value && foreground === foregroundEpoch
+          && (action.key === 'sound' || action.key === 'haptics')) feedback.sample(action.key);
       if (eligible && timedBefore && timed?.run.cleared === timedBefore.run.cleared + 1) feedback.accepted('win');
       if (acceptedPair && previous && next) {
         scene.presentSwap(previous, next, acceptedPair.from, acceptedPair.to, motionAllowed(), cost);

@@ -99,6 +99,12 @@ export function levelPreview(state: Workspace, id: string) {
 const pickChapter = (state: Workspace, index: number) => `Глава ${index+1} · ${chapterCount(state,index)}/${chapters[index]!.levelIds.length}`;
 const chapterRequirement = (index: number) => `Соберите ${META_POLICY.chapterAt} работ главы ${index}`;
 
+function levelRequirement(state: Workspace, level: LevelDefinition): string {
+  const index = chapterIndexFor(level.id);
+  if (!chapterIsOpen(state,index)) return chapterRequirement(index);
+  return `Соберите уровень ${level.ordinal <= 5 ? level.ordinal - 1 : 5}`;
+}
+
 function chapterStrips(v: MetaView, selected: number | undefined, choose: (index: number) => void): HTMLElement {
   const strips = document.createElement('div'); strips.className = 'chapter-strips';
   const hint = document.createElement('p'); hint.className = 'chapter-note'; hint.setAttribute('aria-live','polite');
@@ -279,8 +285,7 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
   details.append(selection);
   if (selectedState === 'Закрыт') {
     const requirement = document.createElement('p'); requirement.className = 'chapter-note';
-    const ordinal = getLevel(route.levelId).ordinal;
-    requirement.textContent = `Соберите уровень ${ordinal <= 5 ? ordinal - 1 : 5}`; details.append(requirement);
+    requirement.textContent = levelRequirement(state,getLevel(route.levelId)); details.append(requirement);
   } else button(label, activate, details).dataset.levelAction = '';
   actions.append(rail);
   chapter.levelIds.forEach((id, number) => {
@@ -429,12 +434,14 @@ export function renderMeta(v: MetaView): void {
       tile.dataset.earned = String(earned);
       tile.dataset.selected = String(selected === index);
       if (earned) {
+        tile.setAttribute('role','img');
         tile.setAttribute('aria-label', `${number} · Выполнено`);
+        tile.title = 'Выполнено';
         slots.append(tile);
       } else {
         const text = document.createElement('strong'); text.textContent = number;
         const detail = document.createElement('small');
-        detail.textContent = !open ? 'Закрыто' : caption;
+        detail.textContent = open ? caption : challenge ? `Соберите ${challenge.requiredWorks} работ` : levelRequirement(state,level);
         tile.append(text, detail);
       }
       if (goal.completed) {

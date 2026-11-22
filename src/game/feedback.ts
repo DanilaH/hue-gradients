@@ -61,5 +61,12 @@ export class GameFeedback {
         return buffer;
       } });
   }
+  sample(channel: 'sound' | 'haptics'): void {
+    if (this.blocked) return;
+    if (channel === 'sound') this.sound('setting');
+    else if (this.preferences.haptics) {
+      try { this.haptic('swap'); } catch { /* A device may not support vibration. */ }
+    }
+  }
   destroy(): void { this.player.dispose(); }
 }

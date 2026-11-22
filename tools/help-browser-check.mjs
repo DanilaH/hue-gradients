@@ -45,11 +45,12 @@ async function solveFirst(page) {
 async function cardDetails(page) {
   await button(page, 'В альбом').click();
   const records = page.locator('.work-card-records');
+  await page.getByLabel('Действия с работой').click();
   assert(await records.isVisible());
   return records;
 }
 async function replay(page) {
-  await page.getByLabel('Действия с работой').click();
+  if (!(await page.locator('.work-card-options[open]').count())) await page.getByLabel('Действия с работой').click();
   await button(page, 'Повторить работу').click();
   await button(page, 'Начать заново').click();
   await layer(page, 'none');
@@ -168,6 +169,7 @@ try {
   assert.match(await helpedCard.innerText(), /Минимум — 1.*Рекорд с помощью — 3/s);
   assert.equal(await helpedCard.getByText('Идеально без помощи').count(), 0);
   await record(soft, 'assisted', 17);
+  await soft.keyboard.press('Escape');
   await button(soft, '‹ Назад').click();
   await button(soft, 'Дальше').click();
   await idle(soft);

@@ -47,5 +47,29 @@
       }
     },
     "limits": "Production app entrypoints and separately served staging publication. Offline restart uses local packaged shell bytes; browser network is disabled. No live publication or native binary."
+  },
+  "standalone": {
+    "browser": "141.0.7390.37",
+    "authoredSnapshot": true,
+    "emptyArchiveBack": true,
+    "completedLevel": "gradient-daily-001",
+    "moves": 4,
+    "sameDailyStartOnTwoProfiles": true,
+    "acrossUtcMidnight": [
+      "2026-11-21",
+      "2026-11-22"
+    ],
+    "verifiedWireBytes": true,
+    "corruptUpdatePreservedArchive": true,
+    "bankPasses": [],
+    "reusedOldVersion": "3bf12ec2967c1dc8f125b17a3116a544ba5a51eb58664aee723a9b1076866aab",
+    "newVersion": "423754bb9136b80522b3b7bbb9256c30a4e9969b9598577179d7f0d70735a411",
+    "offlineReplay": true,
+    "distinctWins": [
+      "2026-11-21"
+    ],
+    "clipStartMillis": 3560,
+    "clipMillis": 4203,
+    "limits": "Injected dated feed and trusted clock. No public source, shared rewards or native runtime."
   }
 }

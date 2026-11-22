@@ -270,7 +270,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 04",
-      "currentImplementation": "Треугольники разной ориентации и разные формы не обмениваются; совместимые обмены проверены. | https://github.com/DanilaH/hue-gradients/blob/493b2415967e77f7c61bdb471e8db06677f63eb8/tools/shape-browser-check.mjs",
+      "currentImplementation": "Треугольники разной ориентации и разные формы не обмениваются; совместимые обмены проверены. | https://github.com/DanilaH/hue-gradients/blob/493b2415967e77f7c61bdb471e8db06677f63eb8/tools/shape-browser-check.mjs В 0.4.39 в пробе форм проверены допустимая и недопустимая пары без записи в профиль.",
       "nextAction": "Перепроверить взаимодействие, форму, отклик и различимость RGB на физическом телефоне (G1).",
       "deliveryPackage": "04",
       "sourceNextCheck": "На прототипе проверить, как игрок видит допустимые пары разных форм."
@@ -350,7 +350,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "MATCH",
       "stage": "Пакет 03",
-      "currentImplementation": "Финал главы открыт только после всех обычных задач своего набора; проверены 14/15, 15/15 и повтор с одной разблокировкой. | https://github.com/DanilaH/hue-gradients/blob/a976384455eeb503df89fb45898727d6f35e9808/tools/chapter-challenge-browser-check.mjs",
+      "currentImplementation": "Финал главы открыт только после всех обычных задач своего набора; проверены 14/15, 15/15 и повтор с одной разблокировкой. | https://github.com/DanilaH/hue-gradients/blob/a976384455eeb503df89fb45898727d6f35e9808/tools/chapter-challenge-browser-check.mjs В 0.4.39 знак открывает финал при 15/15; победа возвращает к полосе с рекордом.",
       "nextAction": "Повторить первое открытие, reload, Back и отображение цветов на телефоне (G1).",
       "deliveryPackage": "03",
       "sourceNextCheck": "Сравнить одно испытание главы с обычной новой главой."
@@ -370,7 +370,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 01",
-      "currentImplementation": "Автообмен выбирает дальнюю неверную позицию и добавляет три хода одной транзакцией. Проверены победа, незавершённое поле и восстановление без дубля в Chromium. Физический счётчик оригинала ещё не записан. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/domain/puzzle.ts",
+      "currentImplementation": "Автообмен выбирает дальнюю неверную позицию и добавляет три хода одной транзакцией. Проверены победа, незавершённое поле и восстановление без дубля в Chromium. Физический счётчик оригинала ещё не записан. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/domain/puzzle.ts В 0.4.41 стоимость показана заранее; на 001 сохраняются 3 хода и помощь.",
       "nextAction": "Подтвердить счётчик в оригинале и наш отклик на телефоне.",
       "deliveryPackage": "01",
       "sourceNextCheck": "Сравнить автоматический правильный обмен с preview; решение владельца открыто."
@@ -400,7 +400,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 05",
-      "currentImplementation": "Отдельная задача предлагает прежний уровень с достижимой целью на ход лучше. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs PR №8/D2: Для идеального результата добавлена цель «Повторить рекорд» с удержанием математического минимума.",
+      "currentImplementation": "Отдельная задача предлагает прежний уровень с достижимой целью на ход лучше. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs PR №8/D2: Для идеального результата добавлена цель «Повторить рекорд» с удержанием математического минимума. В 0.4.37 кристалл открывает реальную цель и повтор рекорда.",
       "nextAction": "Проверить смысл трёх целей и время на физическом телефоне (G1).",
       "deliveryPackage": "05",
       "sourceNextCheck": "Прототип из уже решённой работы, последний допустимый ход засчитывается."
@@ -410,7 +410,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 05",
-      "currentImplementation": "Поле без помощи с локальным лимитом времени. Истечение проверено в Chromium. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs PR №8/D2: Лимит зависит от минимума, числа подвижных плиток и отдельного коэффициента для финала главы. В 0.4.35 тот же таймер пережил два перезапуска до и после обмена.",
+      "currentImplementation": "Поле без помощи с локальным лимитом времени. Истечение проверено в Chromium. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs PR №8/D2: Лимит зависит от минимума, числа подвижных плиток и отдельного коэффициента для финала главы. В 0.4.35 тот же таймер пережил два перезапуска до и после обмена. В 0.4.37 песочные часы показывают остаток сохранённой попытки.",
       "nextAction": "Проверить смысл трёх целей и время на физическом телефоне (G1).",
       "deliveryPackage": "05",
       "sourceNextCheck": "Проверить границу таймера и возобновление после паузы."
@@ -420,7 +420,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 05",
-      "currentImplementation": "Первое поле будущей закрытой главы доступно отдельно; в кампании оно не открывается. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs PR №8/D2: Сложное задание выбирается из непройденных полей, в том числе после открытия всех глав.",
+      "currentImplementation": "Первое поле будущей закрытой главы доступно отдельно; в кампании оно не открывается. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs PR №8/D2: Сложное задание выбирается из непройденных полей, в том числе после открытия всех глав. В 0.4.37 мозаика использует выданное поле и его палитру.",
       "nextAction": "Проверить смысл трёх целей и время на физическом телефоне (G1).",
       "deliveryPackage": "05",
       "sourceNextCheck": "Проверить выдачу на профилях с разным прогрессом."
@@ -430,7 +430,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 05",
-      "currentImplementation": "История личных заданий сохраняет одну отметку на задание и дату, повтор не дублирует. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs PR №8/D2: После коррекции даты сохраняются история, выданные поля и одна отметка за повтор.",
+      "currentImplementation": "История личных заданий сохраняет одну отметку на задание и дату, повтор не дублирует. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs PR №8/D2: После коррекции даты сохраняются история, выданные поля и одна отметка за повтор. В 0.4.37 проверены четыре даты, откат календаря и повтор без дубля.",
       "nextAction": "Проверить смысл трёх целей и время на физическом телефоне (G1).",
       "deliveryPackage": "05",
       "sourceNextCheck": "Проверить на двух разных профилях, если вводится личная подборка."
@@ -510,7 +510,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "MATCH",
       "stage": "Пакет 01",
-      "currentImplementation": "Готовое поле показывается после явного выбора. Открытие учитывается один раз. Возврат сохраняет доску и ходы. Проверено в Chromium. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/mountGame.ts",
+      "currentImplementation": "Готовое поле показывается после явного выбора. Открытие учитывается один раз. Возврат сохраняет доску и ходы. Проверено в Chromium. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/mountGame.ts В 0.4.41 образец изолирован; игровое решение открывает отдельная команда.",
       "nextAction": "Проверить показ и системный Back на телефоне.",
       "deliveryPackage": "01",
       "sourceNextCheck": "Открыть/закрыть preview в незавершённой партии."
@@ -520,7 +520,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "MATCH",
       "stage": "Пакет 01",
-      "currentImplementation": "После подтверждения циклический поиск выделяет одну неверную подвижную плитку. Ходы и перестановка прежние, при reduced motion контур статичен. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/mountGame.ts",
+      "currentImplementation": "После подтверждения циклический поиск выделяет одну неверную подвижную плитку. Ходы и перестановка прежние, при reduced motion контур статичен. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/mountGame.ts В 0.4.41 миниатюра изолирована; отдельная команда применяет реальную помощь.",
       "nextAction": "Проверить различимость контура на телефоне.",
       "deliveryPackage": "01",
       "sourceNextCheck": "Проверить мягкую помощь без раскрытия назначения и без автоматического хода."
@@ -570,7 +570,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 03",
-      "currentImplementation": "Полусон использует 10 минут и считает собранные поля. Игра сохраняет остаток и отдельный рекорд. Проверены второе поле, фон, истечение и повтор. Банк своих полей до 6×5. | https://github.com/DanilaH/hue-gradients/blob/ed67542ba6c76a198c487600a296c27fd6c838f4/tools/timed-trial-browser-check.mjs PR №8/B3: новый 7×7 банк с перемешиванием и сменой опор, монотонные часы. Пройдено семь полей и завершён заезд из 0.4.25. 0.4.35 восстанавливает монотонную отметку той же попытки после двух перезапусков в Chromium.",
+      "currentImplementation": "Полусон использует 10 минут и считает собранные поля. Игра сохраняет остаток и отдельный рекорд. Проверены второе поле, фон, истечение и повтор. Банк своих полей до 6×5. | https://github.com/DanilaH/hue-gradients/blob/ed67542ba6c76a198c487600a296c27fd6c838f4/tools/timed-trial-browser-check.mjs PR №8/B3: новый 7×7 банк с перемешиванием и сменой опор, монотонные часы. Пройдено семь полей и завершён заезд из 0.4.25. 0.4.35 восстанавливает монотонную отметку той же попытки после двух перезапусков в Chromium. В 0.4.41 на результате можно начать новый заезд и сохранить источник возврата.",
       "nextAction": "Повторить обновление, фон и перезапуск на Android с миграцией SQLite (G1).",
       "deliveryPackage": "03",
       "sourceNextCheck": "Зафиксировать паузу/таймер/новое поле до оценки."
@@ -590,7 +590,7 @@
       "status": "ROADMAPPED",
       "gap": "PARTIAL",
       "stage": "Пакет 07",
-      "currentImplementation": "У нас 1–6 × 1–5, собственные проверки и живое редактирование углов. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/editor.ts E2: принята передача точной проверенной ревизии, безопасный отказ импорта и повторное решение без кампанийного кредита. | https://github.com/DanilaH/hue-gradients/blob/2540d4f2e448e1727bd3a3b389fbc88acd07000e/tools/transfer-browser-check.mjs",
+      "currentImplementation": "У нас 1–6 × 1–5, собственные проверки и живое редактирование углов. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/editor.ts E2: принята передача точной проверенной ревизии, безопасный отказ импорта и повторное решение без кампанийного кредита. | https://github.com/DanilaH/hue-gradients/blob/2540d4f2e448e1727bd3a3b389fbc88acd07000e/tools/transfer-browser-check.mjs В 0.4.40 угол, опора, авторское испытание и возврат проверены одним дублем.",
       "nextAction": "Проверить Android отправку, системный выбор JSON и обои на телефоне (G1).",
       "deliveryPackage": "07",
       "sourceNextCheck": "Сравнить редактор на старом черновике и одномерной работе."
@@ -720,7 +720,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 01",
-      "currentImplementation": "Подписанный APK включает системное действие для того же PNG. В Chromium заглушки отказа и отмены сохраняют путь «Сохранить PNG». | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/native/android/app/src/main/java/com/danilah/huegradients/HueExportPlugin.java",
+      "currentImplementation": "Подписанный APK включает системное действие для того же PNG. В Chromium заглушки отказа и отмены сохраняют путь «Сохранить PNG». | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/native/android/app/src/main/java/com/danilah/huegradients/HueExportPlugin.java В 0.4.40 проверены все пиксели восьми полноэкранных PNG.",
       "nextAction": "Открыть настоящий обработчик Android и проверить отказ, отмену и возврат в карточку.",
       "deliveryPackage": "01",
       "sourceNextCheck": "Различать сохранить файл и установить обои в ОС."
@@ -740,7 +740,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "MATCH",
       "stage": "Пакет 06",
-      "currentImplementation": "В карточке можно скопировать работу и редактировать углы. Совпадает цепочка творчества. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/creative.ts",
+      "currentImplementation": "В карточке можно скопировать работу и редактировать углы. Совпадает цепочка творчества. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/creative.ts В 0.4.40 сохранение и повторный импорт задачи подтверждены одним дублем.",
       "nextAction": "Переиспользовать реализованное поведение и пройти регрессию пакета 06.",
       "deliveryPackage": "06",
       "sourceNextCheck": "После копии проверить неизменность оригинала."
@@ -770,7 +770,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 06",
-      "currentImplementation": "На доверенной датированной фикстуре кешированное тематическое событие завершается офлайн и оставляет отметку. | https://github.com/DanilaH/hue-gradients/blob/36df8036981c4d91685ce133878b1719de318437/tools/books-browser-check.mjs В E1 авторская карточка из месячного снимка открылась в книгах; два прохода офлайн оставили одну отметку. E1 также прошёл тот же клиентский загрузчик с проверкой исходных файлов. В 0.4.35 вход в то же событие из календаря или книг определяет возврат и сохраняется после перезапуска.",
+      "currentImplementation": "На доверенной датированной фикстуре кешированное тематическое событие завершается офлайн и оставляет отметку. | https://github.com/DanilaH/hue-gradients/blob/36df8036981c4d91685ce133878b1719de318437/tools/books-browser-check.mjs В E1 авторская карточка из месячного снимка открылась в книгах; два прохода офлайн оставили одну отметку. E1 также прошёл тот же клиентский загрузчик с проверкой исходных файлов. В 0.4.35 вход в то же событие из календаря или книг определяет возврат и сохраняется после перезапуска. В 0.4.38 день и карточка события принимают возврат по источнику. Офлайн проверен на стенде.",
       "nextAction": "Проверить живой источник событий после D1 и показать книгу на телефоне.",
       "deliveryPackage": "06",
       "sourceNextCheck": "Развести постоянный архив, ограниченную тему и сохранение права."

@@ -202,7 +202,8 @@ export function applyAction(state: Workspace, action: Action, fingerprints: Read
     const opening = action.kind === 'challenge-open' || action.kind === 'challenge-restart';
     if (opening && !bookGoal(state, action.book, action.id, true)) return state;
     const challengeProgress = applyChallenge(state, action);
-    if (!challengeProgress) return state;
+    if (!challengeProgress || opening && challengeProgress.active !== action.id ||
+        action.kind === 'challenge-restart' && challengeProgress === state.challengeProgress) return state;
     const attemptId = opening ? challengeProgress.attempts[action.id]?.attemptId : undefined;
     const bookOrigin = opening && challengeProgress.active === action.id && attemptId && action.book
       ? { ...action.book, attemptId } : opening || action.kind === 'challenge-leave' ? null : state.bookOrigin ?? null;
