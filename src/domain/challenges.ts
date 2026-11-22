@@ -1,3 +1,4 @@
+import type { BookTarget } from './workspace';
 import { chapters, getLevel } from './levels';
 import { bookProgress, books, type Book, type BookProof } from './books';
 import { geometryLevels } from './shapeLevels';
@@ -67,8 +68,8 @@ export interface ChallengeProgress {
 }
 
 export type ChallengeAction =
-  | { kind: 'challenge-open'; id: string; attemptId: string }
-  | { kind: 'challenge-restart'; id: string; attemptId: string }
+  | { kind: 'challenge-open'; id: string; attemptId: string; book?: BookTarget }
+  | { kind: 'challenge-restart'; id: string; attemptId: string; book?: BookTarget }
   | { kind: 'challenge-swap'; from: number; to: number; attemptId: string }
   | { kind: 'challenge-leave' };
 

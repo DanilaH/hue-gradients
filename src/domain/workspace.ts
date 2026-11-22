@@ -2,6 +2,7 @@ import { CAMPAIGN_CONTENT_VERSION, CONTENT_VERSION, createAttempt, proposeAssist
 import { getLevel, levels } from './levels';
 import { earnedRights, isKnownRight, levelIsOpen, META_POLICY } from './progression';
 import { initialCreative, validateCreative, type CreativeState } from './creative';
+import { books, bookProgress } from './books';
 import { applyChallenge, validateChallengeProgress, type ChallengeAction, type ChallengeProgress } from './challenges';
 import { applyAdLedger, validateAdLedger, type AdCommand, type AdLedger } from './monetization';
 import { applyPublication, validatePublication, type PublicationCommand, type PublicationState } from './publication';
@@ -20,6 +21,16 @@ export interface AlbumCopy {
   snapshot: Pick<LevelDefinition, 'width' | 'height' | 'solvedTileColors' | 'pinnedPositions' | 'startTileAtPosition' | 'minimumSwaps'>;
   authorCompletions: readonly string[];
 }
+export interface BookTarget { bookId: string; slot: number }
+export interface BookOrigin extends BookTarget { attemptId: string }
+
+function bookGoal(state: Workspace, target: BookTarget | undefined, levelId: string, challenge: boolean): boolean {
+  if (!target) return true;
+  const book = books.find(candidate => candidate.id === target.bookId);
+  const goal = book && bookProgress(book, state).goals[target.slot];
+  return !!goal && !goal.completed && goal.levelId === levelId && (goal.need === 'challenge') === challenge;
+}
+
 export interface Workspace {
   schemaVersion: 1;
   contentVersion: ContentVersion;
@@ -30,6 +41,7 @@ export interface Workspace {
   preferences: Preferences;
   /** Absent in snapshots saved before campaign history. */
   victories?: readonly CampaignVictory[];
+  bookOrigin?: BookOrigin | null;
   challengeProgress?: ChallengeProgress;
   timedProgress?: TimedProgress;
   dailyProgress?: DailyProgress;
@@ -45,7 +57,8 @@ export type Action = { kind: 'monetization'; command: AdCommand } | { kind: 'pub
   { kind: 'help'; attemptId: string; assistance?: Assistance } | { kind: 'pin' } |
   { kind: 'preferences'; key: keyof Preferences; value: boolean } |
   { kind: 'copy'; levelId: string; draftId: string; workId: string; nodeId: string; name: string } |
-  { kind: 'open'; levelId: string; attemptId: string } | { kind: 'restart'; levelId: string; attemptId: string };
+  { kind: 'open'; levelId: string; attemptId: string; book?: BookTarget } |
+  { kind: 'restart'; levelId: string; attemptId: string; book?: BookTarget };
 
 export function newWorkspace(attemptId: string): Workspace {
   const level = levels[0]!;
@@ -145,6 +158,11 @@ export function decodeWorkspace(json: string, fingerprints: ReadonlyMap<string, 
   }
   if (state.adLedger !== undefined) validateAdLedger(state.adLedger);
   if (state.publication !== undefined) validatePublication(state.publication, state.creative);
+  if (state.bookOrigin != null) {
+    const { bookId, slot, attemptId } = state.bookOrigin;
+    const book = books.find(candidate => candidate.id === bookId);
+    if (!book || !Number.isInteger(slot) || !book.goals[slot] || !safeId(attemptId)) throw new Error('Invalid book origin');
+  }
   const modes = [state.timedProgress?.active, state.challengeProgress?.active, state.creative?.playing, state.dailyProgress?.active, state.personalProgress?.active];
   if (modes.filter(Boolean).length > 1) throw new Error('Conflicting active game modes');
   return state;
@@ -181,8 +199,15 @@ export function applyAction(state: Workspace, action: Action, fingerprints: Read
   if (action.kind === 'challenge-open' || action.kind === 'challenge-restart' ||
       action.kind === 'challenge-swap' || action.kind === 'challenge-leave') {
     if (state.timedProgress?.active || state.dailyProgress?.active || state.personalProgress?.active) return state;
+    const opening = action.kind === 'challenge-open' || action.kind === 'challenge-restart';
+    if (opening && !bookGoal(state, action.book, action.id, true)) return state;
     const challengeProgress = applyChallenge(state, action);
-    return !challengeProgress || challengeProgress === state.challengeProgress ? state : { ...state, challengeProgress };
+    if (!challengeProgress) return state;
+    const attemptId = opening ? challengeProgress.attempts[action.id]?.attemptId : undefined;
+    const bookOrigin = opening && challengeProgress.active === action.id && attemptId && action.book
+      ? { ...action.book, attemptId } : opening || action.kind === 'challenge-leave' ? null : state.bookOrigin ?? null;
+    if (challengeProgress === state.challengeProgress && JSON.stringify(bookOrigin) === JSON.stringify(state.bookOrigin ?? null)) return state;
+    return { ...state, challengeProgress, bookOrigin };
   }
   if (action.kind === 'preferences') {
     if (!Object.hasOwn(DEFAULT_PREFERENCES, action.key) || typeof action.value !== 'boolean' || state.preferences[action.key] === action.value) return state;
@@ -206,13 +231,14 @@ export function applyAction(state: Workspace, action: Action, fingerprints: Read
   const level = getLevel(state.activeLevelId), attempt = state.attempts[level.id];
   if (action.kind === 'open' || action.kind === 'restart') {
     const target = getLevel(action.levelId);
-    if (!levelIsOpen(state, target.id)) return state;
+    if (!levelIsOpen(state, target.id) || !bookGoal(state, action.book, target.id, false)) return state;
     const create = action.kind === 'restart' || !state.attempts[target.id];
     if (create && (Object.values(state.attempts).some(candidate => candidate.attemptId === action.attemptId)
         || campaignVictories(state).some(victory => victory.attemptId === action.attemptId))) return state;
     const next = create ? createAttempt(target, action.attemptId) : state.attempts[target.id]!;
-    if (state.activeLevelId === target.id && next === attempt) return state;
-    return { ...state, activeLevelId: target.id, attempts: { ...state.attempts, [target.id]: next }, victories: campaignVictories(state) };
+    const bookOrigin = action.book ? { ...action.book, attemptId: next.attemptId } : null;
+    if (state.activeLevelId === target.id && next === attempt && JSON.stringify(bookOrigin) === JSON.stringify(state.bookOrigin ?? null)) return state;
+    return { ...state, bookOrigin, activeLevelId: target.id, attempts: { ...state.attempts, [target.id]: next }, victories: campaignVictories(state) };
   }
   if (action.kind === 'pin') {
     const taps = state.onboarding.earlyPinTaps ?? Number(state.onboarding.pinExplained);

@@ -730,7 +730,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 06",
-      "currentImplementation": "Книга постепенно раскрывает четыре цвета непрерывной внутриигровой композиции. | https://github.com/DanilaH/hue-gradients/blob/36df8036981c4d91685ce133878b1719de318437/tools/books-browser-check.mjs",
+      "currentImplementation": "В 0.4.36 пустая четверть запускает свою попытку. При завершении впервые цветной фрагмент встаёт в гнездо после возврата; проверено на 006. | https://github.com/DanilaH/hue-gradients/blob/36df8036981c4d91685ce133878b1719de318437/tools/books-browser-check.mjs",
       "nextAction": "Проверить реальный каталог событий после D1 и показать книгу на телефоне (G1).",
       "deliveryPackage": "06",
       "sourceNextCheck": "Сравнить внутреннюю сборную картину и альбом на одном наборе, без смены экспорта."
@@ -760,7 +760,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 06",
-      "currentImplementation": "Разнородные цели открывают отдельную задачу; повтор сохраняет одну отметку. | https://github.com/DanilaH/hue-gradients/blob/36df8036981c4d91685ce133878b1719de318437/tools/books-browser-check.mjs В 0.4.35 HUD, пауза и оба исхода особой задачи возвращают к книге.",
+      "currentImplementation": "Разнородные цели открывают отдельную задачу; повтор сохраняет одну отметку. | https://github.com/DanilaH/hue-gradients/blob/36df8036981c4d91685ce133878b1719de318437/tools/books-browser-check.mjs В 0.4.36 четвёртый фрагмент открывает особую задачу именно этой обложки.",
       "nextAction": "Проверить книгу и системный Back на физическом телефоне (G1).",
       "deliveryPackage": "06",
       "sourceNextCheck": "Проверить интерес к двум разным действиям и конечной награде."

@@ -1,10 +1,10 @@
 import { chapters, getLevel, levels } from '../domain/levels';
 import { chapterCount, chapterIndexFor, chapterIsOpen, levelIsOpen, META_POLICY, recommendedLevel } from '../domain/progression';
 import type { LevelDefinition } from '../domain/puzzle';
-import type { Workspace } from '../domain/workspace';
+import type { BookTarget, Workspace } from '../domain/workspace';
 import type { AlbumRoute } from './albumView';
 import { chapterChallenges, challengeAvailable, challenges, challengeStatus, geometryChallenges } from '../domain/challenges';
-import { bookProgress, books, goalLabel } from '../domain/books';
+import { bookProgress, books } from '../domain/books';
 import { gradientThumbnail } from './exportRenderer';
 import { personalLevel, personalTaskName, TASK_KINDS, taskKey, taskStatus } from '../domain/personal';
 import { renderProgress } from './progressView';
@@ -12,7 +12,7 @@ import { renderProgress } from './progressView';
 type PickerRoute = { kind: 'chapter'; levelId: string; chapterMenu?: number };
 export type MetaRoute = PickerRoute | AlbumRoute | { kind: 'card' | 'copy'; levelId: string } |
   { kind: 'own-card'; workId: string; nodeId: string } | { kind: 'draft'; draftId: string; nodeId?: string } |
-  { kind: 'progress' | 'personal' | 'books' } | { kind: 'daily'; date?: string } | { kind: 'challenges'; group?: 'chapter' | 'geometry' };
+  { kind: 'progress' | 'personal' | 'books' } | { kind: 'book'; bookId: string; slot?: number } | { kind: 'daily'; date?: string } | { kind: 'challenges'; group?: 'chapter' | 'geometry' };
 interface MetaView {
   route: MetaRoute; state: Workspace; disabled: boolean;
   title: HTMLElement; copy: HTMLElement; actions: HTMLElement;
@@ -21,6 +21,8 @@ interface MetaView {
   repeat(id: string): void;
   playChallenge(id: string, restart: boolean): void;
   playTimed(): void;
+  playBook(target: BookTarget): void;
+  bookInsertion?: BookTarget;
   dailyLoading: boolean;
   retryDaily?: () => void;
   playDaily(date: string, replay: boolean): void;
@@ -28,7 +30,7 @@ interface MetaView {
 }
 
 export function isMenuList(route: MetaRoute): boolean {
-  return ['personal', 'daily', 'books', 'progress', 'challenges'].includes(route.kind);
+  return ['personal', 'daily', 'books', 'book', 'progress', 'challenges'].includes(route.kind);
 }
 
 function actionButton(parent: HTMLElement, text: string, invoke: () => void, disabled: boolean): HTMLButtonElement {
@@ -287,29 +289,19 @@ export function renderMeta(v: MetaView): void {
   } else if (route.kind === 'books') {
     v.title.textContent = 'Книги';
     menuBack();
+    const covers = document.createElement('div');
+    covers.className = 'book-shelf';
+    actions.append(covers);
     for (const book of books) {
       const progress = bookProgress(book, state);
-      const panel = document.createElement('article');
-      panel.className = 'book';
-      panel.dataset.book = book.id;
-      panel.append(gradientThumbnail({ width: 2, height: 2,
-        solvedTileColors: book.palette.map((color, index) => progress.goals[index]?.completed ? color : '#392749') }));
-      const title = document.createElement('h3');
-      title.textContent = `${book.title} · ${progress.filled}/${book.goals.length}`;
-      panel.append(title);
-      const checklist = document.createElement('ul');
-      for (const goal of progress.goals) {
-        const row = document.createElement('li');
-        row.dataset.earned = String(goal.completed);
-        row.textContent = goalLabel(goal);
-        checklist.append(row);
-      }
-      panel.append(checklist);
-      if (progress.unlocked) {
-        button(progress.claimed ? 'Повторить особую задачу' : 'Особая задача',
-          () => v.playChallenge(book.id, progress.claimed), panel).dataset.bookChallenge = book.id;
-      }
-      actions.append(panel);
+      const cover = button('', () => v.navigate({ kind: 'book', bookId: book.id }), covers);
+      cover.dataset.bookCover = book.id;
+      cover.append(gradientThumbnail(book.level));
+      const name = document.createElement('strong');
+      name.textContent = book.title;
+      const count = document.createElement('span');
+      count.textContent = `${progress.filled}/4`;
+      cover.append(name, count);
     }
     const featured = Object.values(state.dailyProgress?.slots ?? {}).filter(slot => slot.feature).sort((a,b) => b.date.localeCompare(a.date));
     for (const slot of featured) {
@@ -319,6 +311,60 @@ export function renderMeta(v: MetaView): void {
       card.className = 'quiet';
       card.dataset.event = slot.feature!.id;
     }
+  } else if (route.kind === 'book') {
+    const book = books.find(item => item.id === route.bookId);
+    if (!book) { menuBack(); return; }
+    v.title.textContent = book.title;
+    menuBack();
+    const progress = bookProgress(book, state);
+    const incoming = v.bookInsertion?.bookId === book.id ? v.bookInsertion.slot : undefined;
+    const panel = document.createElement('article');
+    panel.className = 'book-cover';
+    panel.dataset.book = book.id;
+    const slots = document.createElement('div'); slots.className = 'book-slots';
+    const selected = route.slot ?? progress.goals.findIndex(goal => !goal.completed);
+    for (const [index, goal] of progress.goals.entries()) {
+      const challenge = goal.need === 'challenge' ? challenges.find(item => item.level.id === goal.levelId) : undefined;
+      const level = challenge?.level ?? getLevel(goal.levelId);
+      const number = challenge ? 'I' : String(level.ordinal).padStart(3, '0');
+      const open = challenge ? challengeAvailable(challenge, state) : levelIsOpen(state, level.id);
+      const earned = goal.completed && incoming !== index;
+      const attempt = challenge ? state.challengeProgress?.attempts[level.id] : state.attempts[level.id];
+      const verb = goal.need === 'perfect' ? 'Идеально без помощи' : attempt && !attempt.completed ? 'Продолжить' : 'Собрать';
+      const caption = challenge ? 'Первое испытание' : `${verb} ${number}`;
+      const tile = earned ? document.createElement('div') : button('', () => v.playBook({ bookId: book.id, slot: index }), slots, !open || incoming === index);
+      tile.className = 'book-slot';
+      tile.dataset.slot = String(index);
+      tile.dataset.earned = String(earned);
+      tile.dataset.selected = String(selected === index);
+      if (earned) {
+        tile.setAttribute('aria-label', `${number} · Выполнено`);
+        slots.append(tile);
+      } else {
+        const text = document.createElement('strong'); text.textContent = number;
+        const detail = document.createElement('small');
+        detail.textContent = !open ? 'Закрыто' : caption;
+        tile.append(text, detail);
+      }
+      if (goal.completed) {
+        const print = gradientThumbnail(level);
+        print.className = 'book-fragment';
+        if (incoming === index) print.classList.add('book-fragment-arriving');
+        tile.append(print);
+      }
+    }
+    const status = document.createElement('p');
+    status.className = 'book-count'; status.dataset.bookCount = '';
+    status.setAttribute('aria-live', 'polite');
+    status.textContent = `${progress.filled - Number(incoming !== undefined)}/4`;
+    panel.append(slots, status);
+    if (progress.unlocked && incoming === undefined) {
+      const saved = state.challengeProgress?.attempts[book.id];
+      const continuing = saved && !saved.completed && saved.moves < book.level.minimumSwaps + 3;
+      const title = progress.claimed ? 'Повторить особую задачу' : continuing ? 'Продолжить особую задачу' : 'Особая задача';
+      button(title, () => v.playChallenge(book.id, !!saved && !continuing), panel).dataset.bookChallenge = book.id;
+    }
+    actions.append(panel);
   } else if (route.kind === 'personal') {
     v.title.textContent = 'Личные задания';
     menuBack();

@@ -3,7 +3,7 @@ import { localCalendarDay, getRenderPixelRatio } from '@danilah/mini-games-kit/c
 import { destroyRenderer } from '@danilah/mini-games-kit/phaser';
 import type { GameplayActivityCoordinator } from '@danilah/mini-games-kit/platform';
 import { levels, getLevel } from '../domain/levels';
-import { fingerprintPayload, type Action } from '../domain/workspace';
+import { fingerprintPayload, type Action, type BookTarget } from '../domain/workspace';
 import { hashText } from '../local-store/command';
 import type { TransactionalLocalStore } from '../local-store/contracts';
 import { gameMode, type InputIntent } from '../app/gameTelemetry';
@@ -22,7 +22,8 @@ import { AUTO_HELP_COST, autoHelpSwap, pulsePosition, type Assistance } from '..
 import { activePersonal, personalTaskName } from '../domain/personal';
 import { activeDaily, validateDailyFeed, type DailyFeed } from '../domain/daily';
 import { activeTimed, timedRemaining } from '../domain/timeTrial';
-import { activeChallenge } from '../domain/challenges';
+import { books, bookProgress } from '../domain/books';
+import { activeChallenge, challenges } from '../domain/challenges';
 import { publishedBenchmark } from '../domain/playerProgress';
 import { EditorView } from './editorView';
 import { renderAlbum, type AlbumPosition, type AlbumRoute } from './albumView';
@@ -91,6 +92,9 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   let queuedClock = false;
   let dailyLoading = false;
   let dailyUnavailable = false;
+  let newlyFilled: BookTarget | undefined;
+  let bookInsertion: BookTarget | undefined;
+  let insertionTimer: ReturnType<typeof setTimeout> | undefined;
   let dailyFocus: string | undefined;
   let importing = false, importNote = '';
   let pendingImport: Awaited<ReturnType<typeof parsePuzzleFile>> | null = null;
@@ -236,6 +240,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   }
   function showMeta(route: MetaRoute): void {
     scene.cancel();
+    if (layer === 'meta' && metaRoute.kind === 'book') finishInsertion();
     if (layer !== 'meta') { metaReturn = layer; metaHistory = []; }
     else {
       const samePicker = route.kind === 'chapter' && metaRoute.kind === 'chapter'
@@ -247,23 +252,69 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (route.kind === 'daily' || route.kind === 'books') void refreshDaily();
     if (route.kind === 'personal') void issuePersonal();
   }
-  function startLevel(id: string): void {
-    if (current().own) { void run({ kind: 'author-exit' }, () => queueMicrotask(() => startLevel(id))); return; }
-    const after = () => { metaHistory = []; notice = ''; layer = session.state.attempts[id]?.completed ? 'result' : 'none'; };
-    if (session.state.activeLevelId === id && session.state.attempts[id]) { after(); render(); }
-    else void run({ kind: 'open', levelId: id, attemptId: crypto.randomUUID() }, after);
+  function startLevel(id: string, book?: BookTarget, restart = false): void {
+    if (current().own) { void run({ kind: 'author-exit' }, () => queueMicrotask(() => startLevel(id, book, restart))); return; }
+    const after = () => { metaHistory = []; notice = ''; layer = gameLayer(); };
+    const sameSource = book ? currentBook()?.bookId === book.bookId && currentBook()?.slot === book.slot : !session.state.bookOrigin;
+    if (!restart && sameSource && session.state.activeLevelId === id && session.state.attempts[id]) { after(); render(); }
+    else void run({ kind: restart ? 'restart' : 'open', levelId: id, attemptId: crypto.randomUUID(), ...(book ? { book } : {}) }, after);
   }
-  function repeatLevel(id: string): void {
-    void run({ kind: 'restart', levelId: id, attemptId: crypto.randomUUID() }, () => {
-      metaHistory = []; layer = 'none';
-    });
-  }
-  function playChallenge(id: string, restart: boolean): void {
+  function repeatLevel(id: string): void { startLevel(id, undefined, true); }
+  function playChallenge(id: string, restart: boolean, book?: BookTarget): void {
     const firstOpen = !session.state.challengeProgress?.attempts[id];
-    void run({ kind: restart ? 'challenge-restart' : 'challenge-open', id, attemptId: crypto.randomUUID() }, () => {
+    if (!restart && current().challenge?.level.id === id && book?.bookId === currentBook()?.bookId &&
+        book?.slot === currentBook()?.slot) {
+      layer = gameLayer(); render(); return;
+    }
+    void run({ kind: restart ? 'challenge-restart' : 'challenge-open', id, attemptId: crypto.randomUUID(), ...(book ? { book } : {}) }, () => {
       metaHistory = [];
       layer = firstOpen && current().challenge?.afterFinaleId ? 'secret' : gameLayer();
     });
+  }
+  function playBook(target: BookTarget): void {
+    const book = books.find(item => item.id === target.bookId);
+    const goal = book && bookProgress(book, session.state).goals[target.slot];
+    if (!goal || goal.completed) return;
+    const id = goal.levelId;
+    if (goal.need === 'challenge') {
+      const attempt = session.state.challengeProgress?.attempts[id];
+      const definition = challenges.find(item => item.level.id === id);
+      playChallenge(id, !!attempt && !!definition && attempt.moves >= definition.moveLimit, target);
+    } else startLevel(id, target, session.state.attempts[id]?.completed === true);
+  }
+  function currentBook() {
+    const { attempt, level, personal, daily, timed, own } = current();
+    if (personal || daily || timed || own) return undefined;
+    const origin = session.state.bookOrigin;
+    const book = origin && books.find(item => item.id === origin.bookId);
+    return origin && origin.attemptId === attempt?.attemptId && book?.goals[origin.slot]?.levelId === level.id ? origin : undefined;
+  }
+  function finishInsertion(sound = false): void {
+    clearTimeout(insertionTimer);
+    if (!bookInsertion) return;
+    bookInsertion = undefined;
+    if (sound && !activity.isBlocked() && !document.hidden) feedback.sound('book');
+    render();
+  }
+  function showBook(bookId: string, slot?: number): void {
+    metaReturn = gameLayer();
+    metaHistory = [{ kind: 'album', tab: 'campaign' }, { kind: 'books' }];
+    metaRoute = { kind: 'book', bookId, ...(slot !== undefined ? { slot } : {}) };
+    layer = 'meta';
+    if (newlyFilled?.bookId === bookId && newlyFilled.slot === slot) {
+      if (motionAllowed()) {
+        bookInsertion = newlyFilled;
+        insertionTimer = setTimeout(() => finishInsertion(true), 620);
+      } else feedback.sound('book');
+    }
+    newlyFilled = undefined;
+  }
+  function leaveBook(): void {
+    const origin = currentBook();
+    if (!origin) return;
+    if (current().challenge) { leaveChallenge(); return; }
+    showBook(origin.bookId, origin.slot);
+    render();
   }
   function challengeLobby(group?: 'chapter' | 'geometry'): void {
     metaReturn = gameLayer();
@@ -273,13 +324,12 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   }
   function leaveChallenge(): void {
     const challenge = current().challenge;
+    const origin = currentBook();
     const group = challenge?.chapterIndex !== undefined ? 'chapter' : challenge?.level.id.startsWith('geometry-v1-') ? 'geometry' : undefined;
     void run({ kind: 'challenge-leave' }, () => {
-      if (!challenge?.book) { challengeLobby(group); return; }
-      metaReturn = gameLayer();
-      metaHistory = [{ kind: 'album', tab: 'campaign' }];
-      metaRoute = { kind: 'books' };
-      layer = 'meta';
+      if (origin) showBook(origin.bookId, origin.slot);
+      else if (challenge?.book) showBook(challenge.book.id);
+      else challengeLobby(group);
     });
   }
   async function refreshDaily(): Promise<void> {
@@ -408,6 +458,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     return work && hasAuthorProof(work, metaRoute.nodeId) ? { work, nodeId: metaRoute.nodeId } : null;
   }
   function popMeta(): void {
+    finishInsertion();
     const previous = metaHistory.pop();
     if (previous) metaRoute = previous;
     else layer = metaReturn;
@@ -469,6 +520,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     chapterUnlock.hidden = true;
     delete actions.dataset.meta;
     dialog.dataset.layer = layer;
+    if (layer === 'meta' && metaRoute.kind === 'book') dialog.dataset.cover = metaRoute.bookId;
+    else delete dialog.dataset.cover;
     if (editorView && !(layer === 'meta' && metaRoute.kind === 'draft')) { editorView.destroy(); editorView = null; editorDraftId = null; }
     const cardId = selectedWork(), authorCard = selectedAuthorWork();
     const cardKey = cardId ? `campaign:${cardId}` : authorCard ? `own:${authorCard.work.workId}:${authorCard.nodeId}` : null;
@@ -506,10 +559,10 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       if (won) colourPrism(prism, level);
       byId('dialog-title').textContent = won ? 'Испытание пройдено' : 'Ходы закончились';
       byId('dialog-copy').textContent = `Ходы · ${challenge.attempt.moves} из ${challenge.moveLimit}`;
-      const challengeBack = challenge.book ? 'К книгам' : 'К испытаниям';
+      const challengeBack = challenge.book || currentBook() ? 'К книге' : 'К испытаниям';
       if (won) button(challengeBack, leaveChallenge);
       else {
-        button('Повторить', () => playChallenge(level.id, true));
+        button('Повторить', () => playChallenge(level.id, true, currentBook()));
         button(challengeBack, leaveChallenge, true);
       }
     } else if (layer === 'result') {
@@ -521,6 +574,10 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       byId('dialog-copy').textContent = session.state.preferences.statistics ? `${count} ${word}${assist}` : '';
       if (own) {
         button('В редактор', leaveAuthor);
+      } else if (currentBook()) {
+        const returnButton = button('К книге', leaveBook);
+        returnButton.classList.add('result-next');
+        returnButton.setAttribute('aria-label', 'К книге');
       } else {
         const next = recommendedLevel(session.state, chapterIndexFor(level.id)) ?? recommendedLevel(session.state);
         const receipt = session.state.lastCompletion;
@@ -543,10 +600,10 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       byId('dialog-title').textContent = 'Начать заново?';
       byId('dialog-copy').textContent = `«${own || challenge || timed || daily || personal ? level.title : getLevel(restartLevelId ?? level.id).title}» начнётся с исходного поля.`;
       button('Начать заново', () => {
-        if (challenge) { playChallenge(level.id, true); return; }
+        if (challenge) { playChallenge(level.id, true, currentBook()); return; }
         if (personal) { playPersonal(personal.key, true); return; }
         if (daily) { playDaily(daily.date, true); return; }
-        void run(own ? { kind: 'author-start', workId: own.work.workId, nodeId: own.node.nodeId, attemptId: crypto.randomUUID(), restart: true } : { kind: 'restart', levelId: restartLevelId ?? level.id, attemptId: crypto.randomUUID() }, () => { metaHistory = []; layer = 'none'; });
+        void run(own ? { kind: 'author-start', workId: own.work.workId, nodeId: own.node.nodeId, attemptId: crypto.randomUUID(), restart: true } : { kind: 'restart', levelId: restartLevelId ?? level.id, attemptId: crypto.randomUUID(), ...(currentBook() ? { book: currentBook()! } : {}) }, () => { metaHistory = []; layer = 'none'; });
       });
       button('Отмена', cancelRestart, true);
     } else if (layer === 'settings') {
@@ -557,7 +614,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       }
       if (!timed) button('Начать заново', () => askRestart(session.state.activeLevelId), true).id = 'restart';
       button('Настройки', () => { layer = 'preferences'; render(); }, true);
-      button(personal ? 'К заданиям' : daily?.entry === 'books' || challenge?.book ? 'К книгам' : daily ? 'К календарю'
+      button(personal ? 'К заданиям' : currentBook() || challenge?.book ? 'К книге' : daily?.entry === 'books' ? 'К книгам' : daily ? 'К календарю'
         : timed || challenge ? 'К испытаниям' : own ? 'В редактор' : 'К уровням',
         leaveBoard, true);
     } else if (layer === 'preferences') {
@@ -644,7 +701,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       } else {
       renderMeta({ route: metaRoute, state: session.state, disabled: busy || activity.isBlocked() || !!session.pending,
         title: byId('dialog-title'), copy: byId('dialog-copy'), actions, navigate: showMeta, back: () => { back(); },
-        play: startLevel, repeat: repeatLevel, playChallenge, playTimed, playDaily, playPersonal,
+        play: startLevel, repeat: repeatLevel, playChallenge, playTimed, playDaily, playPersonal, playBook,
+        ...(bookInsertion ? { bookInsertion } : {}),
         dailyLoading,
         ...(dailyUnavailable && options.dailySource ? { retryDaily: () => void refreshDaily() } : {}),
         saveCopy: (levelId, name) => {
@@ -699,7 +757,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     const preview = layer === 'help' || pausedBoard && pauseOrigin === 'help';
     root.style.setProperty('--color-a', hiddenField ? '#392449' : level.solvedTileColors[0]!);
     root.style.setProperty('--color-b', hiddenField ? '#164657' : level.solvedTileColors.at(-1)!);
-    byId('levels').textContent = personal ? '‹ Задания' : daily?.entry === 'books' || challenge?.book ? '‹ Книги'
+    byId('levels').textContent = personal ? '‹ Задания' : currentBook() || challenge?.book ? '‹ Книга' : daily?.entry === 'books' ? '‹ Книги'
       : daily ? '‹ Календарь' : timed || challenge ? '‹ Испытания' : own ? '‹ Редактор' : '‹ Уровни';
     byId('title').textContent = personal ? personalTaskName(personal) : daily ? dailyLabel(daily.date) : own || challenge || timed ? level.title : `Уровень ${level.ordinal}`;
     const guidance = byId('guidance');
@@ -716,7 +774,11 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     const cardId = selectedWork(), authorCard = selectedAuthorWork();
     const menuBackdrop = layer === 'meta' && (metaRoute.kind === 'album' || isMenuList(metaRoute));
     atmosphere.placeInside(picker || cardId || authorCard || menuBackdrop ? dialog : root);
-    if (picker) {
+    const coverId = layer === 'meta' && metaRoute.kind === 'book' ? metaRoute.bookId : undefined;
+    const cover = books.find(book => book.id === coverId);
+    if (cover) {
+      atmosphere.setModel(cover.level, null);
+    } else if (picker) {
       const model = picker.chapterMenu === undefined ? levelPreview(session.state, picker.levelId) : null;
       atmosphere.setModel(model?.level ?? null, model?.board ?? null);
     } else if (cardId) {
@@ -757,6 +819,9 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   async function run(action: Action | CreativeAction, after?: () => void): Promise<boolean> {
     if (busy || session.pending || activity.isBlocked() && action.kind !== 'timed-pause' && action.kind !== 'personal-pause') return false;
     const { attempt: previous, level: previousLevel, timed: timedBefore } = current();
+    const origin = currentBook();
+    const book = origin && books.find(item => item.id === origin.bookId);
+    const unfilled = origin && book && !bookProgress(book, session.state).goals[origin.slot]?.completed;
     const ordinarySwap = action.kind === 'swap' || action.kind === 'author-swap' || action.kind === 'challenge-swap' || action.kind === 'timed-swap' || action.kind === 'daily-swap' || action.kind === 'personal-swap';
     const autoSwap = (action.kind === 'help' || action.kind === 'author-help') && action.assistance?.kind === 'auto';
     const pair = ordinarySwap ? action : autoSwap && previous ? autoHelpSwap(previousLevel, previous) : null;
@@ -771,6 +836,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       if (changed) {
         notice = '';
         if (pair) clearMark();
+        if (origin && book && unfilled && bookProgress(book, session.state).goals[origin.slot]?.completed) newlyFilled = origin;
         after?.();
         if ((pair || action.kind === 'timed-expire' || action.kind === 'timed-pause' || action.kind === 'personal-expire' || action.kind === 'personal-pause') && gameLayer() === 'result') layer = 'result';
         swapAccepted = pair !== null;
@@ -868,6 +934,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if ((layer === 'result' || layer === 'none') && current().personal) { leavePersonal(); return true; }
     if ((layer === 'result' || layer === 'none') && current().daily) { leaveDaily(); return true; }
     if ((layer === 'result' || layer === 'none') && current().timed) { leaveTimed(); return true; }
+    if ((layer === 'result' || layer === 'none') && currentBook()) { leaveBook(); return true; }
     if ((layer === 'result' || layer === 'none') && current().challenge) { leaveChallenge(); return true; }
     if (layer !== 'none') { layer = 'none'; render(); return true; }
     if (current().own) { leaveAuthor(); return true; }
@@ -884,6 +951,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (current().personal) leavePersonal();
     else if (current().daily) leaveDaily();
     else if (current().timed) leaveTimed();
+    else if (currentBook()) leaveBook();
     else if (current().challenge) leaveChallenge();
     else if (current().own) leaveAuthor();
     else showMeta({ kind: 'chapter', levelId: session.state.activeLevelId });
@@ -907,7 +975,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     pauseOrigin = layer === 'secret' || layer === 'help' ? layer : 'none';
     layer = 'settings'; render();
   }, { signal: listeners.signal });
-  systemMotion.addEventListener('change', () => { scene.cancel(); render(); }, { signal: listeners.signal });
+  systemMotion.addEventListener('change', () => { scene.cancel(); if (!motionAllowed()) finishInsertion(); render(); }, { signal: listeners.signal });
   dialog.tabIndex = -1;
   const ignoreInput = (event: Event) => { event.preventDefault(); event.stopImmediatePropagation(); };
   dialog.addEventListener('pointerdown', event => {
@@ -954,6 +1022,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   }, { signal: listeners.signal });
   const unblock = activity.onBlockedChange(blocked => {
     if (blocked) {
+      finishInsertion();
       foregroundEpoch++;
       heldActivation.clear();
       blockedActivation.clear();
@@ -975,5 +1044,5 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
         session.state.personalProgress?.day !== localCalendarDay()) void issuePersonal();
   }, 1000);
   await frame; ready = true; render(); resize();
-  return { back, destroy() { alive = false; clearInterval(clockTicker); clearInterval(personalTicker); clearMark(); editorView?.destroy(); workCard?.destroy(); stopVictory(); exportFiles.destroy?.(); listeners.abort(); observer.disconnect(); unblock(); atmosphere.destroy(); feedback.destroy(); music.destroy(); activity.setGameplayDesired(false); store.close(); destroyRenderer(game); } };
+  return { back, destroy() { alive = false; clearTimeout(insertionTimer); clearInterval(clockTicker); clearInterval(personalTicker); clearMark(); editorView?.destroy(); workCard?.destroy(); stopVictory(); exportFiles.destroy?.(); listeners.abort(); observer.disconnect(); unblock(); atmosphere.destroy(); feedback.destroy(); music.destroy(); activity.setGameplayDesired(false); store.close(); destroyRenderer(game); } };
 }
