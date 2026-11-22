@@ -11,5 +11,41 @@
     "2026-11-21: вход из события Тихий свет, выход из паузы возвращает фокус к нему",
     "После 503 календарь использует IndexedDB, повтор 31 октября сохраняет одну отметку"
   ],
-  "recording": "03-calendar-and-events.mp4"
+  "recording": "03-calendar-and-events.mp4",
+  "entrypoints": {
+    "dates": [
+      "2026-11-22",
+      "2026-11-21"
+    ],
+    "snapshot": "423754bb9136b80522b3b7bbb9256c30a4e9969b9598577179d7f0d70735a411",
+    "hosts": {
+      "android": {
+        "cleanProfile": true,
+        "retry": true,
+        "bothDatesSolved": true,
+        "offlineReopen": true,
+        "activeAttemptRetained": true,
+        "calendarFocusRestored": true,
+        "eventBothOrigins": true,
+        "distinctWins": [
+          "2026-11-21",
+          "2026-11-22"
+        ]
+      },
+      "yandex": {
+        "cleanProfile": true,
+        "retry": true,
+        "bothDatesSolved": true,
+        "offlineReopen": true,
+        "activeAttemptRetained": true,
+        "calendarFocusRestored": true,
+        "eventBothOrigins": true,
+        "distinctWins": [
+          "2026-11-21",
+          "2026-11-22"
+        ]
+      }
+    },
+    "limits": "Production app entrypoints and separately served staging publication. Offline restart uses local packaged shell bytes; browser network is disabled. No live publication or native binary."
+  }
 }

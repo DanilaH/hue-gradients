@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { localCalendarDay, getRenderPixelRatio } from '@danilah/mini-games-kit/core';
 import { destroyRenderer } from '@danilah/mini-games-kit/phaser';
 import type { GameplayActivityCoordinator } from '@danilah/mini-games-kit/platform';
-import { levels, getLevel } from '../domain/levels';
+import { chapters, levels, getLevel } from '../domain/levels';
 import { fingerprintPayload, type Action, type BookTarget } from '../domain/workspace';
 import { hashText } from '../local-store/command';
 import type { TransactionalLocalStore } from '../local-store/contracts';
@@ -146,6 +146,10 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   }
   let lastFocus: HTMLElement | null = null;
   let metaRoute: MetaRoute = { kind: 'chapter', levelId: session.state.activeLevelId };
+  const chosenLevels = new Map<number, string>();
+  const chosenLevel = (index: number) => chosenLevels.get(index)
+    ?? (chapterIndexFor(session.state.activeLevelId) === index ? session.state.activeLevelId : recommendedLevel(session.state, index))
+    ?? chapters[index]!.levelIds[0]!;
   let metaHistory: MetaRoute[] = [], metaReturn: Layer = 'none';
   let restartLevelId: string | null = null, restartReturn: Layer = 'none';
   const initialLevel = current().level;
@@ -250,6 +254,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
         || route.kind === 'challenges' && metaRoute.kind === 'challenges';
       if (!samePicker && JSON.stringify(route) !== JSON.stringify(metaRoute)) metaHistory.push(metaRoute);
     }
+    if (route.kind === 'chapter') chosenLevels.set(chapterIndexFor(route.levelId),route.levelId);
     metaRoute = route; layer = 'meta'; render();
     if (route.kind === 'daily') {
       if (!route.date && !route.month) void refreshDaily();
@@ -268,13 +273,13 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     else void run({ kind: restart ? 'restart' : 'open', levelId: id, attemptId: crypto.randomUUID(), ...(book ? { book } : {}) }, after);
   }
   function repeatLevel(id: string): void { startLevel(id, undefined, true); }
-  function playChallenge(id: string, restart: boolean, book?: BookTarget): void {
+  function playChallenge(id: string, restart: boolean, book?: BookTarget, entry?: 'progress'): void {
     const firstOpen = !session.state.challengeProgress?.attempts[id];
     if (!restart && current().challenge?.level.id === id && book?.bookId === currentBook()?.bookId &&
-        book?.slot === currentBook()?.slot) {
+        book?.slot === currentBook()?.slot && session.state.challengeProgress?.entry === entry) {
       layer = gameLayer(); render(); return;
     }
-    void run({ kind: restart ? 'challenge-restart' : 'challenge-open', id, attemptId: crypto.randomUUID(), ...(book ? { book } : {}) }, () => {
+    void run({ kind: restart ? 'challenge-restart' : 'challenge-open', id, attemptId: crypto.randomUUID(), ...(book ? { book } : {}), ...(entry ? { entry } : {}) }, () => {
       metaHistory = [];
       layer = firstOpen && current().challenge?.afterFinaleId ? 'secret' : gameLayer();
     });
@@ -333,11 +338,17 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   function leaveChallenge(): void {
     const challenge = current().challenge;
     const origin = currentBook();
+    const progress = session.state.challengeProgress?.entry === 'progress' ? challenge?.chapterIndex : undefined;
     const group = challenge?.chapterIndex !== undefined ? 'chapter' : challenge?.level.id.startsWith('geometry-v1-') ? 'geometry' : undefined;
     void run({ kind: 'challenge-leave' }, () => {
       if (origin) showBook(origin.bookId, origin.slot);
       else if (challenge?.book) showBook(challenge.book.id);
-      else challengeLobby(group);
+      else if (progress !== undefined) {
+        metaReturn = gameLayer();
+        metaHistory = [{ kind: 'chapter', levelId: session.state.activeLevelId }];
+        metaRoute = { kind: 'progress', chapter: progress };
+        layer = 'meta';
+      } else challengeLobby(group);
     });
   }
   async function refreshDaily(): Promise<void> {
@@ -569,10 +580,10 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       if (won) colourPrism(prism, level);
       byId('dialog-title').textContent = won ? 'Испытание пройдено' : 'Ходы закончились';
       byId('dialog-copy').textContent = `Ходы · ${challenge.attempt.moves} из ${challenge.moveLimit}`;
-      const challengeBack = challenge.book || currentBook() ? 'К книге' : 'К испытаниям';
+      const challengeBack = challenge.book || currentBook() ? 'К книге' : session.state.challengeProgress?.entry === 'progress' ? 'К прогрессу' : 'К испытаниям';
       if (won) button(challengeBack, leaveChallenge);
       else {
-        button('Повторить', () => playChallenge(level.id, true, currentBook()));
+        button('Повторить', () => playChallenge(level.id, true, currentBook(), session.state.challengeProgress?.entry));
         button(challengeBack, leaveChallenge, true);
       }
     } else if (layer === 'result') {
@@ -610,7 +621,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       byId('dialog-title').textContent = 'Начать заново?';
       byId('dialog-copy').textContent = `«${own || challenge || timed || daily || personal ? level.title : getLevel(restartLevelId ?? level.id).title}» начнётся с исходного поля.`;
       button('Начать заново', () => {
-        if (challenge) { playChallenge(level.id, true, currentBook()); return; }
+        if (challenge) { playChallenge(level.id, true, currentBook(), session.state.challengeProgress?.entry); return; }
         if (personal) { playPersonal(personal.key, true); return; }
         if (daily) { playDaily(daily.date, true); return; }
         void run(own ? { kind: 'author-start', workId: own.work.workId, nodeId: own.node.nodeId, attemptId: crypto.randomUUID(), restart: true } : { kind: 'restart', levelId: restartLevelId ?? level.id, attemptId: crypto.randomUUID(), ...(currentBook() ? { book: currentBook()! } : {}) }, () => { metaHistory = []; layer = 'none'; });
@@ -625,7 +636,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       if (!timed) button('Начать заново', () => askRestart(session.state.activeLevelId), true).id = 'restart';
       button('Настройки', () => { layer = 'preferences'; render(); }, true);
       button(personal ? 'К заданиям' : currentBook() || challenge?.book ? 'К книге' : daily?.entry === 'books' ? 'К книгам' : daily ? 'К календарю'
-        : timed || challenge ? 'К испытаниям' : own ? 'В редактор' : 'К уровням',
+        : challenge && session.state.challengeProgress?.entry === 'progress' ? 'К прогрессу' : timed || challenge ? 'К испытаниям' : own ? 'В редактор' : 'К уровням',
         leaveBoard, true);
     } else if (layer === 'preferences') {
       byId('dialog-title').textContent = 'Настройки';
@@ -711,7 +722,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       } else {
       renderMeta({ route: metaRoute, state: session.state, disabled: busy || activity.isBlocked() || !!session.pending,
         title: byId('dialog-title'), copy: byId('dialog-copy'), actions, navigate: showMeta, back: () => { back(); },
-        play: startLevel, repeat: repeatLevel, playChallenge, playTimed, playDaily, playPersonal, playBook,
+        chosenLevel, play: startLevel, repeat: repeatLevel, playChallenge, playTimed, playDaily, playPersonal, playBook,
         ...(bookInsertion ? { bookInsertion } : {}),
         dailyLoading,
         ...(dailyUnavailable && options.dailySource ? { retryDaily: () => void refreshDaily() } : {}),
@@ -745,7 +756,12 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       if (selected && !selected.disabled) {
         selected.focus({ preventScroll: true });
         if (switchMenu) selected.scrollIntoView({ block: 'nearest' });
-      } else if (switchMenu) dialogTitle.focus({ preventScroll: true });
+      } else if (switchMenu) {
+        const progressChapter = metaRoute.kind === 'progress' ? metaRoute.chapter : undefined;
+        const strip = progressChapter !== undefined ? actions.querySelector<HTMLElement>(`[data-finale="${progressChapter+1}"]`) : undefined;
+        if (strip) { strip.focus({ preventScroll: true }); strip.scrollIntoView({ block: 'nearest' }); }
+        else dialogTitle.focus({ preventScroll: true });
+      }
     }
     if (isPause(layer) && !busy && !activity.isBlocked()) {
       (actions.querySelectorAll<HTMLElement>('button, input')[pauseFocus] ?? actions.querySelector<HTMLElement>('button, input'))?.focus({ preventScroll: true });

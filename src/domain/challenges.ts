@@ -63,13 +63,14 @@ export const chapterChallenges: readonly ChallengeDefinition[] = Object.freeze(c
 
 export interface ChallengeProgress {
   readonly active: string | null;
+  readonly entry?: 'progress';
   readonly attempts: Readonly<Record<string, Attempt>>;
   readonly best: Readonly<Record<string, number>>;
 }
 
 export type ChallengeAction =
-  | { kind: 'challenge-open'; id: string; attemptId: string; book?: BookTarget }
-  | { kind: 'challenge-restart'; id: string; attemptId: string; book?: BookTarget }
+  | { kind: 'challenge-open'; id: string; attemptId: string; book?: BookTarget; entry?: 'progress' }
+  | { kind: 'challenge-restart'; id: string; attemptId: string; book?: BookTarget; entry?: 'progress' }
   | { kind: 'challenge-swap'; from: number; to: number; attemptId: string }
   | { kind: 'challenge-leave' };
 
@@ -105,7 +106,10 @@ const empty: ChallengeProgress = { active: null, attempts: {}, best: {} };
 export function applyChallenge(proof: BookProof, action: ChallengeAction): ChallengeProgress | undefined {
   const progress = proof.challengeProgress;
   const state = progress ?? empty;
-  if (action.kind === 'challenge-leave') return state.active === null ? progress : { ...state, active: null };
+  if (action.kind === 'challenge-leave') {
+    if (state.active === null) return progress;
+    return { active: null, attempts: state.attempts, best: state.best };
+  }
   if (action.kind === 'challenge-swap') {
     const active = activeChallenge(state);
     if (!active || active.status !== 'playing' || active.attempt.attemptId !== action.attemptId) return progress;
@@ -118,19 +122,23 @@ export function applyChallenge(proof: BookProof, action: ChallengeAction): Chall
   }
   const definition = entry(action.id);
   if (!definition || !challengeAvailable(definition, proof)) return progress;
+  if (action.entry && (definition.chapterIndex === undefined || definition.afterFinaleId)) return progress;
+  const source = action.entry === 'progress' ? { entry: 'progress' as const } : {};
   const saved = state.attempts[action.id];
   if (action.kind === 'challenge-open' && saved) {
-    return state.active === action.id ? progress : { ...state, active: action.id };
+    return state.active === action.id && state.entry === action.entry ? progress
+      : { ...source, active: action.id, attempts: state.attempts, best: state.best };
   }
   if (!action.attemptId || Object.values(state.attempts).some(attempt => attempt.attemptId === action.attemptId)) return progress;
   const attempt = createAttempt(definition.level, action.attemptId);
-  return { ...state, active: action.id, attempts: { ...state.attempts, [action.id]: attempt } };
+  return { ...source, active: action.id, best: state.best, attempts: { ...state.attempts, [action.id]: attempt } };
 }
 
 export function validateChallengeProgress(progress: ChallengeProgress, proof: BookProof): void {
   if (!progress || !progress.attempts || typeof progress.attempts !== 'object' || Array.isArray(progress.attempts) ||
       !progress.best || typeof progress.best !== 'object' || Array.isArray(progress.best) ||
-      (progress.active !== null && (!entry(progress.active) || !progress.attempts[progress.active]))) {
+      (progress.active !== null && (!entry(progress.active) || !progress.attempts[progress.active])) ||
+      (progress.entry !== undefined && (progress.entry !== 'progress' || !progress.active?.startsWith('finale-v1-')))) {
     throw new Error('Invalid challenge workspace');
   }
   const attempts = new Set<string>();

@@ -1,6 +1,6 @@
 import { chapters, getLevel, levels } from '../domain/levels';
 import { chapterCount, chapterIndexFor, chapterIsOpen, levelIsOpen, META_POLICY, recommendedLevel } from '../domain/progression';
-import type { LevelDefinition } from '../domain/puzzle';
+import { canSwap, type LevelDefinition } from '../domain/puzzle';
 import type { BookTarget, Workspace } from '../domain/workspace';
 import type { AlbumRoute } from './albumView';
 import { chapterChallenges, challengeAvailable, challenges, challengeStatus, geometryChallenges } from '../domain/challenges';
@@ -12,14 +12,15 @@ import { renderProgress } from './progressView';
 type PickerRoute = { kind: 'chapter'; levelId: string; chapterMenu?: number };
 export type MetaRoute = PickerRoute | AlbumRoute | { kind: 'card' | 'copy'; levelId: string } |
   { kind: 'own-card'; workId: string; nodeId: string } | { kind: 'draft'; draftId: string; nodeId?: string } |
-  { kind: 'progress' } | { kind: 'books'; eventDate?: string } | { kind: 'personal'; key?: string } | { kind: 'book'; bookId: string; slot?: number } | { kind: 'daily'; date?: string; month?: string } | { kind: 'challenges'; group?: 'chapter' | 'geometry' };
+  { kind: 'progress'; chapter?: number } | { kind: 'books'; eventDate?: string } | { kind: 'personal'; key?: string } | { kind: 'book'; bookId: string; slot?: number } | { kind: 'daily'; date?: string; month?: string } | { kind: 'challenges'; group?: 'chapter' | 'geometry' };
 interface MetaView {
   route: MetaRoute; state: Workspace; disabled: boolean;
   title: HTMLElement; copy: HTMLElement; actions: HTMLElement;
   navigate(route: MetaRoute): void; back(): void;
+  chosenLevel(index: number): string;
   play(id: string): void; saveCopy(id: string, name: string): void;
   repeat(id: string): void;
-  playChallenge(id: string, restart: boolean): void;
+  playChallenge(id: string, restart: boolean, book?: BookTarget, entry?: 'progress'): void;
   playTimed(): void;
   playBook(target: BookTarget): void;
   bookInsertion?: BookTarget;
@@ -95,12 +96,93 @@ export function levelPreview(state: Workspace, id: string) {
   return { level, board: status === 'Собран' ? null : state.attempts[id]?.board ?? level.startTileAtPosition };
 }
 
+const pickChapter = (state: Workspace, index: number) => `Глава ${index+1} · ${chapterCount(state,index)}/${chapters[index]!.levelIds.length}`;
+const chapterRequirement = (index: number) => `Соберите ${META_POLICY.chapterAt} работ главы ${index}`;
+
+function chapterStrips(v: MetaView, selected: number | undefined, choose: (index: number) => void): HTMLElement {
+  const strips = document.createElement('div'); strips.className = 'chapter-strips';
+  const hint = document.createElement('p'); hint.className = 'chapter-note'; hint.setAttribute('aria-live','polite');
+  chapters.forEach((chapter, index) => {
+    const open = chapterIsOpen(v.state,index);
+    const caption = pickChapter(v.state,index);
+    const strip = document.createElement('div'); strip.className = 'chapter-strip';
+    strip.dataset.chapterStrip = String(index+1);
+    const select = actionButton(strip, caption, () => open ? choose(index) : hint.textContent = chapterRequirement(index), v.disabled);
+    select.dataset.chapter = String(index+1); select.dataset.locked = String(!open);
+    select.setAttribute('aria-label',caption+(open ? '' : ', закрыта'));
+    if (selected === index) select.setAttribute('aria-current','true');
+    const fragments = document.createElement('span'); fragments.className = 'chapter-pieces'; fragments.setAttribute('aria-hidden','true');
+    for (const levelId of chapter.levelIds) {
+      const piece = document.createElement('span'), level = getLevel(levelId);
+      piece.style.background = `linear-gradient(152deg,${level.solvedTileColors[0]},${level.solvedTileColors.at(-1)})`;
+      piece.dataset.earned = String(v.state.completed.includes(levelId));
+      fragments.append(piece);
+    }
+    select.append(fragments);
+    const finale = chapterChallenges[index*2]!;
+    const finaleOpen = challengeAvailable(finale,v.state);
+    const best = v.state.challengeProgress?.best[finale.level.id];
+    const saved = v.state.challengeProgress?.attempts[finale.level.id];
+    const mark = actionButton(strip, best === undefined ? '◇' : '◆', () => {
+      if (!finaleOpen) { hint.textContent = `Финал главы ${index+1} откроется после ${chapter.levelIds.length} работ`; return; }
+      v.playChallenge(finale.level.id, !!saved && challengeStatus(finale,saved) !== 'playing',undefined, v.route.kind === 'progress' ? 'progress' : undefined);
+    },v.disabled);
+    mark.dataset.finale = String(index+1);
+    mark.dataset.locked = String(!finaleOpen);
+    mark.setAttribute('aria-label',`Финал главы ${index+1}${best !== undefined ? `, рекорд ${best} ход.` : finaleOpen ? ', открыт' : ', закрыт'}`);
+    if (best !== undefined) {
+      const badge = document.createElement('small'); badge.textContent = String(best); mark.append(badge);
+    }
+    strips.append(strip);
+  });
+  strips.append(hint);
+  return strips;
+}
+
+function renderChallengeDemo(parent: HTMLElement, level: LevelDefinition, moveLimit: number, geometry: boolean): void {
+  const movable = level.startTileAtPosition.flatMap((_,index) => level.pinnedPositions.includes(index) ? [] : [index]);
+  const pair = movable.flatMap(from => movable.filter(to => from < to && canSwap(level,from,to)).map(to => [from,to] as const))[0];
+  if (!pair) return;
+  const different = geometry ? movable.find(index => !pair.includes(index) && !canSwap(level,pair[0],index)) : undefined;
+  const positions = [...pair, ...(different === undefined ? [] : [different])];
+  const values = positions.map(index => level.solvedTileColors[level.startTileAtPosition[index]!]!);
+  const demo = document.createElement('section'); demo.className = 'challenge-demo';
+  const title = document.createElement('h3'); title.textContent = geometry ? 'Проба форм' : 'Проба обмена';
+  const tiles = document.createElement('div'); tiles.className = 'challenge-demo-tiles';
+  const note = document.createElement('p'); note.setAttribute('role','status');
+  let selected: number | undefined, remaining = moveLimit;
+  const elements = positions.map((position, index) => {
+    const tile = actionButton(tiles, String(index+1), () => {
+      if (selected === undefined || selected === index) { selected = selected === index ? undefined : index; }
+      else if (!canSwap(level,positions[selected]!,position)) {
+        note.textContent = 'Можно обменять плитки одинаковой формы'; selected = undefined;
+      } else if (geometry || remaining > 0) {
+        [values[selected],values[index]] = [values[index]!,values[selected]!];
+        if (!geometry) remaining--;
+        note.textContent = geometry ? 'Формы совпали' : `Ходов в пробе · ${remaining}`;
+        selected = undefined;
+      }
+      paint();
+    }, false);
+    tile.dataset.shape = level.positions?.[position]?.shape ?? 'rect';
+    return tile;
+  });
+  function paint(): void {
+    elements.forEach((tile,index) => {
+      tile.style.setProperty('--demo-tile',values[index]!);
+      tile.setAttribute('aria-pressed',String(selected===index));
+    });
+  }
+  note.textContent = geometry ? 'Коснись двух плиток' : `Ходов в пробе · ${remaining}`;
+  paint();
+  demo.append(title,tiles,note);
+  parent.append(demo);
+}
+
 function renderPicker(v: MetaView, route: PickerRoute): void {
   const { state, actions } = v;
   const index = chapterIndexFor(route.levelId);
   const chapter = chapters[index]!;
-  const pickChapter = (chapterIndex: number) => `Глава ${chapterIndex + 1} · ${chapterCount(state, chapterIndex)}/${chapters[chapterIndex]!.levelIds.length}`;
-  const chapterRequirement = (chapterIndex: number) => `Соберите ${META_POLICY.chapterAt} работ главы ${chapterIndex}`;
   const button = (text: string, invoke: () => void, parent: HTMLElement) => actionButton(parent, text, invoke, v.disabled);
   const moveTo = (next: PickerRoute, focus: string) => {
     v.navigate(next);
@@ -110,27 +192,10 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
   button('‹ Назад', v.back, nav).className = 'quiet';
   if (route.chapterMenu !== undefined) {
     v.title.textContent = 'Главы';
-    const list = document.createElement('div'); list.className = 'chapter-picker'; actions.append(list);
-    chapters.forEach((_, chapterIndex) => {
-      const open = chapterIsOpen(state, chapterIndex);
-      const node = button(pickChapter(chapterIndex), () => {
-        if (!open) {
-          moveTo({ ...route, chapterMenu: chapterIndex }, `[data-chapter="${chapterIndex + 1}"]`);
-          return;
-        }
-        const levelId = chapterIndex === index ? route.levelId : chapterIndexFor(state.activeLevelId) === chapterIndex
-          ? state.activeLevelId : recommendedLevel(state, chapterIndex) ?? chapters[chapterIndex]!.levelIds[0]!;
-        moveTo({ kind: 'chapter', levelId }, '[data-open-chapters]');
-      }, list);
-      node.dataset.chapter = String(chapterIndex + 1); node.dataset.locked = String(!open);
-      if (!open) node.setAttribute('aria-label', `${pickChapter(chapterIndex)}, закрыта`);
-      if (chapterIndex === route.chapterMenu) node.setAttribute('aria-current', 'true');
-      const swatch = document.createElement('span'); swatch.className = 'chapter-swatch';
-      swatch.setAttribute('aria-hidden', 'true'); node.prepend(swatch);
-    });
-    const hint = document.createElement('p'); hint.className = 'chapter-note'; hint.setAttribute('aria-live', 'polite');
-    if (!chapterIsOpen(state, route.chapterMenu)) hint.textContent = chapterRequirement(route.chapterMenu);
-    actions.append(hint);
+    actions.append(chapterStrips(v, route.chapterMenu, chapterIndex => {
+      const levelId = chapterIndex === index ? route.levelId : v.chosenLevel(chapterIndex);
+      moveTo({ kind:'chapter',levelId }, '[data-open-chapters]');
+    }));
     return;
   }
 
@@ -241,7 +306,7 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
   const links = document.createElement('div');
   links.className = 'level-picker-links';
   actions.append(links);
-  const chapterLink = button(pickChapter(index), () => moveTo({ ...route, chapterMenu: index }, '[aria-current=true][data-chapter]'), links);
+  const chapterLink = button(pickChapter(state,index), () => moveTo({ ...route, chapterMenu: index }, '[aria-current=true][data-chapter]'), links);
   chapterLink.className = 'quiet level-chapter-link';
   chapterLink.dataset.openChapters = '';
   const challengesLink = button('Испытания', () => v.navigate({ kind: 'challenges' }), links);
@@ -305,7 +370,9 @@ export function renderMeta(v: MetaView): void {
     renderPicker(v, route);
   } else if (route.kind === 'progress') {
     v.title.textContent = 'Прогресс';
-    renderProgress(actions, state, v.disabled, v.back);
+    renderProgress(actions, state, v.disabled, v.back, chapterStrips(v, route.chapter, index => {
+      v.navigate({ kind: 'chapter', levelId: v.chosenLevel(index) });
+    }));
   } else if (route.kind === 'books') {
     v.title.textContent = 'Книги';
     menuBack();
@@ -546,7 +613,13 @@ export function renderMeta(v: MetaView): void {
     menuRow(timedButton, continuing ? 'Продолжить заезд' : 'Заезд на время',
       timed?.finished ? `${duration} · Рекорд · ${timed.best}` : duration);
     actions.append(tabs, list);
-    for (const definition of route.group === 'chapter' ? chapterChallenges : route.group === 'geometry' ? geometryChallenges : challenges) {
+    const definitions = route.group === 'chapter' ? chapterChallenges : route.group === 'geometry' ? geometryChallenges : challenges;
+    if (route.group !== 'chapter') {
+      const demonstration = route.group === 'geometry' ? definitions.find(item => item.level.id === 'geometry-v1-mixed')
+        : definitions.find(item => challengeAvailable(item,state));
+      if (demonstration) renderChallengeDemo(list, demonstration.level, demonstration.moveLimit, route.group === 'geometry');
+    }
+    for (const definition of definitions) {
       const { level, requiredWorks, moveLimit } = definition;
       const locked = !challengeAvailable(definition, state);
       const attempt = state.challengeProgress?.attempts[level.id];

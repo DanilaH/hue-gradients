@@ -16,7 +16,7 @@ function text(parent: HTMLElement, tag: 'h3' | 'p' | 'li' | 'summary', value: st
   return node;
 }
 
-export function renderProgress(parent: HTMLElement, state: Workspace, disabled: boolean, back: () => void): void {
+export function renderProgress(parent: HTMLElement, state: Workspace, disabled: boolean, back: () => void, chapters: HTMLElement): void {
   const progress = campaignProgress(state);
   const nav = document.createElement('nav');
   nav.className = 'menu-back';
@@ -41,15 +41,7 @@ export function renderProgress(parent: HTMLElement, state: Workspace, disabled: 
   text(overview, 'p', `Идеально без помощи · ${progress.perfect}`);
   parent.append(overview);
 
-  const sets = document.createElement('ul');
-  sets.className = 'progress-list';
-  sets.setAttribute('aria-label', 'Главы');
-  for (const set of progress.sets) {
-    const caption = set.complete ? 'Собрана' : !set.open ? 'Закрыта' : set.lastOrdinary ? 'Последний обычный уровень пройден' : '';
-    const finale = set.finale ? 'Финал пройден' : set.complete ? 'Финал открыт' : '';
-    text(sets, 'li', [`${set.title} · ${set.count}/${set.total}`, caption, finale].filter(Boolean).join(' · '));
-  }
-  parent.append(sets);
+  parent.append(chapters);
 
   const history = document.createElement('details');
   history.dataset.menuDisclosure = 'history';

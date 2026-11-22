@@ -752,3 +752,28 @@ html[data-host=browser] .editor-panel {
 .calendar-selection p { margin: 0; color: #e6d0e1; font-size: .83rem; }
 .calendar-selection button { margin-top: 4px; border-radius: 0; font-weight: 700; }
 .calendar-number { position: relative; text-shadow: 0 1px 3px #1c0f23; }
+
+.chapter-strips { display: grid; gap: 8px; min-width: 0; }
+.chapter-strip { display: grid; grid-template-columns: minmax(0,1fr) 49px; gap: 3px; }
+.chapter-strip button {
+  display: grid; gap: 4px; justify-items: start; padding: 8px 10px;
+  border: 1px solid #c59fb744; border-radius: 0; color: #fff1d7; background: #21172c;
+  text-align: left; line-height: 1.1; min-width: 0;
+}
+.chapter-strip button[data-finale] { justify-items: center; align-content: center; text-align: center; font-size: 1.15rem; color: #ffdc9f; }
+.chapter-strip button[data-finale] small { font-size: .69rem; }
+.chapter-strip button[data-locked=true] { color: #c9adca; }
+.chapter-strip button[aria-current=true], .chapter-strip button:focus-visible { outline: 2px solid #ffdfa4; outline-offset: -2px; }
+.chapter-pieces { display: grid; grid-template-columns: repeat(15,minmax(0,1fr)); gap: 2px; width: 100%; }
+.chapter-pieces span { height: 13px; opacity: .26; border-bottom: 2px solid #25182e; }
+.chapter-pieces span[data-earned=true] { opacity: 1; border-bottom-color: #f6d7ab; }
+.challenge-demo { padding: 10px; background: #25182e; border: 1px solid #bb9ab644; }
+.challenge-demo h3, .challenge-demo p { margin: 0; font-size: .88rem; }
+.challenge-demo-tiles { display: flex; gap: 7px; margin: 7px 0; }
+.challenge-demo-tiles button {
+  width: 53px; padding: 0; background: var(--demo-tile); border-radius: 0;
+  color: #171021; font-weight: 700; text-shadow: 0 0 6px #ffecd6;
+}
+.challenge-demo-tiles button[data-shape^=triangle] { clip-path: polygon(50% 0,100% 100%,0 100%); padding-top: 10px; }
+.challenge-demo-tiles button[data-shape=hex] { clip-path: polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%); }
+.challenge-demo-tiles button[aria-pressed=true] { box-shadow: inset 0 0 0 4px #fff2d6; filter: brightness(1.12); }
