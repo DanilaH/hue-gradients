@@ -132,10 +132,38 @@ try {
     await row(page, yesterday).tap();
     await page.locator('[data-daily-play]').tap();
     await idle(page);
-    assert.equal(await page.locator('#levels').innerText(), '‹ Календарь');
-    await page.locator('#settings').tap();
-    assert(await button(page, 'К календарю').isVisible());
-    await button(page, 'Продолжить').tap();
+    const count = requests;
+    await context.route(`${origin}/**`, async route => {
+      try { await route.fulfill(await packaged(new URL(route.request().url()).pathname)); }
+      catch { await route.fulfill({ status: 404 }); }
+    });
+    await context.setOffline(true);
+    async function restartAndReturn(entry, hud, back, focusProperty) {
+      const before = (await state(page)).book.attempts[yesterday].attemptId;
+      await page.reload();
+      await ready(page);
+      assert.equal(await page.locator('#levels').innerText(), hud);
+      assert.equal((await state(page)).book.attempts[yesterday].attemptId, before);
+      await page.locator('#settings').tap();
+      await button(page, 'Начать заново').tap();
+      await button(page, 'Начать заново').tap();
+      await idle(page);
+      const restarted = (await state(page)).book;
+      assert.equal(restarted.entry, entry);
+      assert.equal(restarted.active, yesterday);
+      assert.notEqual(restarted.attempts[yesterday].attemptId, before);
+      assert.equal(await page.locator('#levels').innerText(), hud);
+      await page.locator('#settings').tap();
+      await button(page, back).tap();
+      await page.waitForFunction(({property,date}) => document.activeElement.dataset[property] === date,
+        { property: focusProperty, date: yesterday });
+      return restarted.attempts[yesterday].attemptId;
+    }
+    const archiveAttempt = await restartAndReturn('daily', '‹ Календарь', 'К календарю', 'dailyDate');
+    assert.equal(await row(page, yesterday).getAttribute('aria-pressed'), 'true');
+    await page.locator('[data-daily-play]').tap();
+    await idle(page);
+    assert.equal((await state(page)).book.attempts[yesterday].attemptId, archiveAttempt);
     await solve(page, yesterday);
     await button(page, 'К календарю').tap();
     await row(page, yesterday).waitFor();
@@ -145,21 +173,14 @@ try {
     await button(page, 'Книги').tap();
     await page.locator('[data-event]').tap();
     await idle(page);
-    assert.equal(await page.locator('#levels').innerText(), '‹ Книги');
-    const before = (await state(page)).book.attempts[yesterday].attemptId;
-    const count = requests;
-    await context.route(`${origin}/**`, async route => {
-      try { await route.fulfill(await packaged(new URL(route.request().url()).pathname)); }
-      catch { await route.fulfill({ status: 404 }); }
-    });
-    await context.setOffline(true);
-    await page.reload();
-    await ready(page);
-    assert.equal(await page.locator('#levels').innerText(), '‹ Книги');
-    assert.equal((await state(page)).book.attempts[yesterday].attemptId, before);
+    const eventAttempt = await restartAndReturn('books', '‹ Книги', 'К книгам', 'eventDate');
+    await page.locator('[data-event]').tap();
+    await idle(page);
+    assert.equal((await state(page)).book.attempts[yesterday].attemptId, eventAttempt);
     await solve(page, yesterday);
     await button(page, 'К книгам').tap();
     await page.locator('[data-event]').waitFor();
+    assert.equal(await page.evaluate(() => document.activeElement.dataset.eventDate), yesterday);
     await button(page, '‹ Назад').tap();
     await button(page, '‹ Назад').tap();
     await selectCalendar(page);
@@ -171,7 +192,7 @@ try {
     assert.deepEqual(saved.wins.sort(), [yesterday, today]);
     assert.deepEqual(errors, []);
     report.hosts[host] = { cleanProfile: true, retry: true, bothDatesSolved: true, offlineReopen: true,
-      activeAttemptRetained: true, calendarFocusRestored: true, eventBothOrigins: true, distinctWins: saved.wins };
+      activeAttemptRetained: true, bothSourcesRetainedOnRestart: true, focusRestoredFromPauseAndVictory: true, eventBothOrigins: true, distinctWins: saved.wins };
     await context.close();
   }
   await writeFile(`${output}/browser.json`, JSON.stringify(report, null, 2) + '\n');

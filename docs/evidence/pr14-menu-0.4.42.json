@@ -1,0 +1,279 @@
+{
+  "version": "0.4.42",
+  "base": "89a4f3beb49405c595950a1c08f6bd540180a908",
+  "source": "https://github.com/DanilaH/hue-gradients/blob/6191b1a78e88731f547b087bbfbede227339b013/docs/audits/menu-0.4.41/README.md",
+  "webZipSha256": "edd7bd99808f95f35fba450807cac1fac32404e554ce683068e32698850aedac",
+  "capture": {
+    "browser": "Chromium 141",
+    "viewport": [
+      390,
+      740
+    ],
+    "levels": {
+      "001": {
+        "seconds": 2.7333333333333334,
+        "frames": 117,
+        "cues": [
+          {
+            "ms": 1215,
+            "lengthMs": 240
+          }
+        ],
+        "phases": [
+          {
+            "phase": "still",
+            "ms": 345
+          },
+          {
+            "phase": "approach",
+            "ms": 381
+          },
+          {
+            "phase": "landed",
+            "ms": 1217
+          },
+          {
+            "phase": "reveal",
+            "ms": 1742
+          },
+          {
+            "phase": "still",
+            "ms": 2143
+          }
+        ],
+        "observedFrames": 140,
+        "earlyFooterFrames": 0,
+        "earlyDialogEnabledFrames": 0
+      },
+      "006": {
+        "seconds": 2.6666666666666665,
+        "frames": 121,
+        "cues": [
+          {
+            "ms": 1159,
+            "lengthMs": 240
+          }
+        ],
+        "phases": [
+          {
+            "phase": "still",
+            "ms": 311
+          },
+          {
+            "phase": "approach",
+            "ms": 334
+          },
+          {
+            "phase": "landed",
+            "ms": 1160
+          },
+          {
+            "phase": "reveal",
+            "ms": 1709
+          },
+          {
+            "phase": "still",
+            "ms": 2110
+          }
+        ],
+        "observedFrames": 139,
+        "earlyFooterFrames": 0,
+        "earlyDialogEnabledFrames": 0
+      }
+    },
+    "colors": {
+      "two": {
+        "normal": {
+          "color": "rgb(75, 44, 72)",
+          "opacity": 1
+        },
+        "focus": {
+          "color": "rgb(75, 44, 72)",
+          "opacity": 1
+        },
+        "active": {
+          "color": "rgb(84, 54, 82)",
+          "opacity": 1
+        },
+        "disabled": {
+          "color": "rgb(75, 44, 72)",
+          "opacity": 1
+        }
+      },
+      "three": {
+        "normal": {
+          "color": "rgb(45, 30, 54)",
+          "opacity": 1
+        },
+        "focus": {
+          "color": "rgb(45, 30, 54)",
+          "opacity": 1
+        },
+        "active": {
+          "color": "rgb(84, 54, 82)",
+          "opacity": 1
+        },
+        "disabled": {
+          "color": "rgb(45, 30, 54)",
+          "opacity": 1
+        }
+      },
+      "warmBook": {
+        "normal": {
+          "color": "rgb(38, 24, 45)",
+          "opacity": 1
+        },
+        "focus": {
+          "color": "rgb(38, 24, 45)",
+          "opacity": 1
+        },
+        "active": {
+          "color": "rgb(60, 39, 69)",
+          "opacity": 1
+        },
+        "disabled": {
+          "color": "rgb(38, 24, 45)",
+          "opacity": 1
+        }
+      },
+      "coolBook": {
+        "color": "rgb(38, 24, 45)",
+        "opacity": 1
+      }
+    },
+    "shapes": [
+      "polygon(0% 0%, 100% 0%, 0% 100%)",
+      "polygon(0% 0%, 100% 0%, 0% 100%)",
+      "polygon(100% 0%, 100% 100%, 0% 100%)"
+    ],
+    "acceptedPair": [
+      1,
+      2
+    ],
+    "rejectedPair": [
+      1,
+      3
+    ],
+    "unchangedSave": true,
+    "personalObjectWidths": [
+      130.328125,
+      78.96875,
+      78.96875
+    ],
+    "fontProbes": [
+      "Noto Sans Display",
+      "DejaVu Sans Mono"
+    ]
+  },
+  "daily": {
+    "dates": [
+      "2026-11-22",
+      "2026-11-21"
+    ],
+    "snapshot": "423754bb9136b80522b3b7bbb9256c30a4e9969b9598577179d7f0d70735a411",
+    "hosts": {
+      "android": {
+        "cleanProfile": true,
+        "retry": true,
+        "bothDatesSolved": true,
+        "offlineReopen": true,
+        "activeAttemptRetained": true,
+        "bothSourcesRetainedOnRestart": true,
+        "focusRestoredFromPauseAndVictory": true,
+        "eventBothOrigins": true,
+        "distinctWins": [
+          "2026-11-21",
+          "2026-11-22"
+        ]
+      },
+      "yandex": {
+        "cleanProfile": true,
+        "retry": true,
+        "bothDatesSolved": true,
+        "offlineReopen": true,
+        "activeAttemptRetained": true,
+        "bothSourcesRetainedOnRestart": true,
+        "focusRestoredFromPauseAndVictory": true,
+        "eventBothOrigins": true,
+        "distinctWins": [
+          "2026-11-21",
+          "2026-11-22"
+        ]
+      }
+    },
+    "limits": "Production app entrypoints and separately served staging publication. Offline restart uses local packaged shell bytes; browser network is disabled. No live publication or native binary."
+  },
+  "personal": {
+    "browser": "141.0.7390.37",
+    "sameDayRetry": true,
+    "staleRetryReturnedToToday": true,
+    "retainedHistory": true,
+    "civilClockDidNotChangeTimer": true,
+    "awardsAfterReplay": 1
+  },
+  "victoryTiming": {
+    "landing": {
+      "ms": 881,
+      "zoom": 0.783135,
+      "wave": 0.004090909095424595,
+      "opacity": 0,
+      "chrome": 0,
+      "tileOpacity": 1
+    },
+    "fortyMs": {
+      "ms": 914,
+      "zoom": 0.807643,
+      "wave": 0.05469696969922745,
+      "opacity": 0,
+      "chrome": 0,
+      "tileOpacity": 1
+    },
+    "peak": {
+      "ms": 1047,
+      "zoom": 1.02185,
+      "wave": 0.25742424242762907,
+      "opacity": 0,
+      "chrome": 0,
+      "tileOpacity": 0.580191
+    },
+    "appears": {
+      "ms": 1431,
+      "zoom": 1,
+      "wave": 0.8374242424287579,
+      "opacity": 0.00243216,
+      "chrome": 0,
+      "tileOpacity": 0
+    },
+    "ready": {
+      "ms": 1831,
+      "zoom": 1,
+      "wave": 1,
+      "opacity": 1,
+      "chrome": 0,
+      "tileOpacity": 0
+    }
+  },
+  "art": {
+    "fresh": 2,
+    "afterCampaign001": 3,
+    "viewports": [
+      [
+        390,
+        740
+      ]
+    ],
+    "fontDecision": "pending owner review"
+  },
+  "checks": {
+    "unitPassed": 198,
+    "webRelease": true,
+    "specFiles": 40,
+    "yandexBuild": true
+  },
+  "remaining": [
+    "signed Android APK",
+    "physical Android device",
+    "production Daily catalog",
+    "owner font decision"
+  ]
+}
