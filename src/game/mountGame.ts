@@ -13,7 +13,7 @@ import { Atmosphere, type ColourPointer } from './atmosphere';
 import { cellCenter } from './geometry';
 import { AmbientMusic } from './music';
 import { GameFeedback, type Haptic } from './feedback';
-import { dailyLabel, levelPreview, renderMeta, type MetaRoute } from './metaView';
+import { dailyLabel, isMenuList, levelPreview, renderMeta, type MetaRoute } from './metaView';
 import { chapterIndexFor, recommendedLevel, rewardTitle } from '../domain/progression';
 import { authorBests, authorView, findDraft, hasAuthorProof, type CreativeAction } from '../domain/creative';
 import { makePuzzleFile, parsePuzzleFile } from '../domain/puzzleTransfer';
@@ -422,6 +422,17 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   function renderDialog(): void {
     rememberAlbum();
     const switchLayer = dialog.dataset.layer !== layer;
+    const menu = layer === 'meta' && isMenuList(metaRoute) ? metaRoute.kind : undefined;
+    const switchMenu = dialog.dataset.menu !== menu;
+    const menuScroll = !switchMenu && menu ? dialog.scrollTop : 0;
+    const openDisclosures = !switchMenu && menu
+      ? [...actions.querySelectorAll<HTMLDetailsElement>('details[open][data-menu-disclosure]')].map(node => node.dataset.menuDisclosure)
+      : [];
+    if (menu) dialog.dataset.menu = menu;
+    else delete dialog.dataset.menu;
+    const dialogTitle = byId('dialog-title');
+    if (menu) dialogTitle.tabIndex = -1;
+    else if (switchMenu) dialogTitle.removeAttribute('tabindex');
     if (switchLayer) pauseFocus = 0;
     shownAlbum = layer === 'meta' && metaRoute.kind === 'album' ? metaRoute : null;
     dialog.dataset.album = String(!!shownAlbum);
@@ -623,6 +634,13 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     }
     syncVictoryActions();
     if (!dialog.open) { lastFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null; dialog.showModal(); }
+    if (menu) {
+      for (const node of actions.querySelectorAll<HTMLDetailsElement>('details[data-menu-disclosure]')) {
+        node.open = openDisclosures.includes(node.dataset.menuDisclosure);
+      }
+      dialog.scrollTop = menuScroll;
+      if (switchMenu) dialogTitle.focus({ preventScroll: true });
+    }
     if (isPause(layer) && !busy && !activity.isBlocked()) {
       (actions.querySelectorAll<HTMLElement>('button, input')[pauseFocus] ?? actions.querySelector<HTMLElement>('button, input'))?.focus({ preventScroll: true });
     } else if (layer === 'result' && (switchLayer || document.activeElement === dialog)) syncVictoryActions(true);
@@ -659,8 +677,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     else scene.setView(level, initialAttempt, false, false);
     const picker = layer === 'meta' && metaRoute.kind === 'chapter' ? metaRoute : null;
     const cardId = selectedWork(), authorCard = selectedAuthorWork();
-    const gallery = layer === 'meta' && metaRoute.kind === 'album';
-    atmosphere.placeInside(picker || cardId || authorCard || gallery ? dialog : root);
+    const menuBackdrop = layer === 'meta' && (metaRoute.kind === 'album' || isMenuList(metaRoute));
+    atmosphere.placeInside(picker || cardId || authorCard || menuBackdrop ? dialog : root);
     if (picker) {
       const model = picker.chapterMenu === undefined ? levelPreview(session.state, picker.levelId) : null;
       atmosphere.setModel(model?.level ?? null, model?.board ?? null);
@@ -668,12 +686,12 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       atmosphere.setModel(getLevel(cardId), null);
     } else if (authorCard) {
       atmosphere.setModel(authorCard.work.nodes[authorCard.nodeId]!.field, null);
-    } else if (gallery) {
+    } else if (menuBackdrop) {
       atmosphere.setModel(null, null);
     } else {
       atmosphere.setModel(hiddenField ? null : level, preview || hiddenField ? null : attempt?.board ?? initialAttempt.board, !hiddenField);
     }
-    atmosphere.configure(ready && !activity.isBlocked() && (picker !== null || cardId !== null || authorCard !== null || gallery || ['none', 'help', 'settings', 'preferences'].includes(layer) || layer === 'result' && victoryPhase === 'approach'), motionAllowed());
+    atmosphere.configure(ready && !activity.isBlocked() && (picker !== null || cardId !== null || authorCard !== null || menuBackdrop || ['none', 'help', 'settings', 'preferences'].includes(layer) || layer === 'result' && victoryPhase === 'approach'), motionAllowed());
     feedback.configure(session.state.preferences, !ready || activity.isBlocked());
     music.configure(ready && !activity.isBlocked() && session.state.preferences.music);
     activity.setGameplayDesired(ready && !busy && layer === 'none' && !attempt?.completed && !activity.isBlocked());

@@ -72,8 +72,12 @@ export function renderAlbum(parent: HTMLElement, props: Props): void {
     return node;
   };
   const print = (parent: HTMLElement, field: ExportField, title: string, id: string, action: () => void) => {
-    const node = button(parent, '', action);
+    const node = button(parent, '', () => {
+      node.focus({ preventScroll: true });
+      action();
+    });
     node.dataset.albumFocus = id;
+    if (position?.focus === id) node.dataset.albumSelected = '';
     node.className = 'album-print';
     node.append(gradientThumbnail(field));
     const name = document.createElement('span');

@@ -24,7 +24,7 @@ try {
   const recording = process.env.RECORD_EPISODE === '1';
   const errors = [];
   async function profile(day, record = false) {
-    const context = await browser.newContext({ viewport, hasTouch: true, isMobile: true, timezoneId: 'UTC',
+    const context = await browser.newContext({ viewport, hasTouch: true, isMobile: true, timezoneId: 'UTC', reducedMotion: 'reduce',
       ...(record ? { recordVideo: { dir: output, size: viewport } } : {}) });
     await context.addInitScript(day => {
       const CivilDate = Date;

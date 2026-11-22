@@ -25,6 +25,11 @@ interface MetaView {
   playDaily(date: string, replay: boolean): void;
   playPersonal(key: string, restart: boolean): void;
 }
+
+export function isMenuList(route: MetaRoute): boolean {
+  return ['personal', 'daily', 'books', 'progress', 'challenges'].includes(route.kind);
+}
+
 function actionButton(parent: HTMLElement, text: string, invoke: () => void, disabled: boolean): HTMLButtonElement {
   const button = document.createElement('button');
   button.type = 'button'; button.textContent = text; button.disabled = disabled;
@@ -176,6 +181,14 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
       center?.contains(document.elementFromPoint(event.clientX, event.clientY))) activate();
   };
   const details = document.createElement('div'); details.className = 'level-actions'; actions.append(details);
+  const selection = document.createElement('p');
+  selection.className = 'level-selection';
+  const number = document.createElement('strong');
+  number.textContent = String(getLevel(route.levelId).ordinal).padStart(3, '0');
+  const status = document.createElement('span');
+  status.textContent = selectedState;
+  selection.append(number, status);
+  details.append(selection);
   if (selectedState === 'Закрыт') {
     const requirement = document.createElement('p'); requirement.className = 'chapter-note';
     const ordinal = getLevel(route.levelId).ordinal;
@@ -224,6 +237,41 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
 const russianDate = new Intl.DateTimeFormat('ru', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 export const dailyLabel = (date: string): string => russianDate.format(new Date(`${date}T00:00:00Z`));
 
+function menuRow(row: HTMLButtonElement, title: string, description: string, status?: string,
+  colours?: readonly string[]): void {
+  row.className = 'quiet menu-row';
+  const copy = document.createElement('span');
+  copy.className = 'menu-row-copy';
+  const name = document.createElement('span');
+  name.textContent = title;
+  copy.append(name);
+  if (description) {
+    const detail = document.createElement('small');
+    detail.textContent = description;
+    copy.append(detail);
+  }
+  if (colours) {
+    const swatch = document.createElement('span');
+    swatch.className = 'menu-row-swatch';
+    swatch.style.background = `linear-gradient(145deg,${colours.join(',')})`;
+    swatch.setAttribute('aria-hidden', 'true');
+    row.append(swatch);
+  }
+  row.append(copy);
+  if (status) {
+    const state = document.createElement('span');
+    state.className = 'menu-row-status';
+    state.textContent = status;
+    row.append(state);
+  } else if (!row.disabled) {
+    const arrow = document.createElement('span');
+    arrow.className = 'menu-row-arrow';
+    arrow.setAttribute('aria-hidden', 'true');
+    arrow.textContent = '›';
+    row.append(arrow);
+  }
+}
+
 export function renderMeta(v: MetaView): void {
   const { state, route, actions } = v;
   actions.dataset.meta = route.kind;
@@ -231,6 +279,7 @@ export function renderMeta(v: MetaView): void {
   const button = (text: string, handler: () => void, parent: HTMLElement = actions, disabled = false) =>
     actionButton(parent, text, handler, disabled || v.disabled);
   const back = () => button('Назад', v.back);
+  const menuBack = () => button('‹ Назад', v.back).className = 'quiet menu-back';
   if (route.kind === 'chapter') {
     renderPicker(v, route);
   } else if (route.kind === 'progress') {
@@ -238,7 +287,7 @@ export function renderMeta(v: MetaView): void {
     renderProgress(actions, state, v.disabled, v.back);
   } else if (route.kind === 'books') {
     v.title.textContent = 'Книги';
-    button('‹ Назад', v.back).className = 'quiet challenge-back';
+    menuBack();
     for (const book of books) {
       const progress = bookProgress(book, state);
       const panel = document.createElement('article');
@@ -278,12 +327,12 @@ export function renderMeta(v: MetaView): void {
     button('Отмена', v.back);
   } else if (route.kind === 'personal') {
     v.title.textContent = 'Личные задания';
-    button('‹ Назад', v.back).className = 'quiet challenge-back';
+    menuBack();
     const progress = state.personalProgress;
     if (!progress) return;
-    label(dailyLabel(progress.day));
+    label(dailyLabel(progress.day), 'menu-date');
     const list = document.createElement('div');
-    list.className = 'challenge-list';
+    list.className = 'menu-list';
     actions.append(list);
     for (const kind of TASK_KINDS) {
       const key = taskKey(progress.day, kind);
@@ -291,60 +340,56 @@ export function renderMeta(v: MetaView): void {
       if (!task) continue;
       const finished = taskStatus(task) !== 'playing';
       const card = button('', () => v.playPersonal(key, finished), list);
-      card.className = 'quiet challenge-card';
+      const level = personalLevel(task.levelId);
+      const earned = progress.earned.includes(key);
       card.dataset.personal = kind;
-      const name = document.createElement('span');
-      name.textContent = personalTaskName(task);
-      const info = document.createElement('small');
-      info.textContent = [
-        personalLevel(task.levelId).title,
+      card.dataset.earned = String(earned);
+      menuRow(card, personalTaskName(task), [
+        level.title,
         task.limit !== undefined ? `Лимит: ${task.limit}` : task.durationMs ? `${task.durationMs / 1000} с` : '',
-        progress.earned.includes(key) ? 'Выполнено' : task.attempt && !finished ? 'Продолжить' : '',
-      ].filter(Boolean).join(' · ');
-      card.append(name, info);
+      ].filter(Boolean).join(' · '),
+      earned ? 'Выполнено' : task.attempt ? finished ? 'Повторить' : 'Продолжить' : undefined,
+      [level.solvedTileColors[0]!, level.solvedTileColors[level.width - 1]!, level.solvedTileColors.at(-1)!]);
     }
     if (progress.earned.length) {
       const history = document.createElement('details');
+      history.dataset.menuDisclosure = 'personal';
       const title = document.createElement('summary');
       title.textContent = `Выполненные задания · ${progress.earned.length}`;
-      const list = document.createElement('ul');
+      const historyRows = document.createElement('ul');
+      historyRows.className = 'menu-history';
       for (const key of [...progress.earned].reverse()) {
         const task = progress.tasks[key]!;
         const row = document.createElement('li');
         row.textContent = `${dailyLabel(task.date)} · ${personalTaskName(task)}`;
-        list.append(row);
+        historyRows.append(row);
       }
-      history.append(title, list);
+      history.append(title, historyRows);
       actions.append(history);
     }
   } else if (route.kind === 'daily') {
     v.title.textContent = 'Задача дня';
-    button('‹ Назад', v.back).className = 'quiet challenge-back';
+    menuBack();
     const catalog = state.dailyProgress;
     const dates = Object.keys(catalog?.slots ?? {}).sort().reverse();
     if (!dates.length) {
-      label(v.dailyLoading ? 'Проверяем календарь…' : 'Календарь пока недоступен.');
+      label(v.dailyLoading ? 'Проверяем календарь…' : 'Календарь пока недоступен.', 'menu-note').setAttribute('role', 'status');
       return;
     }
     const list = document.createElement('div');
-    list.className = 'challenge-list';
+    list.className = 'menu-list';
     actions.append(list);
     for (const date of dates) {
       const attempt = catalog!.attempts[date];
       const replay = attempt?.completed === true;
       const card = button('', () => v.playDaily(date, replay), list);
-      card.className = 'quiet challenge-card';
       card.dataset.dailyDate = date;
-      const title = document.createElement('span');
-      title.textContent = dailyLabel(date);
-      const info = document.createElement('small');
-      info.textContent = [date === catalog!.through ? 'Общая задача' : 'Архив',
-        replay ? 'Собрано · Повторить' : attempt ? 'Продолжить' : ''].filter(Boolean).join(' · ');
-      card.append(title, info);
+      menuRow(card, dailyLabel(date), date === catalog!.through ? 'Общая задача' : 'Архив',
+        replay ? 'Собрано · Повторить' : attempt ? 'Продолжить' : undefined);
     }
   } else if (route.kind === 'challenges') {
     v.title.textContent = 'Испытания';
-    button('‹ Назад', v.back).className = 'quiet challenge-back';
+    menuBack();
     const tabs = document.createElement('div');
     tabs.className = 'challenge-tabs';
     for (const [group, name] of [[undefined, 'Лимит ходов'], ['chapter', 'Финалы глав'], ['geometry', 'Фигуры']] as const) {
@@ -353,13 +398,11 @@ export function renderMeta(v: MetaView): void {
       tab.setAttribute('aria-pressed', String(route.group === group));
     }
     const list = document.createElement('div');
-    list.className = 'challenge-list';
+    list.className = 'menu-list';
     const timed = state.timedProgress;
-    const timedButton = button(timed && timed.run.remainingMs > 0 ? 'Продолжить заезд' : 'Заезд на время', v.playTimed);
-    timedButton.className = 'quiet challenge-card';
-    const detail = document.createElement('small');
-    detail.textContent = timed?.finished ? `10 минут · Рекорд · ${timed.best}` : '10 минут';
-    timedButton.append(detail);
+    const timedButton = button('', v.playTimed);
+    menuRow(timedButton, timed && timed.run.remainingMs > 0 ? 'Продолжить заезд' : 'Заезд на время',
+      timed?.finished ? `10 минут · Рекорд · ${timed.best}` : '10 минут');
     actions.append(tabs, list);
     for (const definition of route.group === 'chapter' ? chapterChallenges : route.group === 'geometry' ? geometryChallenges : challenges) {
       const { level, requiredWorks, moveLimit } = definition;
@@ -368,19 +411,13 @@ export function renderMeta(v: MetaView): void {
       const best = state.challengeProgress?.best[level.id];
       const restart = !!attempt && challengeStatus(definition, attempt) !== 'playing';
       const card = button('', () => v.playChallenge(level.id, restart), list, locked);
-      card.className = 'quiet challenge-card';
       card.dataset.challengeId = level.id;
-      const title = document.createElement('span');
-      title.textContent = level.title;
-      const note = document.createElement('small');
-      note.textContent = locked ? definition.afterFinaleId ? 'Пройди финал главы'
+      menuRow(card, level.title, locked ? definition.afterFinaleId ? 'Пройди финал главы'
         : definition.chapterIndex !== undefined ? 'Собери все работы главы'
         : `Откроется за ${requiredWorks} работ` : [
         `Лимит · ${moveLimit}`,
-        restart ? 'Повторить' : attempt ? 'Продолжить' : '',
         best === undefined ? '' : `Рекорд · ${best}`,
-      ].filter(Boolean).join(' · ');
-      card.append(title, note);
+      ].filter(Boolean).join(' · '), locked ? 'Закрыто' : restart ? 'Повторить' : attempt ? 'Продолжить' : undefined);
     }
   } else if (route.kind === 'card' || route.kind === 'copy') {
     const level = getLevel(route.levelId);

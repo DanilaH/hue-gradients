@@ -19,7 +19,7 @@ try{
  const state=()=>page.evaluate(async()=>{const{openIndexedDb}=await import('/src/local-store/indexed-db.ts');const s=await openIndexedDb(),r=await s.load('guest-local-v1');s.close();return{...JSON.parse(r.snapshotJson),revision:r.localRevision};});
  const solve=async ordinal=>{const level=defs[ordinal-1];assert.equal((await state()).activeLevelId,level.id);
   for(const[from,to]of witnesses.find(r=>r.id===level.id).legalOptimalWitness){for(const index of[from,to]){const r=await page.locator('#board-region canvas').boundingBox();await page.mouse.click(r.x+(index%level.width+.5)*r.width/level.width,r.y+4+(Math.floor(index/level.width)+.5)*(r.height-8)/level.height);}await idle();}
-  await page.waitForSelector('#hue-app[data-layer=result]');assert((await state()).attempts[level.id].completed);
+  await page.waitForSelector('#hue-app[data-layer=result][data-victory-phase=still]');assert((await state()).attempts[level.id].completed);
  };
  const picker=async()=>{for(let i=0;i<12&&(await page.locator('#hue-app').getAttribute('data-layer'))!=='none';i++)await page.keyboard.press('Escape');await page.locator('#levels').click();await page.locator('.level-stage').waitFor();};
  const chapterMenu=()=>page.locator('[data-open-chapters]').click();

@@ -1,0 +1,289 @@
+{
+  "package": "V2",
+  "date": "2026-11-22",
+  "baseCommit": "e79bc5d58102546e4d8a6bef0ad56e5cd3b0f27a",
+  "ownerAcceptedV14On006": true,
+  "build": {
+    "version": "0.4.34",
+    "versionCode": 38,
+    "host": "web",
+    "latestSignedAndroid": "0.4.31 (35)",
+    "signedAndroidBuilt": false
+  },
+  "feature": {
+    "sourceFeatureId": "poluson-angular-ui",
+    "before": "PARTIAL",
+    "observed": "MATCH in Chromium for V2 menu routes",
+    "typeface": "Owner decision pending. System UI retained."
+  },
+  "kitImpact": "REUSE",
+  "scenarios": {
+    "browser": "141.0.7390.37",
+    "comparisonProfiles": "Same 30 campaign completions in Chapters 1–3, prepared with legal session swaps. Fixed civil date 2026-11-25. Gesture and navigation were performed in the actual browser app.",
+    "visibleResume": true,
+    "picker": {
+      "swipe": true,
+      "arrow": true,
+      "previewTap": true
+    },
+    "album": {
+      "scrollBefore": 2026,
+      "scrollAfter": 2026,
+      "selected": "gradient-037"
+    },
+    "progressHistoryEntries": 30,
+    "layout": [
+      {
+        "tag": "tasks-390x740",
+        "viewport": [
+          390,
+          740
+        ],
+        "dialog": [
+          390,
+          740
+        ],
+        "horizontalOverflow": 0,
+        "titleSize": "23.4px",
+        "tasks": [
+          {
+            "width": 343.21875,
+            "height": 62.296875,
+            "bottom": 235.03125
+          },
+          {
+            "width": 343.21875,
+            "height": 62.296875,
+            "bottom": 297.328125
+          },
+          {
+            "width": 343.21875,
+            "height": 62.296875,
+            "bottom": 359.625
+          }
+        ]
+      },
+      {
+        "tag": "tasks-320x568",
+        "viewport": [
+          320,
+          568
+        ],
+        "dialog": [
+          320,
+          568
+        ],
+        "horizontalOverflow": 0,
+        "titleSize": "22.4px",
+        "tasks": [
+          {
+            "width": 281.625,
+            "height": 102.59375,
+            "bottom": 267.328125
+          },
+          {
+            "width": 281.625,
+            "height": 62.296875,
+            "bottom": 329.625
+          },
+          {
+            "width": 281.625,
+            "height": 62.296875,
+            "bottom": 391.921875
+          }
+        ]
+      },
+      {
+        "tag": "tasks-320x568-150-percent",
+        "viewport": [
+          320,
+          568
+        ],
+        "dialog": [
+          320,
+          568
+        ],
+        "horizontalOverflow": 0,
+        "titleSize": "33.6px",
+        "tasks": [
+          {
+            "width": 281.625,
+            "height": 147.40625,
+            "bottom": 372.59375
+          },
+          {
+            "width": 281.625,
+            "height": 98.140625,
+            "bottom": 470.734375
+          },
+          {
+            "width": 281.625,
+            "height": 71.265625,
+            "bottom": 542
+          }
+        ]
+      },
+      {
+        "tag": "tasks-568x320",
+        "viewport": [
+          568,
+          320
+        ],
+        "dialog": [
+          568,
+          320
+        ],
+        "horizontalOverflow": 0,
+        "titleSize": "22.72px",
+        "tasks": [
+          {
+            "width": 504,
+            "height": 62.296875,
+            "bottom": 178.671875
+          },
+          {
+            "width": 504,
+            "height": 62.296875,
+            "bottom": 240.96875
+          },
+          {
+            "width": 504,
+            "height": 62.296875,
+            "bottom": 303.265625
+          }
+        ]
+      },
+      {
+        "tag": "challenges-568x320",
+        "viewport": [
+          568,
+          320
+        ],
+        "dialog": [
+          568,
+          320
+        ],
+        "horizontalOverflow": 0,
+        "titleSize": "22.72px",
+        "tasks": [
+          {
+            "width": 504,
+            "height": 62,
+            "bottom": 151.671875
+          },
+          {
+            "width": 504,
+            "height": 62.296875,
+            "bottom": 274.96875
+          },
+          {
+            "width": 504,
+            "height": 62.296875,
+            "bottom": 337.265625
+          },
+          {
+            "width": 504,
+            "height": 62.296875,
+            "bottom": 399.5625
+          },
+          {
+            "width": 504,
+            "height": 62.296875,
+            "bottom": 461.859375
+          },
+          {
+            "width": 504,
+            "height": 62.296875,
+            "bottom": 524.15625
+          },
+          {
+            "width": 504,
+            "height": 62.296875,
+            "bottom": 586.453125
+          },
+          {
+            "width": 504,
+            "height": 62.296875,
+            "bottom": 648.75
+          },
+          {
+            "width": 504,
+            "height": 62.296875,
+            "bottom": 711.046875
+          },
+          {
+            "width": 504,
+            "height": 62.296875,
+            "bottom": 773.34375
+          },
+          {
+            "width": 504,
+            "height": 62.296875,
+            "bottom": 835.640625
+          }
+        ]
+      },
+      {
+        "tag": "progress-568x320",
+        "viewport": [
+          568,
+          320
+        ],
+        "dialog": [
+          568,
+          320
+        ],
+        "horizontalOverflow": 0,
+        "titleSize": "22.72px",
+        "tasks": [
+          {
+            "width": 56.078125,
+            "height": 48,
+            "bottom": 52
+          }
+        ]
+      }
+    ],
+    "dailyArchive": {
+      "emptyAndBack": true,
+      "offlineReplayFromFixture": true
+    },
+    "personalDatesAndNoDuplicateRewards": true,
+    "booksAndEventFixture": true,
+    "lockedChapterAndFinale": true,
+    "m3ScenarioCount": 15,
+    "editorScenarioCount": 19,
+    "helpScenarioCount": 7,
+    "wallpaperUIFlows": 6,
+    "independentPngPixelChecks": 8,
+    "v14VictoryBrowserRegression": true
+  },
+  "buildChecks": {
+    "unitTests": 197,
+    "typecheck": true,
+    "androidWebReleaseAssets": true,
+    "yandex": true,
+    "spec": true,
+    "kitDoctorStrict": true
+  },
+  "artifacts": [
+    {
+      "file": "Poluson-V2-menus.gif",
+      "sha256": "6922950b9640c1c1bb0756b6fa014f364a56744f4b589fe1fd1e92a0281fbb8b"
+    },
+    {
+      "file": "Tasks-comparison.png",
+      "sha256": "205a9239af33aa9c046dcc8dd5ca0c4d2ec9e928eb4b49a7eae3b37e76640f4f"
+    },
+    {
+      "file": "Album-comparison.png",
+      "sha256": "4aa76ad3597877677b6b892840d27c2a10205247b8463695f650e623c8b7b7f9"
+    }
+  ],
+  "limits": {
+    "physicalAndroid": "pending",
+    "androidBuild": "SDK unavailable in executor. V1.4 base host CI failed at read-only kit access configuration.",
+    "liveDaily": "fixture checks only",
+    "appearance": "System UI retained until typeface is approved."
+  }
+}

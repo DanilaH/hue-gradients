@@ -19,7 +19,7 @@ function text(parent: HTMLElement, tag: 'h3' | 'p' | 'li' | 'summary', value: st
 export function renderProgress(parent: HTMLElement, state: Workspace, disabled: boolean, back: () => void): void {
   const progress = campaignProgress(state);
   const nav = document.createElement('nav');
-  nav.className = 'progress-nav';
+  nav.className = 'menu-back';
   const close = document.createElement('button');
   close.type = 'button';
   close.className = 'quiet';
@@ -52,6 +52,7 @@ export function renderProgress(parent: HTMLElement, state: Workspace, disabled: 
   parent.append(sets);
 
   const history = document.createElement('details');
+  history.dataset.menuDisclosure = 'history';
   text(history, 'summary', `История побед · ${progress.victories.length}`);
   if (progress.victories.length === 0) text(history, 'p', 'Здесь появятся результаты собранных уровней.');
   else {
@@ -85,6 +86,7 @@ export function renderProgress(parent: HTMLElement, state: Workspace, disabled: 
 
   if (state.preferences.statistics) {
     const mastery = document.createElement('details');
+    mastery.dataset.menuDisclosure = 'mastery';
     text(mastery, 'summary', 'Ступени мастерства');
     if (!progress.compared && !PUBLISHED_BENCHMARKS.length) {
       text(mastery, 'p', 'Сравнение появится после публикации результатов игроков.');

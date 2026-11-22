@@ -33,7 +33,7 @@ try {
   const first = staged?.before.through ?? '2026-11-20', second = staged?.after.through ?? '2026-11-21';
   const versions = { before: staged?.before.publication.catalogSha256 ?? 'v1', after: staged?.after.publication.catalogSha256 ?? 'v2' };
   const errors = [];
-  async function profile(record) {
+  async function profile(record, initialPhase) {
     const context = await browser.newContext({ viewport, hasTouch: true, isMobile: true,
       ...(record ? { recordVideo: { dir: output, size: viewport } } : {}) });
     await context.route('**/daily-fixture.html', route => route.fulfill({ contentType: 'text/html; charset=utf-8', body:
@@ -90,6 +90,7 @@ try {
       }, staged && { before: staged.before.publication, after: staged.after.publication, bank: staged.bank?.publication });
     };
     await page.goto(`${base}/daily-fixture.html`);
+    if (initialPhase) await page.evaluate(phase => sessionStorage.setItem('fixture-daily', phase), initialPhase);
     await boot();
     return { context, page, boot, captureBase };
   }
@@ -100,6 +101,14 @@ try {
     await page.locator(`[data-daily-date="${first}"]`).waitFor();
   };
   const slot = (page, date) => page.locator(`[data-daily-date="${date}"]`);
+  const empty = await profile(false, 'offline');
+  await empty.page.locator('#levels').tap();
+  await empty.page.getByRole('button', { name: 'Задача дня', exact: true }).tap();
+  await empty.page.getByRole('status').filter({ hasText: 'Календарь пока недоступен.' }).waitFor();
+  assert.equal(await empty.page.locator('[data-daily-date]').count(), 0);
+  await empty.page.getByRole('button', { name: '‹ Назад', exact: true }).tap();
+  await empty.page.locator('.level-stage').waitFor();
+  await empty.context.close();
   const idle = page => page.waitForSelector('#hue-app[data-busy=false]');
   const state = page => page.evaluate(async () => {
     const { openIndexedDb } = await import('/src/local-store/indexed-db.ts');
@@ -215,7 +224,7 @@ try {
     await bank.context.close();
   }
   assert.deepEqual(errors, []);
-  const report = { browser: browser.version(), authoredSnapshot: Boolean(staged),
+  const report = { browser: browser.version(), authoredSnapshot: Boolean(staged), emptyArchiveBack: true,
     completedLevel: offline.book.slots[first].level.id, moves: offline.book.attempts[first].moves,
     sameDailyStartOnTwoProfiles: true, acrossUtcMidnight: [first, second],
     verifiedWireBytes: Boolean(staged), corruptUpdatePreservedArchive: Boolean(staged),
