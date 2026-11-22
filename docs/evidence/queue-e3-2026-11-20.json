@@ -1,0 +1,15 @@
+{
+  "source": "src/app/publicationClient.ts",
+  "controls": "tests/publication.test.ts",
+  "kitImpact": "REUSE",
+  "passed": 2,
+  "fixtureChecks": [
+    "retry after accepted response loss uses same operation ID and original revision bytes",
+    "unchecked revision blocked; 15 accepted submissions per trusted UTC date and new day",
+    "monotonic moderation, withdrawal and deduplicated complaint; invalid payload filtered from feed"
+  ],
+  "live": {
+    "status": "NOT CONFIGURED",
+    "returnWhen": "A deployed service with verified identity and UTC, durable idempotent moderation, listing, complaint and withdrawal receipts is available."
+  }
+}

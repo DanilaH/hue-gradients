@@ -1,0 +1,58 @@
+{
+  "browser": "158.0.8127.36",
+  "emptyProfileSlots": 2,
+  "experiencedProfileSlots": 3,
+  "earlierBest": 3,
+  "acceptedPersonalMoves": 1,
+  "awardsAfterReplay": 1,
+  "future": "gradient-016",
+  "presentTimerFixture": "45 seconds, injected time",
+  "clipStartMillis": 1442,
+  "clipMillis": 1915,
+  "source": "1f206af56b9cde90fe571d30faab0e868352b207",
+  "kitImpact": "REUSE",
+  "unitChecks": 178,
+  "coreChromium": 21,
+  "timedRegression": true,
+  "policy": "personal-v1",
+  "apk": {
+    "kind": "releasecheck",
+    "package": "com.danilah.huegradients.preview3",
+    "versionName": "0.4.22",
+    "versionCode": 26,
+    "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+    "source": "1f206af56b9cde90fe571d30faab0e868352b207",
+    "apkSha256": "cdd57c334ce51e779c78b20eaa2b3a332f8b0721d63c76f924d313d9d4b96f7d",
+    "bytes": 1208676,
+    "certificateSha256": "3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85",
+    "productionSigner": false,
+    "v2": true,
+    "zipalign16k": true,
+    "debuggable": false,
+    "webViewDebuggingConfigured": false,
+    "nativeInsetOwner": "content-root",
+    "webPayload": {
+      "start-error.html": "22cc22f670fac501b781a7e27ee2b38842839e03f47bfb72c199768b5c709598",
+      "index.html": "8300bcb04acc081492fe60e393158450e7df1d4c10d458c2d594e2c808136cf1",
+      "native-build.json": "d6776c22b4d785acafac6f324de6e51d9700f8d00340e5638b59090fc0a0fc70",
+      "assets/native-ttWVwMFk.js": "a77e2538e2c6cea787fc6d1ac82c4828eec2f8a3c3244eb1c14751fef8ea6102",
+      "assets/nativeFeedback-BdXlsEx8.js": "aa12bc0f39307f8a86d95c5b93e428317c5282ed05069350ea7ef8fd1ad69648",
+      "assets/web-BM7xF5pS.js": "874bbd026b2a3757b6c7bedc1bd163f0c735a3e0a943605c9853f660d828d658",
+      "assets/index-Q2wAHdDX.css": "df7b0f397eee53929bf8904961e47b403e72ee84dd00107843e9eeb11eb740ef",
+      "assets/nativeExport-CqbPFgKE.js": "5810d391885079b04fe08fbd9075ad787560ad4f04d814f2b7faac850fb46b8b",
+      "assets/index-1xdhda0r.js": "5c9c6e66e153523f8f1f67f286bc19f9474e3bbaa0173f0d27531a9d4278c17a",
+      "assets/command-BzJMFn4z.js": "56f6750bc40b8fb2c1a76c2cfb70085b2719545adc9b46739cdf944861ab6655",
+      "assets/dist-CMedSjkm.js": "067d9ca66629f984cf538346471032b4b24f9acd1cb914834126e2b88d3250fe"
+    },
+    "nativeRuntime": "NOT RUN",
+    "liveServices": "NOT INSTALLED BY THIS HOST TEMPLATE"
+  },
+  "gif": {
+    "name": "Poluson-D2-personal.gif",
+    "sha256": "52fdbab4be33a9ff892f745fc39a45a87f652f18b035cdddc4e37678c254f13b"
+  },
+  "sharing": {
+    "status": "UNKNOWN",
+    "returnWhen": "Obtain original recording with regular win and all 3 personal result shares, compare payload and destinations."
+  }
+}

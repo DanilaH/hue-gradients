@@ -1,0 +1,256 @@
+{
+  "date": "2026-11-21",
+  "package": "V1",
+  "base": "b53e8ef71880e77b505df27e13659f18cd6e4db9",
+  "brief": "https://github.com/DanilaH/hue-gradients/pull/9",
+  "sourceFeatureIds": [
+    "poluson-angular-ui",
+    "poluson-tile-dither",
+    "poluson-win-landing",
+    "poluson-paint-spray"
+  ],
+  "browser": {
+    "episodes": {
+      "ordinary": {
+        "id": "gradient-006",
+        "moves": 7,
+        "stableAndMovesWithTile": true,
+        "shades": 4,
+        "mean": [
+          134,
+          135,
+          136
+        ],
+        "source": "#868788",
+        "quietReplay": true,
+        "pauseKeyboardAndTouch": true,
+        "resultWallpaper": true,
+        "sounds": [
+          {
+            "duration": 0.24,
+            "phase": "landed"
+          }
+        ],
+        "vibration": [
+          {
+            "value": 22,
+            "phase": "landed"
+          }
+        ]
+      },
+      "wide": {
+        "id": "geometry-v1-wide",
+        "zoom": 2.4,
+        "reframe": 0.94,
+        "moves": 36,
+        "sampledFrames": 41,
+        "medianFrameMs": 16.700000000000045,
+        "naturalLight": [
+          187,
+          180,
+          222
+        ],
+        "naturalDark": [
+          55,
+          60,
+          139
+        ],
+        "zoomShades": 4,
+        "sprayColors": 8,
+        "sounds": [
+          {
+            "duration": 0.24,
+            "phase": "landed"
+          }
+        ],
+        "vibration": [
+          {
+            "value": 22,
+            "phase": "landed"
+          }
+        ]
+      }
+    },
+    "quick": {
+      "before-hit": {
+        "moves": 1,
+        "assisted": false,
+        "sounds": 0,
+        "pulses": 0
+      },
+      "after-hit": {
+        "moves": 1,
+        "assisted": false,
+        "sounds": 1,
+        "pulses": 1
+      },
+      "reduced": {
+        "moves": 1,
+        "assisted": false,
+        "sounds": 1,
+        "pulses": 1,
+        "dpr": 1.9989910879435009,
+        "shades": 4,
+        "mean": [
+          111,
+          122,
+          110
+        ]
+      },
+      "background": {
+        "moves": 1,
+        "assisted": false,
+        "sounds": 0,
+        "pulses": 0
+      },
+      "assisted": {
+        "moves": 3,
+        "assisted": true,
+        "sounds": 1,
+        "pulses": 1
+      }
+    },
+    "limits": "Chromium CDP touch, keyboard and browser audio/haptic calls. Prepared checkpoints use legal domain swaps. Android phone not run.",
+    "browser": "153.0.8010.0"
+  },
+  "checkpoints": "Ordinary 4×4 campaign and 13×13 use prepared late-game checkpoints reached by legal swaps. Capture shows an ordinary drag and the final two-finger zoom/tap exchange.",
+  "presentation": {
+    "grainPeriodCssPx": 8,
+    "grainDotCssPx": 2,
+    "maximumJumpScale": 1.03,
+    "landingFromCommitMs": 665,
+    "waveMs": 660,
+    "maxSprayParticles": 36,
+    "ambientHzLimit": 24
+  },
+  "export": {
+    "downloadFromOrdinaryWin": {
+      "dimensions": [
+        390,
+        740
+      ],
+      "exactGradientPixels": true,
+      "alpha": 255,
+      "sRGBIntent": 1,
+      "sha256": "6abe58735056437b3af747d1d9c4a9a74225f306d0888e9f799f2f6b34da5e7a"
+    },
+    "additionalFullyDecodedPngs": 8
+  },
+  "regression": {
+    "unit": 197,
+    "ordinaryInput": "PASS",
+    "largeBoardEdges": "PASS",
+    "m1BrowserScenarios": 21,
+    "presentationBrowserScenarios": 12,
+    "helpBrowserScenarios": 7,
+    "metaBrowserScenarios": 15,
+    "chapterPauseHidesSecretPalette": true,
+    "shapedBoards": 5,
+    "independentMusicSoundHaptics": "PASS",
+    "largeTextPauseViewport": [
+      [
+        320,
+        568
+      ],
+      [
+        568,
+        320
+      ]
+    ],
+    "typecheck": "PASS",
+    "yandexBuildAndAudit": "PASS",
+    "specIntegrity": "PASS",
+    "kitDoctor": "PASS",
+    "signedApkWebResources": {
+      "versions": [
+        "92.0.4512.0",
+        "153.0.8010.0"
+      ],
+      "checks": [
+        "92: reproduced 0.4.12 clean start failure with Object.hasOwn unavailable",
+        "92.0.4512.0: exact APK starts, touch preview resumes, retained board survives reload",
+        "92.0.4512.0: packaged compatibility page leaves save unchanged",
+        "153.0.8010.0: exact APK starts, touch preview resumes, retained board survives reload",
+        "153.0.8010.0: packaged compatibility page leaves save unchanged",
+        "modern: real 0.4.12 save bytes preserved on update and capability failure"
+      ],
+      "packagedWebViewMinimum": 92,
+      "nativeRuntime": "NOT RUN"
+    }
+  },
+  "apk": {
+    "kind": "releasecheck",
+    "package": "com.danilah.huegradients.preview3",
+    "versionName": "0.4.29",
+    "versionCode": 33,
+    "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+    "source": "local",
+    "apkSha256": "d796b75a8c2eaf7948cf43546d8d885c5fe8ca6fa926f468f837e0d65a85e717",
+    "bytes": 1217568,
+    "certificateSha256": "3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85",
+    "productionSigner": false,
+    "v2": true,
+    "zipalign16k": true,
+    "debuggable": false,
+    "webViewDebuggingConfigured": false,
+    "nativeInsetOwner": "content-root",
+    "webPayload": {
+      "start-error.html": "22cc22f670fac501b781a7e27ee2b38842839e03f47bfb72c199768b5c709598",
+      "native-build.json": "d6776c22b4d785acafac6f324de6e51d9700f8d00340e5638b59090fc0a0fc70",
+      "index.html": "005a633412af0d6bbb584590da30c86e81e0ef2eddfb4a838659f1c6ecf4f965",
+      "assets/web-BM7xF5pS.js": "874bbd026b2a3757b6c7bedc1bd163f0c735a3e0a943605c9853f660d828d658",
+      "assets/nativeExport-h9Yj4vWw.js": "848850442afa3eb83d0e63d4d962277b4206448d48192c88f7377be1008c5f42",
+      "assets/native-BzVX4ABT.js": "99520aaf09b63c84f15d3671935f9076bf2c8ffb4b2a3cbcfaa5cfc4c7c1a971",
+      "assets/nativeFeedback-BdXlsEx8.js": "aa12bc0f39307f8a86d95c5b93e428317c5282ed05069350ea7ef8fd1ad69648",
+      "assets/index-BHD4s-_a.css": "bf27d54231cd4e8ee62728136828b89e4a962c19c7e9c514dcd2e75d1d0e17de",
+      "assets/index-DP3OPv5A.js": "35b37f8febf776a5c5ae055a394d46302fbae0def8008b92dcc5d38996178479",
+      "assets/command-HwzQ1dsz.js": "c8e016d32ccdd98d25f4cbf26df3dd03f1e664f10885163ffbe33eb9d4216285",
+      "assets/dist-CMedSjkm.js": "067d9ca66629f984cf538346471032b4b24f9acd1cb914834126e2b88d3250fe"
+    },
+    "nativeRuntime": "NOT RUN",
+    "liveServices": "NOT INSTALLED BY THIS HOST TEMPLATE"
+  },
+  "artifacts": [
+    {
+      "file": "Poluson-V1-two-wins.gif",
+      "sha256": "2fc25fda9cce3f42c5aa3b2b25145521b6d5e4f9ee2797b63e5aecb8b635b497",
+      "width": 304,
+      "height": 576,
+      "frames": 127,
+      "durationSeconds": 9.77,
+      "environment": "Chromium"
+    },
+    {
+      "file": "Poluson-V1-field.png",
+      "sha256": "77fa3b615f8daf0bb4500673c0305c5c8a07a236387c92f907b869d19bd44398",
+      "width": 390,
+      "height": 740,
+      "environment": "Chromium",
+      "devicePixelRatio": 1
+    },
+    {
+      "file": "Poluson-V1-dither-1x.png",
+      "sha256": "c308aa72f0d5f4610148c3345e1de2d996cabd9322fc8d8adea75e4b2bf65c39",
+      "width": 318,
+      "height": 240,
+      "sourceCrop": [
+        36,
+        242,
+        354,
+        482
+      ],
+      "resampled": false
+    }
+  ],
+  "phone": {
+    "status": "NOT RUN",
+    "attachedDevices": 0,
+    "remaining": [
+      "nearby tile colours and texture",
+      "landing sound and physical haptics",
+      "touch feel on 13×13"
+    ]
+  },
+  "next": "V2 starts with Personal Tasks after owner review of V1.",
+  "kitImpact": "REUSE. Pinned audio, activity, rendering lifecycle and UI guidance used."
+}

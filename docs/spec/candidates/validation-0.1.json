@@ -1,0 +1,5330 @@
+{
+  "status": "TECHNICAL_PASS_HUMAN_REVIEW_REQUIRED",
+  "packSha256": "6c283226eecc9b92846c182328d9491880588ab420d67e62bcb0ecf36d67aa2a",
+  "baselineUnchanged": true,
+  "campaign": 60,
+  "daily": 30,
+  "legalOptimalReplays": 90,
+  "exhaustiveBfs": 26,
+  "exactDuplicateTargets": 0,
+  "structuralSignatures": {
+    "1x5:ends:3": 2,
+    "3x3:corners:5": 4,
+    "4x1:ends:2": 1,
+    "4x4:corners:12": 2,
+    "4x4:corners_center:11": 3,
+    "4x4:frame:4": 11,
+    "4x4:left_right:8": 4,
+    "4x4:top_bottom:8": 4,
+    "4x5:corners:16": 1,
+    "4x5:left_right:10": 1,
+    "5x1:ends:3": 1,
+    "5x3:top_bottom:5": 4,
+    "5x4:corners:16": 2,
+    "5x4:cross_corners:8": 3,
+    "5x4:frame:6": 4,
+    "5x4:top_bottom:10": 4,
+    "5x4:top_bottom_center:9": 1,
+    "5x5:corners:21": 2,
+    "5x5:corners_center:20": 4,
+    "5x5:cross_corners:12": 3,
+    "5x5:frame:9": 6,
+    "5x5:left_right:15": 2,
+    "5x5:top_bottom:15": 1,
+    "5x5:top_bottom_center:14": 2,
+    "6x1:ends:4": 3,
+    "6x3:top_bottom:6": 1,
+    "6x4:corners:20": 2,
+    "6x4:corners_center:19": 1,
+    "6x4:frame:8": 1,
+    "6x4:left_right:16": 2,
+    "6x5:corners:26": 1,
+    "6x5:corners_center:25": 2,
+    "6x5:cross_corners:16": 2,
+    "6x5:left_right:20": 1,
+    "6x5:top_bottom:18": 1,
+    "6x5:top_bottom_center:17": 1
+  },
+  "colorWarningPolicy": "Nominal Euclidean Oklab <0.025 is a chosen review trigger, not a universal perception/accessibility threshold.",
+  "colorWarnings": [
+    "gradient-027",
+    "gradient-037",
+    "gradient-053",
+    "gradient-060"
+  ],
+  "humanPlaytest": false,
+  "phoneValidation": false,
+  "newApkRuns": false,
+  "rows": [
+    {
+      "id": "gradient-001",
+      "width": 4,
+      "height": 1,
+      "movable": 2,
+      "role": "introduce",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 1,
+      "minimumNominalOklab": 0.140815016,
+      "closestMovablePair": [
+        1,
+        2
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "cf57542fe0423f7797d3800c1a42100191757fd7ca250a4ef9870757bcc734f4",
+      "bfs": {
+        "distance": 1,
+        "visited": 2
+      },
+      "legalOptimalWitness": [
+        [
+          1,
+          2
+        ]
+      ]
+    },
+    {
+      "id": "gradient-002",
+      "width": 5,
+      "height": 1,
+      "movable": 3,
+      "role": "practice",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 2,
+      "minimumNominalOklab": 0.122389666,
+      "closestMovablePair": [
+        1,
+        2
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "574e950f27d3452ba6400a9f135c5544280b24f3950fe59db1f28ecb8a6ea392",
+      "bfs": {
+        "distance": 2,
+        "visited": 6
+      },
+      "legalOptimalWitness": [
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          3
+        ]
+      ]
+    },
+    {
+      "id": "gradient-003",
+      "width": 1,
+      "height": 5,
+      "movable": 3,
+      "role": "transfer",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 2,
+      "minimumNominalOklab": 0.102082583,
+      "closestMovablePair": [
+        1,
+        2
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "bb87a6dbd0c8436bd25462746732491b0daa920460aed111ccf3c9e6da2d915f",
+      "bfs": {
+        "distance": 2,
+        "visited": 6
+      },
+      "legalOptimalWitness": [
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ]
+      ]
+    },
+    {
+      "id": "gradient-004",
+      "width": 3,
+      "height": 3,
+      "movable": 5,
+      "role": "introduce",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 4,
+      "minimumNominalOklab": 0.083020914,
+      "closestMovablePair": [
+        4,
+        5
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "a7604f765be4be7789481b0a9ebdc0bb4dcc1b4d99639908c052ee0593cd1998",
+      "bfs": {
+        "distance": 4,
+        "visited": 120
+      },
+      "legalOptimalWitness": [
+        [
+          1,
+          5
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          5,
+          7
+        ]
+      ]
+    },
+    {
+      "id": "gradient-005",
+      "width": 4,
+      "height": 4,
+      "movable": 4,
+      "role": "recovery",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 3,
+      "minimumNominalOklab": 0.068269658,
+      "closestMovablePair": [
+        5,
+        6
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "0cd0d3a1bd17fb2976ed130d94036751e56fd571e30b7c691809ba14aa0aa483",
+      "bfs": {
+        "distance": 3,
+        "visited": 24
+      },
+      "legalOptimalWitness": [
+        [
+          5,
+          10
+        ],
+        [
+          6,
+          10
+        ],
+        [
+          9,
+          10
+        ]
+      ]
+    },
+    {
+      "id": "gradient-006",
+      "width": 4,
+      "height": 4,
+      "movable": 8,
+      "role": "practice",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 7,
+      "minimumNominalOklab": 0.041081225,
+      "closestMovablePair": [
+        6,
+        7
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "afdd5d4d141ad1affca5ef2a8eb6b4b3a83d35a91d8f8932526a9b4cc8b584ae",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          4,
+          7
+        ],
+        [
+          5,
+          7
+        ],
+        [
+          6,
+          7
+        ],
+        [
+          7,
+          11
+        ],
+        [
+          8,
+          9
+        ],
+        [
+          9,
+          11
+        ],
+        [
+          10,
+          11
+        ]
+      ]
+    },
+    {
+      "id": "gradient-007",
+      "width": 4,
+      "height": 4,
+      "movable": 12,
+      "role": "combine",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 11,
+      "minimumNominalOklab": 0.048798828,
+      "closestMovablePair": [
+        1,
+        2
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "4c1582a7529e21bba9455da01179e32a92c4fb43ffcdc3c29a17f3fe3d43c24e",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          6
+        ],
+        [
+          4,
+          10
+        ],
+        [
+          5,
+          10
+        ],
+        [
+          6,
+          11
+        ],
+        [
+          7,
+          8
+        ],
+        [
+          8,
+          13
+        ],
+        [
+          9,
+          14
+        ],
+        [
+          10,
+          11
+        ],
+        [
+          11,
+          14
+        ],
+        [
+          13,
+          14
+        ]
+      ]
+    },
+    {
+      "id": "gradient-008",
+      "width": 6,
+      "height": 1,
+      "movable": 4,
+      "role": "recovery",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 3,
+      "minimumNominalOklab": 0.08372933,
+      "closestMovablePair": [
+        1,
+        2
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "9d7fa373d2e713bd135fa4fff99955c3dfd60f2602ee0356cadcfeee8b2e51c7",
+      "bfs": {
+        "distance": 3,
+        "visited": 24
+      },
+      "legalOptimalWitness": [
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          3,
+          4
+        ]
+      ]
+    },
+    {
+      "id": "gradient-009",
+      "width": 4,
+      "height": 4,
+      "movable": 8,
+      "role": "transfer",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 7,
+      "minimumNominalOklab": 0.03840619,
+      "closestMovablePair": [
+        1,
+        2
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "21d0895df53b0f669c031c0d383002a89a0b0d94c344cfcce24115f62bf8ef9a",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          5
+        ],
+        [
+          5,
+          10
+        ],
+        [
+          6,
+          13
+        ],
+        [
+          9,
+          14
+        ],
+        [
+          10,
+          14
+        ],
+        [
+          13,
+          14
+        ]
+      ]
+    },
+    {
+      "id": "gradient-010",
+      "width": 5,
+      "height": 5,
+      "movable": 9,
+      "role": "practice",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 8,
+      "minimumNominalOklab": 0.041573918,
+      "closestMovablePair": [
+        7,
+        8
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "80fb4e6951c2b1845de2d5e345389b6181e5cee5c42d3d7e8b782ea654d871f1",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          6,
+          11
+        ],
+        [
+          7,
+          18
+        ],
+        [
+          8,
+          11
+        ],
+        [
+          11,
+          18
+        ],
+        [
+          12,
+          13
+        ],
+        [
+          13,
+          18
+        ],
+        [
+          16,
+          18
+        ],
+        [
+          17,
+          18
+        ]
+      ]
+    },
+    {
+      "id": "gradient-011",
+      "width": 5,
+      "height": 5,
+      "movable": 12,
+      "role": "introduce",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 11,
+      "minimumNominalOklab": 0.029408232,
+      "closestMovablePair": [
+        8,
+        9
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "9255e54994b49b105da5d5e50529907986b8b0f33284029258716edb5f23e96b",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          21
+        ],
+        [
+          3,
+          9
+        ],
+        [
+          5,
+          16
+        ],
+        [
+          6,
+          19
+        ],
+        [
+          8,
+          18
+        ],
+        [
+          9,
+          19
+        ],
+        [
+          15,
+          23
+        ],
+        [
+          16,
+          23
+        ],
+        [
+          18,
+          19
+        ],
+        [
+          19,
+          23
+        ],
+        [
+          21,
+          23
+        ]
+      ]
+    },
+    {
+      "id": "gradient-012",
+      "width": 4,
+      "height": 4,
+      "movable": 12,
+      "role": "precision_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 11,
+      "minimumNominalOklab": 0.02537924,
+      "closestMovablePair": [
+        6,
+        7
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "f4edd3acb8b74241ed894c66431d6be1e4cee74e3b789aae5ee599dc15cdfeb8",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          9
+        ],
+        [
+          4,
+          13
+        ],
+        [
+          5,
+          14
+        ],
+        [
+          6,
+          11
+        ],
+        [
+          7,
+          11
+        ],
+        [
+          8,
+          14
+        ],
+        [
+          9,
+          11
+        ],
+        [
+          10,
+          13
+        ],
+        [
+          11,
+          14
+        ],
+        [
+          13,
+          14
+        ]
+      ]
+    },
+    {
+      "id": "gradient-013",
+      "width": 4,
+      "height": 4,
+      "movable": 4,
+      "role": "recovery",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 3,
+      "minimumNominalOklab": 0.051043159,
+      "closestMovablePair": [
+        5,
+        6
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "26e63170d58d261378bd10ff0567a8783f13e92c479b635fd4840cdcb39441ad",
+      "bfs": {
+        "distance": 3,
+        "visited": 24
+      },
+      "legalOptimalWitness": [
+        [
+          5,
+          10
+        ],
+        [
+          6,
+          10
+        ],
+        [
+          9,
+          10
+        ]
+      ]
+    },
+    {
+      "id": "gradient-014",
+      "width": 5,
+      "height": 5,
+      "movable": 14,
+      "role": "combine",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 13,
+      "minimumNominalOklab": 0.0321159,
+      "closestMovablePair": [
+        8,
+        9
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "173eac311ec4b9aca08c7f9d171fa6c6776cbbf0c56ef474e6cba869ae5245b4",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          5,
+          6
+        ],
+        [
+          6,
+          11
+        ],
+        [
+          7,
+          11
+        ],
+        [
+          8,
+          15
+        ],
+        [
+          9,
+          13
+        ],
+        [
+          10,
+          11
+        ],
+        [
+          11,
+          19
+        ],
+        [
+          13,
+          17
+        ],
+        [
+          14,
+          15
+        ],
+        [
+          15,
+          17
+        ],
+        [
+          16,
+          18
+        ],
+        [
+          17,
+          18
+        ],
+        [
+          18,
+          19
+        ]
+      ]
+    },
+    {
+      "id": "gradient-015",
+      "width": 5,
+      "height": 5,
+      "movable": 20,
+      "role": "combine",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 19,
+      "minimumNominalOklab": 0.034726316,
+      "closestMovablePair": [
+        2,
+        3
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "69069f6fb2960252cd05735d793ff2db988776042dcdda20698c41727e1f7125",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          18
+        ],
+        [
+          2,
+          13
+        ],
+        [
+          3,
+          18
+        ],
+        [
+          5,
+          11
+        ],
+        [
+          6,
+          8
+        ],
+        [
+          7,
+          23
+        ],
+        [
+          8,
+          19
+        ],
+        [
+          9,
+          15
+        ],
+        [
+          10,
+          18
+        ],
+        [
+          11,
+          15
+        ],
+        [
+          13,
+          17
+        ],
+        [
+          14,
+          17
+        ],
+        [
+          15,
+          17
+        ],
+        [
+          16,
+          17
+        ],
+        [
+          17,
+          18
+        ],
+        [
+          18,
+          19
+        ],
+        [
+          19,
+          23
+        ],
+        [
+          21,
+          22
+        ],
+        [
+          22,
+          23
+        ]
+      ]
+    },
+    {
+      "id": "gradient-016",
+      "width": 5,
+      "height": 3,
+      "movable": 5,
+      "role": "practice",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 4,
+      "minimumNominalOklab": 0.035054289,
+      "closestMovablePair": [
+        8,
+        9
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "aae7de20b601dcd1ca2d9ca8cf88d0f99a469d21b6eda49b3f57785620ae9e20",
+      "bfs": {
+        "distance": 4,
+        "visited": 120
+      },
+      "legalOptimalWitness": [
+        [
+          5,
+          6
+        ],
+        [
+          6,
+          9
+        ],
+        [
+          7,
+          9
+        ],
+        [
+          8,
+          9
+        ]
+      ]
+    },
+    {
+      "id": "gradient-017",
+      "width": 4,
+      "height": 5,
+      "movable": 10,
+      "role": "practice",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 9,
+      "minimumNominalOklab": 0.069146258,
+      "closestMovablePair": [
+        2,
+        6
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "c1484b78146e0d88e11650fccfdd442aa04cf7c82eb0a710e30a6f0a0cebd02a",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          10
+        ],
+        [
+          2,
+          17
+        ],
+        [
+          5,
+          14
+        ],
+        [
+          6,
+          17
+        ],
+        [
+          9,
+          10
+        ],
+        [
+          10,
+          13
+        ],
+        [
+          13,
+          18
+        ],
+        [
+          14,
+          17
+        ],
+        [
+          17,
+          18
+        ]
+      ]
+    },
+    {
+      "id": "gradient-018",
+      "width": 5,
+      "height": 4,
+      "movable": 6,
+      "role": "practice",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 5,
+      "minimumNominalOklab": 0.047663042,
+      "closestMovablePair": [
+        11,
+        12
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "e4760796441d8a4d636496e11588c8d2687a046b79d47c5c76f40f82979464f8",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          6,
+          8
+        ],
+        [
+          7,
+          12
+        ],
+        [
+          8,
+          11
+        ],
+        [
+          11,
+          12
+        ],
+        [
+          12,
+          13
+        ]
+      ]
+    },
+    {
+      "id": "gradient-019",
+      "width": 5,
+      "height": 4,
+      "movable": 10,
+      "role": "practice",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 9,
+      "minimumNominalOklab": 0.053898343,
+      "closestMovablePair": [
+        5,
+        6
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "8cbca721d1d72a33e6539ab6e9e1f7cf17d0aae9e11ac92c0a3f8f4c2cfbc2ef",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          5,
+          12
+        ],
+        [
+          6,
+          14
+        ],
+        [
+          7,
+          11
+        ],
+        [
+          8,
+          10
+        ],
+        [
+          9,
+          12
+        ],
+        [
+          10,
+          11
+        ],
+        [
+          11,
+          13
+        ],
+        [
+          12,
+          13
+        ],
+        [
+          13,
+          14
+        ]
+      ]
+    },
+    {
+      "id": "gradient-020",
+      "width": 4,
+      "height": 4,
+      "movable": 4,
+      "role": "recovery",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 3,
+      "minimumNominalOklab": 0.075964033,
+      "closestMovablePair": [
+        5,
+        6
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "247e395d63ab7532d9a671a666a627c2f80943d26e11c89ded365c3b96e0c053",
+      "bfs": {
+        "distance": 3,
+        "visited": 24
+      },
+      "legalOptimalWitness": [
+        [
+          5,
+          9
+        ],
+        [
+          6,
+          10
+        ],
+        [
+          9,
+          10
+        ]
+      ]
+    },
+    {
+      "id": "gradient-021",
+      "width": 5,
+      "height": 4,
+      "movable": 16,
+      "role": "practice",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 15,
+      "minimumNominalOklab": 0.036596533,
+      "closestMovablePair": [
+        17,
+        18
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "86b0011e7f5e9bb302e90b7ace187cef61b422f4826f9fc3fd7a469c3b8e3cf0",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          8
+        ],
+        [
+          2,
+          13
+        ],
+        [
+          3,
+          8
+        ],
+        [
+          5,
+          9
+        ],
+        [
+          6,
+          16
+        ],
+        [
+          7,
+          17
+        ],
+        [
+          8,
+          17
+        ],
+        [
+          9,
+          10
+        ],
+        [
+          10,
+          12
+        ],
+        [
+          11,
+          17
+        ],
+        [
+          12,
+          16
+        ],
+        [
+          13,
+          16
+        ],
+        [
+          14,
+          17
+        ],
+        [
+          16,
+          17
+        ],
+        [
+          17,
+          18
+        ]
+      ]
+    },
+    {
+      "id": "gradient-022",
+      "width": 6,
+      "height": 3,
+      "movable": 6,
+      "role": "combine",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 5,
+      "minimumNominalOklab": 0.067513601,
+      "closestMovablePair": [
+        10,
+        11
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "925928a3f68a13fe8b09c1092521d4b98653887582cce1a9c85e2b0477bc6e83",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          6,
+          9
+        ],
+        [
+          7,
+          9
+        ],
+        [
+          8,
+          9
+        ],
+        [
+          9,
+          10
+        ],
+        [
+          10,
+          11
+        ]
+      ]
+    },
+    {
+      "id": "gradient-023",
+      "width": 6,
+      "height": 1,
+      "movable": 4,
+      "role": "recovery",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 3,
+      "minimumNominalOklab": 0.040694979,
+      "closestMovablePair": [
+        1,
+        2
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "f704786d94584e8da69e9eced0250f9a0cbbd175d8b3122a296a7b99053af0b8",
+      "bfs": {
+        "distance": 3,
+        "visited": 24
+      },
+      "legalOptimalWitness": [
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          4
+        ]
+      ]
+    },
+    {
+      "id": "gradient-024",
+      "width": 4,
+      "height": 5,
+      "movable": 16,
+      "role": "practice",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 15,
+      "minimumNominalOklab": 0.051846603,
+      "closestMovablePair": [
+        14,
+        15
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "ddb6af594fbd4400d272c7821c6dae0728a1243fdd48a7ac0b7eca683c9f9a1c",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          14
+        ],
+        [
+          2,
+          6
+        ],
+        [
+          4,
+          14
+        ],
+        [
+          5,
+          14
+        ],
+        [
+          6,
+          8
+        ],
+        [
+          7,
+          15
+        ],
+        [
+          8,
+          15
+        ],
+        [
+          9,
+          10
+        ],
+        [
+          10,
+          11
+        ],
+        [
+          11,
+          18
+        ],
+        [
+          12,
+          17
+        ],
+        [
+          13,
+          18
+        ],
+        [
+          14,
+          15
+        ],
+        [
+          15,
+          17
+        ],
+        [
+          17,
+          18
+        ]
+      ]
+    },
+    {
+      "id": "gradient-025",
+      "width": 5,
+      "height": 5,
+      "movable": 9,
+      "role": "practice",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 8,
+      "minimumNominalOklab": 0.063239463,
+      "closestMovablePair": [
+        13,
+        18
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "d9ca6047cf5a98a839c2a2df104601e1a7708c3f889c4c69d4bbc02e1a21d9d5",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          6,
+          16
+        ],
+        [
+          7,
+          12
+        ],
+        [
+          8,
+          13
+        ],
+        [
+          11,
+          12
+        ],
+        [
+          12,
+          13
+        ],
+        [
+          13,
+          16
+        ],
+        [
+          16,
+          18
+        ],
+        [
+          17,
+          18
+        ]
+      ]
+    },
+    {
+      "id": "gradient-026",
+      "width": 5,
+      "height": 5,
+      "movable": 14,
+      "role": "combine",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 13,
+      "minimumNominalOklab": 0.040625596,
+      "closestMovablePair": [
+        8,
+        9
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "1bf0597c6b770a8e9f512674ebd076f7a5baa8f02e82b08615eb10c3a0ce03fd",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          5,
+          11
+        ],
+        [
+          6,
+          17
+        ],
+        [
+          7,
+          9
+        ],
+        [
+          8,
+          18
+        ],
+        [
+          9,
+          18
+        ],
+        [
+          10,
+          15
+        ],
+        [
+          11,
+          15
+        ],
+        [
+          13,
+          14
+        ],
+        [
+          14,
+          19
+        ],
+        [
+          15,
+          16
+        ],
+        [
+          16,
+          19
+        ],
+        [
+          17,
+          19
+        ],
+        [
+          18,
+          19
+        ]
+      ]
+    },
+    {
+      "id": "gradient-027",
+      "width": 6,
+      "height": 4,
+      "movable": 16,
+      "role": "practice",
+      "errors": [],
+      "warnings": [
+        "CLOSE_COLORS_REVIEW"
+      ],
+      "minimumSwaps": 15,
+      "minimumNominalOklab": 0.020682681,
+      "closestMovablePair": [
+        20,
+        21
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "e5bd9fc9ebe6e6f05bb246f7b4a155a2be0e15e2c8ab91b8df18fb09f70af8f1",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          7
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          7,
+          16
+        ],
+        [
+          8,
+          20
+        ],
+        [
+          9,
+          16
+        ],
+        [
+          10,
+          13
+        ],
+        [
+          13,
+          20
+        ],
+        [
+          14,
+          22
+        ],
+        [
+          15,
+          20
+        ],
+        [
+          16,
+          22
+        ],
+        [
+          19,
+          22
+        ],
+        [
+          20,
+          22
+        ],
+        [
+          21,
+          22
+        ]
+      ]
+    },
+    {
+      "id": "gradient-028",
+      "width": 4,
+      "height": 4,
+      "movable": 4,
+      "role": "recovery",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 3,
+      "minimumNominalOklab": 0.060242041,
+      "closestMovablePair": [
+        5,
+        6
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "2b26662eb06aa03f55aa3f0bc9dfd1409d13f0c085809f6f171a3986241463e6",
+      "bfs": {
+        "distance": 3,
+        "visited": 24
+      },
+      "legalOptimalWitness": [
+        [
+          5,
+          6
+        ],
+        [
+          6,
+          9
+        ],
+        [
+          9,
+          10
+        ]
+      ]
+    },
+    {
+      "id": "gradient-029",
+      "width": 5,
+      "height": 5,
+      "movable": 20,
+      "role": "combine",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 19,
+      "minimumNominalOklab": 0.037821462,
+      "closestMovablePair": [
+        5,
+        6
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "4d9278890c008ab44a305a647beb2c4eabb486841fed5d817a19eb52ab85aa90",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          15
+        ],
+        [
+          3,
+          21
+        ],
+        [
+          5,
+          11
+        ],
+        [
+          6,
+          21
+        ],
+        [
+          7,
+          13
+        ],
+        [
+          8,
+          11
+        ],
+        [
+          9,
+          21
+        ],
+        [
+          10,
+          11
+        ],
+        [
+          11,
+          14
+        ],
+        [
+          13,
+          21
+        ],
+        [
+          14,
+          23
+        ],
+        [
+          15,
+          17
+        ],
+        [
+          16,
+          19
+        ],
+        [
+          17,
+          19
+        ],
+        [
+          18,
+          23
+        ],
+        [
+          19,
+          22
+        ],
+        [
+          21,
+          23
+        ],
+        [
+          22,
+          23
+        ]
+      ]
+    },
+    {
+      "id": "gradient-030",
+      "width": 6,
+      "height": 4,
+      "movable": 20,
+      "role": "combine",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 19,
+      "minimumNominalOklab": 0.064986545,
+      "closestMovablePair": [
+        19,
+        20
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "de54afaf8c474c98f9584df5bb3632e3fac6d7bdf08db9c46e4e11f0ebd60f00",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          15
+        ],
+        [
+          2,
+          7
+        ],
+        [
+          3,
+          17
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          6,
+          7
+        ],
+        [
+          7,
+          17
+        ],
+        [
+          8,
+          22
+        ],
+        [
+          9,
+          16
+        ],
+        [
+          10,
+          14
+        ],
+        [
+          11,
+          20
+        ],
+        [
+          12,
+          21
+        ],
+        [
+          13,
+          21
+        ],
+        [
+          14,
+          20
+        ],
+        [
+          15,
+          22
+        ],
+        [
+          16,
+          22
+        ],
+        [
+          17,
+          21
+        ],
+        [
+          19,
+          21
+        ],
+        [
+          20,
+          21
+        ],
+        [
+          21,
+          22
+        ]
+      ]
+    },
+    {
+      "id": "gradient-031",
+      "width": 5,
+      "height": 5,
+      "movable": 12,
+      "role": "practice",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 11,
+      "minimumNominalOklab": 0.043014684,
+      "closestMovablePair": [
+        5,
+        6
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "9d58239e997e0aa31fff57979d2dfc18d79964627c97762f459f77c810931339",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          19
+        ],
+        [
+          3,
+          15
+        ],
+        [
+          5,
+          18
+        ],
+        [
+          6,
+          21
+        ],
+        [
+          8,
+          16
+        ],
+        [
+          9,
+          23
+        ],
+        [
+          15,
+          23
+        ],
+        [
+          16,
+          18
+        ],
+        [
+          18,
+          19
+        ],
+        [
+          19,
+          23
+        ],
+        [
+          21,
+          23
+        ]
+      ]
+    },
+    {
+      "id": "gradient-032",
+      "width": 5,
+      "height": 4,
+      "movable": 9,
+      "role": "practice",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 8,
+      "minimumNominalOklab": 0.046677521,
+      "closestMovablePair": [
+        8,
+        9
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "4eaa0216bfcb0435e15cbcb764d192a6c1af808635a2d083dc3cfe2c25e62efd",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          5,
+          7
+        ],
+        [
+          6,
+          8
+        ],
+        [
+          7,
+          14
+        ],
+        [
+          8,
+          14
+        ],
+        [
+          9,
+          13
+        ],
+        [
+          10,
+          14
+        ],
+        [
+          11,
+          14
+        ],
+        [
+          13,
+          14
+        ]
+      ]
+    },
+    {
+      "id": "gradient-033",
+      "width": 5,
+      "height": 5,
+      "movable": 20,
+      "role": "practice",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 19,
+      "minimumNominalOklab": 0.054083045,
+      "closestMovablePair": [
+        9,
+        14
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "d1d1b5fb2c9d9bcd461e3615ffc4a52198938183586f91920c67883cece36b41",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          14
+        ],
+        [
+          3,
+          9
+        ],
+        [
+          5,
+          21
+        ],
+        [
+          6,
+          8
+        ],
+        [
+          7,
+          22
+        ],
+        [
+          8,
+          22
+        ],
+        [
+          9,
+          14
+        ],
+        [
+          10,
+          22
+        ],
+        [
+          11,
+          13
+        ],
+        [
+          13,
+          21
+        ],
+        [
+          14,
+          22
+        ],
+        [
+          15,
+          22
+        ],
+        [
+          16,
+          23
+        ],
+        [
+          17,
+          23
+        ],
+        [
+          18,
+          21
+        ],
+        [
+          19,
+          23
+        ],
+        [
+          21,
+          22
+        ],
+        [
+          22,
+          23
+        ]
+      ]
+    },
+    {
+      "id": "gradient-034",
+      "width": 6,
+      "height": 4,
+      "movable": 16,
+      "role": "practice",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 15,
+      "minimumNominalOklab": 0.029604258,
+      "closestMovablePair": [
+        3,
+        4
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "bf7be8519c01f580a31e2efab27a4de25c54e0ede7a94e94a2e91714e7b67e0d",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          20
+        ],
+        [
+          2,
+          21
+        ],
+        [
+          3,
+          22
+        ],
+        [
+          4,
+          22
+        ],
+        [
+          7,
+          21
+        ],
+        [
+          8,
+          22
+        ],
+        [
+          9,
+          16
+        ],
+        [
+          10,
+          21
+        ],
+        [
+          13,
+          14
+        ],
+        [
+          14,
+          15
+        ],
+        [
+          15,
+          22
+        ],
+        [
+          16,
+          19
+        ],
+        [
+          19,
+          21
+        ],
+        [
+          20,
+          21
+        ],
+        [
+          21,
+          22
+        ]
+      ]
+    },
+    {
+      "id": "gradient-035",
+      "width": 4,
+      "height": 4,
+      "movable": 4,
+      "role": "recovery",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 3,
+      "minimumNominalOklab": 0.083596399,
+      "closestMovablePair": [
+        5,
+        10
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "36897f2015e8865e2320d1e4c2d0888f592d6336eab84dbb396af422460ac28c",
+      "bfs": {
+        "distance": 3,
+        "visited": 24
+      },
+      "legalOptimalWitness": [
+        [
+          5,
+          6
+        ],
+        [
+          6,
+          9
+        ],
+        [
+          9,
+          10
+        ]
+      ]
+    },
+    {
+      "id": "gradient-036",
+      "width": 5,
+      "height": 5,
+      "movable": 15,
+      "role": "practice",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 14,
+      "minimumNominalOklab": 0.039743196,
+      "closestMovablePair": [
+        18,
+        19
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "9695251395785b7d906a7f6451344149dfcf5fa626a93fe8cc3e066b7602e311",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          5,
+          16
+        ],
+        [
+          6,
+          13
+        ],
+        [
+          7,
+          17
+        ],
+        [
+          8,
+          14
+        ],
+        [
+          9,
+          17
+        ],
+        [
+          10,
+          11
+        ],
+        [
+          11,
+          15
+        ],
+        [
+          12,
+          15
+        ],
+        [
+          13,
+          18
+        ],
+        [
+          14,
+          19
+        ],
+        [
+          15,
+          16
+        ],
+        [
+          16,
+          19
+        ],
+        [
+          17,
+          18
+        ],
+        [
+          18,
+          19
+        ]
+      ]
+    },
+    {
+      "id": "gradient-037",
+      "width": 6,
+      "height": 5,
+      "movable": 16,
+      "role": "combine",
+      "errors": [],
+      "warnings": [
+        "CLOSE_COLORS_REVIEW"
+      ],
+      "minimumSwaps": 15,
+      "minimumNominalOklab": 0.024371735,
+      "closestMovablePair": [
+        18,
+        19
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "8411650064f9e124f35cc1aae3664e7b1ef7d8e79978a382e38296a98af77ffa",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          8
+        ],
+        [
+          2,
+          25
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          6,
+          20
+        ],
+        [
+          7,
+          10
+        ],
+        [
+          8,
+          26
+        ],
+        [
+          10,
+          11
+        ],
+        [
+          11,
+          23
+        ],
+        [
+          18,
+          25
+        ],
+        [
+          19,
+          25
+        ],
+        [
+          20,
+          26
+        ],
+        [
+          22,
+          23
+        ],
+        [
+          23,
+          25
+        ],
+        [
+          25,
+          26
+        ],
+        [
+          26,
+          28
+        ]
+      ]
+    },
+    {
+      "id": "gradient-038",
+      "width": 1,
+      "height": 5,
+      "movable": 3,
+      "role": "recovery",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 2,
+      "minimumNominalOklab": 0.063804457,
+      "closestMovablePair": [
+        2,
+        3
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "e45c943131ca6918683639d701752e358afae46ec5b132124a67ffbfbe612d92",
+      "bfs": {
+        "distance": 2,
+        "visited": 6
+      },
+      "legalOptimalWitness": [
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          3
+        ]
+      ]
+    },
+    {
+      "id": "gradient-039",
+      "width": 5,
+      "height": 5,
+      "movable": 15,
+      "role": "practice",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 14,
+      "minimumNominalOklab": 0.036016449,
+      "closestMovablePair": [
+        21,
+        22
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "8257a8b06ec839dd609905b1aac22733e3d5a143d2c659fd8be9075559367106",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          21
+        ],
+        [
+          2,
+          7
+        ],
+        [
+          3,
+          11
+        ],
+        [
+          6,
+          13
+        ],
+        [
+          7,
+          22
+        ],
+        [
+          8,
+          22
+        ],
+        [
+          11,
+          18
+        ],
+        [
+          12,
+          22
+        ],
+        [
+          13,
+          23
+        ],
+        [
+          16,
+          18
+        ],
+        [
+          17,
+          22
+        ],
+        [
+          18,
+          21
+        ],
+        [
+          21,
+          22
+        ],
+        [
+          22,
+          23
+        ]
+      ]
+    },
+    {
+      "id": "gradient-040",
+      "width": 6,
+      "height": 4,
+      "movable": 8,
+      "role": "practice",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 7,
+      "minimumNominalOklab": 0.04553232,
+      "closestMovablePair": [
+        8,
+        9
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "1ba709428f411c840278abdf301cc2ca88f74bb26923c1d0cb39707c95ba05e9",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          7,
+          8
+        ],
+        [
+          8,
+          14
+        ],
+        [
+          9,
+          15
+        ],
+        [
+          10,
+          16
+        ],
+        [
+          13,
+          15
+        ],
+        [
+          14,
+          15
+        ],
+        [
+          15,
+          16
+        ]
+      ]
+    },
+    {
+      "id": "gradient-041",
+      "width": 6,
+      "height": 5,
+      "movable": 25,
+      "role": "combine",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 24,
+      "minimumNominalOklab": 0.035576541,
+      "closestMovablePair": [
+        6,
+        7
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "93feefa409c2906563849c74ba571bd899e9d98e5cb57c556ec866925b7057f7",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          26
+        ],
+        [
+          2,
+          26
+        ],
+        [
+          3,
+          28
+        ],
+        [
+          4,
+          23
+        ],
+        [
+          6,
+          9
+        ],
+        [
+          7,
+          26
+        ],
+        [
+          8,
+          14
+        ],
+        [
+          9,
+          26
+        ],
+        [
+          10,
+          23
+        ],
+        [
+          11,
+          28
+        ],
+        [
+          12,
+          23
+        ],
+        [
+          13,
+          22
+        ],
+        [
+          14,
+          16
+        ],
+        [
+          16,
+          18
+        ],
+        [
+          17,
+          28
+        ],
+        [
+          18,
+          26
+        ],
+        [
+          19,
+          25
+        ],
+        [
+          20,
+          22
+        ],
+        [
+          21,
+          22
+        ],
+        [
+          22,
+          26
+        ],
+        [
+          23,
+          27
+        ],
+        [
+          25,
+          27
+        ],
+        [
+          26,
+          27
+        ],
+        [
+          27,
+          28
+        ]
+      ]
+    },
+    {
+      "id": "gradient-042",
+      "width": 5,
+      "height": 4,
+      "movable": 16,
+      "role": "practice",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 15,
+      "minimumNominalOklab": 0.037408535,
+      "closestMovablePair": [
+        17,
+        18
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "ad282475f94bf88bc090d00697981d8b9daa0f729091568b2d98ca9b585badd2",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          8
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          11
+        ],
+        [
+          5,
+          13
+        ],
+        [
+          6,
+          10
+        ],
+        [
+          7,
+          11
+        ],
+        [
+          8,
+          10
+        ],
+        [
+          9,
+          12
+        ],
+        [
+          10,
+          16
+        ],
+        [
+          11,
+          13
+        ],
+        [
+          12,
+          16
+        ],
+        [
+          13,
+          17
+        ],
+        [
+          14,
+          16
+        ],
+        [
+          16,
+          18
+        ],
+        [
+          17,
+          18
+        ]
+      ]
+    },
+    {
+      "id": "gradient-043",
+      "width": 4,
+      "height": 4,
+      "movable": 4,
+      "role": "recovery",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 3,
+      "minimumNominalOklab": 0.102656672,
+      "closestMovablePair": [
+        6,
+        10
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "18f5f0d15d1ae6a31809ac3e417f8115be121ec4c564ec447b3956dc2ebc0861",
+      "bfs": {
+        "distance": 3,
+        "visited": 24
+      },
+      "legalOptimalWitness": [
+        [
+          5,
+          9
+        ],
+        [
+          6,
+          10
+        ],
+        [
+          9,
+          10
+        ]
+      ]
+    },
+    {
+      "id": "gradient-044",
+      "width": 6,
+      "height": 5,
+      "movable": 17,
+      "role": "combine",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 16,
+      "minimumNominalOklab": 0.034188825,
+      "closestMovablePair": [
+        16,
+        17
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "91284768b2bb76b994130dc4a18d0916e82de5529dcd2214297ebae357e30ca4",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          6,
+          16
+        ],
+        [
+          7,
+          16
+        ],
+        [
+          8,
+          22
+        ],
+        [
+          9,
+          12
+        ],
+        [
+          10,
+          23
+        ],
+        [
+          11,
+          17
+        ],
+        [
+          12,
+          22
+        ],
+        [
+          13,
+          19
+        ],
+        [
+          14,
+          17
+        ],
+        [
+          16,
+          21
+        ],
+        [
+          17,
+          20
+        ],
+        [
+          18,
+          22
+        ],
+        [
+          19,
+          20
+        ],
+        [
+          20,
+          23
+        ],
+        [
+          21,
+          22
+        ],
+        [
+          22,
+          23
+        ]
+      ]
+    },
+    {
+      "id": "gradient-045",
+      "width": 5,
+      "height": 5,
+      "movable": 21,
+      "role": "combine",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 20,
+      "minimumNominalOklab": 0.036800663,
+      "closestMovablePair": [
+        15,
+        16
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "9b4329fcc602578818307cd39df476a52d5f84c6a445db8c8a349917db75cf08",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          17
+        ],
+        [
+          2,
+          16
+        ],
+        [
+          3,
+          18
+        ],
+        [
+          5,
+          13
+        ],
+        [
+          6,
+          19
+        ],
+        [
+          7,
+          23
+        ],
+        [
+          8,
+          9
+        ],
+        [
+          9,
+          23
+        ],
+        [
+          10,
+          18
+        ],
+        [
+          11,
+          22
+        ],
+        [
+          12,
+          18
+        ],
+        [
+          13,
+          16
+        ],
+        [
+          14,
+          18
+        ],
+        [
+          15,
+          19
+        ],
+        [
+          16,
+          21
+        ],
+        [
+          17,
+          22
+        ],
+        [
+          18,
+          23
+        ],
+        [
+          19,
+          21
+        ],
+        [
+          21,
+          23
+        ],
+        [
+          22,
+          23
+        ]
+      ]
+    },
+    {
+      "id": "gradient-046",
+      "width": 6,
+      "height": 4,
+      "movable": 19,
+      "role": "practice",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 18,
+      "minimumNominalOklab": 0.055319544,
+      "closestMovablePair": [
+        2,
+        3
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "c9a68112ee7beb25237761cc3f9d323a2a24065401124bb375cc3d1ceaaf556b",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          20
+        ],
+        [
+          2,
+          13
+        ],
+        [
+          3,
+          17
+        ],
+        [
+          4,
+          14
+        ],
+        [
+          6,
+          8
+        ],
+        [
+          7,
+          8
+        ],
+        [
+          8,
+          21
+        ],
+        [
+          9,
+          11
+        ],
+        [
+          10,
+          22
+        ],
+        [
+          11,
+          17
+        ],
+        [
+          12,
+          21
+        ],
+        [
+          13,
+          21
+        ],
+        [
+          14,
+          16
+        ],
+        [
+          16,
+          21
+        ],
+        [
+          17,
+          20
+        ],
+        [
+          19,
+          20
+        ],
+        [
+          20,
+          21
+        ],
+        [
+          21,
+          22
+        ]
+      ]
+    },
+    {
+      "id": "gradient-047",
+      "width": 5,
+      "height": 5,
+      "movable": 15,
+      "role": "practice",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 14,
+      "minimumNominalOklab": 0.032637452,
+      "closestMovablePair": [
+        1,
+        2
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "ee2f1591b5cc2509ca62400b7aa5c8032a416eed58b0b982384f9536c2714168",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          21
+        ],
+        [
+          2,
+          8
+        ],
+        [
+          3,
+          23
+        ],
+        [
+          6,
+          7
+        ],
+        [
+          7,
+          12
+        ],
+        [
+          8,
+          11
+        ],
+        [
+          11,
+          23
+        ],
+        [
+          12,
+          18
+        ],
+        [
+          13,
+          16
+        ],
+        [
+          16,
+          21
+        ],
+        [
+          17,
+          21
+        ],
+        [
+          18,
+          21
+        ],
+        [
+          21,
+          22
+        ],
+        [
+          22,
+          23
+        ]
+      ]
+    },
+    {
+      "id": "gradient-048",
+      "width": 6,
+      "height": 5,
+      "movable": 16,
+      "role": "practice",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 15,
+      "minimumNominalOklab": 0.027744645,
+      "closestMovablePair": [
+        25,
+        26
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "f854ada70f244a20e24d275ef4c019623c4e396c678c71b593a04903d08db2d6",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          10
+        ],
+        [
+          2,
+          8
+        ],
+        [
+          4,
+          11
+        ],
+        [
+          6,
+          26
+        ],
+        [
+          7,
+          28
+        ],
+        [
+          8,
+          11
+        ],
+        [
+          10,
+          19
+        ],
+        [
+          11,
+          28
+        ],
+        [
+          18,
+          19
+        ],
+        [
+          19,
+          23
+        ],
+        [
+          20,
+          25
+        ],
+        [
+          22,
+          23
+        ],
+        [
+          23,
+          26
+        ],
+        [
+          25,
+          26
+        ],
+        [
+          26,
+          28
+        ]
+      ]
+    },
+    {
+      "id": "gradient-049",
+      "width": 5,
+      "height": 5,
+      "movable": 21,
+      "role": "practice",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 20,
+      "minimumNominalOklab": 0.03918756,
+      "closestMovablePair": [
+        5,
+        6
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "f7809ca9a19c3de4398dcf2596ed3b103b70824269e5a377683389de4b45b0a6",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          9
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          5,
+          14
+        ],
+        [
+          6,
+          19
+        ],
+        [
+          7,
+          11
+        ],
+        [
+          8,
+          12
+        ],
+        [
+          9,
+          10
+        ],
+        [
+          10,
+          23
+        ],
+        [
+          11,
+          17
+        ],
+        [
+          12,
+          19
+        ],
+        [
+          13,
+          17
+        ],
+        [
+          14,
+          16
+        ],
+        [
+          15,
+          23
+        ],
+        [
+          16,
+          17
+        ],
+        [
+          17,
+          21
+        ],
+        [
+          18,
+          22
+        ],
+        [
+          19,
+          23
+        ],
+        [
+          21,
+          22
+        ],
+        [
+          22,
+          23
+        ]
+      ]
+    },
+    {
+      "id": "gradient-050",
+      "width": 4,
+      "height": 4,
+      "movable": 4,
+      "role": "recovery",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 3,
+      "minimumNominalOklab": 0.058452619,
+      "closestMovablePair": [
+        5,
+        6
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "f92bd89c1d88198d1ab03745e5c03066302cbfbd1a6aaaecfaf9d54244965f1d",
+      "bfs": {
+        "distance": 3,
+        "visited": 24
+      },
+      "legalOptimalWitness": [
+        [
+          5,
+          6
+        ],
+        [
+          6,
+          10
+        ],
+        [
+          9,
+          10
+        ]
+      ]
+    },
+    {
+      "id": "gradient-051",
+      "width": 6,
+      "height": 5,
+      "movable": 18,
+      "role": "practice",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 17,
+      "minimumNominalOklab": 0.055944187,
+      "closestMovablePair": [
+        13,
+        18
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "3bcb734b46d53b830e95745303c9b8ae2e7f272ed268764172f9ae6e3040b768",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          6,
+          14
+        ],
+        [
+          7,
+          16
+        ],
+        [
+          8,
+          17
+        ],
+        [
+          9,
+          12
+        ],
+        [
+          10,
+          21
+        ],
+        [
+          11,
+          23
+        ],
+        [
+          12,
+          22
+        ],
+        [
+          13,
+          21
+        ],
+        [
+          14,
+          17
+        ],
+        [
+          15,
+          21
+        ],
+        [
+          16,
+          17
+        ],
+        [
+          17,
+          19
+        ],
+        [
+          18,
+          20
+        ],
+        [
+          19,
+          21
+        ],
+        [
+          20,
+          21
+        ],
+        [
+          21,
+          22
+        ],
+        [
+          22,
+          23
+        ]
+      ]
+    },
+    {
+      "id": "gradient-052",
+      "width": 5,
+      "height": 5,
+      "movable": 20,
+      "role": "combine",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 19,
+      "minimumNominalOklab": 0.041281683,
+      "closestMovablePair": [
+        8,
+        9
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "c91a22079e287eebf5e6dc6018e9c7750ac144ccd19590801ca1ce2e842fb7d4",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          23
+        ],
+        [
+          2,
+          18
+        ],
+        [
+          3,
+          13
+        ],
+        [
+          5,
+          11
+        ],
+        [
+          6,
+          21
+        ],
+        [
+          7,
+          15
+        ],
+        [
+          8,
+          14
+        ],
+        [
+          9,
+          14
+        ],
+        [
+          10,
+          21
+        ],
+        [
+          11,
+          21
+        ],
+        [
+          13,
+          21
+        ],
+        [
+          14,
+          16
+        ],
+        [
+          15,
+          16
+        ],
+        [
+          16,
+          21
+        ],
+        [
+          17,
+          18
+        ],
+        [
+          18,
+          22
+        ],
+        [
+          19,
+          22
+        ],
+        [
+          21,
+          22
+        ],
+        [
+          22,
+          23
+        ]
+      ]
+    },
+    {
+      "id": "gradient-053",
+      "width": 6,
+      "height": 1,
+      "movable": 4,
+      "role": "recovery",
+      "errors": [],
+      "warnings": [
+        "CLOSE_COLORS_REVIEW"
+      ],
+      "minimumSwaps": 3,
+      "minimumNominalOklab": 0.023860695,
+      "closestMovablePair": [
+        1,
+        2
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "07afa9890fd19a1f627b9cbc023dd8ae7a4ab439d5ed9158c446da2d1536811c",
+      "bfs": {
+        "distance": 3,
+        "visited": 24
+      },
+      "legalOptimalWitness": [
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          3,
+          4
+        ]
+      ]
+    },
+    {
+      "id": "gradient-054",
+      "width": 6,
+      "height": 4,
+      "movable": 20,
+      "role": "practice",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 19,
+      "minimumNominalOklab": 0.041837766,
+      "closestMovablePair": [
+        21,
+        22
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "d20e371a4d46409e30408005bfe4e5f8e845bf51ec38462a700cd496bde8ca35",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          19
+        ],
+        [
+          2,
+          14
+        ],
+        [
+          3,
+          16
+        ],
+        [
+          4,
+          17
+        ],
+        [
+          6,
+          7
+        ],
+        [
+          7,
+          22
+        ],
+        [
+          8,
+          16
+        ],
+        [
+          9,
+          11
+        ],
+        [
+          10,
+          20
+        ],
+        [
+          11,
+          16
+        ],
+        [
+          12,
+          14
+        ],
+        [
+          13,
+          17
+        ],
+        [
+          14,
+          20
+        ],
+        [
+          15,
+          20
+        ],
+        [
+          16,
+          21
+        ],
+        [
+          17,
+          19
+        ],
+        [
+          19,
+          22
+        ],
+        [
+          20,
+          21
+        ],
+        [
+          21,
+          22
+        ]
+      ]
+    },
+    {
+      "id": "gradient-055",
+      "width": 5,
+      "height": 5,
+      "movable": 9,
+      "role": "practice",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 8,
+      "minimumNominalOklab": 0.04498705,
+      "closestMovablePair": [
+        6,
+        7
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "ae6f99223f5ba652b1094b1c1ce65fd1c4930bc7aca70ba2f89af779766a6641",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          6,
+          13
+        ],
+        [
+          7,
+          13
+        ],
+        [
+          8,
+          16
+        ],
+        [
+          11,
+          12
+        ],
+        [
+          12,
+          13
+        ],
+        [
+          13,
+          18
+        ],
+        [
+          16,
+          18
+        ],
+        [
+          17,
+          18
+        ]
+      ]
+    },
+    {
+      "id": "gradient-056",
+      "width": 6,
+      "height": 5,
+      "movable": 20,
+      "role": "combine",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 19,
+      "minimumNominalOklab": 0.0415395,
+      "closestMovablePair": [
+        2,
+        3
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "20fc99a487375677b0c550f3af9e57138db20ca3b37f9643604113046af3bfd3",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          9
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          4,
+          13
+        ],
+        [
+          7,
+          9
+        ],
+        [
+          8,
+          26
+        ],
+        [
+          9,
+          26
+        ],
+        [
+          10,
+          27
+        ],
+        [
+          13,
+          21
+        ],
+        [
+          14,
+          15
+        ],
+        [
+          15,
+          16
+        ],
+        [
+          16,
+          21
+        ],
+        [
+          19,
+          21
+        ],
+        [
+          20,
+          28
+        ],
+        [
+          21,
+          22
+        ],
+        [
+          22,
+          26
+        ],
+        [
+          25,
+          28
+        ],
+        [
+          26,
+          28
+        ],
+        [
+          27,
+          28
+        ]
+      ]
+    },
+    {
+      "id": "gradient-057",
+      "width": 5,
+      "height": 5,
+      "movable": 12,
+      "role": "practice",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 11,
+      "minimumNominalOklab": 0.039983366,
+      "closestMovablePair": [
+        15,
+        16
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "bcd9bdde8e56d92aa7bf56e026bb2cbe6ff35c26ae81605b46fd9fc6199abb42",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          21
+        ],
+        [
+          3,
+          18
+        ],
+        [
+          5,
+          19
+        ],
+        [
+          6,
+          23
+        ],
+        [
+          8,
+          21
+        ],
+        [
+          9,
+          23
+        ],
+        [
+          15,
+          23
+        ],
+        [
+          16,
+          23
+        ],
+        [
+          18,
+          19
+        ],
+        [
+          19,
+          21
+        ],
+        [
+          21,
+          23
+        ]
+      ]
+    },
+    {
+      "id": "gradient-058",
+      "width": 4,
+      "height": 4,
+      "movable": 4,
+      "role": "recovery",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 3,
+      "minimumNominalOklab": 0.060577254,
+      "closestMovablePair": [
+        5,
+        6
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "dc2c00d07016c56ac7d6d178f9ff0cbd8e9d6d705fd5d3bf3f30a6f291c6baf3",
+      "bfs": {
+        "distance": 3,
+        "visited": 24
+      },
+      "legalOptimalWitness": [
+        [
+          5,
+          9
+        ],
+        [
+          6,
+          10
+        ],
+        [
+          9,
+          10
+        ]
+      ]
+    },
+    {
+      "id": "gradient-059",
+      "width": 6,
+      "height": 5,
+      "movable": 25,
+      "role": "combine",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 24,
+      "minimumNominalOklab": 0.055104149,
+      "closestMovablePair": [
+        1,
+        8
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "8f888d6cb965099307db123ba7dd3bc8c376f264308d1cb7b4846fad62be00f5",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          13
+        ],
+        [
+          2,
+          18
+        ],
+        [
+          3,
+          21
+        ],
+        [
+          4,
+          22
+        ],
+        [
+          6,
+          26
+        ],
+        [
+          7,
+          26
+        ],
+        [
+          8,
+          26
+        ],
+        [
+          9,
+          11
+        ],
+        [
+          10,
+          11
+        ],
+        [
+          11,
+          13
+        ],
+        [
+          12,
+          18
+        ],
+        [
+          13,
+          22
+        ],
+        [
+          14,
+          26
+        ],
+        [
+          16,
+          20
+        ],
+        [
+          17,
+          18
+        ],
+        [
+          18,
+          19
+        ],
+        [
+          19,
+          26
+        ],
+        [
+          20,
+          22
+        ],
+        [
+          21,
+          27
+        ],
+        [
+          22,
+          23
+        ],
+        [
+          23,
+          28
+        ],
+        [
+          25,
+          26
+        ],
+        [
+          26,
+          27
+        ],
+        [
+          27,
+          28
+        ]
+      ]
+    },
+    {
+      "id": "gradient-060",
+      "width": 6,
+      "height": 5,
+      "movable": 26,
+      "role": "combine",
+      "errors": [],
+      "warnings": [
+        "CLOSE_COLORS_REVIEW"
+      ],
+      "minimumSwaps": 25,
+      "minimumNominalOklab": 0.024773315,
+      "closestMovablePair": [
+        27,
+        28
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "85b8b3cd12b680035a88620cb117047062c5df84e02f41fa9a005e549daa19bc",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          14
+        ],
+        [
+          4,
+          17
+        ],
+        [
+          6,
+          28
+        ],
+        [
+          7,
+          18
+        ],
+        [
+          8,
+          18
+        ],
+        [
+          9,
+          13
+        ],
+        [
+          10,
+          16
+        ],
+        [
+          11,
+          23
+        ],
+        [
+          12,
+          18
+        ],
+        [
+          13,
+          23
+        ],
+        [
+          14,
+          17
+        ],
+        [
+          15,
+          20
+        ],
+        [
+          16,
+          25
+        ],
+        [
+          17,
+          25
+        ],
+        [
+          18,
+          21
+        ],
+        [
+          19,
+          25
+        ],
+        [
+          20,
+          23
+        ],
+        [
+          21,
+          26
+        ],
+        [
+          22,
+          25
+        ],
+        [
+          23,
+          28
+        ],
+        [
+          25,
+          26
+        ],
+        [
+          26,
+          27
+        ],
+        [
+          27,
+          28
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-001",
+      "width": 3,
+      "height": 3,
+      "movable": 5,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 4,
+      "minimumNominalOklab": 0.109264126,
+      "closestMovablePair": [
+        1,
+        5
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "92f935be708546a282cfb01ec1eb116486162dbf7ae0d2db9f32a8952c11a7bb",
+      "bfs": {
+        "distance": 4,
+        "visited": 120
+      },
+      "legalOptimalWitness": [
+        [
+          1,
+          4
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          5,
+          7
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-002",
+      "width": 4,
+      "height": 4,
+      "movable": 4,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 3,
+      "minimumNominalOklab": 0.055171125,
+      "closestMovablePair": [
+        9,
+        10
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "fb2caa178e60519571b349c27001f975ccabc0efc851cbea8210c39958d01cc8",
+      "bfs": {
+        "distance": 3,
+        "visited": 24
+      },
+      "legalOptimalWitness": [
+        [
+          5,
+          9
+        ],
+        [
+          6,
+          10
+        ],
+        [
+          9,
+          10
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-003",
+      "width": 5,
+      "height": 4,
+      "movable": 6,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 5,
+      "minimumNominalOklab": 0.042499771,
+      "closestMovablePair": [
+        6,
+        7
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "d58d7890dcd9e83ca5cf02a088844d38cbdc86c997daba942fb6476729d1d932",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          6,
+          11
+        ],
+        [
+          7,
+          12
+        ],
+        [
+          8,
+          11
+        ],
+        [
+          11,
+          13
+        ],
+        [
+          12,
+          13
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-004",
+      "width": 4,
+      "height": 4,
+      "movable": 8,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 7,
+      "minimumNominalOklab": 0.088227844,
+      "closestMovablePair": [
+        7,
+        10
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "c26ccbe890d1cf465f089dfbc9e70273aef8aec6eac22254d777c834d618e042",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          4,
+          10
+        ],
+        [
+          5,
+          11
+        ],
+        [
+          6,
+          9
+        ],
+        [
+          7,
+          9
+        ],
+        [
+          8,
+          9
+        ],
+        [
+          9,
+          11
+        ],
+        [
+          10,
+          11
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-005",
+      "width": 4,
+      "height": 4,
+      "movable": 8,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 7,
+      "minimumNominalOklab": 0.053410083,
+      "closestMovablePair": [
+        13,
+        14
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "84805c65fea12872e601b3ccbb3542d6ad86fd8efb2c42655338579ebcfe189f",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          9
+        ],
+        [
+          2,
+          10
+        ],
+        [
+          5,
+          14
+        ],
+        [
+          6,
+          13
+        ],
+        [
+          9,
+          13
+        ],
+        [
+          10,
+          13
+        ],
+        [
+          13,
+          14
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-006",
+      "width": 5,
+      "height": 3,
+      "movable": 5,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 4,
+      "minimumNominalOklab": 0.071596741,
+      "closestMovablePair": [
+        8,
+        9
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "907b792b3c27f041c6c7988495d21cd654692044dfe50e74825265e3fc713549",
+      "bfs": {
+        "distance": 4,
+        "visited": 120
+      },
+      "legalOptimalWitness": [
+        [
+          5,
+          7
+        ],
+        [
+          6,
+          8
+        ],
+        [
+          7,
+          9
+        ],
+        [
+          8,
+          9
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-007",
+      "width": 4,
+      "height": 4,
+      "movable": 11,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 10,
+      "minimumNominalOklab": 0.069705554,
+      "closestMovablePair": [
+        4,
+        5
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "1f5d15f70942da20fb5f89e901bf224a992caafb94374e9c8d026ca83b13f1eb",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          9
+        ],
+        [
+          4,
+          14
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          6,
+          11
+        ],
+        [
+          7,
+          14
+        ],
+        [
+          8,
+          14
+        ],
+        [
+          9,
+          11
+        ],
+        [
+          11,
+          13
+        ],
+        [
+          13,
+          14
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-008",
+      "width": 5,
+      "height": 4,
+      "movable": 8,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 7,
+      "minimumNominalOklab": 0.053262265,
+      "closestMovablePair": [
+        8,
+        9
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "949062418502249025e69a2a300674e87e158168e6e749767cd0a94037cb1323",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          5
+        ],
+        [
+          3,
+          18
+        ],
+        [
+          5,
+          8
+        ],
+        [
+          6,
+          9
+        ],
+        [
+          8,
+          16
+        ],
+        [
+          9,
+          16
+        ],
+        [
+          16,
+          18
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-009",
+      "width": 5,
+      "height": 5,
+      "movable": 9,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 8,
+      "minimumNominalOklab": 0.061857703,
+      "closestMovablePair": [
+        6,
+        12
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "4b60149b0314c1b96c6a785661318c2175664c96d3f493f3ff782b1a684a2e0d",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          6,
+          17
+        ],
+        [
+          7,
+          17
+        ],
+        [
+          8,
+          17
+        ],
+        [
+          11,
+          12
+        ],
+        [
+          12,
+          16
+        ],
+        [
+          13,
+          17
+        ],
+        [
+          16,
+          17
+        ],
+        [
+          17,
+          18
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-010",
+      "width": 5,
+      "height": 4,
+      "movable": 10,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 9,
+      "minimumNominalOklab": 0.040475707,
+      "closestMovablePair": [
+        8,
+        9
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "7b9e2f58963a5a4e6cc8f39deb6c30c1622cc93de3ea03bef2da940a2475b26c",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          5,
+          14
+        ],
+        [
+          6,
+          12
+        ],
+        [
+          7,
+          11
+        ],
+        [
+          8,
+          10
+        ],
+        [
+          9,
+          11
+        ],
+        [
+          10,
+          12
+        ],
+        [
+          11,
+          12
+        ],
+        [
+          12,
+          14
+        ],
+        [
+          13,
+          14
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-011",
+      "width": 3,
+      "height": 3,
+      "movable": 5,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 4,
+      "minimumNominalOklab": 0.084850974,
+      "closestMovablePair": [
+        3,
+        4
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "d702ea43163efe24a5d6108bce8520f2edec40ae0a549fedffed8010a2fddeb3",
+      "bfs": {
+        "distance": 4,
+        "visited": 120
+      },
+      "legalOptimalWitness": [
+        [
+          1,
+          4
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          5,
+          7
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-012",
+      "width": 4,
+      "height": 4,
+      "movable": 4,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 3,
+      "minimumNominalOklab": 0.089852118,
+      "closestMovablePair": [
+        5,
+        9
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "f0750adcf85d19307711f4198d5cf08dc87b6d9ce67c877e8d3684e4e734280a",
+      "bfs": {
+        "distance": 3,
+        "visited": 24
+      },
+      "legalOptimalWitness": [
+        [
+          5,
+          9
+        ],
+        [
+          6,
+          10
+        ],
+        [
+          9,
+          10
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-013",
+      "width": 5,
+      "height": 4,
+      "movable": 6,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 5,
+      "minimumNominalOklab": 0.049778595,
+      "closestMovablePair": [
+        6,
+        7
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "5ce878cf2fa5d8bbb3a66163ddfa0650f089b97fc3d0f98e0a10a119b8a1327c",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          6,
+          7
+        ],
+        [
+          7,
+          11
+        ],
+        [
+          8,
+          13
+        ],
+        [
+          11,
+          12
+        ],
+        [
+          12,
+          13
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-014",
+      "width": 4,
+      "height": 4,
+      "movable": 8,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 7,
+      "minimumNominalOklab": 0.07089771,
+      "closestMovablePair": [
+        8,
+        9
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "546c8e0ae396005c6908915b40b5ea9588123da964255465b9769610bf60c5ed",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          4,
+          11
+        ],
+        [
+          5,
+          8
+        ],
+        [
+          6,
+          8
+        ],
+        [
+          7,
+          8
+        ],
+        [
+          8,
+          9
+        ],
+        [
+          9,
+          10
+        ],
+        [
+          10,
+          11
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-015",
+      "width": 4,
+      "height": 4,
+      "movable": 8,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 7,
+      "minimumNominalOklab": 0.059653289,
+      "closestMovablePair": [
+        5,
+        6
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "a5dcbbe707a38b42fc8feb00bbd63f2c72054ea2d22b9e605a34d62224a5c4c6",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          9
+        ],
+        [
+          2,
+          14
+        ],
+        [
+          5,
+          13
+        ],
+        [
+          6,
+          9
+        ],
+        [
+          9,
+          10
+        ],
+        [
+          10,
+          13
+        ],
+        [
+          13,
+          14
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-016",
+      "width": 5,
+      "height": 3,
+      "movable": 5,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 4,
+      "minimumNominalOklab": 0.04032124,
+      "closestMovablePair": [
+        8,
+        9
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "5bb789e70d469270d9746c5e836641268566325360c10bf018a9a7c1ce8d39ee",
+      "bfs": {
+        "distance": 4,
+        "visited": 120
+      },
+      "legalOptimalWitness": [
+        [
+          5,
+          7
+        ],
+        [
+          6,
+          9
+        ],
+        [
+          7,
+          8
+        ],
+        [
+          8,
+          9
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-017",
+      "width": 4,
+      "height": 4,
+      "movable": 11,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 10,
+      "minimumNominalOklab": 0.088172084,
+      "closestMovablePair": [
+        5,
+        8
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "b949437d4c432998ae223dea1e362f16443bdd330f069af4c736ac5fa85d6fd7",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          4,
+          6
+        ],
+        [
+          5,
+          13
+        ],
+        [
+          6,
+          11
+        ],
+        [
+          7,
+          9
+        ],
+        [
+          8,
+          11
+        ],
+        [
+          9,
+          13
+        ],
+        [
+          11,
+          13
+        ],
+        [
+          13,
+          14
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-018",
+      "width": 5,
+      "height": 4,
+      "movable": 8,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 7,
+      "minimumNominalOklab": 0.043976625,
+      "closestMovablePair": [
+        8,
+        9
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "20c8d6c1ff7ba18362c29ebe0cd83ea59a5f074f6d49cb6b64a62f606f422072",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          16
+        ],
+        [
+          3,
+          18
+        ],
+        [
+          5,
+          18
+        ],
+        [
+          6,
+          9
+        ],
+        [
+          8,
+          9
+        ],
+        [
+          9,
+          18
+        ],
+        [
+          16,
+          18
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-019",
+      "width": 5,
+      "height": 5,
+      "movable": 9,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 8,
+      "minimumNominalOklab": 0.044140326,
+      "closestMovablePair": [
+        6,
+        7
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "7d6ba817a9d3af1999653e10754436722302795d9cac779834b436c8ba7c8ff9",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          6,
+          7
+        ],
+        [
+          7,
+          11
+        ],
+        [
+          8,
+          17
+        ],
+        [
+          11,
+          13
+        ],
+        [
+          12,
+          18
+        ],
+        [
+          13,
+          17
+        ],
+        [
+          16,
+          17
+        ],
+        [
+          17,
+          18
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-020",
+      "width": 5,
+      "height": 4,
+      "movable": 10,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 9,
+      "minimumNominalOklab": 0.062507927,
+      "closestMovablePair": [
+        13,
+        14
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "f034d1e8b97aae754a8700ed2d1a45638abfede154495af513cf9911169d49f0",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          5,
+          9
+        ],
+        [
+          6,
+          8
+        ],
+        [
+          7,
+          13
+        ],
+        [
+          8,
+          9
+        ],
+        [
+          9,
+          11
+        ],
+        [
+          10,
+          12
+        ],
+        [
+          11,
+          13
+        ],
+        [
+          12,
+          13
+        ],
+        [
+          13,
+          14
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-021",
+      "width": 3,
+      "height": 3,
+      "movable": 5,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 4,
+      "minimumNominalOklab": 0.108521099,
+      "closestMovablePair": [
+        3,
+        4
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "cbe6c0304c06557058b7c754c05752899157d549bd24f382423ad6888eebf83f",
+      "bfs": {
+        "distance": 4,
+        "visited": 120
+      },
+      "legalOptimalWitness": [
+        [
+          1,
+          7
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          5,
+          7
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-022",
+      "width": 4,
+      "height": 4,
+      "movable": 4,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 3,
+      "minimumNominalOklab": 0.083596399,
+      "closestMovablePair": [
+        6,
+        9
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "feda8db848c86d2b91efcb085605ec30dc9a649dd07be9db5d5cde94766317ed",
+      "bfs": {
+        "distance": 3,
+        "visited": 24
+      },
+      "legalOptimalWitness": [
+        [
+          5,
+          6
+        ],
+        [
+          6,
+          10
+        ],
+        [
+          9,
+          10
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-023",
+      "width": 5,
+      "height": 4,
+      "movable": 6,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 5,
+      "minimumNominalOklab": 0.040599204,
+      "closestMovablePair": [
+        11,
+        12
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "1d5cc5bab7dec797a600edc642656cdad63fdcec2caa75330f8ff4fa80f7694e",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          6,
+          13
+        ],
+        [
+          7,
+          8
+        ],
+        [
+          8,
+          11
+        ],
+        [
+          11,
+          12
+        ],
+        [
+          12,
+          13
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-024",
+      "width": 4,
+      "height": 4,
+      "movable": 8,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 7,
+      "minimumNominalOklab": 0.045582567,
+      "closestMovablePair": [
+        10,
+        11
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "9b34aa9510e57ccc9286fa1d735bb73c341ec1e8dbd8b619c0cc1606e166963a",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          4,
+          5
+        ],
+        [
+          5,
+          9
+        ],
+        [
+          6,
+          7
+        ],
+        [
+          7,
+          8
+        ],
+        [
+          8,
+          11
+        ],
+        [
+          9,
+          10
+        ],
+        [
+          10,
+          11
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-025",
+      "width": 4,
+      "height": 4,
+      "movable": 8,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 7,
+      "minimumNominalOklab": 0.088520482,
+      "closestMovablePair": [
+        1,
+        6
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "6d78179aec94b09a38104352fa8217a99cc70e1fd680692dce014a051ef98f94",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          9
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          6,
+          14
+        ],
+        [
+          9,
+          14
+        ],
+        [
+          10,
+          13
+        ],
+        [
+          13,
+          14
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-026",
+      "width": 5,
+      "height": 3,
+      "movable": 5,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 4,
+      "minimumNominalOklab": 0.053105162,
+      "closestMovablePair": [
+        8,
+        9
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "fe38b088b60ab3246d22ceeaa81641ff2326d6f05cadb43c2616782c1696bea7",
+      "bfs": {
+        "distance": 4,
+        "visited": 120
+      },
+      "legalOptimalWitness": [
+        [
+          5,
+          8
+        ],
+        [
+          6,
+          8
+        ],
+        [
+          7,
+          9
+        ],
+        [
+          8,
+          9
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-027",
+      "width": 4,
+      "height": 4,
+      "movable": 11,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 10,
+      "minimumNominalOklab": 0.036544753,
+      "closestMovablePair": [
+        1,
+        2
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "e1cfd0198bf771f75db697722cd18c7791383edc96e7ac2d816780a68440f7c3",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          8
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          6,
+          13
+        ],
+        [
+          7,
+          13
+        ],
+        [
+          8,
+          14
+        ],
+        [
+          9,
+          13
+        ],
+        [
+          11,
+          14
+        ],
+        [
+          13,
+          14
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-028",
+      "width": 5,
+      "height": 4,
+      "movable": 8,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 7,
+      "minimumNominalOklab": 0.047145306,
+      "closestMovablePair": [
+        8,
+        9
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "79278f7342417400195ec2502dcafadd27b160a189951a0e1273eca2a050010d",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          1,
+          9
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          5,
+          8
+        ],
+        [
+          6,
+          9
+        ],
+        [
+          8,
+          16
+        ],
+        [
+          9,
+          18
+        ],
+        [
+          16,
+          18
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-029",
+      "width": 5,
+      "height": 5,
+      "movable": 9,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 8,
+      "minimumNominalOklab": 0.041983662,
+      "closestMovablePair": [
+        16,
+        17
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "61775d214cd30ae10c342bf558e1ab2392453bc6ce45117c037c5e80e5a17385",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          6,
+          12
+        ],
+        [
+          7,
+          18
+        ],
+        [
+          8,
+          16
+        ],
+        [
+          11,
+          12
+        ],
+        [
+          12,
+          16
+        ],
+        [
+          13,
+          17
+        ],
+        [
+          16,
+          17
+        ],
+        [
+          17,
+          18
+        ]
+      ]
+    },
+    {
+      "id": "gradient-daily-030",
+      "width": 5,
+      "height": 4,
+      "movable": 10,
+      "role": "daily_candidate",
+      "errors": [],
+      "warnings": [],
+      "minimumSwaps": 9,
+      "minimumNominalOklab": 0.076638214,
+      "closestMovablePair": [
+        9,
+        13
+      ],
+      "orientationAmbiguities": [],
+      "fingerprint": "e1ca7bfc05d34f52413ab9cd9c44c68495bd1a3d5d64b1761489a06098354838",
+      "bfs": null,
+      "legalOptimalWitness": [
+        [
+          5,
+          9
+        ],
+        [
+          6,
+          14
+        ],
+        [
+          7,
+          10
+        ],
+        [
+          8,
+          14
+        ],
+        [
+          9,
+          14
+        ],
+        [
+          10,
+          12
+        ],
+        [
+          11,
+          14
+        ],
+        [
+          12,
+          14
+        ],
+        [
+          13,
+          14
+        ]
+      ]
+    }
+  ]
+}

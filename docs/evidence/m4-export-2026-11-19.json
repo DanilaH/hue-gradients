@@ -1,0 +1,566 @@
+{
+  "date": "2026-11-19",
+  "stage": "M4 local editor/export implementation; native/production acceptance pending",
+  "version": "0.4.1",
+  "runtimeCommit": "469928d03f4bae5053e23db26e82187bedbc252e",
+  "sourceSha256": {
+    "src/domain/export.ts": "31d472ff1ff3a8998759831b3fb454f4228bbd3b5d9ae7901337ac7fce211531",
+    "src/game/exportRenderer.ts": "61712fad67d8bf68efc9f55c49f1edec4876e7e575e97dbfa4fd3704b79d3595",
+    "src/game/exportView.ts": "2584be5370591d3e0ec8ab666d661820b48651e3af382240cfc743e4c7c9042f",
+    "src/app/exportFiles.ts": "05b884de8b1939f1726761935ae93a2495bd4692902ac1b3f95d409d6630e9ff",
+    "src/app/nativeExport.ts": "d703029883a028517625ecf3424e895de72b73d589aedc36e8813ce4710089cb",
+    "src/game/mountGame.ts": "cafe756fc83e0e8092e8d05a91c2fb2af751a2cdd11bf321779f8da63dceba9e",
+    "src/game/metaView.ts": "ed14eae94dd92be8a79da7af659aec4d7a85023e6d4fbc789829972d2119c7db",
+    "src/game/editorView.ts": "4c9575be715f53a58a300b245f5a12a535c27c24dec860ba619c75799b7d1f85",
+    "src/game/game.css": "34df9e251710e6e9c394782785e6a0e1aa6176fe3c638f2d13945393669a1477",
+    "src/main.ts": "0405e03adf5561ffbca0763bbc218dfa3b82e77815dcada1bc69d2b907349581",
+    "native/android/app/src/main/java/com/danilah/huegradients/HueExportPlugin.java": "0ce9d583ff7c8fb9149cb26f4f75544410be2a99c620c3a0c52f286d82271b9b",
+    "native/android/app/src/main/java/com/danilah/huegradients/MainActivity.java": "2d20d29b883b8fa723843cca98a3f093a5584af0c46d310efa5efe28cec87fd0",
+    "native/android/app/src/main/AndroidManifest.xml": "2822f809f2d80f3b7580410044848d143c7c2918f53bf0a2ca8ce53af33fb778",
+    "native/android/app/src/main/res/xml/hue_export_paths.xml": "ca74b666331da998134eff372243c9a0b49f2ca1f8d72235448ce108861eecd1",
+    "native/android/app/proguard-rules.pro": "a4fd577ff9dd1ea27ed2fbebd28e518f940d7857f0daafc3145a4300baaa9289",
+    "tools/verify-apk.py": "12e4216c39848c48d794166d5f25c9b6e5a9dac8e1d988a9b9bbf8c593adbd59",
+    "tools/m4-export-browser-check.mjs": "6ca12b4f96dbab661bb284366342a438b874b507a42d3d9ed1bf22db7751475f",
+    "tools/check-export-pixels.py": "f3609d97028460636ed4cbe5b5ad5466f12a89a039d74a9acd48685784c32361",
+    "tools/requirements-test.txt": "ae3337e5ae362bf1fad83355272ff595b58aae13d7a7ac67617f6f3161fa0c07",
+    "tests/export.test.ts": "7b952a6703d9cac8742e350a6f4d203923dc90ebdc520f1d8fa2e432867a9d42",
+    "package.json": "599bde3c17dabf3ebc3ca84a4adfb44ff192bbeeafd58e7ee15ad7f9893485c7",
+    "android-project.json": "c5421a5659db68e20bc658c65aeee282a11d1715288ff128e814bbf443b969b2"
+  },
+  "unitTests": {
+    "passed": 149,
+    "files": 9,
+    "editorParityCases": 33,
+    "campaignWitnesses": 60
+  },
+  "browserTotal": 75,
+  "exportBrowser": {
+    "passed": [
+      "empty profile cannot export unfinished targets; no automatic share call",
+      "actual Chromium download is byte-identical to the preview PNG; UI does not invent an OS receipt",
+      "multi-work selection replaces another revision of the same logical work and requests missing works",
+      "actual Canvas metrics reject excess lines and wide text without truncation or font shrink; caption remains editable",
+      "share cancel/denial/success fixtures preserve preview and caption, retain click activation and never claim publication",
+      "picker cancellation, denied access, quota failure/abort and successful close retain the prepared file for retry",
+      "initial save/share/back actions remain visible and hittable across target viewports and enlarged text",
+      "all exports and OS response fixtures leave progress, rights, author proofs and workspace revision unchanged",
+      "all eight renderers execute in real Canvas; future daily rights are fixture-only, never awarded or persisted"
+    ],
+    "pageErrors": [],
+    "actual": "Chromium PNG render/download, UI selection, text metrics, geometry/lifecycle",
+    "fixtures": "30 completed campaign + verified own revisions imported with reducers; share/save-picker responses modelled; daily rights renderer-only",
+    "nativeRuntime": "NOT RUN",
+    "publication": "NOT ATTEMPTED"
+  },
+  "independentPngChecks": {
+    "scope": "Real Canvas PNGs decoded independently with Pillow; future daily rights are synthetic renderer fixtures",
+    "results": [
+      {
+        "format": "clean",
+        "dimensions": [
+          1800,
+          300
+        ],
+        "fields": [
+          [
+            0,
+            0,
+            1800,
+            300,
+            300
+          ]
+        ],
+        "exactOpaqueTiles": 6,
+        "allTilePixelsAndSeams": "PASS",
+        "outsideFieldsAndText": "PASS",
+        "sRGBIntent": 1,
+        "gamma": 45455,
+        "crc": "PASS",
+        "sha256": "37dae28c3b45926a4132ae96fb6f5c421f77eb98bab7d492d6aad706d37f1940"
+      },
+      {
+        "format": "export-caption",
+        "dimensions": [
+          1800,
+          2000
+        ],
+        "fields": [
+          [
+            96,
+            766,
+            1608,
+            268,
+            268
+          ]
+        ],
+        "exactOpaqueTiles": 6,
+        "allTilePixelsAndSeams": "PASS",
+        "outsideFieldsAndText": "PASS",
+        "sRGBIntent": 1,
+        "gamma": 45455,
+        "crc": "PASS",
+        "sha256": "eb67d4b844e75bb07f9f70d1ba18edb8bcdc3c7f03b28f64d1825966a658659e"
+      },
+      {
+        "format": "export-strip",
+        "dimensions": [
+          2400,
+          960
+        ],
+        "fields": [
+          [
+            96,
+            424,
+            672,
+            112,
+            112
+          ],
+          [
+            864,
+            396,
+            672,
+            168,
+            168
+          ],
+          [
+            1632,
+            144,
+            672,
+            672,
+            168
+          ]
+        ],
+        "exactOpaqueTiles": 26,
+        "allTilePixelsAndSeams": "PASS",
+        "outsideFieldsAndText": "PASS",
+        "sRGBIntent": 1,
+        "gamma": 45455,
+        "crc": "PASS",
+        "sha256": "e1cb65511a9e98031d8ff451f8d8ab74e625f3368ff5c3342760aacae6572344"
+      },
+      {
+        "format": "export-grid",
+        "dimensions": [
+          2000,
+          2000
+        ],
+        "fields": [
+          [
+            98,
+            453,
+            852,
+            142,
+            142
+          ],
+          [
+            1048,
+            417,
+            856,
+            214,
+            214
+          ],
+          [
+            96,
+            1048,
+            856,
+            856,
+            214
+          ],
+          [
+            1048,
+            1048,
+            855,
+            855,
+            171
+          ]
+        ],
+        "exactOpaqueTiles": 51,
+        "allTilePixelsAndSeams": "PASS",
+        "outsideFieldsAndText": "PASS",
+        "sRGBIntent": 1,
+        "gamma": 45455,
+        "crc": "PASS",
+        "sha256": "884929ea5af69f9c60d4bf51a75ca36a41fb5a35d169a589e4329e674e6b9861"
+      },
+      {
+        "format": "export-frame",
+        "dimensions": [
+          2000,
+          2000
+        ],
+        "fields": [
+          [
+            202,
+            867,
+            1596,
+            266,
+            266
+          ]
+        ],
+        "exactOpaqueTiles": 6,
+        "allTilePixelsAndSeams": "PASS",
+        "outsideFieldsAndText": "PASS",
+        "sRGBIntent": 1,
+        "gamma": 45455,
+        "crc": "PASS",
+        "sha256": "fd71eed805e8cbac0d1eb38d524dc354bd92ef55ca101db0719e05fbb4f66cd7"
+      },
+      {
+        "format": "export-diptych",
+        "dimensions": [
+          2400,
+          1400
+        ],
+        "fields": [
+          [
+            96,
+            612,
+            1056,
+            176,
+            176
+          ],
+          [
+            1248,
+            568,
+            1056,
+            264,
+            264
+          ]
+        ],
+        "exactOpaqueTiles": 10,
+        "allTilePixelsAndSeams": "PASS",
+        "outsideFieldsAndText": "PASS",
+        "sRGBIntent": 1,
+        "gamma": 45455,
+        "crc": "PASS",
+        "sha256": "c0c56585274795fd138aaed75bfa717eb1d129d5e7432fd2baed3e0c26ff3c8b"
+      },
+      {
+        "format": "export-postcard",
+        "dimensions": [
+          1800,
+          2200
+        ],
+        "fields": [
+          [
+            96,
+            766,
+            1608,
+            268,
+            268
+          ]
+        ],
+        "exactOpaqueTiles": 6,
+        "allTilePixelsAndSeams": "PASS",
+        "outsideFieldsAndText": "PASS",
+        "sRGBIntent": 1,
+        "gamma": 45455,
+        "crc": "PASS",
+        "sha256": "72e0cda9a7fc3a8d8c2695a2d1acb520826cb2ee8e2b3da5b578e9f4282fbd1a"
+      },
+      {
+        "format": "chapter-page",
+        "dimensions": [
+          1800,
+          3000
+        ],
+        "fields": [
+          [
+            108,
+            394,
+            496,
+            124,
+            124
+          ],
+          [
+            652,
+            406,
+            495,
+            99,
+            99
+          ],
+          [
+            1394,
+            208,
+            99,
+            495,
+            99
+          ],
+          [
+            108,
+            752,
+            495,
+            495,
+            165
+          ],
+          [
+            652,
+            752,
+            496,
+            496,
+            124
+          ],
+          [
+            1196,
+            752,
+            496,
+            496,
+            124
+          ],
+          [
+            108,
+            1296,
+            496,
+            496,
+            124
+          ],
+          [
+            654,
+            1503,
+            492,
+            82,
+            82
+          ],
+          [
+            1196,
+            1296,
+            496,
+            496,
+            124
+          ],
+          [
+            108,
+            1840,
+            495,
+            495,
+            99
+          ],
+          [
+            652,
+            1840,
+            495,
+            495,
+            99
+          ],
+          [
+            1196,
+            1840,
+            496,
+            496,
+            124
+          ],
+          [
+            108,
+            2384,
+            496,
+            496,
+            124
+          ],
+          [
+            652,
+            2384,
+            495,
+            495,
+            99
+          ],
+          [
+            1196,
+            2384,
+            495,
+            495,
+            99
+          ]
+        ],
+        "exactOpaqueTiles": 225,
+        "allTilePixelsAndSeams": "PASS",
+        "outsideFieldsAndText": "PASS",
+        "sRGBIntent": 1,
+        "gamma": 45455,
+        "crc": "PASS",
+        "sha256": "247b1b822bd3f37dcf3e5a872853b039b428acf49691924edaa59a7822072e8f"
+      }
+    ]
+  },
+  "retainedBrowser": {
+    "core": {
+      "browser": "Chromium",
+      "passed": [
+        "idempotence",
+        "payload mismatch",
+        "CAS with two connections",
+        "atomic rollback",
+        "reopen",
+        "lost bridge reply",
+        "unreadable ledger recovery",
+        "quota/retry identity",
+        "pin and deselect no-op",
+        "help durably recorded before preview, preview not restored",
+        "real drag win and reload without duplicate reward",
+        "next and restart confirmation",
+        "actual two-tab CAS",
+        "resize cancels captured drag",
+        "pointercancel rejects late release",
+        "background cancels captured drag",
+        "final pointerup coordinates and ignored second pointer",
+        "keyboard swap",
+        "first five through actual UI, unique completions and rights",
+        "320px, portrait and landscape layout"
+      ],
+      "pageErrors": [],
+      "limits": [
+        "No physical Android",
+        "No hosted Yandex SDK",
+        "No production cloud/ads"
+      ]
+    },
+    "presentation": {
+      "passed": [
+        "pin/deselect have no success audio or haptic",
+        "one victory cue after commit; CTA immediately enabled",
+        "restored victory never replays sound/haptic",
+        "new gesture interrupts settling without dropping the next move",
+        "sound/haptic/motion settings persist; muted actions stay silent",
+        "system reduced motion overrides the animation preference",
+        "actual displayed tile RGB unchanged by atmosphere",
+        "background stops ambient frames and feedback",
+        "failed transaction and explicit receipt recovery do not replay feedback"
+      ],
+      "pageErrors": [],
+      "limits": [
+        "Desktop Chromium, not a physical Android feel test",
+        "Font selection and owner art approval pending"
+      ]
+    },
+    "meta": {
+      "passed": [
+        "first five remain sequential; fifth grants caption rights",
+        "album contains only completed previews; no solution leaks",
+        "copy persists with new identity, plain-text name and no progress/mastery farming",
+        "free choice after fifth and next-lowest recommendation",
+        "9→10 unique completions opens chapter two before page completion",
+        "all 15 levels of an opened later chapter are available",
+        "14→15 stores page and format together, with one optional reward list",
+        "full chapter page renders exactly 15 earned works",
+        "album/page navigation fits narrow portrait and landscape",
+        "legacy migration atomically preserves active board, assistance/bests and backup without ceremony",
+        "failed migration rolls back backup/progress; retry preserves legacy state exactly",
+        "all-60 imported checkpoint shows 60 cards, finite six formats and no fake next chapter"
+      ],
+      "pageErrors": [],
+      "actualUiCompleted": "Chapter 1: all 15; non-linear selection after tutorial",
+      "fixtureCases": "14-completion v0.2 snapshots, with/without transaction fault",
+      "limits": [
+        "Physical Android and hosted services NOT RUN",
+        "Human acceptance of candidate content NOT RUN"
+      ]
+    },
+    "editor": {
+      "passed": [
+        "new 4×4 editor available before any campaign completion",
+        "debounced plain-text Unicode rename commits without gameplay revision",
+        "resize preview is durable separately; Cancel leaves previous revision exact",
+        "Apply makes one immutable revision; one-row palette and anchors normalize",
+        "invalid draft saves for editing but author Play is unavailable",
+        "author attempt and assistance survive reload on the exact saved snapshot",
+        "real tap–tap author completion stores exact proof with zero campaign awards",
+        "rename keeps proof; history is not rewritten",
+        "different fixed start invalidates current verification while preserving old proof",
+        "interrupted preview restores from physical IndexedDB without changing the committed version",
+        "two actual editor tabs retain independent recovered previews and expose a stale applied branch in history",
+        "quota failure keeps the actual form and input visible; explicit retry confirms the pending operation",
+        "invalid unsaved Unicode name offers Stay or explicit exit without edits; normal Back flushes",
+        "initial editor actions remain visible and hittable in narrow/short/tablet viewports and at 150% computed text size",
+        "physical IndexedDB snapshot/fact/receipt resolves lost editor response exactly once",
+        "two sessions preserve stale edit as a branch after CAS conflict",
+        "failed editor write remains invisible; retry uses the original operation ID",
+        "M3 copies migrate atomically to unverified editor roots without changing campaign data",
+        "failed M3 editor migration leaves exact source; retry commits one backup and converted draft"
+      ],
+      "physical": {
+        "responseLossResolved": true,
+        "staleBranchPreserved": true,
+        "failedWriteInvisible": true,
+        "sameOperationRetry": true
+      },
+      "pageErrors": [],
+      "limits": [
+        "Native SQLite/runtime, physical Android touch NOT RUN",
+        "PNG/share M4b NOT IMPLEMENTED",
+        "150% check is browser smoke, not native font acceptance"
+      ]
+    },
+    "localSdk": {
+      "passed": [
+        "local first frame before SDK init",
+        "LoadingAPI once after usable frame",
+        "GameplayAPI bridge",
+        "pause closes help",
+        "additive SDK/background blockers",
+        "offline SDK does not block play"
+      ],
+      "pageErrors": [],
+      "kind": "Local SDK stub and failed SDK request; hosted platform NOT RUN"
+    }
+  },
+  "checks": {
+    "typecheck": "PASS",
+    "webStandard": "PASS",
+    "webRelease": "PASS",
+    "yandexBuildAudit": "PASS",
+    "strictGuidanceDoctor": "PASS",
+    "specIntegrity": "40 exact files; 71 acceptance rows unchanged",
+    "gradleDebug": "PASS",
+    "gradleR8ReleaseCheck": "PASS",
+    "exactApk": "PASS",
+    "privateActivityCallbackSurvivesR8": "PASS",
+    "providerAuthorityAndNarrowCompiledPaths": "PASS",
+    "broadStoragePermissions": "ABSENT"
+  },
+  "apk": {
+    "kind": "releasecheck",
+    "package": "com.danilah.huegradients.preview3",
+    "versionName": "0.4.1",
+    "versionCode": 5,
+    "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+    "source": "local",
+    "apkSha256": "a2c64c510dbd38b8a92c78b30601b5cebc8557cd7acef3274f8f20146df28b41",
+    "bytes": 1188660,
+    "certificateSha256": "3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85",
+    "productionSigner": false,
+    "v2": true,
+    "zipalign16k": true,
+    "debuggable": false,
+    "webViewDebuggingConfigured": false,
+    "nativeInsetOwner": "content-root",
+    "webPayload": {
+      "index.html": "f5baedc73b336c2e54b8eb686ef1f15f49ef3fdcbb9dc3e7c3c1ac06b662e910",
+      "native-build.json": "d6776c22b4d785acafac6f324de6e51d9700f8d00340e5638b59090fc0a0fc70",
+      "assets/nativeExport-C522HTTS.js": "bc674294bbd0fdcd3fff02a2c68d53064e8e7ece06dd5e723c834509dbb4b4f2",
+      "assets/nativeFeedback-BdXlsEx8.js": "aa12bc0f39307f8a86d95c5b93e428317c5282ed05069350ea7ef8fd1ad69648",
+      "assets/index-DFJG0zan.js": "54c5f6d3c384f6db8aea41102f30cbfdbbcedad9c815a8570224048fca238da8",
+      "assets/command-DsiNmMzb.js": "3bdb3eee67e5f0fe3039141e80a3f8764b0d75be05f0c89e4b81260fc3bd9e89",
+      "assets/web-BM7xF5pS.js": "874bbd026b2a3757b6c7bedc1bd163f0c735a3e0a943605c9853f660d828d658",
+      "assets/index-Ba4Z3Amw.css": "9bb84b385d5b1cc4b3719dd93b63237ae8aa60600d9c64a94183e636d4c452ac",
+      "assets/native-BRf8Vtup.js": "c0ee103e5db093b632c2b0a8d00c59e51b8b10e97f54b99e0883aa6d66cb9e24",
+      "assets/dist-CMedSjkm.js": "067d9ca66629f984cf538346471032b4b24f9acd1cb914834126e2b88d3250fe"
+    },
+    "nativeRuntime": "NOT RUN",
+    "liveServices": "NOT INSTALLED BY THIS HOST TEMPLATE"
+  },
+  "previewIdentityMatches040": true,
+  "first15Sha256": "55efdbd17d6e77c23753ea5f6b494de25e02c3c8a05459a92fbbcee8eb34ae51",
+  "pixelOracle": {
+    "library": "Pillow",
+    "version": "13.0.0",
+    "crc": "independent Python zlib"
+  },
+  "remaining": [
+    "Native Android save/share/cancel/permission/storage-pressure runtime NOT RUN",
+    "Native SQLite/touch/haptic/process-death/update NOT RUN",
+    "Real daily unlock/archive awaiting M6; three renderers tested only with synthetic rights",
+    "Hosted Yandex/identity/cloud/ads NOT RUN",
+    "Owner fonts/art/phone acceptance NOT RUN",
+    "Production register71 NOT RUN; no publication"
+  ],
+  "kitImpact": "REUSE"
+}

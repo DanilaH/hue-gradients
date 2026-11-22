@@ -1,0 +1,278 @@
+{
+  "package": "V1.4",
+  "date": "2026-11-22",
+  "baseCommit": "e81a6fffc901d3ec5b1e572958a30e3bc1de3e66",
+  "build": {
+    "version": "0.4.33",
+    "versionCode": 37,
+    "host": "web",
+    "signedAndroidBuilt": false,
+    "latestSignedAndroid": "0.4.31 (35)"
+  },
+  "kitImpact": "REUSE",
+  "checks": {
+    "unitTests": {
+      "passed": 197,
+      "files": 20
+    },
+    "yandex": "passed",
+    "spec": "passed",
+    "kitDoctorStrict": "passed",
+    "browser": "141.0.7390.37",
+    "physicalPhone": "pending",
+    "limits": "Chromium CDP touch, keyboard and browser audio/haptic calls. Prepared checkpoints use legal domain swaps. Android phone not run.",
+    "export006ByteIdenticalToV13": true
+  },
+  "comparison": {
+    "v13Landing": {
+      "ms": 885,
+      "zoom": 0.824898,
+      "wave": 0.013181818181747627,
+      "opacity": 0
+    },
+    "v13ZoomPeak": {
+      "ms": 1000,
+      "zoom": 1.02199,
+      "wave": 0.18984848484820263,
+      "opacity": 0
+    },
+    "sourceFramesMsFromRelease": {
+      "v13": [
+        826,
+        856,
+        900,
+        944,
+        995,
+        1074
+      ],
+      "v14": [
+        827,
+        857,
+        895,
+        944,
+        995,
+        1079
+      ]
+    },
+    "visibleDifference": "Before: the last airborne row cuts to a smooth gradient. After: the same colour patches are seated before becoming smooth, with HUD and pins already faded."
+  },
+  "timingFromLastTouchRelease": {
+    "landing": {
+      "ms": 885,
+      "zoom": 0.784772,
+      "wave": 0.013939393939676158,
+      "opacity": 0,
+      "chrome": 0,
+      "tileOpacity": 1
+    },
+    "fortyMs": {
+      "ms": 916,
+      "zoom": 0.816179,
+      "wave": 0.06439393939393939,
+      "opacity": 0,
+      "chrome": 0,
+      "tileOpacity": 0.998612
+    },
+    "peak": {
+      "ms": 1057,
+      "zoom": 1.02191,
+      "wave": 0.2663636363640597,
+      "opacity": 0,
+      "chrome": 0,
+      "tileOpacity": 0.550921
+    },
+    "appears": {
+      "ms": 1416,
+      "zoom": 1,
+      "wave": 0.8218181818180407,
+      "opacity": 2.6946e-05,
+      "chrome": 0,
+      "tileOpacity": 0
+    },
+    "ready": {
+      "ms": 1816,
+      "zoom": 1,
+      "wave": 1,
+      "opacity": 1,
+      "chrome": 0,
+      "tileOpacity": 0
+    }
+  },
+  "recordedImpactSoundStartsMs": 870.800048828125,
+  "episodes": {
+    "ordinary": {
+      "id": "gradient-006",
+      "moves": 7,
+      "stableAndMovesWithTile": true,
+      "shades": 4,
+      "mean": [
+        134,
+        135,
+        136
+      ],
+      "source": "#868788",
+      "quietReplay": true,
+      "pauseKeyboardAndTouch": true,
+      "resultWallpaper": true,
+      "sounds": [
+        {
+          "duration": 0.24,
+          "phase": "landed"
+        }
+      ],
+      "vibration": [
+        {
+          "value": 22,
+          "phase": "landed"
+        }
+      ],
+      "pair": [
+        {
+          "at": 10,
+          "neighbor": 11,
+          "elapsed": 477.39999999990687,
+          "camera": "{\"zoom\":0.8984786861980875,\"x\":18.867101661874184,\"y\":31.674649906196713}",
+          "a": 0.43134096686393253,
+          "b": 0
+        },
+        {
+          "at": 10,
+          "neighbor": 11,
+          "elapsed": 710.6000000000931,
+          "camera": "{\"zoom\":0.8362400380060412,\"x\":30.433765436814785,\"y\":51.09310814211515}",
+          "a": 0,
+          "b": 0.9765555373320094
+        },
+        {
+          "at": 10,
+          "neighbor": 11,
+          "elapsed": 760.5,
+          "camera": "{\"zoom\":0.8261938795688258,\"x\":32.30078119388102,\"y\":54.22750957452634}",
+          "a": 0,
+          "b": 0
+        }
+      ],
+      "seated": {
+        "clearPixels": 0,
+        "maxChannelError": 0.5
+      },
+      "clipStart": 1466,
+      "clipEnd": 6506,
+      "winClipStart": 3190
+    },
+    "wide": {
+      "id": "geometry-v1-wide",
+      "zoom": 2.4,
+      "reframe": 0.8554031646997982,
+      "moves": 36,
+      "sampledFrames": 51,
+      "medianFrameMs": 16.699999999999818,
+      "naturalLight": [
+        187,
+        180,
+        222
+      ],
+      "naturalDark": [
+        55,
+        60,
+        139
+      ],
+      "zoomShades": 4,
+      "sprayColors": 12,
+      "sounds": [
+        {
+          "duration": 0.24,
+          "phase": "landed"
+        }
+      ],
+      "vibration": [
+        {
+          "value": 22,
+          "phase": "landed"
+        }
+      ],
+      "clipStart": 908,
+      "clipEnd": 4536
+    },
+    "triangles": {
+      "id": "geometry-v1-triangles",
+      "moves": 6
+    }
+  },
+  "interactionChecks": {
+    "back-before-hit": {
+      "moves": 1,
+      "assisted": false,
+      "sounds": 0,
+      "pulses": 0
+    },
+    "back-after-hit": {
+      "moves": 1,
+      "assisted": false,
+      "sounds": 1,
+      "pulses": 1
+    },
+    "early-input": {
+      "moves": 1,
+      "assisted": false,
+      "sounds": 1,
+      "pulses": 1
+    },
+    "stale-input": {
+      "moves": 1,
+      "assisted": false,
+      "sounds": 1,
+      "pulses": 1
+    },
+    "strip": {
+      "moves": 1,
+      "assisted": false,
+      "sounds": 1,
+      "pulses": 1
+    },
+    "reduced": {
+      "moves": 1,
+      "assisted": false,
+      "sounds": 1,
+      "pulses": 1,
+      "dpr": 1.9989910879435009,
+      "shades": 4,
+      "mean": [
+        111,
+        122,
+        110
+      ]
+    },
+    "background": {
+      "moves": 1,
+      "assisted": false,
+      "sounds": 0,
+      "pulses": 0
+    },
+    "assisted": {
+      "moves": 3,
+      "assisted": true,
+      "sounds": 1,
+      "pulses": 1
+    }
+  },
+  "recordings": [
+    {
+      "filename": "Poluson-006-V14-1x.gif",
+      "sha256": "722b1a09815d9676aae5e91eae8d0bd784db1adc64460b2ee911cc6ceaf01519",
+      "encodedFramesPerSecond": 50,
+      "durationSeconds": 2.4,
+      "playbackSpeed": 1,
+      "audio": false
+    },
+    {
+      "filename": "Poluson-006-V14-1x.mp4",
+      "sha256": "b39d724abb7b89e2d3d95c755e1e394780d2a8502b5b517a9561bf68a984ba92",
+      "encodedFramesPerSecond": 60,
+      "durationSeconds": 2.4,
+      "playbackSpeed": 1,
+      "audio": true
+    }
+  ],
+  "next": "Owner reviews the 006 landing before V2 Personal Tasks."
+}

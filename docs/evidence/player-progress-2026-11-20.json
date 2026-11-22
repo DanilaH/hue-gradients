@@ -1,0 +1,58 @@
+{
+  "sourceCommit": "08a2162544b1eeb1cca403893078368d9e2c04ab",
+  "basePackageOne": "71d9f8b42c87dd41076eda266e097dd55bda78cd",
+  "branch": "feat/m0-foundation",
+  "kitImpact": "REUSE",
+  "packageOneAcceptance": {
+    "firstLevelManualMoves": 1,
+    "mastery": "Идеально без помощи",
+    "firstLevelAutoMoves": 3,
+    "assisted": true,
+    "referenceCases": 12,
+    "chromiumCases": 7,
+    "apkEvidence": "help-mastery-2026-11-20.json"
+  },
+  "checks": {
+    "unit": 162,
+    "coreChromium": 21,
+    "presentationChromium": 12,
+    "metaChromium": 15,
+    "editorChromium": 19,
+    "helpChromium": 7,
+    "exportChromium": 6,
+    "pngPixelVerification": 8,
+    "exactSpecFiles": 40,
+    "gradleDebug": true,
+    "gradleReleaseCheck": true
+  },
+  "progress": {
+    "offline": "Actual Chromium screen with 15 campaign clears, chapter mark and victory history. Statistics toggle persisted after reload.",
+    "referenceFixtures": "Equal and one-move-better, reference version change, missing or incompatible reference, assisted and hidden scores, duplicate attempt and older save.",
+    "liveBenchmarks": "None published. Competition UI waits for a versioned sample for the exact definition.",
+    "legacyHistory": "Existing bests are preserved. Still-saved completed attempts seed history. Earlier overwritten attempts are not reconstructed."
+  },
+  "apk": {
+    "kind": "releasecheck",
+    "package": "com.danilah.huegradients.preview3",
+    "versionName": "0.4.12",
+    "versionCode": 16,
+    "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+    "source": "08a2162544b1eeb1cca403893078368d9e2c04ab",
+    "apkSha256": "037a4687d85013fb991b7d4b2eba03d06c4a5f8088a1d0162adfaf1f8c5e2111",
+    "bytes": 1196136,
+    "certificateSha256": "3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85",
+    "productionSigner": false,
+    "v2": true,
+    "zipalign16k": true,
+    "debuggable": false,
+    "webViewDebuggingConfigured": false,
+    "nativeInsetOwner": "content-root",
+    "nativeRuntime": "NOT RUN",
+    "liveServices": "NOT INSTALLED BY THIS HOST TEMPLATE"
+  },
+  "file": {
+    "name": "Poluson-0.4.12-preview.apk",
+    "libraryFileId": "libfile_fde3_f-3b6894dde9b88191b72e6f119332be93_2841ca9da26c8191b7a266fa9b41a810",
+    "bytes": 1196136
+  }
+}

@@ -1,0 +1,902 @@
+{
+  "schema": "consumer-adoption-ledger-v1",
+  "consumerCommit": "7b8200062ab6398980827fd27d884506ca3eb786",
+  "asOf": "2026-11-21",
+  "features": [
+    {
+      "id": "h1-swap",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "MATCH",
+      "stage": "Пакет 01",
+      "currentImplementation": "Обмен, перетаскивание и отказ на опорах подтверждены тестом ядра. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/PuzzleScene.ts В A1 на 001 Chromium подтвердил тап и сброс на (200,398), плюс отказ на опоре и за пределами поля. | https://github.com/DanilaH/hue-gradients/blob/2e7c0b8546403b640167f11b691f143e164b5553/tools/board-input-browser-check.mjs",
+      "nextAction": "Повторить контрольный эпизод на физическом телефоне (G1).",
+      "deliveryPackage": "01",
+      "sourceNextCheck": "Проверить tap и drag одного обмена на Android."
+    },
+    {
+      "id": "h1-pins",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "MATCH",
+      "stage": "Пакет 01",
+      "currentImplementation": "Опоры защищены перестановкой и доменными правилами. В Chromium тап по опоре не меняет ходы. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/domain/puzzle.ts В A1 на 001 Chromium подтвердил тап и сброс на (200,398), плюс отказ на опоре и за пределами поля. | https://github.com/DanilaH/hue-gradients/blob/2e7c0b8546403b640167f11b691f143e164b5553/tools/board-input-browser-check.mjs",
+      "nextAction": "Повторить контрольный эпизод на физическом телефоне (G1).",
+      "deliveryPackage": "01",
+      "sourceNextCheck": "Попытаться уронить плитку на опору."
+    },
+    {
+      "id": "h1-geometry",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 04",
+      "currentImplementation": "Четыре тестовых собственных поля, включая треугольники и шестиугольники. | https://github.com/DanilaH/hue-gradients/blob/493b2415967e77f7c61bdb471e8db06677f63eb8/tools/shape-browser-check.mjs",
+      "nextAction": "Перепроверить взаимодействие, форму, отклик и различимость RGB на физическом телефоне (G1).",
+      "deliveryPackage": "04",
+      "sourceNextCheck": "Сравнить по одной собственной задаче одинаковой длины с разной геометрией."
+    },
+    {
+      "id": "h1-shuffle",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 04",
+      "currentImplementation": "Seeded shuffle устраняет неподвижные позиции в перемещаемой группе размером от двух. | https://github.com/DanilaH/hue-gradients/blob/493b2415967e77f7c61bdb471e8db06677f63eb8/tools/shape-browser-check.mjs",
+      "nextAction": "Перепроверить взаимодействие, форму, отклик и различимость RGB на физическом телефоне (G1).",
+      "deliveryPackage": "04",
+      "sourceNextCheck": "Для отдельного варианта измерить разброс оптимума при replay."
+    },
+    {
+      "id": "h1-unlock",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 02",
+      "currentImplementation": "Экран показывает открытые главы. Следующая глава открывается на 10 разных победах предыдущей по действующим правилам Полусна. | https://github.com/DanilaH/hue-gradients/blob/08a2162544b1eeb1cca403893078368d9e2c04ab/src/domain/progression.ts",
+      "nextAction": "Принять переход по главам на телефоне.",
+      "deliveryPackage": "02",
+      "sourceNextCheck": "Сопоставить открытие и заполнение всей главы."
+    },
+    {
+      "id": "h1-world-average",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 02",
+      "currentImplementation": "Сравнение привязано к отпечатку и версии правил. Карточка знает версию, источник и размер выборки. Среднее показывается только при наличии опубликованной выборки. | https://github.com/DanilaH/hue-gradients/blob/08a2162544b1eeb1cca403893078368d9e2c04ab/src/domain/playerProgress.ts A3 вывел личный рекорд на карточку и повторно проверил сравнения на фикстурах. | https://github.com/DanilaH/hue-gradients/blob/960c8304eb82ce4675d914296c3263d05f6674e9/src/game/workCardView.ts",
+      "nextAction": "После публикации измеренных чистых проходов для точного отпечатка и правил записать источник, версию и размер; проверить сравнение и первую ступень.",
+      "deliveryPackage": "02",
+      "sourceNextCheck": "Для сравнения выбрать прозрачно названный ориентир и источник."
+    },
+    {
+      "id": "h1-entry",
+      "status": "OWNER_EXCLUDED",
+      "gap": "MISSING",
+      "stage": "Пакет 08",
+      "currentImplementation": "Игра без энергии и цены входа. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/PRODUCT_SPEC_1_0.md",
+      "nextAction": "Проверять бесплатный вход и повтор на новом и старом профилях.",
+      "ownerDecisionRef": "https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/AGENTS.md",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Сохранить бесплатный вход при переносе идей прогрессии."
+    },
+    {
+      "id": "h1-gift",
+      "status": "ROADMAPPED",
+      "gap": "MISSING",
+      "stage": "Пакет 08",
+      "currentImplementation": "Подарка расходуемого ресурса нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/progression.ts F1 подтверждает клиентскую развязку интересов на фикстурах; живой провайдер не настроен.",
+      "nextAction": "Проверить настроенный провайдер и подтверждённые callbacks на платформе; для подарка и оффера получить решение владельца.",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Оценивать отдельно от бесплатного доступа и от daily-задачи."
+    },
+    {
+      "id": "h1-rewarded",
+      "status": "ROADMAPPED",
+      "gap": "MISSING",
+      "stage": "Пакет 08",
+      "currentImplementation": "У нас бесплатная помощь; rewarded за призмы не запланирован. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md F1 подтверждает клиентскую развязку интересов на фикстурах; живой провайдер не настроен.",
+      "nextAction": "Проверить настроенный провайдер и подтверждённые callbacks на платформе; для подарка и оффера получить решение владельца.",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Рассматривать размещения отдельно, с назначением награды."
+    },
+    {
+      "id": "h1-iap",
+      "status": "ROADMAPPED",
+      "gap": "MISSING",
+      "stage": "Пакет 08",
+      "currentImplementation": "Экономики расходуемых призм нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md F1 подтверждает клиентскую развязку интересов на фикстурах; живой провайдер не настроен.",
+      "nextAction": "Проверить настроенный провайдер и подтверждённые callbacks на платформе; для подарка и оффера получить решение владельца.",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Зафиксировать решение о покупках отдельно от решения об энергии."
+    },
+    {
+      "id": "h1-paying-noads",
+      "status": "ROADMAPPED",
+      "gap": "MISSING",
+      "stage": "Пакет 08",
+      "currentImplementation": "Рабочая политика проекта без IAP. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md F1 подтверждает клиентскую развязку интересов на фикстурах; живой провайдер не настроен.",
+      "nextAction": "Проверить настроенный провайдер и подтверждённые callbacks на платформе; для подарка и оффера получить решение владельца.",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Проверять entitlement только при выборе предложения."
+    },
+    {
+      "id": "h1-interstitial",
+      "status": "ROADMAPPED",
+      "gap": "MISSING",
+      "stage": "Пакет 08",
+      "currentImplementation": "Для Полусна спроектирован иной переход и лимит; M7 открыт. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md F1 подтверждает клиентскую развязку интересов на фикстурах; живой провайдер не настроен.",
+      "nextAction": "Проверить настроенный провайдер и подтверждённые callbacks на платформе; для подарка и оффера получить решение владельца.",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Прогнать provider-ready/no-fill и реальный переход."
+    },
+    {
+      "id": "h1-rate-grace",
+      "status": "ROADMAPPED",
+      "gap": "UNKNOWN",
+      "stage": "Пакет 08",
+      "currentImplementation": "Привязка поставленного значения к исполненному сценарию не проверена. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md",
+      "nextAction": "Реализовать соответствующий пункт пакета 08 и проверить приёмку из FULL_ROADMAP.md. Подтвердить границу источника: Проследить вызовы в Lua; проверить таймер до и после оценки.",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Проследить вызовы в Lua; проверить таймер до и после оценки."
+    },
+    {
+      "id": "h1-reward-grace",
+      "status": "ROADMAPPED",
+      "gap": "UNKNOWN",
+      "stage": "Пакет 08",
+      "currentImplementation": "В оригинале проверена настройка, применение в живой сессии открыто. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md",
+      "nextAction": "Реализовать соответствующий пункт пакета 08 и проверить приёмку из FULL_ROADMAP.md. Подтвердить границу источника: После тестовой награды снять состояние nextAdTime.",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "После тестовой награды снять состояние nextAdTime."
+    },
+    {
+      "id": "h1-local-resume",
+      "status": "ROADMAPPED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 09",
+      "currentImplementation": "Веб-путь восстанавливает подтверждённое поле; физический Android открыт. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/workspace.ts A2: ресурсы 0.4.14 из APK открывают ту же попытку на Chromium 92/158. Обновление и несовместимость сохраняют байты локальной партии Chromium 0.4.12. | https://github.com/DanilaH/hue-gradients/blob/356c9576436d7b0f5378aee432add400fffcdeec/tools/first-launch-apk-check.mjs F2: добавлены атомарные локальные факты «принято», проверка replay, разделение сопоставимых результатов и тест дедупликации.",
+      "nextAction": "Сетевой провайдер соревнования, доверенное время и аналитика ждут конфигурации. Реальные Android-записи и прерывание проверить в G1.",
+      "deliveryPackage": "09",
+      "sourceNextCheck": "Убить процесс после хода на тестовом устройстве."
+    },
+    {
+      "id": "h1-cloud",
+      "status": "DEFERRED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 09",
+      "currentImplementation": "Есть локальное сохранение и контракт, нет подтверждённого переноса между устройствами. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/TECHNICAL_SPEC_0_1.md F2: добавлены атомарные локальные факты «принято», проверка replay, разделение сопоставимых результатов и тест дедупликации.",
+      "nextAction": "Сетевой провайдер соревнования, доверенное время и аналитика ждут конфигурации. Реальные Android-записи и прерывание проверить в G1.",
+      "reason": "Пауза владельца 19 ноября, см. AGENTS.md.",
+      "deliveryPackage": "09",
+      "sourceNextCheck": "После снятия паузы проверить два расходящихся профиля."
+    },
+    {
+      "id": "h1-share",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 01",
+      "currentImplementation": "Открытая работа передаётся как полноэкранные обои Полусна. В браузерной регрессии проверены тот же файл в предпросмотре и выдаче. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/workCardView.ts",
+      "nextAction": "Проверить реальный Android chooser для PNG.",
+      "deliveryPackage": "01",
+      "sourceNextCheck": "Сохранить и отправить одну и ту же проверенную версию."
+    },
+    {
+      "id": "h1-pin-feedback",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 01",
+      "currentImplementation": "Повторный тап даёт локальный контур опоры. В Chromium проверены неподвижный контур и неизменный счёт. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/mountGame.ts",
+      "nextAction": "Принять читаемость контура на телефоне.",
+      "deliveryPackage": "01",
+      "sourceNextCheck": "Нажать ту же опору дважды, с движением и без него."
+    },
+    {
+      "id": "h1-audio",
+      "status": "ROADMAPPED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 10",
+      "currentImplementation": "Свой звук подтверждённого обмена и победы. Стеклянный тембр предложен в PR2. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/feedback.ts",
+      "nextAction": "Реализовать соответствующий пункт пакета 10 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "10",
+      "sourceNextCheck": "Проверить отмену и быстрый следующий ход со звуком."
+    },
+    {
+      "id": "h1-music",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 10",
+      "currentImplementation": "В 0.4.25 собственная 12-секундная музыкальная петля управляется отдельно от игровых сигналов, выключена по умолчанию и останавливается в фоне. В Chromium проверены независимость регуляторов, приостановка и возобновление. | https://github.com/DanilaH/hue-gradients/blob/7b8200062ab6398980827fd27d884506ca3eb786/tools/feel-queue-browser-check.mjs",
+      "nextAction": "Проверить громкость и паузы музыки и игровых сигналов на двух телефонах. Согласовать тембр и шрифт с владельцем.",
+      "deliveryPackage": "10",
+      "sourceNextCheck": "Сравнить тихую петлю с текущей партией на телефоне."
+    },
+    {
+      "id": "h1-score-toggle",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "MATCH",
+      "stage": "Пакет 02",
+      "currentImplementation": "Переключатель в паузе убирает статистику уровня и сравнение. Настройка сохраняется после перезапуска. Локальная история открывается отдельно. | https://github.com/DanilaH/hue-gradients/blob/08a2162544b1eeb1cca403893078368d9e2c04ab/src/game/mountGame.ts",
+      "nextAction": "Проверить переключатель на Android и в увеличенном тексте.",
+      "deliveryPackage": "02",
+      "sourceNextCheck": "Проверить спрос на спокойный режим без счётчика."
+    },
+    {
+      "id": "h1-belts",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 02",
+      "currentImplementation": "Десять ступеней 2/5/10/20/50/100/150/200/250/300. Строгое сравнение и смена эталона проверены. Пока выборка отсутствует, ступени видны без начислений. | https://github.com/DanilaH/hue-gradients/blob/08a2162544b1eeb1cca403893078368d9e2c04ab/src/game/progressView.ts A3 вывел личный рекорд на карточку и повторно проверил сравнения на фикстурах. | https://github.com/DanilaH/hue-gradients/blob/960c8304eb82ce4675d914296c3263d05f6674e9/src/game/workCardView.ts",
+      "nextAction": "После публикации измеренных чистых проходов для точного отпечатка и правил записать источник, версию и размер; проверить сравнение и первую ступень.",
+      "deliveryPackage": "02",
+      "sourceNextCheck": "Проверить повтор одного уровня и показ достижения без сети; выбрать честный ориентир для своей шкалы."
+    },
+    {
+      "id": "h1-set-award",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 02",
+      "currentImplementation": "Отдельно показаны завершение последнего уровня главы и заполнение всей главы. Право полной главы хранится по 15/15. | https://github.com/DanilaH/hue-gradients/blob/08a2162544b1eeb1cca403893078368d9e2c04ab/src/game/progressView.ts",
+      "nextAction": "Принять два состояния главы на телефоне.",
+      "deliveryPackage": "02",
+      "sourceNextCheck": "Проверить завершение финального этапа с пропусками и без них."
+    },
+    {
+      "id": "h1-category-award",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 02",
+      "currentImplementation": "Одна категория Полусна — Кампания. Полный сбор требует всех четырёх глав. Граница 60/60 проверена. | https://github.com/DanilaH/hue-gradients/blob/08a2162544b1eeb1cca403893078368d9e2c04ab/src/game/progressView.ts",
+      "nextAction": "Принять вид полного сбора на телефоне.",
+      "deliveryPackage": "02",
+      "sourceNextCheck": "Отделить полную главу от полного набора глав."
+    },
+    {
+      "id": "h1-rating",
+      "status": "ROADMAPPED",
+      "gap": "MISSING",
+      "stage": "Пакет 08",
+      "currentImplementation": "Числа заданы в конфиге оригинала. Что именно учитывается как play и показано в UI, открыто. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md F1 подтверждает клиентскую развязку интересов на фикстурах; живой провайдер не настроен.",
+      "nextAction": "Проверить настроенный провайдер и подтверждённые callbacks на платформе; для подарка и оффера получить решение владельца.",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Проверить пользовательский показ и подавление после выставления флага. Напоминание в игре отделять от окна магазина."
+    },
+    {
+      "id": "h1-pin-dialog",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 01",
+      "currentImplementation": "Первое обращение даёт короткий текст. На третьем тапе по опоре в первых десяти уровнях открывается закрываемое объяснение. Проверено в Chromium. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/mountGame.ts",
+      "nextAction": "Сверить с физическим оригиналом и принять нашу подсказку на телефоне.",
+      "deliveryPackage": "01",
+      "sourceNextCheck": "Сравнить первый и третий тап в игре на новом профиле. Проверить, доступно ли объяснение игроку после перезапуска."
+    },
+    {
+      "id": "h2-shape-swap",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 04",
+      "currentImplementation": "Треугольники разной ориентации и разные формы не обмениваются; совместимые обмены проверены. | https://github.com/DanilaH/hue-gradients/blob/493b2415967e77f7c61bdb471e8db06677f63eb8/tools/shape-browser-check.mjs В 0.4.39 в пробе форм проверены допустимая и недопустимая пары без записи в профиль.",
+      "nextAction": "Перепроверить взаимодействие, форму, отклик и различимость RGB на физическом телефоне (G1).",
+      "deliveryPackage": "04",
+      "sourceNextCheck": "На прототипе проверить, как игрок видит допустимые пары разных форм."
+    },
+    {
+      "id": "h2-cycles",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 04",
+      "currentImplementation": "Для треугольного и смешанного поля у каждой совместимой группы один цикл. | https://github.com/DanilaH/hue-gradients/blob/493b2415967e77f7c61bdb471e8db06677f63eb8/tools/shape-browser-check.mjs",
+      "nextAction": "Перепроверить взаимодействие, форму, отклик и различимость RGB на физическом телефоне (G1).",
+      "deliveryPackage": "04",
+      "sourceNextCheck": "Сверить минимумы однотипного и смешанного полей отдельно."
+    },
+    {
+      "id": "h2-perfect",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "MATCH",
+      "stage": "Пакет 01",
+      "currentImplementation": "Карточка показывает математический минимум, два личных рекорда и отметку идеальной чистой победы. Метка переживает перезапуск и новую победу с помощью. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/workCardView.ts",
+      "nextAction": "Проверить читаемость карточки на Android.",
+      "deliveryPackage": "01",
+      "sourceNextCheck": "Довести знак и минимум до карточки и проверить после replay."
+    },
+    {
+      "id": "h2-zoom",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "MATCH",
+      "stage": "Пакет 04",
+      "currentImplementation": "Два пальца на 13×13 переключают жест, второй палец отменяет захват; подтверждён масштаб 2.2. | https://github.com/DanilaH/hue-gradients/blob/a76385346086edaa86252e01a0ffc6519aa1cce7/tools/large-board-browser-check.mjs PR №8/C2: масштаб клавиатурой 2,44× и касаниями 2,2× проверен на поле 13×13.",
+      "nextAction": "Повторить приёмку мультитача и прокрутки на физическом Android. | https://github.com/DanilaH/hue-gradients/blob/feat/m0-foundation/docs/evidence/pr8-c2-2026-11-21.json",
+      "deliveryPackage": "04",
+      "sourceNextCheck": "Оценивать только вместе с размером поля."
+    },
+    {
+      "id": "h2-pan",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "MATCH",
+      "stage": "Пакет 04",
+      "currentImplementation": "Сдвиг x=34 и y=45 подтверждён на 13×13. После сдвига попали в опору 84 и обменяли 83/85. | https://github.com/DanilaH/hue-gradients/blob/a76385346086edaa86252e01a0ffc6519aa1cce7/tools/large-board-browser-check.mjs PR №8/C2: камера удерживает клетку полностью видимой при движении стрелками вдоль всех краёв. После сдвига прошли обмены с клавиатуры и касаниями.",
+      "nextAction": "Повторить приёмку мультитача и прокрутки на физическом Android. | https://github.com/DanilaH/hue-gradients/blob/feat/m0-foundation/docs/evidence/pr8-c2-2026-11-21.json",
+      "deliveryPackage": "04",
+      "sourceNextCheck": "Сравнить читаемость крупных задач при масштабировании."
+    },
+    {
+      "id": "h2-edge-pan",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "MATCH",
+      "stage": "Пакет 04",
+      "currentImplementation": "У края увеличенное поле прокручивается во время перетаскивания; сброс за пределами не принят. | https://github.com/DanilaH/hue-gradients/blob/a76385346086edaa86252e01a0ffc6519aa1cce7/tools/large-board-browser-check.mjs PR №8/C2: касание у края во время захвата сдвинуло камеру на 156 CSS px. Сброс снаружи сохранил партию.",
+      "nextAction": "Повторить приёмку мультитача и прокрутки на физическом Android. | https://github.com/DanilaH/hue-gradients/blob/feat/m0-foundation/docs/evidence/pr8-c2-2026-11-21.json",
+      "deliveryPackage": "04",
+      "sourceNextCheck": "Проверить дотягивание до края при увеличении отдельно от cancel."
+    },
+    {
+      "id": "h2-rgb",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "MATCH",
+      "stage": "Пакет 04",
+      "currentImplementation": "Независимое чтение пикселей в Chromium дало исходные RGB на всех четырёх полях. | https://github.com/DanilaH/hue-gradients/blob/493b2415967e77f7c61bdb471e8db06677f63eb8/tools/shape-browser-check.mjs",
+      "nextAction": "Перепроверить взаимодействие, форму, отклик и различимость RGB на физическом телефоне (G1).",
+      "deliveryPackage": "04",
+      "sourceNextCheck": "Сравнить известные углы на одном измеряемом поле."
+    },
+    {
+      "id": "h2-xp",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "MATCH",
+      "stage": "Пакет 02",
+      "currentImplementation": "Первое завершение официального уровня даёт +1 XP, повторная победа только пополняет историю. Экран работает без сети. | https://github.com/DanilaH/hue-gradients/blob/08a2162544b1eeb1cca403893078368d9e2c04ab/src/domain/playerProgress.ts",
+      "nextAction": "Принять показ первого опыта на телефоне.",
+      "deliveryPackage": "02",
+      "sourceNextCheck": "Проверить повтор идеального решения."
+    },
+    {
+      "id": "h2-boss",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "MATCH",
+      "stage": "Пакет 03",
+      "currentImplementation": "Финал главы открыт только после всех обычных задач своего набора; проверены 14/15, 15/15 и повтор с одной разблокировкой. | https://github.com/DanilaH/hue-gradients/blob/a976384455eeb503df89fb45898727d6f35e9808/tools/chapter-challenge-browser-check.mjs В 0.4.39 знак открывает финал при 15/15; победа возвращает к полосе с рекордом.",
+      "nextAction": "Повторить первое открытие, reload, Back и отображение цветов на телефоне (G1).",
+      "deliveryPackage": "03",
+      "sourceNextCheck": "Сравнить одно испытание главы с обычной новой главой."
+    },
+    {
+      "id": "h2-secret",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 03",
+      "currentImplementation": "Первое открытие скрывает подвижные цвета, опоры остаются открытыми. Полусон раскрывает поле явным нажатием или при возврате в сохранение. | https://github.com/DanilaH/hue-gradients/blob/a976384455eeb503df89fb45898727d6f35e9808/tools/chapter-challenge-browser-check.mjs",
+      "nextAction": "Повторить первое открытие, reload, Back и отображение цветов на телефоне (G1).",
+      "deliveryPackage": "03",
+      "sourceNextCheck": "Снять свежий вход и resume в оригинале, отдельно от закрытого уровня."
+    },
+    {
+      "id": "h2-auto-hint",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 01",
+      "currentImplementation": "Автообмен выбирает дальнюю неверную позицию и добавляет три хода одной транзакцией. Проверены победа, незавершённое поле и восстановление без дубля в Chromium. Физический счётчик оригинала ещё не записан. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/domain/puzzle.ts В 0.4.41 стоимость показана заранее; на 001 сохраняются 3 хода и помощь.",
+      "nextAction": "Подтвердить счётчик в оригинале и наш отклик на телефоне.",
+      "deliveryPackage": "01",
+      "sourceNextCheck": "Сравнить автоматический правильный обмен с preview; решение владельца открыто."
+    },
+    {
+      "id": "h2-daily-open",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 05",
+      "currentImplementation": "D1: фиксированный старт по доверенной дате, версия кеша, офлайн-архив и одна отметка о победе подтверждены на датированных фикстурах. | https://github.com/DanilaH/hue-gradients/blob/7341192f984b0a4a7a75a6d78d5017349eb28d14/tools/daily-browser-check.mjs Для D1 готовы проверка 30 авторских кандидатов и сборка датированного каталога. Два профиля в Chromium получили авторское поле, пережили UTC-полночь и сохранили одну победу после повтора офлайн. Клиент сверяет байты каталога, месяца и поля, а также отпечаток. Повреждённое обновление сохраняет старую партию. Все 30 кандидатов пройдены в Chromium офлайн.",
+      "nextAction": "Пройти редакционный игровой просмотр, назначить даты, подключить проверенный UTC и опубликованный каталог, затем проверить живой архив.",
+      "deliveryPackage": "05",
+      "sourceNextCheck": "Определить момент знакомства с daily при запуске сервиса."
+    },
+    {
+      "id": "h2-daily-date",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 05",
+      "currentImplementation": "D1: фиксированный старт по доверенной дате, версия кеша, офлайн-архив и одна отметка о победе подтверждены на датированных фикстурах. | https://github.com/DanilaH/hue-gradients/blob/7341192f984b0a4a7a75a6d78d5017349eb28d14/tools/daily-browser-check.mjs Для D1 готовы проверка 30 авторских кандидатов и сборка датированного каталога. Два профиля в Chromium получили авторское поле, пережили UTC-полночь и сохранили одну победу после повтора офлайн. Клиент сверяет байты каталога, месяца и поля, а также отпечаток. Повреждённое обновление сохраняет старую партию. Все 30 кандидатов пройдены в Chromium офлайн. PR №8/D2: В Chromium открыт локальный день 25 ноября при переводе с 1 декабря. В 0.4.35 открытые задания меняют дату без повторного входа. Обе точки входа Daily прочитали стендовый каталог на чистом профиле и восстановили его офлайн.",
+      "nextAction": "Подключить опубликованный HTTPS-источник и проверить живой календарь на новом профиле.",
+      "deliveryPackage": "05",
+      "sourceNextCheck": "Проверить две зоны и перевод часов на опубликованном слоте."
+    },
+    {
+      "id": "h2-daily-past",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 05",
+      "currentImplementation": "Отдельная задача предлагает прежний уровень с достижимой целью на ход лучше. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs PR №8/D2: Для идеального результата добавлена цель «Повторить рекорд» с удержанием математического минимума. В 0.4.37 кристалл открывает реальную цель и повтор рекорда.",
+      "nextAction": "Проверить смысл трёх целей и время на физическом телефоне (G1).",
+      "deliveryPackage": "05",
+      "sourceNextCheck": "Прототип из уже решённой работы, последний допустимый ход засчитывается."
+    },
+    {
+      "id": "h2-daily-present",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 05",
+      "currentImplementation": "Поле без помощи с локальным лимитом времени. Истечение проверено в Chromium. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs PR №8/D2: Лимит зависит от минимума, числа подвижных плиток и отдельного коэффициента для финала главы. В 0.4.35 тот же таймер пережил два перезапуска до и после обмена. В 0.4.37 песочные часы показывают остаток сохранённой попытки.",
+      "nextAction": "Проверить смысл трёх целей и время на физическом телефоне (G1).",
+      "deliveryPackage": "05",
+      "sourceNextCheck": "Проверить границу таймера и возобновление после паузы."
+    },
+    {
+      "id": "h2-daily-future",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 05",
+      "currentImplementation": "Первое поле будущей закрытой главы доступно отдельно; в кампании оно не открывается. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs PR №8/D2: Сложное задание выбирается из непройденных полей, в том числе после открытия всех глав. В 0.4.37 мозаика использует выданное поле и его палитру.",
+      "nextAction": "Проверить смысл трёх целей и время на физическом телефоне (G1).",
+      "deliveryPackage": "05",
+      "sourceNextCheck": "Проверить выдачу на профилях с разным прогрессом."
+    },
+    {
+      "id": "h2-daily-history",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 05",
+      "currentImplementation": "История личных заданий сохраняет одну отметку на задание и дату, повтор не дублирует. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs PR №8/D2: После коррекции даты сохраняются история, выданные поля и одна отметка за повтор. В 0.4.37 проверены четыре даты, откат календаря и повтор без дубля.",
+      "nextAction": "Проверить смысл трёх целей и время на физическом телефоне (G1).",
+      "deliveryPackage": "05",
+      "sourceNextCheck": "Проверить на двух разных профилях, если вводится личная подборка."
+    },
+    {
+      "id": "h2-daily-reward",
+      "status": "ROADMAPPED",
+      "gap": "MISSING",
+      "stage": "Пакет 05",
+      "currentImplementation": "Общего daily-XP в локальной игре нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md",
+      "nextAction": "Публичную календарную выдачу принять только после D1 с опубликованным источником и правилами наград; запись локального факта сама не даёт глобальных прав.",
+      "deliveryPackage": "05",
+      "sourceNextCheck": "Повторная победа по одному слоту, отдельность от кампании."
+    },
+    {
+      "id": "h2-ads",
+      "status": "ROADMAPPED",
+      "gap": "MISSING",
+      "stage": "Пакет 08",
+      "currentImplementation": "Наши 180 секунд относятся к активной игре и запросу; условия 5 завершений и 3 новых свои. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md F1 подтверждает клиентскую развязку интересов на фикстурах; живой провайдер не настроен.",
+      "nextAction": "Проверить настроенный провайдер и подтверждённые callbacks на платформе; для подарка и оффера получить решение владельца.",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Развести запрос и фактический показ в QA."
+    },
+    {
+      "id": "h2-remove-prompt",
+      "status": "ROADMAPPED",
+      "gap": "UNKNOWN",
+      "stage": "Пакет 08",
+      "currentImplementation": "В игре нет реализованного предложения. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md",
+      "nextAction": "Реализовать соответствующий пункт пакета 08 и проверить приёмку из FULL_ROADMAP.md. Подтвердить границу источника: Проследить счетчик prompt и вызов магазина прежде чем формулировать оффер.",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Проследить счетчик prompt и вызов магазина прежде чем формулировать оффер."
+    },
+    {
+      "id": "cp-fixed-start",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "MATCH",
+      "stage": "Пакет 03",
+      "currentImplementation": "Банк B1 хранит при повторе ту же перестановку. Первые 15 не переразложены. | https://github.com/DanilaH/hue-gradients/blob/8783519e0488d5bbdc0d880013da3a851a4d831a/src/domain/challenges.ts",
+      "nextAction": "В C1 проверить различие между авторским стартом и генерируемой перестановкой.",
+      "deliveryPackage": "03",
+      "sourceNextCheck": "Сохранить fingerprint и replay первого уровня."
+    },
+    {
+      "id": "cp-exact-win",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "MATCH",
+      "stage": "Пакет 01",
+      "currentImplementation": "Победа сверяет каждую позицию. В Chromium последний обмен закрыл 001, а первый на 002 оставил задачу открытой. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/domain/puzzle.ts",
+      "nextAction": "Проверить последний обмен на телефоне.",
+      "deliveryPackage": "01",
+      "sourceNextCheck": "Поменять две похожие, но неверные плитки."
+    },
+    {
+      "id": "cp-four-corners",
+      "status": "ROADMAPPED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 04",
+      "currentImplementation": "Та же основа, Полусон использует своё half-up округление и одномерные поля. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/editor.ts",
+      "nextAction": "Реализовать соответствующий пункт пакета 04 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "04",
+      "sourceNextCheck": "Сверить промежуточные оттенки и вырожденную ось."
+    },
+    {
+      "id": "cp-late-board",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 04",
+      "currentImplementation": "В игре есть своё 13×13; это отдельная задача в «Фигуры», а не весь поздний банк кампании Color. | https://github.com/DanilaH/hue-gradients/blob/a76385346086edaa86252e01a0ffc6519aa1cce7/tools/large-board-browser-check.mjs",
+      "nextAction": "Перепроверить точность и скорость жеста на физическом телефоне (G1).",
+      "deliveryPackage": "04",
+      "sourceNextCheck": "Пройти 6×5 и один крупный прототип на телефоне."
+    },
+    {
+      "id": "cp-preview",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "MATCH",
+      "stage": "Пакет 01",
+      "currentImplementation": "Готовое поле показывается после явного выбора. Открытие учитывается один раз. Возврат сохраняет доску и ходы. Проверено в Chromium. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/mountGame.ts В 0.4.41 образец изолирован; игровое решение открывает отдельная команда.",
+      "nextAction": "Проверить показ и системный Back на телефоне.",
+      "deliveryPackage": "01",
+      "sourceNextCheck": "Открыть/закрыть preview в незавершённой партии."
+    },
+    {
+      "id": "cp-pulse-hint",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "MATCH",
+      "stage": "Пакет 01",
+      "currentImplementation": "После подтверждения циклический поиск выделяет одну неверную подвижную плитку. Ходы и перестановка прежние, при reduced motion контур статичен. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/mountGame.ts В 0.4.41 миниатюра изолирована; отдельная команда применяет реальную помощь.",
+      "nextAction": "Проверить различимость контура на телефоне.",
+      "deliveryPackage": "01",
+      "sourceNextCheck": "Проверить мягкую помощь без раскрытия назначения и без автоматического хода."
+    },
+    {
+      "id": "cp-free-hint",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 01",
+      "currentImplementation": "Открытие и отмена бесплатны. Принятая помощь помечает попытку, автообмен добавляет три хода. В Полусне действуют правила владельца для бесплатных попыток. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/mountGame.ts",
+      "nextAction": "Принять подсказку в плейтесте.",
+      "deliveryPackage": "01",
+      "sourceNextCheck": "Проверить первый и повторный запрос обеих кнопок в оригинале."
+    },
+    {
+      "id": "cp-rewarded-hint",
+      "status": "ROADMAPPED",
+      "gap": "MISSING",
+      "stage": "Пакет 08",
+      "currentImplementation": "Нет этого платного пути к помощи; в проекте бесплатный preview. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md F1 подтверждает клиентскую развязку интересов на фикстурах; живой провайдер не настроен.",
+      "nextAction": "Проверить настроенный провайдер и подтверждённые callbacks на платформе; для подарка и оффера получить решение владельца.",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Оценить placement отдельно от функциональности подсказки."
+    },
+    {
+      "id": "cp-challenge",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "MATCH",
+      "stage": "Пакет 03",
+      "currentImplementation": "Отдельный банк B1; Chromium подтвердил, что на последнем разрешённом ходу проверяется решение перед исчерпанием лимита. | https://github.com/DanilaH/hue-gradients/blob/8783519e0488d5bbdc0d880013da3a851a4d831a/src/domain/challenges.ts",
+      "nextAction": "Проверить темп и отклик последнего хода на телефоне (G1).",
+      "deliveryPackage": "03",
+      "sourceNextCheck": "Прототип на собственном поле: победа последним ходом, проигрыш с нерешённым полем."
+    },
+    {
+      "id": "cp-challenge-gate",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 03",
+      "currentImplementation": "Все десять порогов от 5 до 60 проверены на достижимом прогрессе реального банка кампании. В проекте порог считает уникальные обычные работы. | https://github.com/DanilaH/hue-gradients/blob/8783519e0488d5bbdc0d880013da3a851a4d831a/src/domain/challenges.ts",
+      "nextAction": "Проверить понимание порогов при плейтесте; следующие виды открытий в B2.",
+      "deliveryPackage": "03",
+      "sourceNextCheck": "Отдельно решить чем открывается необязательное испытание."
+    },
+    {
+      "id": "cp-timed",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 03",
+      "currentImplementation": "Полусон использует 10 минут и считает собранные поля. Игра сохраняет остаток и отдельный рекорд. Проверены второе поле, фон, истечение и повтор. Банк своих полей до 6×5. | https://github.com/DanilaH/hue-gradients/blob/ed67542ba6c76a198c487600a296c27fd6c838f4/tools/timed-trial-browser-check.mjs PR №8/B3: новый 7×7 банк с перемешиванием и сменой опор, монотонные часы. Пройдено семь полей и завершён заезд из 0.4.25. 0.4.35 восстанавливает монотонную отметку той же попытки после двух перезапусков в Chromium. В 0.4.41 на результате можно начать новый заезд и сохранить источник возврата.",
+      "nextAction": "Повторить обновление, фон и перезапуск на Android с миграцией SQLite (G1).",
+      "deliveryPackage": "03",
+      "sourceNextCheck": "Зафиксировать паузу/таймер/новое поле до оценки."
+    },
+    {
+      "id": "cp-creative-shuffle",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "MATCH",
+      "stage": "Пакет 07",
+      "currentImplementation": "При двух и более подвижных редактор образует один цикл. Генератор случайных чисел собственный. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/editor.ts",
+      "nextAction": "Переиспользовать реализованное поведение и пройти регрессию пакета 07.",
+      "deliveryPackage": "07",
+      "sourceNextCheck": "Проверить один цикл и минимум n−1 для нескольких seeds."
+    },
+    {
+      "id": "cp-editor",
+      "status": "ROADMAPPED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 07",
+      "currentImplementation": "У нас 1–6 × 1–5, собственные проверки и живое редактирование углов. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/editor.ts E2: принята передача точной проверенной ревизии, безопасный отказ импорта и повторное решение без кампанийного кредита. | https://github.com/DanilaH/hue-gradients/blob/2540d4f2e448e1727bd3a3b389fbc88acd07000e/tools/transfer-browser-check.mjs В 0.4.40 угол, опора, авторское испытание и возврат проверены одним дублем.",
+      "nextAction": "Проверить Android отправку, системный выбор JSON и обои на телефоне (G1).",
+      "deliveryPackage": "07",
+      "sourceNextCheck": "Сравнить редактор на старом черновике и одномерной работе."
+    },
+    {
+      "id": "cp-editor-gate",
+      "status": "ROADMAPPED",
+      "gap": "MISSING",
+      "stage": "Пакет 07",
+      "currentImplementation": "У нас редактор доступен сразу, решение закреплено в ТЗ. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/game/albumView.ts",
+      "nextAction": "Реализовать соответствующий пункт пакета 07 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "07",
+      "sourceNextCheck": "На пустом профиле открыть «Мои работы»."
+    },
+    {
+      "id": "cp-author-proof",
+      "status": "ROADMAPPED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 07",
+      "currentImplementation": "Старая подтверждённая версия у нас хранится и остаётся экспортируемой. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/creative.ts E2: принята передача точной проверенной ревизии, безопасный отказ импорта и повторное решение без кампанийного кредита. | https://github.com/DanilaH/hue-gradients/blob/2540d4f2e448e1727bd3a3b389fbc88acd07000e/tools/transfer-browser-check.mjs",
+      "nextAction": "Проверить Android отправку, системный выбор JSON и обои на телефоне (G1).",
+      "deliveryPackage": "07",
+      "sourceNextCheck": "Проверить выбор старой версии после цветовой правки."
+    },
+    {
+      "id": "cp-submit",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 07",
+      "currentImplementation": "E3: проверены фиксированная отправляемая версия, квота 15 по подтверждённой UTC-дате, повтор, отзыв и жалоба на фикстуре.",
+      "nextAction": "Подключить реальный сервис модерации и проверить публикацию и выдачу на релизной площадке.",
+      "deliveryPackage": "07",
+      "sourceNextCheck": "Сначала проверить исходный UI submit, затем отдельный контракт валидации и жалоб."
+    },
+    {
+      "id": "cp-submission-quota",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 07",
+      "currentImplementation": "E3: проверены фиксированная отправляемая версия, квота 15 по подтверждённой UTC-дате, повтор, отзыв и жалоба на фикстуре.",
+      "nextAction": "Подключить реальный сервис модерации и проверить публикацию и выдачу на релизной площадке.",
+      "deliveryPackage": "07",
+      "sourceNextCheck": "В оригинале проверить смену дня после 15; риск не считать доказанным багом."
+    },
+    {
+      "id": "cp-community-feed",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 07",
+      "currentImplementation": "E3: проверены фиксированная отправляемая версия, квота 15 по подтверждённой UTC-дате, повтор, отзыв и жалоба на фикстуре.",
+      "nextAction": "Подключить реальный сервис модерации и проверить публикацию и выдачу на релизной площадке.",
+      "deliveryPackage": "07",
+      "sourceNextCheck": "Проверить отдельно выдачу, кеш и отзыв контента."
+    },
+    {
+      "id": "cp-banner",
+      "status": "ROADMAPPED",
+      "gap": "MISSING",
+      "stage": "Пакет 08",
+      "currentImplementation": "Размер слота и защита первых пяти — наши настройки M7. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md F1 подтверждает клиентскую развязку интересов на фикстурах; живой провайдер не настроен.",
+      "nextAction": "Проверить настроенный провайдер и подтверждённые callbacks на платформе; для подарка и оффера получить решение владельца.",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Проверить отсутствие сдвига поля при загрузке и no-fill."
+    },
+    {
+      "id": "cp-campaign-ad",
+      "status": "ROADMAPPED",
+      "gap": "MISSING",
+      "stage": "Пакет 08",
+      "currentImplementation": "Наш interstitial после сохранения и новых побед; интеграция впереди. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md F1 подтверждает клиентскую развязку интересов на фикстурах; живой провайдер не настроен.",
+      "nextAction": "Проверить настроенный провайдер и подтверждённые callbacks на платформе; для подарка и оффера получить решение владельца.",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Проверить Continue, replay и недоступного провайдера."
+    },
+    {
+      "id": "cp-challenge-banner",
+      "status": "ROADMAPPED",
+      "gap": "MISSING",
+      "stage": "Пакет 08",
+      "currentImplementation": "Нет отдельного режима/placement. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md F1 подтверждает клиентскую развязку интересов на фикстурах; живой провайдер не настроен.",
+      "nextAction": "Проверить настроенный провайдер и подтверждённые callbacks на платформе; для подарка и оффера получить решение владельца.",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Решать только при принятии испытаний."
+    },
+    {
+      "id": "cp-challenge-ad",
+      "status": "ROADMAPPED",
+      "gap": "MISSING",
+      "stage": "Пакет 08",
+      "currentImplementation": "Механика и её размещение имеют разные зависимости. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md F1 подтверждает клиентскую развязку интересов на фикстурах; живой провайдер не настроен.",
+      "nextAction": "Проверить настроенный провайдер и подтверждённые callbacks на платформе; для подарка и оффера получить решение владельца.",
+      "deliveryPackage": "08",
+      "sourceNextCheck": "Пройти первое и второе испытание, проверить opportunity."
+    },
+    {
+      "id": "cp-average",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 02",
+      "currentImplementation": "В карточке выделены личный результат и математический минимум. Среднее игроков доступно только из подтверждённой выборки. | https://github.com/DanilaH/hue-gradients/blob/08a2162544b1eeb1cca403893078368d9e2c04ab/src/game/workCardView.ts A3 вывел личный рекорд на карточку и повторно проверил сравнения на фикстурах. | https://github.com/DanilaH/hue-gradients/blob/960c8304eb82ce4675d914296c3263d05f6674e9/src/game/workCardView.ts",
+      "nextAction": "После публикации измеренных чистых проходов для точного отпечатка и правил записать источник, версию и размер; проверить сравнение и первую ступень.",
+      "deliveryPackage": "02",
+      "sourceNextCheck": "Указывать происхождение сравнительной величины."
+    },
+    {
+      "id": "cp-save",
+      "status": "ROADMAPPED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 09",
+      "currentImplementation": "У нас контракт сильнее: фиксируем каждый ход; device kill ещё открыт. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/workspace.ts A2: ресурсы 0.4.14 из APK открывают ту же попытку на Chromium 92/158. Обновление и несовместимость сохраняют байты локальной партии Chromium 0.4.12. | https://github.com/DanilaH/hue-gradients/blob/356c9576436d7b0f5378aee432add400fffcdeec/tools/first-launch-apk-check.mjs F2: добавлены атомарные локальные факты «принято», проверка replay, разделение сопоставимых результатов и тест дедупликации.",
+      "nextAction": "Сетевой провайдер соревнования, доверенное время и аналитика ждут конфигурации. Реальные Android-записи и прерывание проверить в G1.",
+      "deliveryPackage": "09",
+      "sourceNextCheck": "Проверить HOME→kill, force-stop→launcher и сохранение последнего хода."
+    },
+    {
+      "id": "cp-share",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 01",
+      "currentImplementation": "В нашей карточке передаётся тот же PNG, что при сохранении. У оригинала формат снимка поля. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/workCardView.ts",
+      "nextAction": "Проверить получение PNG в приложении-получателе на телефоне.",
+      "deliveryPackage": "01",
+      "sourceNextCheck": "Проверить фактические байты Preview/Save/Share."
+    },
+    {
+      "id": "cp-wallpaper",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 01",
+      "currentImplementation": "Подписанный APK включает системное действие для того же PNG. В Chromium заглушки отказа и отмены сохраняют путь «Сохранить PNG». | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/native/android/app/src/main/java/com/danilah/huegradients/HueExportPlugin.java В 0.4.40 проверены все пиксели восьми полноэкранных PNG.",
+      "nextAction": "Открыть настоящий обработчик Android и проверить отказ, отмену и возврат в карточку.",
+      "deliveryPackage": "01",
+      "sourceNextCheck": "Различать сохранить файл и установить обои в ОС."
+    },
+    {
+      "id": "mt-m01",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 06",
+      "currentImplementation": "В 0.4.36 пустая четверть запускает свою попытку. При завершении впервые цветной фрагмент встаёт в гнездо после возврата; проверено на 006. | https://github.com/DanilaH/hue-gradients/blob/36df8036981c4d91685ce133878b1719de318437/tools/books-browser-check.mjs",
+      "nextAction": "Проверить реальный каталог событий после D1 и показать книгу на телефоне (G1).",
+      "deliveryPackage": "06",
+      "sourceNextCheck": "Сравнить внутреннюю сборную картину и альбом на одном наборе, без смены экспорта."
+    },
+    {
+      "id": "mt-m02",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "MATCH",
+      "stage": "Пакет 06",
+      "currentImplementation": "В карточке можно скопировать работу и редактировать углы. Совпадает цепочка творчества. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/creative.ts В 0.4.40 сохранение и повторный импорт задачи подтверждены одним дублем.",
+      "nextAction": "Переиспользовать реализованное поведение и пройти регрессию пакета 06.",
+      "deliveryPackage": "06",
+      "sourceNextCheck": "После копии проверить неизменность оригинала."
+    },
+    {
+      "id": "mt-m03",
+      "status": "ROADMAPPED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 06",
+      "currentImplementation": "Сохранение одной работы за решение, отдельного испытания для него нет. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/export.ts",
+      "nextAction": "Реализовать соответствующий пункт пакета 06 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "06",
+      "sourceNextCheck": "Сверять конкретный способ получения и что сохраняется."
+    },
+    {
+      "id": "mt-m04",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 06",
+      "currentImplementation": "Разнородные цели открывают отдельную задачу; повтор сохраняет одну отметку. | https://github.com/DanilaH/hue-gradients/blob/36df8036981c4d91685ce133878b1719de318437/tools/books-browser-check.mjs В 0.4.36 четвёртый фрагмент открывает особую задачу именно этой обложки.",
+      "nextAction": "Проверить книгу и системный Back на физическом телефоне (G1).",
+      "deliveryPackage": "06",
+      "sourceNextCheck": "Проверить интерес к двум разным действиям и конечной награде."
+    },
+    {
+      "id": "mt-m05",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 06",
+      "currentImplementation": "На доверенной датированной фикстуре кешированное тематическое событие завершается офлайн и оставляет отметку. | https://github.com/DanilaH/hue-gradients/blob/36df8036981c4d91685ce133878b1719de318437/tools/books-browser-check.mjs В E1 авторская карточка из месячного снимка открылась в книгах; два прохода офлайн оставили одну отметку. E1 также прошёл тот же клиентский загрузчик с проверкой исходных файлов. В 0.4.35 вход в то же событие из календаря или книг определяет возврат и сохраняется после перезапуска. В 0.4.38 день и карточка события принимают возврат по источнику. Офлайн проверен на стенде.",
+      "nextAction": "Проверить живой источник событий после D1 и показать книгу на телефоне.",
+      "deliveryPackage": "06",
+      "sourceNextCheck": "Развести постоянный архив, ограниченную тему и сохранение права."
+    },
+    {
+      "id": "mt-m06",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 02",
+      "currentImplementation": "Сумма XP и десять ступеней мастерства имеют отдельные условия. Сравнение ждёт выборки. | https://github.com/DanilaH/hue-gradients/blob/08a2162544b1eeb1cca403893078368d9e2c04ab/src/game/progressView.ts",
+      "nextAction": "Принять шкалу после появления реальных сравнений.",
+      "deliveryPackage": "02",
+      "sourceNextCheck": "Проверить, есть ли у ранга новая понятная цель."
+    },
+    {
+      "id": "mt-m07",
+      "status": "ROADMAPPED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 09",
+      "currentImplementation": "Нет сетевого сравнения результатов. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md F2: добавлены атомарные локальные факты «принято», проверка replay, разделение сопоставимых результатов и тест дедупликации.",
+      "nextAction": "Сетевой провайдер соревнования, доверенное время и аналитика ждут конфигурации. Реальные Android-записи и прерывание проверить в G1.",
+      "deliveryPackage": "09",
+      "sourceNextCheck": "Выработать сравнимый старт и правила помощи перед счётом."
+    },
+    {
+      "id": "mt-m08",
+      "status": "ROADMAPPED",
+      "gap": "MISSING",
+      "stage": "Пакет 07",
+      "currentImplementation": "Опубликованного каталога и отбора у нас нет. Серверная модерация оригинала неизвестна. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/creative.ts E2: принята передача точной проверенной ревизии, безопасный отказ импорта и повторное решение без кампанийного кредита. | https://github.com/DanilaH/hue-gradients/blob/2540d4f2e448e1727bd3a3b389fbc88acd07000e/tools/transfer-browser-check.mjs",
+      "nextAction": "Проверить Android отправку, системный выбор JSON и обои на телефоне (G1).",
+      "deliveryPackage": "07",
+      "sourceNextCheck": "Проверить выход в каталог независимо от успешной отправки."
+    },
+    {
+      "id": "mt-m09",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 05",
+      "currentImplementation": "D1: фиксированный старт по доверенной дате, версия кеша, офлайн-архив и одна отметка о победе подтверждены на датированных фикстурах. | https://github.com/DanilaH/hue-gradients/blob/7341192f984b0a4a7a75a6d78d5017349eb28d14/tools/daily-browser-check.mjs Для D1 готовы проверка 30 авторских кандидатов и сборка датированного каталога. Два профиля в Chromium получили авторское поле, пережили UTC-полночь и сохранили одну победу после повтора офлайн. Клиент сверяет байты каталога, месяца и поля, а также отпечаток. Повреждённое обновление сохраняет старую партию. Все 30 кандидатов пройдены в Chromium офлайн. В 0.4.35 обе точки входа загружают стендовый каталог на чистом профиле без предварительного кеша.",
+      "nextAction": "Подключить опубликованный HTTPS-источник и проверить живой календарь на новом профиле.",
+      "deliveryPackage": "05",
+      "sourceNextCheck": "Сравнить короткое своё вступление со входом сразу в поле."
+    },
+    {
+      "id": "mt-m10",
+      "status": "ROADMAPPED",
+      "gap": "UNKNOWN",
+      "stage": "Пакет 06",
+      "currentImplementation": "Кнопка запуска нового цикла скрыта в 0.4.35. На профиле 60/60 сохранены коллекция, черновик и старое право.",
+      "nextAction": "Согласовать правила нового цикла с владельцем отдельно.",
+      "deliveryPackage": "06",
+      "sourceNextCheck": "Получить полные release notes либо оригинальную запись того, что сбрасывается."
+    },
+    {
+      "id": "h1-analytics",
+      "status": "ROADMAPPED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 09",
+      "currentImplementation": "Есть локальные факты и receipts. Доставку продуктовых событий аналитическому провайдеру не подтвердили. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/local-store/contracts.ts F2: добавлены атомарные локальные факты «принято», проверка replay, разделение сопоставимых результатов и тест дедупликации.",
+      "nextAction": "Сетевой провайдер соревнования, доверенное время и аналитика ждут конфигурации. Реальные Android-записи и прерывание проверить в G1.",
+      "deliveryPackage": "09",
+      "sourceNextCheck": "Развести local commit, событие и подтверждённую доставку; проверять повторы по eventId."
+    },
+    {
+      "id": "h2-daily-share",
+      "status": "ROADMAPPED",
+      "gap": "UNKNOWN",
+      "stage": "Пакет 05",
+      "currentImplementation": "Обои кампании реализованы. Доказательств аналогичного обычного экспорта в оригинале недостаточно. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md",
+      "nextAction": "Реализовать соответствующий пункт пакета 05 и проверить приёмку из FULL_ROADMAP.md. Подтвердить границу источника: Записать в исходной игре отдельно share обычной победы и всех трёх daily, сохранить выходные файлы.",
+      "deliveryPackage": "05",
+      "sourceNextCheck": "Записать в исходной игре отдельно share обычной победы и всех трёх daily, сохранить выходные файлы."
+    },
+    {
+      "id": "cp-creative-validation",
+      "status": "ROADMAPPED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 07",
+      "currentImplementation": "Собственный редактор проверяет разрешимость и цвет. Валидация публичной подачи отсутствует. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/editor.ts E2: принята передача точной проверенной ревизии, безопасный отказ импорта и повторное решение без кампанийного кредита. | https://github.com/DanilaH/hue-gradients/blob/2540d4f2e448e1727bd3a3b389fbc88acd07000e/tools/transfer-browser-check.mjs",
+      "nextAction": "Проверить Android отправку, системный выбор JSON и обои на телефоне (G1).",
+      "deliveryPackage": "07",
+      "sourceNextCheck": "Развести сохранить черновик, играть, отправить и получить публикацию четырьмя тестами."
+    },
+    {
+      "id": "cp-creative-blank",
+      "status": "ROADMAPPED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 07",
+      "currentImplementation": "Невалидный черновик можно хранить; для игры действуют собственные проверки. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/editor.ts",
+      "nextAction": "Реализовать соответствующий пункт пакета 07 и проверить приёмку из FULL_ROADMAP.md. ",
+      "deliveryPackage": "07",
+      "sourceNextCheck": "Сравнить сохранение и запуск монохромного черновика."
+    },
+    {
+      "id": "h2-show-secret-on-resume",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "MATCH",
+      "stage": "Пакет 03",
+      "currentImplementation": "Перезапуск до раскрытия сохраняет тот же старт и сразу показывает RGB всех плиток; подтверждено снимками и байтами попытки. | https://github.com/DanilaH/hue-gradients/blob/a976384455eeb503df89fb45898727d6f35e9808/tools/chapter-challenge-browser-check.mjs",
+      "nextAction": "Повторить первое открытие, reload, Back и отображение цветов на телефоне (G1).",
+      "deliveryPackage": "03",
+      "sourceNextCheck": "Если добавлять скрытие, проверить resume без повторного спойлера."
+    },
+    {
+      "id": "h2-perceptual",
+      "status": "ROADMAPPED",
+      "gap": "UNKNOWN",
+      "stage": "Пакет 04",
+      "currentImplementation": "У нас близость используется как предупреждение редактора. Называть это адаптивной сложностью оригинала нельзя. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/editor.ts",
+      "nextAction": "Реализовать соответствующий пункт пакета 04 и проверить приёмку из FULL_ROADMAP.md. Подтвердить границу источника: Найти места чтения поля и их связь с выдачей до постановки задачи про адаптацию.",
+      "deliveryPackage": "04",
+      "sourceNextCheck": "Найти места чтения поля и их связь с выдачей до постановки задачи про адаптацию."
+    },
+    {
+      "id": "h1-share-scores",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 02",
+      "currentImplementation": "Новая сопоставимая победа учитывается один раз при включённой статистике. Повтор доставки и смена эталона не меняют прошлое сравнение. | https://github.com/DanilaH/hue-gradients/blob/08a2162544b1eeb1cca403893078368d9e2c04ab/src/domain/playerProgress.ts",
+      "nextAction": "Включить сравнение после публикации выборки.",
+      "deliveryPackage": "02",
+      "sourceNextCheck": "На выборе своей механики определить допустимые попытки и отдельно проверить равенство ориентиру."
+    }
+  ],
+  "sourceInventory": "https://github.com/DanilaH/mini-games-kit/blob/0353273fb37b329611951e4500dd6d7cba6690ac/research/games/hue/porting/SOURCE_FEATURES.json",
+  "method": "Пакет 01 проверен на 0.4.11 и перенесён в feat/m0-foundation. Пакет 02 обновлён по 0.4.12. Остальные расхождения отражают срез 0.4.10. IMPLEMENTED_UNVERIFIED оставляет приёмку на телефоне открытой.",
+  "ownerScope": "20.11.2026, после аудита 0.4.10: «это всё делать надо». Весь реестр включён в программу разработки. Более конкретные решения: бесплатные попытки, одни плавные обои на работу, cloud M5 на паузе. Формулировки прежнего аудита «кандидат» отражают предыдущий статус."
+}

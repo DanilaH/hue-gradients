@@ -1,0 +1,123 @@
+{
+  "date": "2026-11-18",
+  "stage": "M1 internal playable slice; production/native runtime acceptance PARTIAL",
+  "recoveredBaseCommit": "3258b47815541d5b4b8faa331e390ce60ba51ffa",
+  "runtimeCommit": "469928d03f4bae5053e23db26e82187bedbc252e",
+  "guidanceCommit": "469928d03f4bae5053e23db26e82187bedbc252e",
+  "sourceSha256": {
+    "src/main.ts": "cd36edd899726ab0b8d3360b42cf898ac7253831d3d5bacb25659b7fb0c3368a",
+    "web/src/main.ts": "9e075058c3fb556e3da44a863abaebee8214cdc37bb35416edf1fa1881f5e048",
+    "web/src/app/platform.ts": "88512142cefc61ac15681114566d0b83194e54fe14d16a9ce7f475bf619c8ae3",
+    "src/app/session.ts": "bb50f78d0cb85604dcc6a5134d81784908c7b642fc909d0973c24c582229c739",
+    "src/domain/puzzle.ts": "07420e34510d45b621c8f45379678c5af587263c58619390489104569058712f",
+    "src/domain/levels.ts": "81b873a59cd315bafdadaed8b7ab8a6c976d616bc32a13be6c3a99a792e0e09a",
+    "src/domain/workspace.ts": "4388f9a580d73dc4a1d3fedb47a4a020cdda2930e33f37465d20d43556b4bccf",
+    "src/game/PuzzleScene.ts": "35ee97bd185ab65744c6dd75a57ce0963fdf4e7c29c966284290ea796119d8cc",
+    "src/game/mountGame.ts": "41f6ff998922787e8df59ada52ec4297b4d64265b0b52b11fc05c4b77ea3e9dd",
+    "src/game/geometry.ts": "43887f6680df7be3eda7121601c3a235e41b5178608aed4413a6643d1eef060f",
+    "src/game/game.css": "1011209473c9a9731930c1ba26f8d14280e6c19eee829ef70f9782c2452e3b3e",
+    "src/local-store/contracts.ts": "fa0c6bf899c97362791fc1c389429234a687dc42debb7efb9f22e52c0f5ff7a2",
+    "src/local-store/command.ts": "426e59f548dfe99ddd43e7532a4dc94bbcd14a1bb8cff1af3a94d34e290331ac",
+    "src/local-store/indexed-db.ts": "dd651a707eb0d3c895a845650410beaf4e7bcc242d3df088ef378a8e3c257522",
+    "src/local-store/native.ts": "96e120fdb6e29ce389df439739acf403097d4e63e177af68ee06f47b7c08e4a3",
+    "native/android/app/src/main/java/com/danilah/huegradients/HueSQLitePlugin.java": "73ec692fd219befd41a6a73d0e5de6e136857bf7339a3ce09d0cf86754070af1",
+    "native/android/app/src/main/java/com/danilah/huegradients/MainActivity.java": "ec2b3cda1388a42715148d0d935b5c99ff9fe9984cd834c17947469e7152626a"
+  },
+  "unitTests": {
+    "passed": 30,
+    "files": 5
+  },
+  "browser": {
+    "browser": "Chromium",
+    "passed": [
+      "idempotence",
+      "payload mismatch",
+      "CAS with two connections",
+      "atomic rollback",
+      "reopen",
+      "lost bridge reply",
+      "unreadable ledger recovery",
+      "quota/retry identity",
+      "pin and deselect no-op",
+      "help durably recorded before preview, preview not restored",
+      "real drag win and reload without duplicate reward",
+      "next and restart confirmation",
+      "actual two-tab CAS",
+      "resize cancels captured drag",
+      "pointercancel rejects late release",
+      "background cancels captured drag",
+      "final pointerup coordinates and ignored second pointer",
+      "keyboard swap",
+      "first five through actual UI, unique completions and rights",
+      "320px, portrait and landscape layout"
+    ],
+    "pageErrors": [],
+    "limits": [
+      "No physical Android",
+      "No hosted Yandex SDK",
+      "No production cloud/ads"
+    ]
+  },
+  "yandexHost": {
+    "passed": [
+      "local first frame before SDK init",
+      "LoadingAPI once after usable frame",
+      "GameplayAPI bridge",
+      "pause closes help",
+      "additive SDK/background blockers",
+      "offline SDK does not block play"
+    ],
+    "pageErrors": [],
+    "kind": "Local SDK stub and failed SDK request; hosted platform NOT RUN"
+  },
+  "android": {
+    "debugBuild": "PASS",
+    "releaseCheckR8Build": "PASS",
+    "exactApk": {
+      "kind": "releasecheck",
+      "package": "com.danilah.huegradients.releasecheck",
+      "versionName": "0.1.0",
+      "versionCode": 1,
+      "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+      "source": "local",
+      "apkSha256": "81913a2c293bda4b3a3d8da107b4562509ec6ca14da558dcfbbbf2e1fd0d587f",
+      "bytes": 1144852,
+      "certificateSha256": "06534d5dedb7cd83e2eb694622c6ab7ae60926c594bcd58109f892358dc264b2",
+      "productionSigner": false,
+      "v2": true,
+      "zipalign16k": true,
+      "debuggable": false,
+      "webViewDebuggingConfigured": false,
+      "nativeInsetOwner": "content-root",
+      "webPayload": {
+        "native-build.json": "d6776c22b4d785acafac6f324de6e51d9700f8d00340e5638b59090fc0a0fc70",
+        "index.html": "db6cd57432c4621ca577657be4c2443a7ce60c0a96a1267d9b4e89f51254ebe8",
+        "assets/dist-CMedSjkm.js": "067d9ca66629f984cf538346471032b4b24f9acd1cb914834126e2b88d3250fe",
+        "assets/index-CEIOOuFa.js": "5fa4a41737b1c1ebeb8adce9065529d3c569980114b746b207b2c561a0e972d6",
+        "assets/command-DsiNmMzb.js": "3bdb3eee67e5f0fe3039141e80a3f8764b0d75be05f0c89e4b81260fc3bd9e89",
+        "assets/native-BRf8Vtup.js": "c0ee103e5db093b632c2b0a8d00c59e51b8b10e97f54b99e0883aa6d66cb9e24",
+        "assets/index-DARzsFeS.css": "6740b14159a6304a7756b783ebd14f626dcdf23d76e06bb83e45c51256dc88b8",
+        "assets/web-BM7xF5pS.js": "874bbd026b2a3757b6c7bedc1bd163f0c735a3e0a943605c9853f660d828d658"
+      },
+      "nativeRuntime": "NOT RUN",
+      "liveServices": "NOT INSTALLED BY THIS HOST TEMPLATE"
+    },
+    "nativeSQLiteRuntime": "NOT RUN",
+    "physicalTouchProcessDeathStoragePressure": "NOT RUN"
+  },
+  "otherChecks": {
+    "specFilesExact": 40,
+    "requirements": 71,
+    "guidanceDoctor": "READY_FOR_AGENT_DISCOVERY",
+    "signingSafetyTests": 4,
+    "yandexUploadAudit": "PASS"
+  },
+  "notExecuted": [
+    "Physical Android/SQLite process-death, quota and corrupt-file runtime",
+    "Hosted Yandex draft",
+    "Production identity/cloud/live ads",
+    "M2 owner art acceptance"
+  ],
+  "productionAcceptance": "All 71 NOT RUN; lab coverage above does not change production rows",
+  "kitImpact": "REUSE; local candidates documented, no upstream changes"
+}

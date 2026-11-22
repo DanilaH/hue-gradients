@@ -1,0 +1,123 @@
+{
+  "date": "2026-11-22",
+  "package": "V1.2",
+  "base": "6e16fdf42390e72f2149c897f6069b9299b2b917",
+  "brief": "https://github.com/DanilaH/hue-gradients/pull/11",
+  "sourceFeatureIds": [
+    "poluson-color-burst-recoil",
+    "poluson-result-reveal",
+    "poluson-win-landing",
+    "poluson-paint-spray"
+  ],
+  "reference": "0.4.30 (34), owner review of the browser recording of level 006.",
+  "comparison": {
+    "level": "gradient-006",
+    "lastDragZeroBased": [
+      10,
+      11
+    ],
+    "alignedAt": "Final pointerup",
+    "speed": 1,
+    "sourceViewport": [
+      390,
+      740
+    ],
+    "outputFps": 25,
+    "outputSeconds": 2.88,
+    "method": "CDP browser captures of the web assets in the two signed APKs; all 11 new web asset hashes match the release APK.",
+    "newTimingFromGestureMs": {
+      "soundStart": 913,
+      "firstObservedBurstFrame": 947,
+      "observedRecoilCssPx": 1.917,
+      "firstClearHoldFrame": 1794,
+      "firstVisibleMenuInEncodedFrames": 2080,
+      "actionsEnabled": 2444
+    },
+    "phaseParametersMs": {
+      "recoilPeak": 36,
+      "recoilReturn": 120,
+      "clearHold": 250,
+      "menuFade": 400
+    },
+    "oneHapticApiCallEach": true,
+    "audio": "The MP4 aligns the 0.4.31 Web Audio buffer with its recorded activation. GIF is silent."
+  },
+  "runtime": {
+    "browser": "153.0.8010.0",
+    "largeField": {
+      "max": 1.9993,
+      "clear": true,
+      "phases": [
+        "approach",
+        "landed",
+        "hold",
+        "reveal",
+        "still"
+      ],
+      "startZoom": 2.4,
+      "moves": 36
+    },
+    "earlyTouchTabEnterAndHeldRelease": "PASS",
+    "freshInputAfterReveal": "PASS",
+    "backBeforeImpact": "No postponed haptic; shows ready result on first Back.",
+    "backAfterImpact": "One haptic; first Back opens menu and second Back follows its route.",
+    "backgroundAndRestoredVictory": "Ready static result; no repeat haptic.",
+    "reducedMotion": "Immediate result, no colour motion, one enabled impact haptic.",
+    "phone": "NOT RUN"
+  },
+  "checks": {
+    "typecheck": "PASS",
+    "unit": 197,
+    "specIntegrity": "PASS",
+    "kitDoctor": "PASS",
+    "androidDebug": "PASS",
+    "androidReleaseCheck": "PASS",
+    "exactApk": "PASS"
+  },
+  "artifacts": [
+    {
+      "file": "Poluson-V12-006-before-after-1x.gif",
+      "bytes": 1346086,
+      "sha256": "a8e93288306adeabeae4749a4d5c7cc22a85b27269428c1c2f502ceef66d37d3"
+    },
+    {
+      "file": "Poluson-V12-006-before-after-1x.mp4",
+      "bytes": 136240,
+      "sha256": "c175ce675292a071a8a1dd116d068895e5d18efdac5625fb78f1aa501a2121c3"
+    }
+  ],
+  "apk": {
+    "kind": "releasecheck",
+    "package": "com.danilah.huegradients.preview3",
+    "versionName": "0.4.31",
+    "versionCode": 35,
+    "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+    "source": "local",
+    "apkSha256": "00f434100a37045556d8ad40e14ac6273d4b2fd18bd800483a0ddf24ff968ec9",
+    "bytes": 1218328,
+    "certificateSha256": "3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85",
+    "productionSigner": false,
+    "v2": true,
+    "zipalign16k": true,
+    "debuggable": false,
+    "webViewDebuggingConfigured": false,
+    "nativeInsetOwner": "content-root",
+    "webPayload": {
+      "start-error.html": "22cc22f670fac501b781a7e27ee2b38842839e03f47bfb72c199768b5c709598",
+      "native-build.json": "d6776c22b4d785acafac6f324de6e51d9700f8d00340e5638b59090fc0a0fc70",
+      "index.html": "1319ab51008569b036076ab7dee29b5a150fac66da9dda78ed30375edfe71d71",
+      "assets/web-BM7xF5pS.js": "874bbd026b2a3757b6c7bedc1bd163f0c735a3e0a943605c9853f660d828d658",
+      "assets/nativeExport-h9Yj4vWw.js": "848850442afa3eb83d0e63d4d962277b4206448d48192c88f7377be1008c5f42",
+      "assets/native-BzVX4ABT.js": "99520aaf09b63c84f15d3671935f9076bf2c8ffb4b2a3cbcfaa5cfc4c7c1a971",
+      "assets/nativeFeedback-BdXlsEx8.js": "aa12bc0f39307f8a86d95c5b93e428317c5282ed05069350ea7ef8fd1ad69648",
+      "assets/index-BeqQyeQm.css": "f4c59470387f5162dd8425e86cc44f4373054a86a012fd0fa53315267cce634f",
+      "assets/command-HwzQ1dsz.js": "c8e016d32ccdd98d25f4cbf26df3dd03f1e664f10885163ffbe33eb9d4216285",
+      "assets/index-ByQieoNg.js": "3c03c8e3230da842a216958c496af9c8769c42804b617eba03590e4518ad6466",
+      "assets/dist-CMedSjkm.js": "067d9ca66629f984cf538346471032b4b24f9acd1cb914834126e2b88d3250fe"
+    },
+    "nativeRuntime": "NOT RUN",
+    "liveServices": "NOT INSTALLED BY THIS HOST TEMPLATE"
+  },
+  "kitImpact": "REUSE. Existing orchestration and audio/haptic paths.",
+  "next": "V2 after owner reviews the comparison."
+}

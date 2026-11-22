@@ -1,0 +1,67 @@
+{
+  "sourceCommit": "753260b6397cfaf1764cdcd417f2c8533aa04427",
+  "baseline": "a4c296e439873a940514a4a3623d598155c87c65",
+  "versionName": "0.4.10",
+  "versionCode": 14,
+  "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+  "kitImpact": "REUSE",
+  "checks": {
+    "unit": 146,
+    "browserMeta": 13,
+    "browserEditor": 19,
+    "browserExport": 6,
+    "browserPngPixelVerification": 8,
+    "strictPinnedGuidance": "PASS",
+    "specExactFiles": 40,
+    "yandexAudit": "PASS"
+  },
+  "capture": {
+    "historicalFixture": "0.4.9 a4c296e actual editor UI",
+    "oldCornerColors": [
+      "#9BA4F5",
+      "#CBB4E8",
+      "#514586",
+      "#78BABB"
+    ],
+    "newlyEditedCorner": "#FFE2A6",
+    "width": 1170,
+    "height": 2532,
+    "sha256": "0d84c7ce503fee14071f091904ad0dbcc5220180383f99ee6241ef894555a3b8",
+    "framesSeen": {
+      "create": 71,
+      "history": 60
+    },
+    "newDraft": "Create and edit an actual draft, win by tap swaps, then return to its exact node",
+    "oldDraft": "Create and verify the older node in 0.4.9. Open that draft in 0.4.10, edit and reload it, select and export the 0.4.9 node",
+    "png": "Byte-for-byte equality to preview in Chromium, with dimensions and four corner values independently decoded"
+  },
+  "clips": [
+    {
+      "file": "Poluson-Editor-Create.gif",
+      "bytes": 1235517,
+      "sha256": "05c41135cc4dff68d454b131a474c9751cc3e8c3cb80e40a0853ebde2f2f18bd",
+      "libraryFileId": "libfile_fde3_f-0d94c30fa7748191b4f7225570886aa7_2841ca9da26c8191b7a266fa9b41a810",
+      "seconds": 7.1
+    },
+    {
+      "file": "Poluson-Editor-History.gif",
+      "bytes": 1037198,
+      "sha256": "68aebf43285ed33f7281390a1d2b939630ce2ef544407150ccd04a2baaf0ca05",
+      "libraryFileId": "libfile_fde3_f-3ca1b52c7ec081919b3b1dae71f95fa1_2841ca9da26c8191b7a266fa9b41a810",
+      "seconds": 6.0
+    }
+  ],
+  "apk": {
+    "file": "Poluson-0.4.10-preview.apk",
+    "bytes": 1191692,
+    "sha256": "4abdfd95709bc742b6ae7610c98e6ac702f96e0ad6eef0395154b18b5e4ed42d",
+    "libraryFileId": "libfile_fde3_f-ff2168e49c608191bc66d06c4d351ae2_2841ca9da26c8191b7a266fa9b41a810",
+    "package": "com.danilah.huegradients.preview3",
+    "certificateSha256": "3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85",
+    "v2": true,
+    "zipalign16k": true,
+    "debuggable": false,
+    "build": "assembleDebug and assembleReleaseCheck, Gradle 8.14.3, JDK 21, Android API 36",
+    "deviceRuntime": "NOT RUN. No Android device attached."
+  }
+}

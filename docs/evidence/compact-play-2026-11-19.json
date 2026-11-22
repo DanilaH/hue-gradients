@@ -1,0 +1,61 @@
+{
+  "version": "0.4.2",
+  "scope": "Field, result, chapter picker, restart and settings",
+  "apk": {
+    "kind": "releasecheck",
+    "package": "com.danilah.huegradients.preview3",
+    "versionName": "0.4.2",
+    "versionCode": 6,
+    "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+    "source": "local",
+    "apkSha256": "7fca67e899040bc49dc9151a277e41eeffa75bca34a71ccc01997cc52111f5e4",
+    "bytes": 1187184,
+    "certificateSha256": "3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85",
+    "productionSigner": false,
+    "v2": true,
+    "zipalign16k": true,
+    "debuggable": false,
+    "webViewDebuggingConfigured": false,
+    "nativeInsetOwner": "content-root",
+    "webPayload": {
+      "index.html": "5080ff428c1ce688315d55e7e708a40076951db2fb1e701ccdaef2f52b516958",
+      "native-build.json": "d6776c22b4d785acafac6f324de6e51d9700f8d00340e5638b59090fc0a0fc70",
+      "assets/nativeExport-C522HTTS.js": "bc674294bbd0fdcd3fff02a2c68d53064e8e7ece06dd5e723c834509dbb4b4f2",
+      "assets/nativeFeedback-BdXlsEx8.js": "aa12bc0f39307f8a86d95c5b93e428317c5282ed05069350ea7ef8fd1ad69648",
+      "assets/index-8o3lj_DM.js": "7eb6447c753725c078ff40b8f444f28d1508baa51012ac702867d6993af024f2",
+      "assets/index-B9LW34Pz.css": "b00b7c6a7a59aa590dc38b03454e4d8060564419a75341cface41dd65e3de85c",
+      "assets/command-DsiNmMzb.js": "3bdb3eee67e5f0fe3039141e80a3f8764b0d75be05f0c89e4b81260fc3bd9e89",
+      "assets/web-BM7xF5pS.js": "874bbd026b2a3757b6c7bedc1bd163f0c735a3e0a943605c9853f660d828d658",
+      "assets/native-BRf8Vtup.js": "c0ee103e5db093b632c2b0a8d00c59e51b8b10e97f54b99e0883aa6d66cb9e24",
+      "assets/dist-CMedSjkm.js": "067d9ca66629f984cf538346471032b4b24f9acd1cb914834126e2b88d3250fe"
+    },
+    "nativeRuntime": "NOT RUN",
+    "liveServices": "NOT INSTALLED BY THIS HOST TEMPLATE"
+  },
+  "priorPreviewIdentityMatched": true,
+  "unitTests": 149,
+  "browserScenarios": {
+    "core": 21,
+    "presentation": 9,
+    "meta": 11,
+    "editor": 19,
+    "export": 9,
+    "localYandexSdk": 6
+  },
+  "checks": [
+    "Picker back preserves the exact IndexedDB snapshot and revision",
+    "Locked chapter shows its requirement and selectable levels stay disabled",
+    "Restart cancel returns to source from both settings and card",
+    "Result and picker fit portrait 320x568 with 150% CSS text size",
+    "Settings fit portrait 320x568",
+    "First chapter replay through UI",
+    "Eight PNGs pass independent pixel checks",
+    "Release web and Yandex build audit",
+    "Gradle debug and R8 releaseCheck build and exact APK inspection"
+  ],
+  "limits": [
+    "Android system Back and installation/runtime not run on a phone",
+    "Yandex SDK exercised with a local stub",
+    "Album, editor and export simplification is a separate package"
+  ]
+}

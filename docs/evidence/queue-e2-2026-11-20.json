@@ -1,0 +1,56 @@
+{
+  "browser": "158.0.8127.36",
+  "exactOldRevision": true,
+  "editedSource": true,
+  "badImportPreservedSnapshot": true,
+  "importedProofOnlyAfterPlay": true,
+  "png": [
+    390,
+    740,
+    "#f9bc92"
+  ],
+  "clipStartMillis": 2971,
+  "clipMillis": 3762,
+  "nativeChooser": "NOT RUN",
+  "source": "2540d4f2e448e1727bd3a3b389fbc88acd07000e",
+  "kitImpact": "REUSE",
+  "editorChromium": 19,
+  "exportChromium": 6,
+  "independentlyCheckedPNGs": 8,
+  "apk": {
+    "kind": "releasecheck",
+    "package": "com.danilah.huegradients.preview3",
+    "versionName": "0.4.24",
+    "versionCode": 28,
+    "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+    "source": "2540d4f2e448e1727bd3a3b389fbc88acd07000e",
+    "apkSha256": "f60cd8eec6616df848596fc838dad36322e82211bfe0aece7e5b57889789e4ab",
+    "bytes": 1210856,
+    "certificateSha256": "3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85",
+    "productionSigner": false,
+    "v2": true,
+    "zipalign16k": true,
+    "debuggable": false,
+    "webViewDebuggingConfigured": false,
+    "nativeInsetOwner": "content-root",
+    "webPayload": {
+      "start-error.html": "22cc22f670fac501b781a7e27ee2b38842839e03f47bfb72c199768b5c709598",
+      "index.html": "05b58bc63e1021370f591ae4c85bc83d375185b30e1a9287fa98cd6ec805b50e",
+      "native-build.json": "d6776c22b4d785acafac6f324de6e51d9700f8d00340e5638b59090fc0a0fc70",
+      "assets/index-CLvIHfud.css": "b215f87c8d35ec35b44fad06d6481b54a3a2c398ac10cda9f5128be45ddc34a9",
+      "assets/index-DQNqeFqz.js": "2df64896ecee342d364f57ed5a248492e3d53266a9e3131ef8a5b63dad904efa",
+      "assets/native-ttWVwMFk.js": "a77e2538e2c6cea787fc6d1ac82c4828eec2f8a3c3244eb1c14751fef8ea6102",
+      "assets/nativeFeedback-BdXlsEx8.js": "aa12bc0f39307f8a86d95c5b93e428317c5282ed05069350ea7ef8fd1ad69648",
+      "assets/web-BM7xF5pS.js": "874bbd026b2a3757b6c7bedc1bd163f0c735a3e0a943605c9853f660d828d658",
+      "assets/command-BzJMFn4z.js": "56f6750bc40b8fb2c1a76c2cfb70085b2719545adc9b46739cdf944861ab6655",
+      "assets/nativeExport-h9Yj4vWw.js": "848850442afa3eb83d0e63d4d962277b4206448d48192c88f7377be1008c5f42",
+      "assets/dist-CMedSjkm.js": "067d9ca66629f984cf538346471032b4b24f9acd1cb914834126e2b88d3250fe"
+    },
+    "nativeRuntime": "NOT RUN",
+    "liveServices": "NOT INSTALLED BY THIS HOST TEMPLATE"
+  },
+  "gif": {
+    "name": "Poluson-E2-transfer.gif",
+    "sha256": "b8dc6ab541cec76d49246a60ae2b309e427e37d1ec1f9f6ecf9d9a6f510e8707"
+  }
+}

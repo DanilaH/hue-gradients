@@ -1,0 +1,58 @@
+{
+  "browser": "158.0.8127.36",
+  "sameDailyStartOnTwoProfiles": true,
+  "acrossUtcMidnight": [
+    "2026-11-20",
+    "2026-11-21"
+  ],
+  "reusedOldVersion": "v1",
+  "offlineReplay": true,
+  "distinctWins": [
+    "2026-11-20"
+  ],
+  "clipStartMillis": 2883,
+  "clipMillis": 3683,
+  "limits": "Injected dated feed and trusted clock. No public source, shared rewards or native runtime.",
+  "source": "7341192f984b0a4a7a75a6d78d5017349eb28d14",
+  "kitImpact": "REUSE",
+  "unitChecks": 176,
+  "productionProvider": null,
+  "productionSchedule": null,
+  "sharedRewards": "OFF",
+  "apk": {
+    "kind": "releasecheck",
+    "package": "com.danilah.huegradients.preview3",
+    "versionName": "0.4.21",
+    "versionCode": 25,
+    "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+    "source": "7341192f984b0a4a7a75a6d78d5017349eb28d14",
+    "apkSha256": "d297f1c115d685b41b27ed06d9c53bf8a559e0af30349fec5d4e80709934026e",
+    "bytes": 1206464,
+    "certificateSha256": "3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85",
+    "productionSigner": false,
+    "v2": true,
+    "zipalign16k": true,
+    "debuggable": false,
+    "webViewDebuggingConfigured": false,
+    "nativeInsetOwner": "content-root",
+    "webPayload": {
+      "start-error.html": "22cc22f670fac501b781a7e27ee2b38842839e03f47bfb72c199768b5c709598",
+      "index.html": "11820326394275dabc0c08f8fe5a574001b4e42f12227430ffe0c1e5ac2f4824",
+      "native-build.json": "d6776c22b4d785acafac6f324de6e51d9700f8d00340e5638b59090fc0a0fc70",
+      "assets/native-ttWVwMFk.js": "a77e2538e2c6cea787fc6d1ac82c4828eec2f8a3c3244eb1c14751fef8ea6102",
+      "assets/nativeFeedback-BdXlsEx8.js": "aa12bc0f39307f8a86d95c5b93e428317c5282ed05069350ea7ef8fd1ad69648",
+      "assets/web-BM7xF5pS.js": "874bbd026b2a3757b6c7bedc1bd163f0c735a3e0a943605c9853f660d828d658",
+      "assets/index-Q2wAHdDX.css": "df7b0f397eee53929bf8904961e47b403e72ee84dd00107843e9eeb11eb740ef",
+      "assets/nativeExport-CqbPFgKE.js": "5810d391885079b04fe08fbd9075ad787560ad4f04d814f2b7faac850fb46b8b",
+      "assets/index-9dL93WU1.js": "5daf078ec8abc3264a9d58cbc7c278baf4a5431b040bb42245107f7dbd19ace2",
+      "assets/command-BzJMFn4z.js": "56f6750bc40b8fb2c1a76c2cfb70085b2719545adc9b46739cdf944861ab6655",
+      "assets/dist-CMedSjkm.js": "067d9ca66629f984cf538346471032b4b24f9acd1cb914834126e2b88d3250fe"
+    },
+    "nativeRuntime": "NOT RUN",
+    "liveServices": "NOT INSTALLED BY THIS HOST TEMPLATE"
+  },
+  "gif": {
+    "name": "Poluson-D1-archive-fixture.gif",
+    "sha256": "dcb816a1c5e0ed923bb09592bd68d69dd324c04f2cc3ecafc7ab82d883a9a681"
+  }
+}

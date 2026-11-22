@@ -1,0 +1,166 @@
+{
+  "date": "2026-11-19",
+  "stage": "M3 local campaign/album implementation; production/editorial acceptance pending",
+  "runtimeCommit": "469928d03f4bae5053e23db26e82187bedbc252e",
+  "runtimeArchiveSha256": "ba9088a0b937b3e86084666c36361ba47627ce833f4594aaf94e10eac62f1cc9",
+  "sourceSha256": {
+    "src/domain/puzzle.ts": "6f157678f68f62b684861cf01e5400ddc87b608582975785441a275d1617b8ac",
+    "src/domain/levels.ts": "ebe334ae15570e2b1fc9017a6eb5308eb8b3cd0908c403039563955854245038",
+    "src/domain/progression.ts": "155ffd56bdd5e68d6d56d9501f3362479a0b794efed6f4ea919d9efbdd520390",
+    "src/domain/workspace.ts": "1bd7deb54be5c409565b1313ae2ce6d9c95f9ce0bedb22f5fe81b80ee688c471",
+    "src/app/session.ts": "bc33e87877bd57d269f6ea3ef4beda8079750af723e621985fa93fc27a99b32c",
+    "src/game/metaView.ts": "b4aa265d15d63df8b94dda6ef055625380d4e3b00da5bd815dac65e5c1b14fe4",
+    "src/game/mountGame.ts": "633ff2d12e6948f90e1052278631bd755dfe16b3e56defbe19387fa511446006",
+    "src/game/game.css": "be73a417e0b423d46d7909fed06ddd9f792b47bff71b249419b91ed885a5a9c4",
+    "android-project.json": "c9dc47e40a459adb43b6978bea1ee5649ff3fd11cadf0d927b3add5c7c520bc3",
+    "native/android/app/build.gradle": "aeca8a148c8aff17fef679a4f6cafaa58f32e0aded632e481f7d36e6fa7e05b7",
+    "native/android/app/src/main/res/values/strings.xml": "66b00e9b3237c9a8aba924513f0c6922545d9c03ad2e0f5544c87026d140cd82"
+  },
+  "unitTests": {
+    "passed": 99,
+    "files": 7,
+    "campaignWitnesses": 60
+  },
+  "coreBrowser": {
+    "browser": "Chromium",
+    "passed": [
+      "idempotence",
+      "payload mismatch",
+      "CAS with two connections",
+      "atomic rollback",
+      "reopen",
+      "lost bridge reply",
+      "unreadable ledger recovery",
+      "quota/retry identity",
+      "pin and deselect no-op",
+      "help durably recorded before preview, preview not restored",
+      "real drag win and reload without duplicate reward",
+      "next and restart confirmation",
+      "actual two-tab CAS",
+      "resize cancels captured drag",
+      "pointercancel rejects late release",
+      "background cancels captured drag",
+      "final pointerup coordinates and ignored second pointer",
+      "keyboard swap",
+      "first five through actual UI, unique completions and rights",
+      "320px, portrait and landscape layout"
+    ],
+    "pageErrors": [],
+    "limits": [
+      "No physical Android",
+      "No hosted Yandex SDK",
+      "No production cloud/ads"
+    ]
+  },
+  "presentationBrowser": {
+    "passed": [
+      "pin/deselect have no success audio or haptic",
+      "one victory cue after commit; CTA immediately enabled",
+      "restored victory never replays sound/haptic",
+      "new gesture interrupts settling without dropping the next move",
+      "sound/haptic/motion settings persist; muted actions stay silent",
+      "system reduced motion overrides the animation preference",
+      "actual displayed tile RGB unchanged by atmosphere",
+      "background stops ambient frames and feedback",
+      "failed transaction and explicit receipt recovery do not replay feedback"
+    ],
+    "pageErrors": [],
+    "limits": [
+      "Desktop Chromium, not a physical Android feel test",
+      "Font selection and owner art approval pending"
+    ]
+  },
+  "yandexHost": {
+    "passed": [
+      "local first frame before SDK init",
+      "LoadingAPI once after usable frame",
+      "GameplayAPI bridge",
+      "pause closes help",
+      "additive SDK/background blockers",
+      "offline SDK does not block play"
+    ],
+    "pageErrors": [],
+    "kind": "Local SDK stub and failed SDK request; hosted platform NOT RUN"
+  },
+  "metaBrowser": {
+    "passed": [
+      "first five remain sequential; fifth grants caption rights",
+      "album contains only completed previews; no solution leaks",
+      "copy persists with new identity, plain-text name and no progress/mastery farming",
+      "free choice after fifth and next-lowest recommendation",
+      "9\u219210 unique completions opens chapter two before page completion",
+      "all 15 levels of an opened later chapter are available",
+      "14\u219215 stores page and format together, with one optional reward list",
+      "full chapter page renders exactly 15 earned works",
+      "album/page navigation fits narrow portrait and landscape",
+      "legacy migration atomically preserves active board, assistance/bests and backup without ceremony",
+      "failed migration rolls back backup/progress; retry preserves legacy state exactly",
+      "all-60 imported checkpoint shows 60 cards, finite six formats and no fake next chapter"
+    ],
+    "pageErrors": [],
+    "actualUiCompleted": "Chapter 1: all 15; non-linear selection after tutorial",
+    "fixtureCases": "14-completion v0.2 snapshots, with/without transaction fault",
+    "limits": [
+      "Physical Android and hosted services NOT RUN",
+      "Human acceptance of candidate content NOT RUN"
+    ]
+  },
+  "guidanceDoctor": "READY_FOR_AGENT_DISCOVERY",
+  "specExactFiles": 40,
+  "signingSafetyTests": 4,
+  "android": {
+    "debugBuild": "PASS",
+    "r8ReleaseCheckBuild": "PASS",
+    "exactApk": {
+      "kind": "releasecheck",
+      "package": "com.danilah.huegradients.preview3",
+      "versionName": "0.3.0",
+      "versionCode": 3,
+      "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+      "source": "local",
+      "apkSha256": "ad6a0936b76efe20ed3e205495be73575d55728736bd82079676fdd933ccbeb6",
+      "bytes": 1168653,
+      "certificateSha256": "3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85",
+      "productionSigner": false,
+      "v2": true,
+      "zipalign16k": true,
+      "debuggable": false,
+      "webViewDebuggingConfigured": false,
+      "nativeInsetOwner": "content-root",
+      "webPayload": {
+        "index.html": "20e71c8a89055055e54bf6ca57048ae9a921d36fd90b2947065c9e6bc0d33f1f",
+        "native-build.json": "d6776c22b4d785acafac6f324de6e51d9700f8d00340e5638b59090fc0a0fc70",
+        "assets/index-DDh6WdJ_.css": "d055b7c69371aa657b8c0c76a9218ccc6c300dbd3fa7c80e4df6ccfbe76329db",
+        "assets/nativeFeedback-BdXlsEx8.js": "aa12bc0f39307f8a86d95c5b93e428317c5282ed05069350ea7ef8fd1ad69648",
+        "assets/command-DsiNmMzb.js": "3bdb3eee67e5f0fe3039141e80a3f8764b0d75be05f0c89e4b81260fc3bd9e89",
+        "assets/web-BM7xF5pS.js": "874bbd026b2a3757b6c7bedc1bd163f0c735a3e0a943605c9853f660d828d658",
+        "assets/index-CBCCb-5A.js": "3a2d32a1db572ac48c885e2d21ed344cecb17014a511e2a2cdb5c5ec3cf48068",
+        "assets/native-BRf8Vtup.js": "c0ee103e5db093b632c2b0a8d00c59e51b8b10e97f54b99e0883aa6d66cb9e24",
+        "assets/dist-CMedSjkm.js": "067d9ca66629f984cf538346471032b4b24f9acd1cb914834126e2b88d3250fe"
+      },
+      "nativeRuntime": "NOT RUN",
+      "liveServices": "NOT INSTALLED BY THIS HOST TEMPLATE"
+    },
+    "oldTestSignerUnavailable": true,
+    "isolatedNewPreviewPackage": true,
+    "newTestKeyPrivatelyPersisted": true,
+    "runtimeTests": "NOT RUN; Android runtime/ADB unavailable"
+  },
+  "contentEditorial": {
+    "all60": "candidate",
+    "individualColourWarnings": [
+      "gradient-027",
+      "gradient-037",
+      "gradient-053",
+      "gradient-060"
+    ],
+    "humanAndTargetPhoneAcceptance": "NOT RUN"
+  },
+  "remaining": [
+    "M2 font comparison/150% and owner art approval",
+    "M4 complete editor/versioning/author test and PNG/share renderer",
+    "Physical Android SQLite/haptic/process-death/storage-pressure",
+    "Hosted Yandex/identity/cloud/live ads/production release"
+  ],
+  "kitImpact": "REUSE getTierProgress; consumer owns policy. Signer-retention guidance CANDIDATE, no upstream changes."
+}

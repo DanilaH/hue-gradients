@@ -1,0 +1,52 @@
+{
+  "browser": "158.0.8127.36",
+  "roundsViaTouch": 1,
+  "pausedRemainingMs": 589000,
+  "backgroundSimulatedMs": 60000,
+  "timedFinishFactsAfterReloadAndReplay": 1,
+  "score": 1,
+  "clipStartMillis": 1901,
+  "clipMillis": 3770,
+  "limits": "Real browser touch and IndexedDB. Test clock and blur/focus injected. Native app suspension not run.",
+  "source": "ed67542ba6c76a198c487600a296c27fd6c838f4",
+  "kitImpact": "REUSE",
+  "durationMs": 600000,
+  "unitChecks": 167,
+  "apk": {
+    "kind": "releasecheck",
+    "package": "com.danilah.huegradients.preview3",
+    "versionName": "0.4.18",
+    "versionCode": 22,
+    "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+    "source": "ed67542ba6c76a198c487600a296c27fd6c838f4",
+    "apkSha256": "a7635aa929f651deddf9d5e44476d579c422a2ff1098d4cbb47949b591e94ecf",
+    "bytes": 1201788,
+    "certificateSha256": "3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85",
+    "productionSigner": false,
+    "v2": true,
+    "zipalign16k": true,
+    "debuggable": false,
+    "webViewDebuggingConfigured": false,
+    "nativeInsetOwner": "content-root",
+    "webPayload": {
+      "start-error.html": "22cc22f670fac501b781a7e27ee2b38842839e03f47bfb72c199768b5c709598",
+      "index.html": "b77f69aa178610eed06b79d375aa2dd772509d7bf5767e3fd8e53e25021970d2",
+      "native-build.json": "d6776c22b4d785acafac6f324de6e51d9700f8d00340e5638b59090fc0a0fc70",
+      "assets/native-ttWVwMFk.js": "a77e2538e2c6cea787fc6d1ac82c4828eec2f8a3c3244eb1c14751fef8ea6102",
+      "assets/nativeFeedback-BdXlsEx8.js": "aa12bc0f39307f8a86d95c5b93e428317c5282ed05069350ea7ef8fd1ad69648",
+      "assets/web-BM7xF5pS.js": "874bbd026b2a3757b6c7bedc1bd163f0c735a3e0a943605c9853f660d828d658",
+      "assets/index-Q2wAHdDX.css": "df7b0f397eee53929bf8904961e47b403e72ee84dd00107843e9eeb11eb740ef",
+      "assets/nativeExport-CqbPFgKE.js": "5810d391885079b04fe08fbd9075ad787560ad4f04d814f2b7faac850fb46b8b",
+      "assets/command-BzJMFn4z.js": "56f6750bc40b8fb2c1a76c2cfb70085b2719545adc9b46739cdf944861ab6655",
+      "assets/index-BZcHfogi.js": "b06aea2e4dd5e85cfabea4d5f1bcc88ddd327a09945b0c04045b895df0f06aba",
+      "assets/dist-CMedSjkm.js": "067d9ca66629f984cf538346471032b4b24f9acd1cb914834126e2b88d3250fe"
+    },
+    "nativeRuntime": "NOT RUN",
+    "liveServices": "NOT INSTALLED BY THIS HOST TEMPLATE"
+  },
+  "gif": {
+    "name": "Poluson-B3-timed.gif",
+    "sha256": "a36b816b7a3259d0270e222e0846f465df7b94377aaf7d8d65b3c7610abd085a"
+  },
+  "deviceOutstanding": "Check native activity pause and resume. If the process dies before a pause commit, the persisted running clock still accounts for elapsed time."
+}

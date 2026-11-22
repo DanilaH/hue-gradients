@@ -1,0 +1,118 @@
+{
+  "date": "2026-11-21",
+  "package": "PR8 B3",
+  "sourceFeatureIds": [
+    "cp-timed"
+  ],
+  "audit": "https://github.com/DanilaH/hue-gradients/pull/8",
+  "browser": {
+    "browser": "153.0.8010.0",
+    "roundSize": [
+      7,
+      7
+    ],
+    "roundsViaTouch": 7,
+    "clockLabels": [
+      "5:00 · Собрано 0",
+      "5:00 · Собрано 0",
+      "5:00 · Собрано 0"
+    ],
+    "rounds": [
+      {
+        "field": "timed-v2-1",
+        "pins": 24,
+        "moves": 7
+      },
+      {
+        "field": "timed-v2-2",
+        "pins": 24,
+        "moves": 9
+      },
+      {
+        "field": "timed-v2-3",
+        "pins": 12,
+        "moves": 11
+      },
+      {
+        "field": "timed-v2-4",
+        "pins": 12,
+        "moves": 13
+      },
+      {
+        "field": "timed-v2-5",
+        "pins": 9,
+        "moves": 15
+      },
+      {
+        "field": "timed-v2-6",
+        "pins": 9,
+        "moves": 17
+      },
+      {
+        "field": "timed-v2-7",
+        "pins": 5,
+        "moves": 19
+      }
+    ],
+    "pausedRemainingMs": 289000,
+    "backgroundSimulatedMs": 60000,
+    "timedFinishFactsAfterReloadAndReplay": 1,
+    "score": 7,
+    "secondRunDifferent": true,
+    "legacy": {
+      "stagedFrom": "exact signed APK 0.4.25",
+      "restoredMoves": 1,
+      "remainingMs": 589000,
+      "nextRound": "timed-v1-2",
+      "finishedOnce": true
+    },
+    "limits": "Real Chromium touch and IndexedDB. Civil/monotonic clocks and blur controlled. Physical Android not run."
+  },
+  "balance": "Own 7×7 playlists. Moving tiles increase with score; anchors 24/12/9/5 after 0/2/4/6 clears.",
+  "restartRecovery": "An abrupt stop resumes the most recent durable clock checkpoint. Legacy saves use their stored remainingMs and original v1 deck.",
+  "checks": {
+    "unit": 193,
+    "gradleDebug": "PASS",
+    "gradleReleaseCheck": "PASS",
+    "exactApk": "PASS",
+    "phone": "NOT RUN"
+  },
+  "apk": {
+    "kind": "releasecheck",
+    "package": "com.danilah.huegradients.preview3",
+    "versionName": "0.4.26",
+    "versionCode": 30,
+    "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+    "source": "local",
+    "apkSha256": "6f296cceb4c992f91db10aaa219c413e165ad8ac94d313ab44d063d4af878407",
+    "bytes": 1213940,
+    "certificateSha256": "3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85",
+    "productionSigner": false,
+    "v2": true,
+    "zipalign16k": true,
+    "debuggable": false,
+    "webViewDebuggingConfigured": false,
+    "nativeInsetOwner": "content-root",
+    "webPayload": {
+      "start-error.html": "22cc22f670fac501b781a7e27ee2b38842839e03f47bfb72c199768b5c709598",
+      "native-build.json": "d6776c22b4d785acafac6f324de6e51d9700f8d00340e5638b59090fc0a0fc70",
+      "index.html": "ec85c9692256f5d75fa275445b42c90e20203879d644225f0c4652deee5fbde5",
+      "assets/web-BM7xF5pS.js": "874bbd026b2a3757b6c7bedc1bd163f0c735a3e0a943605c9853f660d828d658",
+      "assets/index-2uuGTZwp.css": "2f9b94f1c37c819e5ca60455b2023e0887b4be3d7c06eda1927f60a1a74eedb8",
+      "assets/nativeExport-h9Yj4vWw.js": "848850442afa3eb83d0e63d4d962277b4206448d48192c88f7377be1008c5f42",
+      "assets/index-5TueKwr4.js": "c350b93c7e2f2eee62b9a43118a6789d80d5020c1f54ada8a05163a31bc8c64e",
+      "assets/native-BzVX4ABT.js": "99520aaf09b63c84f15d3671935f9076bf2c8ffb4b2a3cbcfaa5cfc4c7c1a971",
+      "assets/nativeFeedback-BdXlsEx8.js": "aa12bc0f39307f8a86d95c5b93e428317c5282ed05069350ea7ef8fd1ad69648",
+      "assets/command-HwzQ1dsz.js": "c8e016d32ccdd98d25f4cbf26df3dd03f1e664f10885163ffbe33eb9d4216285",
+      "assets/dist-CMedSjkm.js": "067d9ca66629f984cf538346471032b4b24f9acd1cb914834126e2b88d3250fe"
+    },
+    "nativeRuntime": "NOT RUN",
+    "liveServices": "NOT INSTALLED BY THIS HOST TEMPLATE"
+  },
+  "gif": {
+    "file": "Poluson-B3-seven-rounds.gif",
+    "sha256": "a40868620c80b306b3e2e2e7c9d81a75abf9bcbeada84df5fd789ddf9d124dd4",
+    "environment": "Chromium, selectively sped up"
+  },
+  "kitImpact": "REUSE"
+}

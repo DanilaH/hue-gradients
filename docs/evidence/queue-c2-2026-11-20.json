@@ -1,0 +1,61 @@
+{
+  "browser": "158.0.8127.36",
+  "cells": 169,
+  "secondFingerCanceled": true,
+  "zoom": 2.2000005503112927,
+  "pan": {
+    "x": 34,
+    "y": 45
+  },
+  "hitPin": 84,
+  "swapped": [
+    83,
+    85
+  ],
+  "edgePan": -147.03625000035402,
+  "outsideDropUnchanged": true,
+  "clipStartMillis": 2330,
+  "clipMillis": 3492,
+  "source": "a76385346086edaa86252e01a0ffc6519aa1cce7",
+  "kitImpact": "REUSE",
+  "unitChecks": 174,
+  "previousA1BrowserRegression": true,
+  "presentationChromium": 12,
+  "apk": {
+    "kind": "releasecheck",
+    "package": "com.danilah.huegradients.preview3",
+    "versionName": "0.4.20",
+    "versionCode": 24,
+    "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+    "source": "a76385346086edaa86252e01a0ffc6519aa1cce7",
+    "apkSha256": "5939cf092d01134f51cdb881280569c68079b00c724a7ec7c3f2171846b5bc82",
+    "bytes": 1204800,
+    "certificateSha256": "3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85",
+    "productionSigner": false,
+    "v2": true,
+    "zipalign16k": true,
+    "debuggable": false,
+    "webViewDebuggingConfigured": false,
+    "nativeInsetOwner": "content-root",
+    "webPayload": {
+      "start-error.html": "22cc22f670fac501b781a7e27ee2b38842839e03f47bfb72c199768b5c709598",
+      "index.html": "5ee4518d1df3e229b94a7b4e59a169fe2642a2607aa859d184e9e6377fc9e39e",
+      "native-build.json": "d6776c22b4d785acafac6f324de6e51d9700f8d00340e5638b59090fc0a0fc70",
+      "assets/native-ttWVwMFk.js": "a77e2538e2c6cea787fc6d1ac82c4828eec2f8a3c3244eb1c14751fef8ea6102",
+      "assets/nativeFeedback-BdXlsEx8.js": "aa12bc0f39307f8a86d95c5b93e428317c5282ed05069350ea7ef8fd1ad69648",
+      "assets/web-BM7xF5pS.js": "874bbd026b2a3757b6c7bedc1bd163f0c735a3e0a943605c9853f660d828d658",
+      "assets/index-Q2wAHdDX.css": "df7b0f397eee53929bf8904961e47b403e72ee84dd00107843e9eeb11eb740ef",
+      "assets/nativeExport-CqbPFgKE.js": "5810d391885079b04fe08fbd9075ad787560ad4f04d814f2b7faac850fb46b8b",
+      "assets/index-BJbLf5Ua.js": "483010cd532f5d2a24d845dcd7c849fb637ff71bbd647547d7b2bfe208b1149b",
+      "assets/command-BzJMFn4z.js": "56f6750bc40b8fb2c1a76c2cfb70085b2719545adc9b46739cdf944861ab6655",
+      "assets/dist-CMedSjkm.js": "067d9ca66629f984cf538346471032b4b24f9acd1cb914834126e2b88d3250fe"
+    },
+    "nativeRuntime": "NOT RUN",
+    "liveServices": "NOT INSTALLED BY THIS HOST TEMPLATE"
+  },
+  "gif": {
+    "name": "Poluson-C2-large-board.gif",
+    "sha256": "ec8ff242ba7022bb226fca87da162347fe535a013a63d7e6cb2b3adae8aa0b0b"
+  },
+  "deviceOutstanding": "Native multitouch, actual insets and perceived edge speed."
+}

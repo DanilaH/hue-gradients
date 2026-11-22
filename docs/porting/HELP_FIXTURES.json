@@ -1,0 +1,237 @@
+{
+  "basis": "Frozen first15, flat 0-based row-major indices, fresh attempt. Reference fixtures for the proposed Poluson policy. Source uses board-space distance; these fixtures use square cell units.",
+  "cases": [
+    {
+      "level": "gradient-001",
+      "action": "pulse",
+      "scanFrom": 0,
+      "expectedPosition": 1,
+      "expectedBoard": [
+        0,
+        2,
+        1,
+        3
+      ],
+      "expectedMoves": 0,
+      "expectedAssistsUsed": 1
+    },
+    {
+      "level": "gradient-001",
+      "action": "pulse",
+      "scanFrom": 3,
+      "expectedPosition": 1,
+      "expectedBoard": [
+        0,
+        2,
+        1,
+        3
+      ],
+      "expectedMoves": 0,
+      "expectedAssistsUsed": 1
+    },
+    {
+      "level": "gradient-001",
+      "action": "auto",
+      "board": [
+        0,
+        2,
+        1,
+        3
+      ],
+      "expectedSwap": [
+        1,
+        2
+      ],
+      "expectedBoard": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "expectedMoves": 3,
+      "expectedAssistsUsed": 1,
+      "expectedCompleted": true
+    },
+    {
+      "level": "gradient-002",
+      "action": "pulse",
+      "scanFrom": 0,
+      "expectedPosition": 1,
+      "expectedBoard": [
+        0,
+        3,
+        1,
+        2,
+        4
+      ],
+      "expectedMoves": 0,
+      "expectedAssistsUsed": 1
+    },
+    {
+      "level": "gradient-002",
+      "action": "pulse",
+      "scanFrom": 4,
+      "expectedPosition": 1,
+      "expectedBoard": [
+        0,
+        3,
+        1,
+        2,
+        4
+      ],
+      "expectedMoves": 0,
+      "expectedAssistsUsed": 1
+    },
+    {
+      "level": "gradient-002",
+      "action": "auto",
+      "board": [
+        0,
+        3,
+        1,
+        2,
+        4
+      ],
+      "expectedSwap": [
+        1,
+        2
+      ],
+      "expectedBoard": [
+        0,
+        1,
+        3,
+        2,
+        4
+      ],
+      "expectedMoves": 3,
+      "expectedAssistsUsed": 1,
+      "expectedCompleted": false
+    },
+    {
+      "level": "gradient-003",
+      "action": "pulse",
+      "scanFrom": 0,
+      "expectedPosition": 1,
+      "expectedBoard": [
+        0,
+        2,
+        3,
+        1,
+        4
+      ],
+      "expectedMoves": 0,
+      "expectedAssistsUsed": 1
+    },
+    {
+      "level": "gradient-003",
+      "action": "pulse",
+      "scanFrom": 4,
+      "expectedPosition": 1,
+      "expectedBoard": [
+        0,
+        2,
+        3,
+        1,
+        4
+      ],
+      "expectedMoves": 0,
+      "expectedAssistsUsed": 1
+    },
+    {
+      "level": "gradient-003",
+      "action": "auto",
+      "board": [
+        0,
+        2,
+        3,
+        1,
+        4
+      ],
+      "expectedSwap": [
+        1,
+        3
+      ],
+      "expectedBoard": [
+        0,
+        1,
+        3,
+        2,
+        4
+      ],
+      "expectedMoves": 3,
+      "expectedAssistsUsed": 1,
+      "expectedCompleted": false
+    },
+    {
+      "level": "gradient-004",
+      "action": "pulse",
+      "scanFrom": 0,
+      "expectedPosition": 1,
+      "expectedBoard": [
+        0,
+        3,
+        2,
+        4,
+        7,
+        1,
+        6,
+        5,
+        8
+      ],
+      "expectedMoves": 0,
+      "expectedAssistsUsed": 1
+    },
+    {
+      "level": "gradient-004",
+      "action": "pulse",
+      "scanFrom": 8,
+      "expectedPosition": 1,
+      "expectedBoard": [
+        0,
+        3,
+        2,
+        4,
+        7,
+        1,
+        6,
+        5,
+        8
+      ],
+      "expectedMoves": 0,
+      "expectedAssistsUsed": 1
+    },
+    {
+      "level": "gradient-004",
+      "action": "auto",
+      "board": [
+        0,
+        3,
+        2,
+        4,
+        7,
+        1,
+        6,
+        5,
+        8
+      ],
+      "expectedSwap": [
+        1,
+        5
+      ],
+      "expectedBoard": [
+        0,
+        1,
+        2,
+        4,
+        7,
+        3,
+        6,
+        5,
+        8
+      ],
+      "expectedMoves": 3,
+      "expectedAssistsUsed": 1,
+      "expectedCompleted": false
+    }
+  ]
+}

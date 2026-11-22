@@ -1,0 +1,107 @@
+{
+  "date": "2026-11-21",
+  "package": "PR8 D2",
+  "sourceFeatureIds": [
+    "h2-daily-past",
+    "h2-daily-present",
+    "h2-daily-future",
+    "h2-daily-history",
+    "h2-daily-date"
+  ],
+  "audit": "https://github.com/DanilaH/hue-gradients/pull/8",
+  "browser": {
+    "browser": "153.0.8010.0",
+    "starterDays": [
+      {
+        "day": "2026-11-21",
+        "present": "gradient-001",
+        "future": "gradient-021",
+        "durationMs": 15000
+      },
+      {
+        "day": "2026-11-22",
+        "present": "gradient-004",
+        "future": "gradient-030",
+        "durationMs": 24000
+      },
+      {
+        "day": "2026-11-23",
+        "present": "gradient-003",
+        "future": "gradient-029",
+        "durationMs": 17000
+      },
+      {
+        "day": "2026-11-24",
+        "present": "gradient-002",
+        "future": "gradient-027",
+        "durationMs": 17000
+      }
+    ],
+    "perfectCampaignWins": 30,
+    "personalGoal": "repeat-record",
+    "targetMoves": 15,
+    "unplayedFuture": "gradient-060",
+    "correctedDay": [
+      "2026-12-01",
+      "2026-11-25"
+    ],
+    "retainedHistory": true,
+    "awardsAfterReplay": 1,
+    "durationMs": {
+      "easy": 15000,
+      "ordinaryFinalField": 74000,
+      "finale": 131000
+    },
+    "finaleId": "finale-v1-1",
+    "finaleWonViaTouch": true,
+    "finaleExpiryVerified": true,
+    "civilClockDidNotChangeTimer": true,
+    "limits": "Actual Chromium input. Campaign history made with domain actions and fixed civil/monotonic test clocks. Physical Android not run."
+  },
+  "policy": "personal-v2. Own allowance uses 10 s setup, movable-cell factor and 3 s per minimum swap, 6 s for chapter finales, with a 15 s floor. Existing assignments keep issued limits. Recency is preferred before a deterministic weighted choice.",
+  "checks": {
+    "focusedUnit": 5,
+    "gradleDebug": "PASS",
+    "gradleReleaseCheck": "PASS",
+    "exactApk": "PASS",
+    "phone": "NOT RUN"
+  },
+  "apk": {
+    "kind": "releasecheck",
+    "package": "com.danilah.huegradients.preview3",
+    "versionName": "0.4.27",
+    "versionCode": 31,
+    "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+    "source": "local",
+    "apkSha256": "8049c9f58a2563d0b41c9a523e23ccd96adf87e72918ad391d3570cd5a373119",
+    "bytes": 1214600,
+    "certificateSha256": "3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85",
+    "productionSigner": false,
+    "v2": true,
+    "zipalign16k": true,
+    "debuggable": false,
+    "webViewDebuggingConfigured": false,
+    "nativeInsetOwner": "content-root",
+    "webPayload": {
+      "start-error.html": "22cc22f670fac501b781a7e27ee2b38842839e03f47bfb72c199768b5c709598",
+      "native-build.json": "d6776c22b4d785acafac6f324de6e51d9700f8d00340e5638b59090fc0a0fc70",
+      "index.html": "013995c4a6e1a3e5b34cf318b3c220cfdeb344e11e39ff9c2d838f7b5cb654e6",
+      "assets/web-BM7xF5pS.js": "874bbd026b2a3757b6c7bedc1bd163f0c735a3e0a943605c9853f660d828d658",
+      "assets/index-2uuGTZwp.css": "2f9b94f1c37c819e5ca60455b2023e0887b4be3d7c06eda1927f60a1a74eedb8",
+      "assets/nativeExport-h9Yj4vWw.js": "848850442afa3eb83d0e63d4d962277b4206448d48192c88f7377be1008c5f42",
+      "assets/native-BzVX4ABT.js": "99520aaf09b63c84f15d3671935f9076bf2c8ffb4b2a3cbcfaa5cfc4c7c1a971",
+      "assets/nativeFeedback-BdXlsEx8.js": "aa12bc0f39307f8a86d95c5b93e428317c5282ed05069350ea7ef8fd1ad69648",
+      "assets/command-HwzQ1dsz.js": "c8e016d32ccdd98d25f4cbf26df3dd03f1e664f10885163ffbe33eb9d4216285",
+      "assets/index-BaVp6H6U.js": "22f894547c8588995481a5eceffe48b7fe37cba48a75518aad98bed914562a78",
+      "assets/dist-CMedSjkm.js": "067d9ca66629f984cf538346471032b4b24f9acd1cb914834126e2b88d3250fe"
+    },
+    "nativeRuntime": "NOT RUN",
+    "liveServices": "NOT INSTALLED BY THIS HOST TEMPLATE"
+  },
+  "gif": {
+    "file": "Poluson-D2-date-and-record.gif",
+    "sha256": "2707c4d43c084feb26518047c941b16763ae1cabaec86bddd1fad202cc7afabc",
+    "environment": "Chromium"
+  },
+  "kitImpact": "REUSE"
+}

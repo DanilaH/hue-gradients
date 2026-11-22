@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "date": "2026-11-18",
+  "kind": "owner-selected generated static concept",
+  "status": "OBSERVED_STATIC_REFERENCE",
+  "library_file_id": "libfile_fde3_f-4518cf7dfd948191a0330e42934c5d7a_2841ca9da26c8191b7a266fa9b41a810",
+  "library_url": "https://chatgpt.com/library?file_id=libfile_fde3_f-4518cf7dfd948191a0330e42934c5d7a_2841ca9da26c8191b7a266fa9b41a810&account_id=personal",
+  "package_file": "reference/owner-art-reference.png",
+  "sha256": "872fd9800184a2e4cc52716cd258cbcb194841782745415ae6dd710aedc586ec",
+  "bytes": 2866546,
+  "width": 1774,
+  "height": 887,
+  "observed": [
+    "left gameplay and right victory composition",
+    "large glowing pastel colour clouds",
+    "dark plum vignette",
+    "soft haze and grain",
+    "warm light UI marks",
+    "translucent faceted prism on victory"
+  ],
+  "owner_requests": [
+    "use approximately this background and presentation",
+    "record in detailed specification and roadmap",
+    "do not implement visual changes now"
+  ],
+  "not_approved": [
+    "pixel/extruded typography",
+    "exact intensity parameters",
+    "generated tile RGB/shading as canonical data",
+    "browser study's flatter appearance as final art"
+  ],
+  "not_observed": [
+    "temporal motion",
+    "actual input",
+    "phone performance",
+    "real game screenshot"
+  ],
+  "contract": "PRODUCT_SPEC_1_0.md section 8",
+  "action_this_turn": "documentation only"
+}
+

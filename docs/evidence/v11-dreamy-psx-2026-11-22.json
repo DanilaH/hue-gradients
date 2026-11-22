@@ -1,0 +1,430 @@
+{
+  "date": "2026-11-22",
+  "package": "V1.1",
+  "base": "beb0b0b5bbf39c5b4a0f6a0b9ff0b4f7c331582d",
+  "brief": "https://github.com/DanilaH/hue-gradients/pull/10",
+  "sourceFeatureIds": [
+    "poluson-win-landing",
+    "poluson-angular-ui",
+    "poluson-tile-dither",
+    "poluson-paint-spray"
+  ],
+  "status": "Chromium verification passed. Owner and physical Android feel review pending.",
+  "timelineMs": {
+    "camera": [
+      150,
+      372
+    ],
+    "firstTileLift": 422,
+    "arrivalStep": 66,
+    "frontLength": 198,
+    "rise": 122,
+    "crest": 18,
+    "return": 58,
+    "lastContact": 818
+  },
+  "visual": {
+    "pause": {
+      "light": {
+        "equalRgbOutsideMenu": 28420,
+        "states": [
+          "pause",
+          "pressed",
+          "preferences"
+        ],
+        "regions": [
+          [
+            18,
+            80,
+            43,
+            660
+          ],
+          [
+            348,
+            80,
+            372,
+            660
+          ]
+        ]
+      },
+      "dark": {
+        "equalRgbOutsideMenu": 28420,
+        "states": [
+          "pause",
+          "pressed",
+          "preferences"
+        ],
+        "regions": [
+          [
+            18,
+            80,
+            43,
+            660
+          ],
+          [
+            348,
+            80,
+            372,
+            660
+          ]
+        ]
+      }
+    },
+    "grain": {
+      "before": {
+        "dotCssPx": 2,
+        "periodCssPx": 4,
+        "boardCrop": [
+          136,
+          391,
+          328,
+          527
+        ],
+        "dpr": 1,
+        "sampleMeanRgb": [
+          101.0,
+          132.0,
+          152.0
+        ]
+      },
+      "after": {
+        "dotCssPx": 1,
+        "periodCssPx": 2,
+        "boardCrop": [
+          136,
+          391,
+          328,
+          527
+        ],
+        "dpr": 1,
+        "sampleMeanRgb": [
+          101.0,
+          132.0,
+          152.0
+        ]
+      }
+    },
+    "recording": {
+      "speed": 1,
+      "sourceFps": 25,
+      "ordinaryClipSeconds": 2.67,
+      "landingAfterClipSeconds": 1.19,
+      "audio": "Sampled game Web Audio buffer remuxed at the first visible landing frame."
+    }
+  },
+  "browser": {
+    "version": "153.0.8010.0",
+    "episodes": {
+      "ordinary": {
+        "id": "gradient-006",
+        "moves": 7,
+        "stableAndMovesWithTile": true,
+        "shades": 4,
+        "mean": [
+          134,
+          135,
+          136
+        ],
+        "source": "#868788",
+        "quietReplay": true,
+        "pauseKeyboardAndTouch": true,
+        "resultWallpaper": true,
+        "sounds": [
+          {
+            "duration": 0.24,
+            "phase": "landed"
+          }
+        ],
+        "vibration": [
+          {
+            "value": 22,
+            "phase": "landed"
+          }
+        ],
+        "pair": [
+          {
+            "at": 10,
+            "neighbor": 11,
+            "elapsed": 477.5,
+            "camera": {
+              "zoom": 0.9028044871794871,
+              "x": 18.063178585737187,
+              "y": 30.325000000000014
+            },
+            "a": 0.433,
+            "b": 0
+          },
+          {
+            "at": 10,
+            "neighbor": 11,
+            "elapsed": 696.8,
+            "camera": {
+              "zoom": 0.9028044871794871,
+              "x": 18.063178585737187,
+              "y": 30.325000000000014
+            },
+            "a": 0,
+            "b": 1.0
+          },
+          {
+            "at": 10,
+            "neighbor": 11,
+            "elapsed": 761.2,
+            "camera": {
+              "zoom": 0.9028044871794871,
+              "x": 18.063178585737187,
+              "y": 30.325000000000014
+            },
+            "a": 0,
+            "b": 0
+          }
+        ]
+      },
+      "wide": {
+        "id": "geometry-v1-wide",
+        "zoom": 2.4,
+        "reframe": 0.94,
+        "moves": 36,
+        "sampledFrames": 51,
+        "medianFrameMs": 16.699999999999818,
+        "naturalLight": [
+          187,
+          180,
+          222
+        ],
+        "naturalDark": [
+          55,
+          60,
+          139
+        ],
+        "zoomShades": 4,
+        "sprayColors": 11,
+        "sounds": [
+          {
+            "duration": 0.24,
+            "phase": "landed"
+          }
+        ],
+        "vibration": [
+          {
+            "value": 22,
+            "phase": "landed"
+          }
+        ]
+      }
+    },
+    "triangles": {
+      "id": "geometry-v1-triangles",
+      "moves": 6
+    },
+    "interactionChecks": {
+      "before-hit": {
+        "moves": 1,
+        "assisted": false,
+        "sounds": 0,
+        "pulses": 0
+      },
+      "after-hit": {
+        "moves": 1,
+        "assisted": false,
+        "sounds": 1,
+        "pulses": 1
+      },
+      "strip": {
+        "moves": 1,
+        "assisted": false,
+        "sounds": 1,
+        "pulses": 1
+      },
+      "reduced": {
+        "moves": 1,
+        "assisted": false,
+        "sounds": 1,
+        "pulses": 1,
+        "dpr": 1.9989910879435009,
+        "shades": 4,
+        "mean": [
+          111,
+          122,
+          110
+        ]
+      },
+      "background": {
+        "moves": 1,
+        "assisted": false,
+        "sounds": 0,
+        "pulses": 0
+      },
+      "assisted": {
+        "moves": 3,
+        "assisted": true,
+        "sounds": 1,
+        "pulses": 1
+      }
+    },
+    "pauseButtonColours": {
+      "light": {
+        "focused": "rgb(89, 68, 102)",
+        "pressed": "rgb(103, 76, 113)"
+      },
+      "dark": {
+        "focused": "rgb(89, 68, 102)",
+        "pressed": "rgb(103, 76, 113)"
+      }
+    },
+    "gameplay": "CDP touch and keyboard on actual browser builds with deterministic pre-win saved checkpoints.",
+    "baselines": {
+      "grainBefore": "0.4.29 source at beb0b0b",
+      "grainAfter": "0.4.30 source",
+      "sameViewport": [
+        390,
+        740
+      ]
+    }
+  },
+  "checks": {
+    "unit": 197,
+    "m1Browser": 21,
+    "m2Browser": 12,
+    "helpBrowser": 7,
+    "typecheck": "PASS",
+    "yandexBuildAndAudit": "PASS",
+    "specIntegrity": "PASS",
+    "kitDoctor": "PASS",
+    "challengeWinAndLoss": "PASS",
+    "largeBoardEdgesAndTouch": "PASS",
+    "hiddenFieldAfterPause": "PASS",
+    "pauseText150Percent": [
+      [
+        320,
+        568
+      ],
+      [
+        568,
+        320
+      ]
+    ],
+    "independentSoundAndVibrationSettings": "PASS",
+    "export": {
+      "fullyDecodedPngs": 8,
+      "exactGradientRgb": true,
+      "alphaAndSrgb": "PASS"
+    },
+    "signedApkWebAssets": {
+      "versions": [
+        "92.0.4512.0",
+        "153.0.8010.0"
+      ],
+      "checks": [
+        "92: reproduced 0.4.12 clean start failure with Object.hasOwn unavailable",
+        "92.0.4512.0: exact APK starts, touch preview resumes, retained board survives reload",
+        "92.0.4512.0: packaged compatibility page leaves save unchanged",
+        "153.0.8010.0: exact APK starts, touch preview resumes, retained board survives reload",
+        "153.0.8010.0: packaged compatibility page leaves save unchanged",
+        "modern: real 0.4.12 save bytes preserved on update and capability failure"
+      ],
+      "packagedWebViewMinimum": 92,
+      "nativeRuntime": "NOT RUN"
+    }
+  },
+  "apk": {
+    "kind": "releasecheck",
+    "package": "com.danilah.huegradients.preview3",
+    "versionName": "0.4.30",
+    "versionCode": 34,
+    "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+    "source": "local",
+    "apkSha256": "1895bbed61f2972069957fa1bf930bfeed929c00526a37b5d280199230d88963",
+    "bytes": 1217696,
+    "certificateSha256": "3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85",
+    "productionSigner": false,
+    "v2": true,
+    "zipalign16k": true,
+    "debuggable": false,
+    "webViewDebuggingConfigured": false,
+    "nativeInsetOwner": "content-root",
+    "webPayload": {
+      "start-error.html": "22cc22f670fac501b781a7e27ee2b38842839e03f47bfb72c199768b5c709598",
+      "native-build.json": "d6776c22b4d785acafac6f324de6e51d9700f8d00340e5638b59090fc0a0fc70",
+      "index.html": "1d50f8a30ec638d55e435d721b0d2ccd834599d0c28d8e8998026f55b18d508d",
+      "assets/web-BM7xF5pS.js": "874bbd026b2a3757b6c7bedc1bd163f0c735a3e0a943605c9853f660d828d658",
+      "assets/nativeExport-h9Yj4vWw.js": "848850442afa3eb83d0e63d4d962277b4206448d48192c88f7377be1008c5f42",
+      "assets/native-BzVX4ABT.js": "99520aaf09b63c84f15d3671935f9076bf2c8ffb4b2a3cbcfaa5cfc4c7c1a971",
+      "assets/nativeFeedback-BdXlsEx8.js": "aa12bc0f39307f8a86d95c5b93e428317c5282ed05069350ea7ef8fd1ad69648",
+      "assets/index-NrhuL0hQ.css": "63d3abd80c8512460821425c60dab6d89fce1cf45f9ff0161e19b1a062e1799a",
+      "assets/command-HwzQ1dsz.js": "c8e016d32ccdd98d25f4cbf26df3dd03f1e664f10885163ffbe33eb9d4216285",
+      "assets/index-DQpccsTT.js": "6ff53161ac0eafa491121a1899b0e92a9a768ae253e02375b5434d71234756a2",
+      "assets/dist-CMedSjkm.js": "067d9ca66629f984cf538346471032b4b24f9acd1cb914834126e2b88d3250fe"
+    },
+    "nativeRuntime": "NOT RUN",
+    "liveServices": "NOT INSTALLED BY THIS HOST TEMPLATE"
+  },
+  "visualFiles": [
+    {
+      "file": "Poluson-V11-006-1x.gif",
+      "width": 304,
+      "height": 576,
+      "frames": 67,
+      "sha256": "d2a328675f2634ecd079e7c73c5d8d0ac02391652e48305b71c8df96f0314c8d"
+    },
+    {
+      "file": "Poluson-V11-006-1x.mp4",
+      "sha256": "a84c590154533d879413cddf8291efb6d5b57346405d38eb82751d55e2f63031"
+    },
+    {
+      "file": "Poluson-V11-13x13-1x.gif",
+      "width": 304,
+      "height": 576,
+      "frames": 99,
+      "sha256": "aed5531a37d4290907375321059b4ae6d70690e291b5528fca016d83536b86c5"
+    },
+    {
+      "file": "Poluson-V11-field-after.png",
+      "width": 390,
+      "height": 740,
+      "sha256": "89c99d003e1ed6c72060cbe5adc544c6334247a393237ccda4965ce7faddd242"
+    },
+    {
+      "file": "Poluson-V11-field-before.png",
+      "width": 390,
+      "height": 740,
+      "sha256": "8513a3276048ec28877e9a414b1c8c1853bb6ed5ea34acb254290a7a45ad41c2"
+    },
+    {
+      "file": "Poluson-V11-grain-after-1x.png",
+      "width": 192,
+      "height": 136,
+      "sha256": "30bd651a2ddf1ead14ef7c9ca495530f9030c9a50fd93bf7242eac5439a11a04"
+    },
+    {
+      "file": "Poluson-V11-grain-before-1x.png",
+      "width": 192,
+      "height": 136,
+      "sha256": "289e00da4b8eae3ccbf92dd3dd64445abd780a863a637bb5e2221dad6152c2db"
+    },
+    {
+      "file": "Poluson-V11-pause-dark.png",
+      "width": 390,
+      "height": 740,
+      "sha256": "91014cefc7691bc2a3204515a66f7f94ae0aa131290fb93426509593e825c9a7"
+    },
+    {
+      "file": "Poluson-V11-pause-light.png",
+      "width": 390,
+      "height": 740,
+      "sha256": "976e9f1658d773cbe1eca1334a4916e26244ed377cfba498d3079691bdbc7f07"
+    },
+    {
+      "file": "Poluson-V11-tile-phases.png",
+      "width": 236,
+      "height": 621,
+      "sha256": "a9c3c6e4615103ea6c00d5cf1f0a75ddc6e270a1ad7b54a13633acde6cbd763e"
+    }
+  ],
+  "phone": {
+    "result": "NOT RUN",
+    "connectedDevices": 0
+  },
+  "next": "V2 starts with Personal Tasks after the owner views V1.1.",
+  "kitImpact": "REUSE. Existing host, feedback and lifecycle; game-specific presentation."
+}

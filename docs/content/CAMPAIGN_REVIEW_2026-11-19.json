@@ -1,0 +1,633 @@
+{
+  "date": "2026-11-19",
+  "policy": "Automated legality is not editorial/human acceptance. No candidate promoted to accepted.",
+  "sourcePackSha256": "6c283226eecc9b92846c182328d9491880588ab420d67e62bcb0ecf36d67aa2a",
+  "requiredIndividualColourDecisions": [
+    "gradient-027",
+    "gradient-037",
+    "gradient-053",
+    "gradient-060"
+  ],
+  "levels": [
+    {
+      "levelId": "gradient-001",
+      "fingerprint": "cf57542fe0423f7797d3800c1a42100191757fd7ca250a4ef9870757bcc734f4",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-002",
+      "fingerprint": "574e950f27d3452ba6400a9f135c5544280b24f3950fe59db1f28ecb8a6ea392",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-003",
+      "fingerprint": "bb87a6dbd0c8436bd25462746732491b0daa920460aed111ccf3c9e6da2d915f",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-004",
+      "fingerprint": "a7604f765be4be7789481b0a9ebdc0bb4dcc1b4d99639908c052ee0593cd1998",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-005",
+      "fingerprint": "0cd0d3a1bd17fb2976ed130d94036751e56fd571e30b7c691809ba14aa0aa483",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-006",
+      "fingerprint": "afdd5d4d141ad1affca5ef2a8eb6b4b3a83d35a91d8f8932526a9b4cc8b584ae",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-007",
+      "fingerprint": "4c1582a7529e21bba9455da01179e32a92c4fb43ffcdc3c29a17f3fe3d43c24e",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-008",
+      "fingerprint": "9d7fa373d2e713bd135fa4fff99955c3dfd60f2602ee0356cadcfeee8b2e51c7",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-009",
+      "fingerprint": "21d0895df53b0f669c031c0d383002a89a0b0d94c344cfcce24115f62bf8ef9a",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-010",
+      "fingerprint": "80fb4e6951c2b1845de2d5e345389b6181e5cee5c42d3d7e8b782ea654d871f1",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-011",
+      "fingerprint": "9255e54994b49b105da5d5e50529907986b8b0f33284029258716edb5f23e96b",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-012",
+      "fingerprint": "f4edd3acb8b74241ed894c66431d6be1e4cee74e3b789aae5ee599dc15cdfeb8",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-013",
+      "fingerprint": "26e63170d58d261378bd10ff0567a8783f13e92c479b635fd4840cdcb39441ad",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-014",
+      "fingerprint": "173eac311ec4b9aca08c7f9d171fa6c6776cbbf0c56ef474e6cba869ae5245b4",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-015",
+      "fingerprint": "69069f6fb2960252cd05735d793ff2db988776042dcdda20698c41727e1f7125",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-016",
+      "fingerprint": "aae7de20b601dcd1ca2d9ca8cf88d0f99a469d21b6eda49b3f57785620ae9e20",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-017",
+      "fingerprint": "c1484b78146e0d88e11650fccfdd442aa04cf7c82eb0a710e30a6f0a0cebd02a",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-018",
+      "fingerprint": "e4760796441d8a4d636496e11588c8d2687a046b79d47c5c76f40f82979464f8",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-019",
+      "fingerprint": "8cbca721d1d72a33e6539ab6e9e1f7cf17d0aae9e11ac92c0a3f8f4c2cfbc2ef",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-020",
+      "fingerprint": "247e395d63ab7532d9a671a666a627c2f80943d26e11c89ded365c3b96e0c053",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-021",
+      "fingerprint": "86b0011e7f5e9bb302e90b7ace187cef61b422f4826f9fc3fd7a469c3b8e3cf0",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-022",
+      "fingerprint": "925928a3f68a13fe8b09c1092521d4b98653887582cce1a9c85e2b0477bc6e83",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-023",
+      "fingerprint": "f704786d94584e8da69e9eced0250f9a0cbbd175d8b3122a296a7b99053af0b8",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-024",
+      "fingerprint": "ddb6af594fbd4400d272c7821c6dae0728a1243fdd48a7ac0b7eca683c9f9a1c",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-025",
+      "fingerprint": "d9ca6047cf5a98a839c2a2df104601e1a7708c3f889c4c69d4bbc02e1a21d9d5",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-026",
+      "fingerprint": "1bf0597c6b770a8e9f512674ebd076f7a5baa8f02e82b08615eb10c3a0ce03fd",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-027",
+      "fingerprint": "e5bd9fc9ebe6e6f05bb246f7b4a155a2be0e15e2c8ab91b8df18fb09f70af8f1",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [
+        "CLOSE_COLORS_REVIEW"
+      ],
+      "closestMovablePair": [
+        20,
+        21
+      ]
+    },
+    {
+      "levelId": "gradient-028",
+      "fingerprint": "2b26662eb06aa03f55aa3f0bc9dfd1409d13f0c085809f6f171a3986241463e6",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-029",
+      "fingerprint": "4d9278890c008ab44a305a647beb2c4eabb486841fed5d817a19eb52ab85aa90",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-030",
+      "fingerprint": "de54afaf8c474c98f9584df5bb3632e3fac6d7bdf08db9c46e4e11f0ebd60f00",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-031",
+      "fingerprint": "9d58239e997e0aa31fff57979d2dfc18d79964627c97762f459f77c810931339",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-032",
+      "fingerprint": "4eaa0216bfcb0435e15cbcb764d192a6c1af808635a2d083dc3cfe2c25e62efd",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-033",
+      "fingerprint": "d1d1b5fb2c9d9bcd461e3615ffc4a52198938183586f91920c67883cece36b41",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-034",
+      "fingerprint": "bf7be8519c01f580a31e2efab27a4de25c54e0ede7a94e94a2e91714e7b67e0d",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-035",
+      "fingerprint": "36897f2015e8865e2320d1e4c2d0888f592d6336eab84dbb396af422460ac28c",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-036",
+      "fingerprint": "9695251395785b7d906a7f6451344149dfcf5fa626a93fe8cc3e066b7602e311",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-037",
+      "fingerprint": "8411650064f9e124f35cc1aae3664e7b1ef7d8e79978a382e38296a98af77ffa",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [
+        "CLOSE_COLORS_REVIEW"
+      ],
+      "closestMovablePair": [
+        18,
+        19
+      ]
+    },
+    {
+      "levelId": "gradient-038",
+      "fingerprint": "e45c943131ca6918683639d701752e358afae46ec5b132124a67ffbfbe612d92",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-039",
+      "fingerprint": "8257a8b06ec839dd609905b1aac22733e3d5a143d2c659fd8be9075559367106",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-040",
+      "fingerprint": "1ba709428f411c840278abdf301cc2ca88f74bb26923c1d0cb39707c95ba05e9",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-041",
+      "fingerprint": "93feefa409c2906563849c74ba571bd899e9d98e5cb57c556ec866925b7057f7",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-042",
+      "fingerprint": "ad282475f94bf88bc090d00697981d8b9daa0f729091568b2d98ca9b585badd2",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-043",
+      "fingerprint": "18f5f0d15d1ae6a31809ac3e417f8115be121ec4c564ec447b3956dc2ebc0861",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-044",
+      "fingerprint": "91284768b2bb76b994130dc4a18d0916e82de5529dcd2214297ebae357e30ca4",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-045",
+      "fingerprint": "9b4329fcc602578818307cd39df476a52d5f84c6a445db8c8a349917db75cf08",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-046",
+      "fingerprint": "c9a68112ee7beb25237761cc3f9d323a2a24065401124bb375cc3d1ceaaf556b",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-047",
+      "fingerprint": "ee2f1591b5cc2509ca62400b7aa5c8032a416eed58b0b982384f9536c2714168",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-048",
+      "fingerprint": "f854ada70f244a20e24d275ef4c019623c4e396c678c71b593a04903d08db2d6",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-049",
+      "fingerprint": "f7809ca9a19c3de4398dcf2596ed3b103b70824269e5a377683389de4b45b0a6",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-050",
+      "fingerprint": "f92bd89c1d88198d1ab03745e5c03066302cbfbd1a6aaaecfaf9d54244965f1d",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-051",
+      "fingerprint": "3bcb734b46d53b830e95745303c9b8ae2e7f272ed268764172f9ae6e3040b768",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-052",
+      "fingerprint": "c91a22079e287eebf5e6dc6018e9c7750ac144ccd19590801ca1ce2e842fb7d4",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-053",
+      "fingerprint": "07afa9890fd19a1f627b9cbc023dd8ae7a4ab439d5ed9158c446da2d1536811c",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [
+        "CLOSE_COLORS_REVIEW"
+      ],
+      "closestMovablePair": [
+        1,
+        2
+      ]
+    },
+    {
+      "levelId": "gradient-054",
+      "fingerprint": "d20e371a4d46409e30408005bfe4e5f8e845bf51ec38462a700cd496bde8ca35",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-055",
+      "fingerprint": "ae6f99223f5ba652b1094b1c1ce65fd1c4930bc7aca70ba2f89af779766a6641",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-056",
+      "fingerprint": "20fc99a487375677b0c550f3af9e57138db20ca3b37f9643604113046af3bfd3",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-057",
+      "fingerprint": "bcd9bdde8e56d92aa7bf56e026bb2cbe6ff35c26ae81605b46fd9fc6199abb42",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-058",
+      "fingerprint": "dc2c00d07016c56ac7d6d178f9ff0cbd8e9d6d705fd5d3bf3f30a6f291c6baf3",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-059",
+      "fingerprint": "8f888d6cb965099307db123ba7dd3bc8c376f264308d1cb7b4846fad62be00f5",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [],
+      "closestMovablePair": null
+    },
+    {
+      "levelId": "gradient-060",
+      "fingerprint": "85b8b3cd12b680035a88620cb117047062c5df84e02f41fa9a005e549daa19bc",
+      "status": "candidate",
+      "automatedLegality": "PASS: supplied witness through production reducer",
+      "humanPlaythrough": "NOT RUN",
+      "targetPhoneColour": "NOT RUN",
+      "warnings": [
+        "CLOSE_COLORS_REVIEW"
+      ],
+      "closestMovablePair": [
+        27,
+        28
+      ]
+    }
+  ]
+}

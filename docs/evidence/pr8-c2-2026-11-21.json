@@ -1,0 +1,115 @@
+{
+  "date": "2026-11-21",
+  "package": "PR8 C2",
+  "sourceFeatureIds": [
+    "h2-zoom",
+    "h2-pan",
+    "h2-edge-pan"
+  ],
+  "audit": "https://github.com/DanilaH/hue-gradients/pull/8",
+  "browser": {
+    "browser": "153.0.8010.0",
+    "cells": 169,
+    "keyboardZoom": 2.44140625,
+    "visibleCorners": [
+      0,
+      12,
+      168,
+      156,
+      0
+    ],
+    "keyboardSwap": [
+      1,
+      2
+    ],
+    "secondFingerCanceled": true,
+    "zoom": 2.2000005503112927,
+    "pan": {
+      "x": 34,
+      "y": 45
+    },
+    "hitPin": 84,
+    "swapped": [
+      83,
+      85
+    ],
+    "edgePan": -155.73468750079616,
+    "outsideDropUnchanged": true,
+    "keyboardSteps": 48,
+    "limits": "Chromium keyboard and CDP touch. Cell bounds checked at each arrow step. No native Android input recorded."
+  },
+  "regression": {
+    "ordinaryBoardInput": "PASS",
+    "cancelWinFeedbackAndAmbient": "PASS",
+    "exactSignedApkWebAssets": {
+      "versions": [
+        "92.0.4512.0",
+        "153.0.8010.0"
+      ],
+      "checks": [
+        "92: reproduced 0.4.12 clean start failure with Object.hasOwn unavailable",
+        "92.0.4512.0: exact APK starts, touch preview resumes, retained board survives reload",
+        "92.0.4512.0: packaged compatibility page leaves save unchanged",
+        "153.0.8010.0: exact APK starts, touch preview resumes, retained board survives reload",
+        "153.0.8010.0: packaged compatibility page leaves save unchanged",
+        "modern: real 0.4.12 save bytes preserved on update and capability failure"
+      ],
+      "packagedWebViewMinimum": 92,
+      "nativeRuntime": "NOT RUN"
+    }
+  },
+  "checks": {
+    "typecheck": "PASS",
+    "unit": 197,
+    "specIntegrity": {
+      "files": 40,
+      "requirements": 71
+    },
+    "yandexBuildAndAudit": "PASS",
+    "kitDoctor": "PASS",
+    "gradleDebug": "PASS",
+    "gradleReleaseCheck": "PASS",
+    "exactApk": "PASS",
+    "phone": "NOT RUN",
+    "attachedAndroidDevices": 0
+  },
+  "apk": {
+    "kind": "releasecheck",
+    "package": "com.danilah.huegradients.preview3",
+    "versionName": "0.4.28",
+    "versionCode": 32,
+    "kitRef": "469928d03f4bae5053e23db26e82187bedbc252e",
+    "source": "local",
+    "apkSha256": "94411af6d77054b41022cc3403d7b0565f76aa15db96d06d5536dd9a0e66c036",
+    "bytes": 1214708,
+    "certificateSha256": "3293c7f8ab780b6204d8eb714177ff119dee76214b7278eb3eb5c7afcdf6ba85",
+    "productionSigner": false,
+    "v2": true,
+    "zipalign16k": true,
+    "debuggable": false,
+    "webViewDebuggingConfigured": false,
+    "nativeInsetOwner": "content-root",
+    "webPayload": {
+      "start-error.html": "22cc22f670fac501b781a7e27ee2b38842839e03f47bfb72c199768b5c709598",
+      "native-build.json": "d6776c22b4d785acafac6f324de6e51d9700f8d00340e5638b59090fc0a0fc70",
+      "index.html": "0b5720c71c337fc344c05a537ebab23484ff99763c7973fee8ac850a3c10d589",
+      "assets/index-C4m-SF-f.js": "23b3e8abc4d59604d23ac7e8da62500d20323ef4543f7428b3d25c989f41636e",
+      "assets/web-BM7xF5pS.js": "874bbd026b2a3757b6c7bedc1bd163f0c735a3e0a943605c9853f660d828d658",
+      "assets/index-2uuGTZwp.css": "2f9b94f1c37c819e5ca60455b2023e0887b4be3d7c06eda1927f60a1a74eedb8",
+      "assets/nativeExport-h9Yj4vWw.js": "848850442afa3eb83d0e63d4d962277b4206448d48192c88f7377be1008c5f42",
+      "assets/native-BzVX4ABT.js": "99520aaf09b63c84f15d3671935f9076bf2c8ffb4b2a3cbcfaa5cfc4c7c1a971",
+      "assets/nativeFeedback-BdXlsEx8.js": "aa12bc0f39307f8a86d95c5b93e428317c5282ed05069350ea7ef8fd1ad69648",
+      "assets/command-HwzQ1dsz.js": "c8e016d32ccdd98d25f4cbf26df3dd03f1e664f10885163ffbe33eb9d4216285",
+      "assets/dist-CMedSjkm.js": "067d9ca66629f984cf538346471032b4b24f9acd1cb914834126e2b88d3250fe"
+    },
+    "nativeRuntime": "NOT RUN",
+    "liveServices": "NOT INSTALLED BY THIS HOST TEMPLATE"
+  },
+  "gif": {
+    "file": "Poluson-C2-focus-and-touch.gif",
+    "sha256": "87e7315f4b4511067b97331151edffe362beb9b6af21989902e90db7c6c554e4",
+    "environment": "Chromium",
+    "durationMs": 5410
+  },
+  "kitImpact": "REUSE"
+}
