@@ -8,7 +8,7 @@
 |---|---|---|---|
 | poluson-book-sockets | MATCH | mt-m01, mt-m04 | [0.4.36. Гнездо 006, вложение и запуск при 4/4](pr13-book-006.json). |
 | poluson-book-goal-return | MATCH | h1-local-resume | [Книга при возврате с результата, паузы и после перезапуска](pr13-book-006.json). |
-| poluson-personal-objects | MATCH | h2-daily-past, h2-daily-present, h2-daily-future, h2-daily-history | [«Личные задания» при 390×740 показаны на свежем профиле и после 001. Выбранный предмет крупнее, подписи видны до выбора. Художественная итерация ожидает просмотра.](pr14-menu-0.4.42.json) |
+| poluson-personal-objects | MATCH | h2-daily-past, h2-daily-present, h2-daily-future, h2-daily-history | [«Личные задания» при 390×740 показаны на свежем профиле и после 001. Выбранный предмет крупнее, подписи видны до выбора. Художественная итерация ожидает просмотра.](pr14-menu-0.4.42.json) [0.4.43. Тапы по фону, предмету и подписи. Три предмета при 320×568 и тексте 150%.](pr14-personal-follow-up-0.4.43.json) |
 | poluson-daily-month | MATCH | — | [0.4.38. Два месяца, миниатюра архивной работы и кэш после 503](pr13-calendar.json). Общий endpoint в ожидании. |
 | poluson-dated-event-return | MATCH | mt-m05 | [Дата 21 ноября удерживает источник после офлайн-перезапуска и рестарта. Из паузы и победы восстанавливается фокус карточки в книгах или выбранного дня в календаре.](pr14-menu-0.4.42.json) |
 | poluson-chapter-strips | MATCH | h1-unlock, h2-boss | [0.4.39. 10/15, 15/15 и возврат к финалу главы](pr13-chapters.json). |

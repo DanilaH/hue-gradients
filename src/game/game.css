@@ -705,26 +705,27 @@ html[data-host=browser] .editor-panel {
 .personal-objects {
   --personal-stage-height: clamp(124px,35vh,248px);
   display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.65fr) minmax(0,1fr);
-  grid-template-rows: auto; gap: clamp(4px,2vw,12px); align-items: start;
+  grid-template-rows: var(--personal-stage-height) auto;
+  column-gap: clamp(4px,2vw,12px); align-items: start;
   margin-block: clamp(3px,2vh,16px) 0;
 }
 .personal-objects[data-count="2"] {
   grid-template-columns: minmax(0,.36fr) minmax(0,1.65fr) minmax(0,1fr) minmax(0,.45fr);
 }
 .personal-objects button {
-  position: relative; display: grid; align-content: start; justify-items: stretch; grid-row: 1;
-  padding: var(--personal-stage-height) 0 0; min-width: 0;
+  position: relative; display: grid; align-content: start; justify-items: stretch; grid-row: 2;
+  padding: 0; min-width: 0; overflow: visible;
   border: 0; border-radius: 0; color: #fff1dd;
-  background: #2d1e36; background-clip: content-box;
+  background: #2d1e36;
   text-align: center; font-size: .81rem; line-height: 1.18; overflow-wrap: anywhere;
 }
 .personal-objects button > strong { min-height: 48px; display: grid; place-content: center; padding: 5px 4px; }
 .personal-objects button[aria-pressed=true] { background-color: #4b2c48; }
-.personal-objects button:active:not(:disabled) { background: #543652 content-box; }
+.personal-objects button:active:not(:disabled) { background-color: #543652; }
 .personal-objects button:disabled { opacity: 1; color: #ddc5d9; }
 .personal-objects button small { font-size: .68rem; padding-bottom: 6px; color: #ffdc9f; }
 .personal-object {
-  position: absolute; bottom: calc(100% - var(--personal-stage-height) + 13px); left: 50%;
+  position: absolute; bottom: calc(100% + 13px); left: 50%;
   display: grid; justify-items: center; width: min(100%,100px);
   transform: translateX(-50%); pointer-events: none;
 }
@@ -733,12 +734,23 @@ html[data-host=browser] .editor-panel {
   background: radial-gradient(ellipse,#1e112be0,transparent 68%);
 }
 .personal-object canvas { width: 88%; height: auto; image-rendering: pixelated; filter: brightness(.88) drop-shadow(3px 8px 4px #23112680); }
+.personal-objects button:not(:disabled) .personal-object canvas { pointer-events: auto; }
 .personal-objects button[aria-pressed=true] .personal-object { width: min(100%,175px); }
 .personal-objects button[aria-pressed=true] .personal-object canvas { filter: drop-shadow(0 0 16px #f7a66c65) drop-shadow(5px 9px 6px #211027a6); }
 .personal-objects button[aria-pressed=true] .personal-object::after {
   content: ''; position: absolute; inset: -6px 0; background: var(--menu-corners); background-repeat: no-repeat;
 }
 .personal-objects button:focus-visible { outline-offset: 2px; }
+.personal-caption-short { display: none; }
+@media (max-width: 360px) {
+  #game-dialog[data-menu=personal] { --menu-top: 6px; --menu-bottom: 12px; gap: 8px; }
+  #game-dialog[data-menu=personal] #dialog-title { margin-top: 0; font-size: clamp(1.2rem,6vw,1.5rem); }
+  .personal-objects { --personal-stage-height: clamp(130px,29vh,190px); margin-block: 0; }
+  .personal-objects button[aria-pressed=false] > strong { padding-inline: 2px; }
+  .personal-objects button[aria-pressed=false] .personal-caption-full { display: none; }
+  .personal-objects button[aria-pressed=false] .personal-caption-short { display: block; font-size: .7rem; overflow-wrap: normal; }
+}
+
 .personal-detail { display: grid; justify-items: center; gap: 4px; text-align: center; padding: 7px 0 13px; }
 .personal-detail h3, .personal-detail p { margin: 0; }
 .personal-detail h3 { font-size: 1rem; color: #e9d6e4; }

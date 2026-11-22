@@ -32,6 +32,8 @@ interface MetaView {
   playPersonal(key: string, restart: boolean): void;
 }
 
+const personalShortLabels = { past: 'Рекорд', present: 'На время', future: 'Поле' };
+
 export function personalObjects(state: Workspace, key?: string) {
   const progress = state.personalProgress;
   const tasks = progress ? TASK_KINDS.flatMap(kind => {
@@ -505,11 +507,27 @@ export function renderMeta(v: MetaView): void {
         const icon = document.createElement('span');
         icon.className = 'personal-object';
         icon.setAttribute('aria-hidden', 'true');
-        icon.append(personalArt(task.kind));
+        const figure = personalArt(task.kind);
+        figure.addEventListener('click', event => {
+          const bounds = figure.getBoundingClientRect();
+          const x = Math.floor((event.clientX - bounds.left) * figure.width / bounds.width);
+          const y = Math.floor((event.clientY - bounds.top) * figure.height / bounds.height);
+          if (figure.getContext('2d')?.getImageData(x, y, 1, 1).data[3] === 0) event.stopPropagation();
+        });
+        icon.append(figure);
+        const taskName = personalTaskName(task);
+        const earned = progress.earned.includes(id);
+        object.setAttribute('aria-label', earned ? `${taskName}, выполнено` : taskName);
         const caption = document.createElement('strong');
-        caption.textContent = personalTaskName(task);
+        const full = document.createElement('span');
+        full.className = 'personal-caption-full';
+        full.textContent = taskName;
+        const short = document.createElement('span');
+        short.className = 'personal-caption-short';
+        short.textContent = personalShortLabels[task.kind];
+        caption.append(full, short);
         object.append(icon, caption);
-        if (progress.earned.includes(id)) {
+        if (earned) {
           const mark = document.createElement('small');
           mark.textContent = '✓ Выполнено';
           object.append(mark);
