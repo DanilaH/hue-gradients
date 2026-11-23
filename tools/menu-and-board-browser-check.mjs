@@ -74,7 +74,7 @@ async function tap(page, locator, paced = false) {
 
 async function swipe(page, client, dx, { pace = 0, cancel = false } = {}) {
   const box = await page.locator('.level-stage').boundingBox();
-  const x = box.x + box.width - 12, y = box.y + box.height * .56;
+  const x = box.x + (dx < 0 ? box.width - 12 : 12), y = box.y + box.height * .56;
   await client.send('Input.dispatchTouchEvent', {type: 'touchStart', touchPoints: [{x,y}]});
   for (let i = 1; i <= 12; i++) {
     const p = { x: x + dx * i / 12, y };
@@ -422,6 +422,153 @@ async function checkFirstWin(browser) {
   await writeFile(`${out}/first-win.json`,JSON.stringify(checked,null,2)+'\n');
 }
 
+async function checkLevelScale(browser, record) {
+  const output = '.test-output/pr17-review';
+  await mkdir(output,{recursive:true});
+  const views = [
+    { width:390, height:844, scale:100 },
+    { width:320, height:568, scale:100 },
+    { width:320, height:568, scale:150 },
+  ];
+  const initial = views[0];
+  const context = await browser.newContext({ viewport:{width:initial.width,height:initial.height}, hasTouch:true, isMobile:true });
+  const cleanContext = await browser.newContext({ viewport:{width:initial.width,height:initial.height}, hasTouch:true, isMobile:true });
+  const completed = [];
+  const selector = '.level-rail [aria-current=true]';
+  const select006 = page => page.locator('.level-rail [data-level-id="gradient-006"]');
+  const centered = page => page.waitForFunction(() => {
+    const active = document.querySelector('.level-rail [aria-current=true]');
+    const rail = active?.parentElement;
+    if (!rail || !active) return false;
+    const a = active.getBoundingClientRect(), r = rail.getBoundingClientRect();
+    return Math.abs((a.left + a.right) / 2 - (r.left + r.right) / 2) < 2;
+  });
+  const inView = (rect, view) => rect.x >= -1 && rect.y >= -1 &&
+    rect.x+rect.width <= view.width+1 && rect.y+rect.height <= view.height+1;
+
+  try {
+    const clean = await cleanContext.newPage(), progress = await context.newPage();
+    await clean.goto(base);
+    await ready(clean);
+    await clean.locator('#levels').tap();
+    assert.equal(await number(clean),'001');
+    assert.equal(await clean.locator('.level-preview circle').count(),2);
+    await prepared(progress);
+    await select006(progress).tap();
+    assert.equal(await number(progress),'006');
+
+    for (const { width,height,scale } of views) {
+      const view = { width,height };
+      for (const [page,id] of [[clean,'001'],[progress,'006']]) {
+        await page.setViewportSize(view);
+        await page.evaluate(scale => { document.documentElement.style.fontSize = scale + '%'; },scale);
+        if (id === '006') await centered(page);
+        const measure = await page.evaluate(() => {
+          const art = document.querySelector('.level-preview svg');
+          const bounds = node => node.getBoundingClientRect().toJSON();
+          const css = node => parseFloat(getComputedStyle(node).fontSize);
+          const matrix = art.getScreenCTM(), view = art.viewBox.baseVal;
+          const title = document.querySelector('.level-selection');
+          const active = document.querySelector('.level-rail [aria-current=true]');
+          const other = document.querySelector('.level-rail button:not([aria-current])');
+          const main = document.querySelector('[data-level-action]');
+          const links = [...document.querySelectorAll('.level-picker-links button')];
+          return { art: { width:matrix.a*view.width, height:matrix.d*view.height, x:matrix.e, y:matrix.f },
+            gap:title.getBoundingClientRect().top-matrix.f-matrix.d*view.height,
+            selected:css(active), other:css(other), key:bounds(active), rail:bounds(active.parentElement),
+            title:css(title.querySelector('span')), caption:css(links[1]), main:css(main),
+            boxes:[bounds(title),bounds(main),...links.map(bounds)],
+            overflow:document.querySelector('#game-dialog').scrollWidth > innerWidth };
+        });
+        const factor = scale/100;
+        assert.equal(measure.selected,26*factor);
+        assert.equal(measure.other,20*factor);
+        assert(measure.key.width>=56 && measure.key.height>=48);
+        assert(measure.key.left >= measure.rail.left - 1 && measure.key.right <= measure.rail.right + 1);
+        assert.equal(measure.title,18*factor);
+        assert.equal(measure.caption,15*factor);
+        assert.equal(measure.main,16*factor);
+        assert(inView(measure.art,view) && measure.boxes.every(rect => inView(rect,view)) && !measure.overflow, JSON.stringify({ id, view,scale,measure }));
+        assert(Math.abs(measure.art.width / measure.art.height - (id === '001' ? 4 : 1)) < .01);
+        if (id === '001') assert(measure.gap >= 24 && measure.gap <= 48, JSON.stringify({id,view,scale,measure}));
+        const filename = `level-${id}-${width}x${height}-${scale}.png`;
+        await page.screenshot({ path:`${output}/${filename}` });
+        completed.push({id,width,height,scale,filename,...measure});
+      }
+
+      if (width === 390 || scale === 150) {
+        await progress.locator('[data-open-chapters]').tap();
+        await progress.locator('[data-chapter="2"]').tap();
+        const note = progress.locator('.chapter-note');
+        assert.equal(await note.innerText(),'Соберите 10 работ главы 1');
+        const row = await progress.locator('[data-chapter="1"]').boundingBox();
+        const sign = await progress.locator('[data-chapter="1"] .chapter-symbol').boundingBox();
+        const finale = await progress.locator('[data-finale="1"]').boundingBox();
+        assert(row.height >= 84 && sign.width === 54 && finale.width >= 48);
+        const lockHint = await note.boundingBox();
+        assert(inView(lockHint,view));
+        await progress.screenshot({ path:`${output}/chapters-${width}x${height}-${scale}.png` });
+        await progress.keyboard.press('Escape');
+        assert.equal(await number(progress),'006');
+        assert(await menu(progress).isVisible());
+        assert(await progress.locator('[data-open-chapters]').evaluate(node => node === document.activeElement));
+      }
+    }
+
+    for (const [key,id] of [['Home','001'],['End','015']]) {
+      await progress.locator(selector).press(key);
+      assert.equal(await number(progress),id);
+      const selected = await progress.locator(selector).boundingBox();
+      const rail = await progress.locator('.level-rail').boundingBox();
+      assert(selected.x >= rail.x - 1 && selected.x+selected.width <= rail.x+rail.width+1);
+    }
+    await select006(progress).tap();
+    await centered(progress);
+    await progress.setViewportSize({width:568,height:320});
+    await centered(progress);
+    const landscape = await progress.locator('[data-level-action]').boundingBox();
+    assert(inView(landscape,{width:568,height:320}));
+  } finally { await context.close(); await cleanContext.close(); }
+
+  if (record) {
+    const viewport = { width:390,height:844 };
+    const takeContext = await browser.newContext({viewport,hasTouch:true,isMobile:true,recordVideo:{dir:output,size:viewport}});
+    const start = Date.now();
+    const page = await takeContext.newPage();
+    await prepared(page);
+    const take = Date.now();
+    await sleep(440);
+    const client = await takeContext.newCDPSession(page);
+    const expectSelection = id => page.waitForFunction(id => document.querySelector('.level-selection strong')?.textContent === id,id);
+    await tap(page,select006(page),true);
+    await expectSelection('006');
+    await sleep(500);
+    await swipe(page,client,-179,{pace:50});
+    await expectSelection('007');
+    await sleep(480);
+    await swipe(page,client,179,{pace:50});
+    await expectSelection('006');
+    await sleep(500);
+    await tap(page,page.locator('[data-open-chapters]'),true);
+    await tap(page,page.locator('[data-chapter="2"]'),true);
+    await sleep(860);
+    await tap(page,page.getByRole('button',{name:'‹ Назад',exact:true}),true);
+    await expectSelection('006');
+    assert(await page.locator('[data-open-chapters]').evaluate(node => node === document.activeElement));
+    await sleep(950);
+    const end = Date.now(), video = page.video();
+    await takeContext.close();
+    await video.saveAs(`${output}/route-raw.webm`);
+    execFileSync('ffmpeg',['-hide_banner','-loglevel','error','-y','-ss',((take-start)/1000).toFixed(3),
+      '-i',`${output}/route-raw.webm`,'-t',((end-take)/1000).toFixed(3),'-an','-c:v','libx264','-pix_fmt','yuv420p',
+      '-movflags','+faststart',`${output}/Poluson-0.4.45-levels-route.mp4`]);
+  }
+  const game = JSON.parse(await readFile('package.json','utf8'));
+  await writeFile(`${output}/measurements.json`,JSON.stringify({
+    version:game.version, browser:browser.version(), views:completed, edges:['001','015'], focusBack:'006', record,
+  },null,2)+'\n');
+}
+
 await mkdir(out, { recursive: true });
 let browser;
 try {
@@ -436,6 +583,7 @@ try {
   if (process.argv.includes('--board')) await boardEpisode(browser,record);
   else if (process.argv.includes('--routes')) await modeRoutes(browser,record);
   else if (process.argv.includes('--first-win')) await checkFirstWin(browser);
+  else if (process.argv.includes('--scale')) await checkLevelScale(browser,record);
   else {
     const viewport = { width: 390, height: 844 };
     const context = await browser.newContext({ viewport, hasTouch: true, isMobile: true,

@@ -1,5 +1,7 @@
 # Status — 21 November 2026
 
+**0.4.45 / 49, 23 November.** The PR #17 follow-up enlarges level numbers and chapter signs and groups the striped 001 preview with its title and action. The 001 and 006 browser matrix includes 320×568 at 150% text. [Measurements and captures](evidence/pr17-level-scale-0.4.45.md).
+
 **0.4.44 / 48, 23 November.** PR #16 has a continuous picker, a settings panel that preserves its source, a preview-to-board transition and touch feedback that holds the tile through transaction confirmation. Chromium covers 006, archive return, book progression and author-trial return. The signed preview inspector passed. [Results and Android acceptance remaining](evidence/pr16-menu-board-0.4.44.md).
 
 All 16 available A1–G1 checkpoints were rerun against `431f06d`. This includes 192 unit tests, the signed 0.4.25 payload in Chromium 92 and 153, 30 offline daily boards and 8 independently checked wallpaper PNGs. Live services and physical device acceptance are recorded separately. [Results](evidence/queue-regression-a1-g1-2026-11-21.json)

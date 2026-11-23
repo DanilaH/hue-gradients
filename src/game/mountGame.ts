@@ -86,6 +86,16 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   region.append(marker);
   const dialog = root.querySelector<HTMLDialogElement>('#game-dialog')!;
   const actions = root.querySelector<HTMLElement>('#dialog-actions')!;
+  function centerPickerRail(rail: HTMLElement): void {
+    const selected = rail.querySelector<HTMLElement>('[aria-current=true]');
+    if (!selected) return;
+    const offset = selected.getBoundingClientRect().left - rail.getBoundingClientRect().left;
+    rail.scrollLeft += offset - (rail.clientWidth - selected.offsetWidth) / 2;
+  }
+  const pickerRailSize = new ResizeObserver(([entry]) => {
+    const rail = entry?.target.closest<HTMLElement>('.level-rail');
+    if (rail?.isConnected) centerPickerRail(rail);
+  });
   const atmosphere = new Atmosphere(root), feedback = new GameFeedback(options.haptic), music = new AmbientMusic();
   const systemMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const motionAllowed = () => session.state.preferences.motion && !systemMotion.matches && !activity.isBlocked();
@@ -644,6 +654,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       closeMenuPreferences(false);
     }
     rememberAlbum();
+    pickerRailSize.disconnect();
     const switchLayer = dialog.dataset.layer !== layer;
     const menu = layer === 'meta' && isMenuList(metaRoute) ? metaRoute.kind : undefined;
     const switchMenu = dialog.dataset.menu !== menu;
@@ -889,6 +900,13 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     }
     syncVictoryActions();
     if (!dialog.open) { lastFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null; dialog.showModal(); }
+    const rail = actions.querySelector<HTMLElement>('.level-rail');
+    const railSelection = rail?.querySelector('[aria-current=true]');
+    if (rail && railSelection) {
+      centerPickerRail(rail);
+      pickerRailSize.observe(rail);
+      pickerRailSize.observe(railSelection);
+    }
     if (menu) {
       for (const node of actions.querySelectorAll<HTMLDetailsElement>('details[data-menu-disclosure]')) {
         node.open = openDisclosures.includes(node.dataset.menuDisclosure);
@@ -1197,7 +1215,13 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   }, { signal: listeners.signal, capture: true });
   dialog.addEventListener('cancel', event => { event.preventDefault(); if (!back()) { layer = 'none'; render(); } }, { signal: listeners.signal });
   window.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && layer === 'help' && !busy) { event.preventDefault(); layer = 'none'; render(); }
+    if (event.key !== 'Escape') return;
+    if (layer === 'meta' && metaRoute.kind === 'chapter' && metaRoute.chapterMenu !== undefined && !menuPreferences.open) {
+      event.preventDefault();
+      if (!event.repeat) back();
+    } else if (layer === 'help' && !busy) {
+      event.preventDefault(); layer = 'none'; render();
+    }
   }, { signal: listeners.signal });
   const observer = new ResizeObserver(resize); observer.observe(region);
   window.addEventListener('resize', resize, { signal: listeners.signal });
@@ -1238,5 +1262,5 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
         session.state.personalProgress?.day !== localCalendarDay()) void issuePersonal();
   }, 1000);
   await frame; ready = true; render(); resize();
-  return { back, destroy() { alive = false; boardEntry.stop(); preferencesFlight?.cancel(); printAnimation?.cancel(); clearTimeout(insertionTimer); clearInterval(clockTicker); clearInterval(personalTicker); clearMark(); editorView?.destroy(); workCard?.destroy(); stopVictory(); exportFiles.destroy?.(); listeners.abort(); observer.disconnect(); unblock(); atmosphere.destroy(); feedback.destroy(); music.destroy(); activity.setGameplayDesired(false); store.close(); destroyRenderer(game); } };
+  return { back, destroy() { alive = false; boardEntry.stop(); preferencesFlight?.cancel(); printAnimation?.cancel(); clearTimeout(insertionTimer); clearInterval(clockTicker); clearInterval(personalTicker); clearMark(); editorView?.destroy(); workCard?.destroy(); stopVictory(); exportFiles.destroy?.(); listeners.abort(); observer.disconnect(); pickerRailSize.disconnect(); unblock(); atmosphere.destroy(); feedback.destroy(); music.destroy(); activity.setGameplayDesired(false); store.close(); destroyRenderer(game); } };
 }

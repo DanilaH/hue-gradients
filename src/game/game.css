@@ -271,9 +271,9 @@ footer { min-height: 56px; padding: 2px 12px 6px; display: flex; gap: 10px; alig
 #game-dialog[data-picker=true] button { -webkit-tap-highlight-color: transparent; }
 #game-dialog[data-picker=true] h2 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); margin: 0; }
 #game-dialog[data-picker=true] #dialog-actions {
-  --picker-bottom: clamp(10px,7vh,64px);
-  min-height: 100%; grid-template-rows: auto minmax(145px,1fr) auto auto auto;
-  gap: 0; padding: 4px 0 var(--picker-bottom);
+  --picker-bottom: clamp(10px,3vh,24px);
+  min-height: 100%; grid-template-rows: auto minmax(min-content,1fr) auto auto;
+  gap: 6px; padding: 4px 0 var(--picker-bottom);
   background: linear-gradient(#160d26b0,transparent 19%,transparent 65%,#160d26ab 94%);
 }
 html[data-host=browser] #game-dialog[data-picker=true] #dialog-actions {
@@ -281,45 +281,76 @@ html[data-host=browser] #game-dialog[data-picker=true] #dialog-actions {
     max(var(--picker-bottom),env(safe-area-inset-bottom)) env(safe-area-inset-left);
 }
 .level-picker-nav { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px; width: min(100%,600px); margin: auto; padding: 0 12px; }
-.level-picker-nav button, button.level-chapter-link {
-  padding: 6px 8px; border-color: transparent; background: transparent; font-size: .875rem; text-shadow: 0 1px 4px #160e27;
+.level-picker-nav button {
+  min-height: 48px; padding: 6px 8px; border-color: transparent; border-radius: 0;
+  color: #fff2de; background: #281e35; font-size: .875rem; text-shadow: 0 1px 4px #160e27;
 }
+.level-picker-nav button:active:not(:disabled) { background: #43334e; }
+.level-hero { display: grid; align-self: center; gap: 12px; min-width: 0; padding-block: 4px; }
+.level-hero[data-strip=true] { --strip-width-limit: 58vh; gap: clamp(26px,3.6vh,36px); }
 .level-stage {
-  --field-width: min(80%,410px,58vh);
-  position: relative; width: min(100%,640px); justify-self: center; min-height: 145px;
-  overflow: hidden; touch-action: pan-y pinch-zoom; user-select: none;
+  --art-height-limit: max(108px,min(57vh,calc(100vh - 12.5rem - 55px)));
+  --field-width: min(80%,410px,var(--strip-width-limit,var(--art-height-limit)));
+  position: relative; width: min(100%,640px); justify-self: center; min-height: 48px;
+  overflow-x: clip; overflow-y: visible; touch-action: pan-y pinch-zoom; user-select: none;
 }
-.level-preview, .level-peek { position: absolute; top: 12%; width: var(--field-width); height: 88%; display: grid; place-items: center; }
-.level-preview { left: 50%; transform: translateX(-50%); }
-button.level-preview.quiet { padding: 0; border: 0; border-radius: 0; background: transparent; }
+/* Use the active SVG's aspect ratio to reserve the coloured height. Each neighbour has its own ratio. */
+.level-stage::before {
+  content: ''; display: block; width: var(--field-width); aspect-ratio: var(--work-aspect); max-height: var(--art-height-limit);
+}
+.level-track { position: absolute; inset: 0; }
+.level-preview, .level-peek {
+  position: absolute; top: 50%; width: var(--field-width); aspect-ratio: var(--card-aspect);
+  max-height: var(--art-height-limit); display: grid; place-items: center; transform: translateY(-50%);
+}
+.level-preview { left: 50%; transform: translate(-50%,-50%); }
+button.level-preview.quiet { min-height: 0; padding: 0; border: 0; border-radius: 0; background: transparent; }
 .level-stage .composition { height: 100%; min-height: 0; pointer-events: none; }
 .level-preview .composition-grid { filter: drop-shadow(0 9px 24px #0b08175e); }
 .level-peek-prev { right: calc(50% + var(--field-width) / 2 + 12px); }
 .level-peek-next { left: calc(50% + var(--field-width) / 2 + 12px); }
+.level-peek.level-locked { max-height: 100%; }
 .level-locked::before {
-  content: ''; width: min(100%,44vh); max-height: 100%; aspect-ratio: 1;
-  border: 1px solid var(--menu-line);
+  content: ''; width: 100%; height: 100%; border: 1px solid var(--menu-line);
   background: linear-gradient(135deg,#d0a9da13,#1e213b52), #262139;
 }
-.level-actions { min-height: 50px; display: grid; place-items: center; gap: 5px; padding: 6px 12px 0; }
-.level-selection { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 10px; margin: 0; }
-.level-selection strong { font-size: clamp(1.45rem,5.5vw,2.15rem); line-height: 1; font-variant-numeric: tabular-nums; }
-.level-selection span { color: var(--menu-secondary); font-size: .85rem; }
-.level-actions > button { width: min(78%,310px); font-weight: 550; }
+.level-actions { display: grid; place-items: center; gap: 7px; padding-inline: 12px; }
+.level-selection {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: min(100%,410px); margin: 0;
+}
+.level-selection strong { font-size: 1.65rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.level-selection span { min-width: 0; color: var(--menu-secondary); font-size: 1.125rem; line-height: 1.16; overflow-wrap: break-word; }
+.level-actions > button { width: min(88%,310px); border-radius: 0; font-size: 1rem; font-weight: 650; }
 .level-rail {
-  display: flex; width: min(100%,440px); justify-self: center; overflow-x: auto; padding: 5px 12px 0;
+  display: flex; width: min(100%,440px); justify-self: center; overflow-x: auto; padding-inline: 8px;
   scrollbar-width: none; overscroll-behavior-x: contain;
-  mask-image: linear-gradient(to right,transparent,#000 12px,#000 calc(100% - 12px),transparent);
 }
 .level-rail button {
-  flex: 0 0 48px; height: 48px; padding: 0; border: 0; border-radius: 0;
-  background: transparent; color: #f1e5f3; font-size: .875rem; font-variant-numeric: tabular-nums; text-shadow: 0 1px 4px #160e27;
+  flex: 0 0 3.5rem; min-width: 48px; min-height: max(56px,3rem); padding: 0;
+  border: 0; border-radius: 0; background: transparent; color: #f1e5f3; font-size: 1.25rem;
+  font-variant-numeric: tabular-nums; text-shadow: 0 1px 4px #160e27;
 }
 .level-rail button[data-status=Закрыт] { color: #daccde; }
-.level-rail button[data-status=Собран] { color: #eabed4; }
-.level-rail button[aria-current=true] { color: #fff2de; font-weight: 700; }
+.level-rail button[data-status=Собран] { color: #ffe2bb; }
+.level-rail button[aria-current=true] { color: #fff2de; font-weight: 750; font-size: 1.625rem; }
+.level-rail button:is([data-status=Закрыт],[data-status=Собран],[data-status=Начат])::after {
+  content: ''; position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
+  width: 5px; height: 5px; background: #ffdc9f;
+}
+.level-rail button[data-status=Закрыт]::after { width: 8px; height: 1px; background: #daccde; }
+.level-rail button[data-status=Начат]::after { background: transparent; border: 1px solid #ffdc9f; }
 .level-rail button:focus-visible { outline-offset: -4px; }
-.level-picker-links { display: flex; justify-content: center; flex-wrap: wrap; }
+.level-picker-links {
+  display: grid; grid-template-columns: repeat(3,minmax(0,1fr));
+  width: min(100% - 16px,440px); margin-inline: auto; gap: 6px;
+}
+button.level-chapter-link {
+  display: grid; place-content: center; gap: 2px; min-width: 0; padding: 6px 3px;
+  border: 0; border-radius: 0; background: #281e35; color: #fff2de;
+  font-size: .9375rem; line-height: 1.12; text-shadow: 0 1px 4px #160e27;
+}
+.level-chapter-count { color: var(--menu-secondary); font-size: .875em; font-variant-numeric: tabular-nums; }
 .book { display: grid; gap: 8px; padding-block: 12px; border-top: 1px solid var(--menu-line); }
 .book canvas { width: 100%; max-height: 108px; }
 .book h3, .book ul { margin: 0; }
@@ -392,7 +423,6 @@ html[data-host=browser] #game-dialog[data-menu] {
 .challenge-tabs button[aria-pressed=true] { color: #fff2de; border-color: #fae0d8; }
 #game-dialog[data-layer=result][data-challenge-lost=true] { display: flex; justify-content: end; padding-bottom: clamp(8px,5vh,38px); }
 #game-dialog[data-challenge-lost=true] #dialog-title { font-size: clamp(1.4rem,6vw,2.5rem); }
-.level-chapter-link::after { content: '›'; margin-left: .45em; }
 #game-dialog[data-chapter-menu=true] #dialog-actions {
   --picker-bottom: 10px; grid-template-rows: auto minmax(0,1fr) auto minmax(48px,1fr); gap: 8px;
 }
@@ -417,13 +447,13 @@ html[data-host=browser] #game-dialog[data-menu] {
   #game-dialog[data-menu] { --menu-top: 4px; --menu-bottom: 12px; gap: 6px; }
   #game-dialog[data-menu] #dialog-title { margin-top: 0; font-size: clamp(1.25rem,4vw,1.8rem); }
   #game-dialog[data-picker=true]:not([data-chapter-menu=true]) #dialog-actions {
-    grid-template-columns: repeat(2,minmax(0,1fr)); grid-template-rows: auto 1fr auto auto auto;
+    grid-template-columns: repeat(2,minmax(0,1fr)); grid-template-rows: auto minmax(min-content,1fr) auto auto auto;
     grid-template-areas: 'nav stage' '. stage' 'action stage' 'rail stage' 'chapters stage';
     --picker-bottom: 10px;
   }
   .level-picker-nav { grid-area: nav; }
-  .level-stage { --field-width: min(76%,82vh); grid-area: stage; }
-  .level-preview, .level-peek { top: 5%; height: 90%; }
+  .level-hero { display: contents; }
+  .level-stage { --field-width: min(76%,82vh); --art-height-limit: 82vh; grid-area: stage; align-self: center; }
   .level-actions { grid-area: action; }
   .level-rail { grid-area: rail; }
   .level-picker-links { grid-area: chapters; }
@@ -849,22 +879,25 @@ html[data-host=browser] .editor-panel {
 }
 #game-dialog[data-layer=preferences] .setting small { margin-left: auto; margin-right: 10px; color: #e6c5de; }
 
-/* Campaign picker, chapter overview and its modal preferences. */
-.level-track { position: absolute; inset: 0; }
-.level-picker-nav button { min-height: 48px; border-radius: 0; color: #fff2de; background: #281e35; }
-.level-picker-nav button:active:not(:disabled) { background: #43334e; }
-.level-selection { align-items: center; flex-wrap: nowrap; width: min(94%,360px); margin: auto; }
-.level-selection span { flex: 1; min-width: 0; text-align: left; font-size: .9rem; }
-.level-actions > button { border-radius: 0; }
-.level-rail button[aria-current=true] { box-shadow: inset 0 -2px #ffe0b0; }
-.level-picker-links { width: min(100% - 16px,440px); margin-inline: auto; gap: 6px; }
-button.level-chapter-link { flex: 1; border: 0; border-radius: 0; padding-inline: 5px; background: #281e35; }
-.level-chapter-link::after { content: none; }
+/* Chapter overview and modal preferences. */
 #game-dialog[data-chapter-menu=true] #dialog-actions {
   width: min(100%,560px); margin-inline: auto; grid-template-rows: auto auto auto; align-content: start;
 }
 #game-dialog[data-chapter-menu=true] :is(.chapter-strips,.chapter-progress) { margin: 6px 12px 0; }
-#game-dialog[data-chapter-menu=true] .chapter-note { grid-row: auto; min-height: 1.5em; }
+#game-dialog[data-chapter-menu=true] .chapter-note { grid-row: auto; min-height: 1.5em; font-size: 1rem; }
+#game-dialog[data-chapter-menu=true] .chapter-strip {
+  --chapter-symbol-width: 54px;
+  grid-template-columns: minmax(0,1fr) 56px; gap: 5px;
+}
+#game-dialog[data-chapter-menu=true] .chapter-strip button {
+  min-height: max(84px,4.25rem); padding-block: 10px; font-size: 1.125rem;
+}
+#game-dialog[data-chapter-menu=true] .chapter-strip button[data-chapter] {
+  grid-template-columns: var(--chapter-symbol-width) minmax(0,1fr); column-gap: 8px;
+}
+#game-dialog[data-chapter-menu=true] .chapter-strip button[data-finale] { font-size: 1.45rem; }
+#game-dialog[data-chapter-menu=true] .chapter-symbol { width: var(--chapter-symbol-width); }
+#game-dialog[data-chapter-menu=true] .chapter-pieces span { height: 16px; }
 .chapter-strip button[data-chapter] {
   grid-template-columns: 46px minmax(0,1fr); align-items: center; background: #2b2139; border-radius: 0;
 }
@@ -884,7 +917,7 @@ button.level-chapter-link { flex: 1; border: 0; border-radius: 0; padding-inline
 }
 .chapter-symbol::after { content: ''; position: absolute; inset: 0; background: var(--chapter-palette); clip-path: inset(calc(100% - var(--chapter-coloured)) 0 0); }
 [data-locked=true] .chapter-symbol { background: #776a81; }
-.chapter-progress { border-radius: 0; }
+.chapter-progress { border-radius: 0; font-size: 1rem; }
 #menu-preferences {
   inset: 0 0 0 auto; margin: 0; width: min(92vw,390px); height: 100%; max-height: none; padding: 14px 16px;
   border: 0; overflow: auto; color: #fff2de; background: #292137; box-shadow: -6px 0 30px #0e091a6b;
@@ -902,8 +935,6 @@ button.level-chapter-link { flex: 1; border: 0; border-radius: 0; padding-inline
 .menu-preference-rows input { margin: 0; }
 @media (max-width: 360px) or (max-height: 620px) {
   #game-dialog[data-picker=true] #dialog-actions { --picker-bottom: 10px; }
-  .level-picker-links { flex-wrap: nowrap; }
-  button.level-chapter-link { font-size: .72rem; }
 }
 .board-entry { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
 [data-board-entry=true] #board-region canvas { visibility: hidden; }

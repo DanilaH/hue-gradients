@@ -10,6 +10,8 @@ Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and
 
 ## Current slice
 
+The audit in PR #17 is addressed in 0.4.45 on `feat/menu-and-board-feel`. Compare 001 and 006 on the three browser configurations, then check readability on the physical phone. [Measurements and the recorded route](evidence/pr17-level-scale-0.4.45.md).
+
 PR #16 is implemented on `feat/menu-and-board-feel` from `feat/m0-foundation` at `92e581a`. Start the next review with the 20-second picker and the 006 contact recording. Android touch, OS Back, sound and haptics remain open for the signed `preview3` APK 0.4.44 / 48. [Evidence](evidence/pr16-menu-board-0.4.44.md).
 
 PR #14 follow-up in 0.4.43 covers the three-object Personal Tasks screen at 320×568 with browser text set to 150%. Empty-stage touch preserves the selection. The figure and its caption select the task. Side captions are compact and the selected task keeps its full name and visible launch control. [Browser evidence](evidence/pr14-personal-follow-up-0.4.43.json).

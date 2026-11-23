@@ -124,12 +124,16 @@ function levelRequirement(state: Workspace, level: LevelDefinition): string {
 function chapterStrips(v: MetaView, selected: number | undefined, choose: (index: number) => void): HTMLElement {
   const strips = document.createElement('div'); strips.className = 'chapter-strips';
   const hint = document.createElement('p'); hint.className = 'chapter-note'; hint.setAttribute('aria-live','polite');
+  const showRequirement = (text: string) => {
+    hint.textContent = text;
+    hint.scrollIntoView({ block:'nearest' });
+  };
   chapters.forEach((chapter, index) => {
     const open = chapterIsOpen(v.state,index);
     const caption = pickChapter(v.state,index);
     const strip = document.createElement('div'); strip.className = 'chapter-strip';
     strip.dataset.chapterStrip = String(index+1);
-    const select = actionButton(strip, caption, () => open ? choose(index) : hint.textContent = chapterRequirement(index), v.disabled);
+    const select = actionButton(strip, caption, () => open ? choose(index) : showRequirement(chapterRequirement(index)), v.disabled);
     select.dataset.chapter = String(index+1); select.dataset.locked = String(!open);
     select.setAttribute('aria-label',caption+(open ? '' : ', закрыта'));
     if (selected === index) select.setAttribute('aria-current','true');
@@ -153,7 +157,7 @@ function chapterStrips(v: MetaView, selected: number | undefined, choose: (index
     const best = v.state.challengeProgress?.best[finale.level.id];
     const saved = v.state.challengeProgress?.attempts[finale.level.id];
     const mark = actionButton(strip, best === undefined ? '◇' : '◆', () => {
-      if (!finaleOpen) { hint.textContent = `Финал главы ${index+1} откроется после ${chapter.levelIds.length} работ`; return; }
+      if (!finaleOpen) { showRequirement(`Финал главы ${index+1} откроется после ${chapter.levelIds.length} работ`); return; }
       v.playChallenge(finale.level.id, !!saved && challengeStatus(finale,saved) !== 'playing',undefined, v.route.kind === 'progress' ? 'progress' : undefined);
     },v.disabled);
     mark.dataset.finale = String(index+1);
@@ -248,6 +252,7 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
 
   v.title.textContent = 'Уровни';
   const position = chapter.levelIds.indexOf(route.levelId);
+  const selectedLevel = getLevel(route.levelId);
   const selectedState = pickerState(state, route.levelId);
   const rail = document.createElement('div'); rail.className = 'level-rail';
   rail.setAttribute('role', 'group'); rail.setAttribute('aria-label', 'Номера уровней');
@@ -255,16 +260,21 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
     const levelId = chapter.levelIds[next];
     if (levelId && next !== position && !v.disabled) moveTo({ kind: 'chapter', levelId }, '[aria-current=true][data-level-id]');
   };
-  const stage = document.createElement('div'); stage.className = 'level-stage'; actions.append(stage);
+  const hero = document.createElement('div'); hero.className = 'level-hero'; actions.append(hero);
+  hero.dataset.strip = String(selectedLevel.width >= 2 * selectedLevel.height);
+  const stage = document.createElement('div'); stage.className = 'level-stage'; hero.append(stage);
+  stage.style.setProperty('--work-aspect', `${selectedLevel.width} / ${selectedLevel.height}`);
   const track = document.createElement('div'); track.className = 'level-track'; stage.append(track);
   const label = selectedState === 'Собран' ? 'Повторить' : selectedState === 'Начат' ? 'Продолжить' : 'Играть';
   const activate = () => (selectedState === 'Собран' ? v.repeat : v.play)(route.levelId);
   let center: HTMLButtonElement | undefined;
   function boardAt(id: string, style: string, selected = false): void {
     const model = levelPreview(state, id);
+    const level = getLevel(id);
     const slot = document.createElement(selected && model ? 'button' : 'div');
     slot.className = style;
     slot.dataset.pickerWork = id;
+    slot.style.setProperty('--card-aspect', `${level.width} / ${level.height}`);
     if (slot instanceof HTMLButtonElement) {
       center = slot;
       slot.classList.add('quiet');
@@ -276,7 +286,7 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
     } else slot.setAttribute('aria-hidden', 'true');
     track.append(slot);
     if (!model) { slot.classList.add('level-locked'); return; }
-    const { level, board } = model;
+    const { board } = model;
     slot.append(preview(level, false, board ?? undefined, selected && board ? level.pinnedPositions : []));
   }
   const previous = chapter.levelIds[position - 1], next = chapter.levelIds[position + 1];
@@ -344,18 +354,18 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
         center?.contains(document.elementFromPoint(event.clientX, event.clientY))) activate();
     }
   };
-  const details = document.createElement('div'); details.className = 'level-actions'; actions.append(details);
+  const details = document.createElement('div'); details.className = 'level-actions'; hero.append(details);
   const selection = document.createElement('p');
   selection.className = 'level-selection';
   const number = document.createElement('strong');
-  number.textContent = String(getLevel(route.levelId).ordinal).padStart(3, '0');
-  const status = document.createElement('span');
-  status.textContent = getLevel(route.levelId).title;
-  selection.append(number, status);
+  number.textContent = String(selectedLevel.ordinal).padStart(3, '0');
+  const title = document.createElement('span');
+  title.textContent = selectedLevel.title;
+  selection.append(number, title);
   details.append(selection);
   if (selectedState === 'Закрыт') {
     const requirement = document.createElement('p'); requirement.className = 'chapter-note';
-    requirement.textContent = levelRequirement(state,getLevel(route.levelId)); details.append(requirement);
+    requirement.textContent = levelRequirement(state,selectedLevel); details.append(requirement);
   } else button(label, activate, details).dataset.levelAction = '';
   actions.append(rail);
   chapter.levelIds.forEach((id, number) => {
@@ -373,17 +383,19 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
     const nextPosition = offsets[event.key];
     if (Number.isInteger(nextPosition)) { event.preventDefault(); select(nextPosition!); }
   };
-  requestAnimationFrame(() => {
-    if (!rail.isConnected) return;
-    const active = rail.querySelector<HTMLElement>('[aria-current=true]')!;
-    rail.scrollLeft += active.getBoundingClientRect().left - rail.getBoundingClientRect().left - (rail.clientWidth - active.offsetWidth) / 2;
-  });
   const links = document.createElement('div');
   links.className = 'level-picker-links';
   actions.append(links);
   const chapterLink = button(pickChapter(state,index), () => moveTo({ ...route, chapterMenu: index }, '[aria-current=true][data-chapter]'), links);
   chapterLink.className = 'quiet level-chapter-link';
   chapterLink.dataset.openChapters = '';
+  chapterLink.setAttribute('aria-label', pickChapter(state,index));
+  const chapterName = document.createElement('span');
+  chapterName.textContent = `Глава ${index + 1}`;
+  const count = document.createElement('span');
+  count.className = 'level-chapter-count';
+  count.textContent = `${chapterCount(state,index)}/${chapter.levelIds.length}`;
+  chapterLink.replaceChildren(chapterName, count);
   button('Режимы', () => v.navigate({ kind: 'modes' }), links).className = 'quiet level-chapter-link';
   button('Альбом', () => v.navigate({ kind: 'album', tab: 'campaign' }), links).className = 'quiet level-chapter-link';
 }
