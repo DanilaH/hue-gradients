@@ -1,7 +1,7 @@
 {
   "schema": "consumer-adoption-ledger-v1",
   "consumerCommit": "7b8200062ab6398980827fd27d884506ca3eb786",
-  "asOf": "2026-11-21",
+  "asOf": "2026-11-23",
   "features": [
     {
       "id": "h1-swap",
@@ -127,22 +127,22 @@
     {
       "id": "h1-rate-grace",
       "status": "ROADMAPPED",
-      "gap": "UNKNOWN",
+      "gap": "PARTIAL",
       "stage": "Пакет 08",
-      "currentImplementation": "Привязка поставленного значения к исполненному сценарию не проверена. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md",
-      "nextAction": "Реализовать соответствующий пункт пакета 08 и проверить приёмку из FULL_ROADMAP.md. Подтвердить границу источника: Проследить вызовы в Lua; проверить таймер до и после оценки.",
+      "currentImplementation": "Адаптер ждёт completed и выставляет 180 секунд активного времени. Оригинал по пути магазин / письмо выставляет 600 секунд настенных часов после открытия системного окна. | https://github.com/DanilaH/hue-gradients/blob/92e581a641f7969b7f869a7db49a08bbbecf1d72/src/app/monetizationClient.ts#L123",
+      "nextAction": "Пакет 08. В контрактных тестах разделить открытие магазина, письмо, «позже» и ответ платформы. Параметры действующей политики Полусна сохраняют силу до выбора владельца.",
       "deliveryPackage": "08",
-      "sourceNextCheck": "Проследить вызовы в Lua; проверить таймер до и после оценки."
+      "sourceNextCheck": "На устройстве проверить открытие и отмену оценки, открытие и отмену письма. Сопоставить таймер и видимое возвращение. | https://github.com/DanilaH/mini-games-kit/blob/cf7cffc48b4925a897c6613949c771d3325713bb/research/games/hue/porting/COLOR_AND_AD_TRIGGERS_2026-11-23.md#h1-rate-grace"
     },
     {
       "id": "h1-reward-grace",
       "status": "ROADMAPPED",
-      "gap": "UNKNOWN",
+      "gap": "PARTIAL",
       "stage": "Пакет 08",
-      "currentImplementation": "В оригинале проверена настройка, применение в живой сессии открыто. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md",
-      "nextAction": "Реализовать соответствующий пункт пакета 08 и проверить приёмку из FULL_ROADMAP.md. Подтвердить границу источника: После тестовой награды снять состояние nextAdTime.",
+      "currentImplementation": "Адаптер выставляет 180 секунд активного времени после успешного зачисления награды. Оригинал выставляет 300 секунд при возврате из запроса загруженного ролика и отдельно обрабатывает выдачу награды. | https://github.com/DanilaH/hue-gradients/blob/92e581a641f7969b7f869a7db49a08bbbecf1d72/src/app/monetizationClient.ts#L78",
+      "nextAction": "Пакет 08. Развести причину отсрочки и квитанцию награды в тестах. Покрыть готовый и незагруженный ролик, закрытие без награды, дублированный callback, соседнюю отсрочку после оценки.",
       "deliveryPackage": "08",
-      "sourceNextCheck": "После тестовой награды снять состояние nextAdTime."
+      "sourceNextCheck": "На устройстве запросить готовый ролик, закрыть без награды и проверить срок. Повторить с выдачей награды и с недоступным роликом. | https://github.com/DanilaH/mini-games-kit/blob/cf7cffc48b4925a897c6613949c771d3325713bb/research/games/hue/porting/COLOR_AND_AD_TRIGGERS_2026-11-23.md#h1-reward-grace"
     },
     {
       "id": "h1-local-resume",
@@ -458,12 +458,12 @@
     {
       "id": "h2-remove-prompt",
       "status": "ROADMAPPED",
-      "gap": "UNKNOWN",
+      "gap": "MISSING",
       "stage": "Пакет 08",
-      "currentImplementation": "В игре нет реализованного предложения. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/MONETIZATION_SPEC_0_1.md",
-      "nextAction": "Реализовать соответствующий пункт пакета 08 и проверить приёмку из FULL_ROADMAP.md. Подтвердить границу источника: Проследить счетчик prompt и вызов магазина прежде чем формулировать оффер.",
+      "currentImplementation": "Есть право removeAds и учёт запросов, но в модели нет счётчика успешных показов и предложения на экране выбора уровня при совпадении с порогом. | https://github.com/DanilaH/hue-gradients/blob/92e581a641f7969b7f869a7db49a08bbbecf1d72/src/domain/monetization.ts#L13",
+      "nextAction": "Пакет 08. Разделить запрос и успешный показ. Проверить два перехода кампании на счёте 4→5 и 5→6, отрицательный результат при сохранённом 5. Применить наше оформление и запуск покупки только по действию игрока.",
       "deliveryPackage": "08",
-      "sourceNextCheck": "Проследить счетчик prompt и вызов магазина прежде чем формулировать оффер."
+      "sourceNextCheck": "Записать оба перехода оригинала на устройстве с тестовым провайдером. Зафиксировать текст, кнопки, момент появления и закрытие. | https://github.com/DanilaH/mini-games-kit/blob/cf7cffc48b4925a897c6613949c771d3325713bb/research/games/hue/porting/COLOR_AND_AD_TRIGGERS_2026-11-23.md#h2-remove-prompt"
     },
     {
       "id": "cp-fixed-start",
@@ -880,10 +880,10 @@
       "status": "ROADMAPPED",
       "gap": "UNKNOWN",
       "stage": "Пакет 04",
-      "currentImplementation": "У нас близость используется как предупреждение редактора. Называть это адаптивной сложностью оригинала нельзя. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/editor.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 04 и проверить приёмку из FULL_ROADMAP.md. Подтвердить границу источника: Найти места чтения поля и их связь с выдачей до постановки задачи про адаптацию.",
+      "currentImplementation": "Редактор рассчитывает минимум OKLab между подвижными плитками и выдаёт CLOSE_COLORS_REVIEW при d < 0,025. В оригинале найден минимум после применения палитры. Влияние на выдачу не установлено. | https://github.com/DanilaH/hue-gradients/blob/92e581a641f7969b7f869a7db49a08bbbecf1d72/src/domain/editor.ts#L113",
+      "nextAction": "Пакет 04. Сохранить проверку редактора и её тесты. Для постановки адаптивной выдачи требуется обнаружить чтение метрики, меняющее поле или палитру.",
       "deliveryPackage": "04",
-      "sourceNextCheck": "Найти места чтения поля и их связь с выдачей до постановки задачи про адаптацию."
+      "sourceNextCheck": "Записать обращения к полю BoardPalette +112 при открытии фиксированных campaign и daily. При чтении проследить решение, индекс уровня и ключ палитры. | https://github.com/DanilaH/mini-games-kit/blob/cf7cffc48b4925a897c6613949c771d3325713bb/research/games/hue/porting/COLOR_AND_AD_TRIGGERS_2026-11-23.md#h2-perceptual"
     },
     {
       "id": "h1-share-scores",
@@ -896,7 +896,7 @@
       "sourceNextCheck": "На выборе своей механики определить допустимые попытки и отдельно проверить равенство ориентиру."
     }
   ],
-  "sourceInventory": "https://github.com/DanilaH/mini-games-kit/blob/0353273fb37b329611951e4500dd6d7cba6690ac/research/games/hue/porting/SOURCE_FEATURES.json",
-  "method": "Пакет 01 проверен на 0.4.11 и перенесён в feat/m0-foundation. Пакет 02 обновлён по 0.4.12. Остальные расхождения отражают срез 0.4.10. IMPLEMENTED_UNVERIFIED оставляет приёмку на телефоне открытой.",
+  "sourceInventory": "https://github.com/DanilaH/mini-games-kit/blob/cf7cffc48b4925a897c6613949c771d3325713bb/research/games/hue/porting/SOURCE_FEATURES.json",
+  "method": "Пакет 01 проверен на 0.4.11 и перенесён в feat/m0-foundation. Пакет 02 обновлён по 0.4.12. Остальные расхождения отражают срез 0.4.10. IMPLEMENTED_UNVERIFIED оставляет приёмку на телефоне открытой. 23 ноября четыре строки (h2-perceptual, h1-rate-grace, h1-reward-grace, h2-remove-prompt) отдельно сверены по коду 0.4.43 на 92e581a641f7969b7f869a7db49a08bbbecf1d72. Остальные строки сохраняют прежние срезы.",
   "ownerScope": "20.11.2026, после аудита 0.4.10: «это всё делать надо». Весь реестр включён в программу разработки. Более конкретные решения: бесплатные попытки, одни плавные обои на работу, cloud M5 на паузе. Формулировки прежнего аудита «кандидат» отражают предыдущий статус."
 }
