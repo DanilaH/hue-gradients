@@ -1,6 +1,7 @@
 import { chapters, getLevel, levels } from '../domain/levels';
 import { chapterCount, chapterIndexFor, chapterIsOpen, levelIsOpen, META_POLICY, recommendedLevel } from '../domain/progression';
 import { canSwap, type LevelDefinition } from '../domain/puzzle';
+import { makeField } from '../domain/editor';
 import type { BookTarget, Workspace } from '../domain/workspace';
 import type { AlbumRoute } from './albumView';
 import { chapterChallenges, challengeAvailable, challenges, challengeStatus, geometryChallenges } from '../domain/challenges';
@@ -262,6 +263,14 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
   };
   const hero = document.createElement('div'); hero.className = 'level-hero'; actions.append(hero);
   hero.dataset.strip = String(selectedLevel.width >= 2 * selectedLevel.height);
+  const selection = document.createElement('p');
+  selection.className = 'level-selection';
+  const number = document.createElement('strong');
+  number.textContent = String(selectedLevel.ordinal).padStart(3, '0');
+  const title = document.createElement('span');
+  title.textContent = selectedLevel.title;
+  selection.append(number, title);
+  hero.append(selection);
   const stage = document.createElement('div'); stage.className = 'level-stage'; hero.append(stage);
   stage.style.setProperty('--work-aspect', `${selectedLevel.width} / ${selectedLevel.height}`);
   const track = document.createElement('div'); track.className = 'level-track'; stage.append(track);
@@ -355,14 +364,6 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
     }
   };
   const details = document.createElement('div'); details.className = 'level-actions'; hero.append(details);
-  const selection = document.createElement('p');
-  selection.className = 'level-selection';
-  const number = document.createElement('strong');
-  number.textContent = String(selectedLevel.ordinal).padStart(3, '0');
-  const title = document.createElement('span');
-  title.textContent = selectedLevel.title;
-  selection.append(number, title);
-  details.append(selection);
   if (selectedState === 'Закрыт') {
     const requirement = document.createElement('p'); requirement.className = 'chapter-note';
     requirement.textContent = levelRequirement(state,selectedLevel); details.append(requirement);
@@ -396,12 +397,15 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
   count.className = 'level-chapter-count';
   count.textContent = `${chapterCount(state,index)}/${chapter.levelIds.length}`;
   chapterLink.replaceChildren(chapterName, count);
-  button('Режимы', () => v.navigate({ kind: 'modes' }), links).className = 'quiet level-chapter-link';
+  const modes = button('Режимы', () => v.navigate({ kind: 'modes' }), links);
+  modes.className = 'quiet level-chapter-link';
+  modes.dataset.openModes = '';
   button('Альбом', () => v.navigate({ kind: 'album', tab: 'campaign' }), links).className = 'quiet level-chapter-link';
 }
 
 const russianDate = new Intl.DateTimeFormat('ru', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 export const dailyLabel = (date: string): string => russianDate.format(new Date(`${date}T00:00:00Z`));
+const shortDate = new Intl.DateTimeFormat('ru', { day: 'numeric', month: 'long', timeZone: 'UTC' });
 
 function menuRow(row: HTMLButtonElement, title: string, description: string, status?: string,
   colours?: readonly string[]): void {
@@ -438,6 +442,73 @@ function menuRow(row: HTMLButtonElement, title: string, description: string, sta
   }
 }
 
+function renderModes(v: MetaView): void {
+  const { state, actions } = v;
+  const gallery = document.createElement('div');
+  gallery.className = 'mode-gallery';
+  actions.append(gallery);
+
+  const calendar = document.createElement('span');
+  calendar.className = 'mode-calendar';
+  const day = calendarSelection(state).selected;
+  const daily = day ? state.dailyProgress?.slots[day] : undefined;
+  if (daily) {
+    calendar.append(preview(daily.level));
+    calendar.dataset.date = daily.date;
+  }
+  const dayCaption = daily
+    ? `${daily.date === state.dailyProgress!.through ? '' : 'Архив · '}${shortDate.format(new Date(`${daily.date}T00:00:00Z`))}`
+    : v.dailyLoading ? 'Загрузка календаря…' : 'Календарь и архив';
+
+  const objects = document.createElement('span');
+  objects.className = 'mode-objects';
+  for (const kind of TASK_KINDS) objects.append(personalArt(kind));
+
+  // The public Shapes set is available from the outset. Chapter secrets stay in their own route.
+  const figure = geometryChallenges.find(item => item.level.id === 'geometry-v1-mixed')!;
+  const shape = preview(figure.level);
+  shape.classList.add('mode-shape');
+
+  const work = Object.values(state.creative?.works ?? {}).at(-1);
+  const field = work?.nodes[work.headNodeId]?.field ?? makeField();
+  const canvas = document.createElement('span');
+  canvas.className = 'mode-canvas';
+  canvas.append(gradientThumbnail(field));
+  for (const colour of field.cornerColorsTLTRBLBR) {
+    const corner = document.createElement('span');
+    corner.className = 'mode-corner';
+    corner.style.backgroundColor = colour;
+    canvas.append(corner);
+  }
+
+  const entries = [
+    ['daily', 'Задача дня', dayCaption, calendar],
+    ['personal', 'Личные задания', 'Рекорд · время · поле', objects],
+    ['challenges', 'Испытания', 'Фигуры, лимит и заезд', shape],
+    ['editor-home', 'Редактор', work?.name ?? 'Создать работу', canvas],
+  ] as const;
+  for (const [kind, title, caption, art] of entries) {
+    const card = actionButton(gallery, '', () => v.navigate({ kind }), v.disabled);
+    card.className = 'quiet mode-card';
+    card.dataset.modeEntry = kind;
+    card.setAttribute('aria-label', title);
+    const artFrame = document.createElement('span');
+    artFrame.className = 'mode-art';
+    artFrame.setAttribute('aria-hidden', 'true');
+    artFrame.append(art);
+    const text = document.createElement('span');
+    text.className = 'mode-caption';
+    const name = document.createElement('strong');
+    name.textContent = title;
+    const detail = document.createElement('small');
+    detail.textContent = caption;
+    detail.id = `mode-caption-${kind}`;
+    card.setAttribute('aria-describedby', detail.id);
+    text.append(name, detail);
+    card.append(artFrame, text);
+  }
+}
+
 export function renderMeta(v: MetaView): void {
   const { state, route, actions } = v;
   actions.dataset.meta = route.kind;
@@ -451,21 +522,7 @@ export function renderMeta(v: MetaView): void {
   } else if (route.kind === 'modes') {
     v.title.textContent = 'Режимы';
     menuBack();
-    const day = calendarSelection(state).selected;
-    const daily = day ? state.dailyProgress?.slots[day] : undefined;
-    const draft = Object.values(state.creative?.works ?? {}).at(-1);
-    const draftColours = draft?.nodes[draft.headNodeId]?.field.solvedTileColors;
-    const modeEntry = (kind: 'daily' | 'personal' | 'challenges' | 'editor-home', title: string,
-      caption: string, colours?: readonly string[]) => {
-      const row = button('', () => v.navigate({ kind }));
-      row.dataset.modeEntry = kind;
-      row.setAttribute('aria-label', title);
-      menuRow(row, title, caption, undefined, colours);
-    };
-    modeEntry('daily', 'Задача дня', daily ? dailyLabel(daily.date) : 'Календарь и архив', daily?.level.solvedTileColors);
-    modeEntry('personal', 'Личные задания', '');
-    modeEntry('challenges', 'Испытания', 'Лимит ходов, фигуры и заезд', geometryChallenges[0]?.level.solvedTileColors);
-    modeEntry('editor-home', 'Редактор', draft?.name ?? 'Создать работу', draftColours);
+    renderModes(v);
   } else if (route.kind === 'editor-home') {
     v.title.textContent = 'Редактор';
     menuBack();

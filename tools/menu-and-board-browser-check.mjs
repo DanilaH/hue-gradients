@@ -363,6 +363,159 @@ async function modeRoutes(browser, record) {
   } finally { await context.close(); }
 }
 
+async function modeGalleryEpisode(browser, record) {
+  const output = '.test-output/pr19';
+  const viewport = { width: 390, height: 844 };
+  const narrow = { width: 320, height: 568 };
+  await mkdir(output, { recursive: true });
+  const layouts = [];
+  const route = [];
+  const errors = [];
+  const calendarDate = '2026-11-23';
+  const seedCalendar = page => page.evaluate(async date => {
+    const { Session } = await import('/src/app/session.ts');
+    const { openIndexedDb } = await import('/src/local-store/indexed-db.ts');
+    const { getLevel, levels } = await import('/src/domain/levels.ts');
+    const { DAILY_CONTENT_VERSION } = await import('/src/domain/puzzle.ts');
+    const { hashText } = await import('/src/local-store/command.ts');
+    const { fingerprintPayload } = await import('/src/domain/workspace.ts');
+    const level = { ...getLevel('gradient-012'), id: `daily-${date}`, contentVersion: DAILY_CONTENT_VERSION };
+    const store = await openIndexedDb();
+    try {
+      const session = new Session(store, new Map(await Promise.all(levels.map(item =>
+        hashText(fingerprintPayload(item)).then(hash => [item.id, hash])))));
+      await session.load();
+      await session.act({ kind: 'daily-cache', feed: {
+        source: 'Calendar test fixture', version: 'art-review-v1', verifiedNowMs: Date.parse(`${date}T12:00:00Z`),
+        days: [{ date, level }],
+      } });
+    } finally { store.close(); }
+    return level.solvedTileColors;
+  }, calendarDate);
+  const openModes = page => press(page, 'Режимы');
+  const card = (page, id) => page.locator(`[data-mode-entry="${id}"]`);
+  for (const view of [viewport, narrow]) {
+    const context = await browser.newContext({ viewport: view, hasTouch: true, isMobile: true, reducedMotion: 'reduce' });
+    try {
+      const page = await context.newPage();
+      page.on('pageerror', error => errors.push(error.message));
+      await prepared(page);
+      await openModes(page);
+      assert.equal(await card(page, 'daily').locator('svg').count(), 0, 'Empty calendar has no invented work');
+      assert.equal(await card(page, 'personal').locator('canvas').count(), 3);
+      assert.equal(await card(page, 'editor-home').locator('.mode-corner').count(), 4);
+      assert(await card(page, 'challenges').locator('.mode-shape polygon').count() > 4);
+      await press(page, '‹ Назад');
+      const expectedArt = await seedCalendar(page);
+      await page.reload();
+      await ready(page);
+      if (await page.locator('#game-dialog[data-layer=result]').isVisible()) await page.keyboard.press('Escape');
+      await page.locator('#levels').tap();
+      await openModes(page);
+      assert.deepEqual(await card(page, 'daily').locator('svg rect').evaluateAll(cells =>
+        cells.map(cell => cell.getAttribute('fill'))), expectedArt);
+      const measured = await page.locator('.mode-gallery').evaluate(gallery => [...gallery.querySelectorAll('button')].map(button => {
+        const { x, y, width, height } = button.getBoundingClientRect();
+        const clickable = [[.5,.5], [.15,.3], [.85,.8]].every(([px,py]) =>
+          button.contains(document.elementFromPoint(x + width*px, y + height*py)));
+        return { mode: button.dataset.modeEntry, x, y, width, height, clickable,
+          font: parseFloat(getComputedStyle(button.querySelector('strong')).fontSize) };
+      }));
+      assert.equal(measured.length, 4);
+      for (const item of measured) {
+        assert(item.clickable && item.width >= 48 && item.height >= 48 && item.font === 16 &&
+          item.x >= 0 && item.x+item.width <= view.width && item.y >= 0 && item.y+item.height <= view.height,
+        JSON.stringify({ view, item }));
+      }
+      assert.equal(await page.locator('html').evaluate(el => getComputedStyle(el).fontSize), '16px');
+      await page.screenshot({ path: `${output}/modes-${view.width}x${view.height}.png` });
+      for (const item of measured) {
+        await page.touchscreen.tap(item.x+item.width/2, item.y+item.height/3);
+        await page.locator(`#game-dialog[data-menu="${item.mode}"]`).waitFor();
+        if (item.mode === 'daily') {
+          await page.locator(`[data-daily-play="${calendarDate}"]`).waitFor();
+        }
+        await press(page, '‹ Назад');
+        assert(await card(page, item.mode).evaluate(node => node === document.activeElement));
+      }
+      await press(page, '‹ Назад');
+      assert.equal(await number(page), '005');
+      assert(await page.locator('[data-open-modes]').evaluate(node => node === document.activeElement));
+      layouts.push({ viewport: view, cards: measured, calendarDate, returnedTo: '005' });
+    } finally { await context.close(); }
+  }
+
+  const context = await browser.newContext({ viewport, hasTouch: true, isMobile: true,
+    ...(record ? { recordVideo: { dir: output, size: viewport } } : {}) });
+  try {
+    const page = await context.newPage();
+    const started = Date.now();
+    page.on('pageerror', error => errors.push(error.message));
+    await prepared(page);
+    await seedCalendar(page);
+    await page.reload();
+    await ready(page);
+    if (await page.locator('#game-dialog[data-layer=result]').isVisible()) await page.keyboard.press('Escape');
+    await page.locator('#levels').tap();
+    assert.equal(await number(page), '005');
+    const take = Date.now();
+    const stage = name => route.push({ name, atMs: Date.now()-take });
+    const wait = duration => sleep(record ? duration : 0);
+    const back = page.getByRole('button', { name: '‹ Назад', exact: true });
+    const client = await context.newCDPSession(page);
+    await wait(500);
+    await tap(page, page.getByRole('button', { name: 'Режимы', exact: true }), record);
+    await card(page, 'personal').waitFor();
+    stage('Modes');
+    await wait(1100);
+    await tap(page, card(page, 'personal'), record);
+    await page.locator('[data-personal-play]').first().waitFor();
+    stage('Personal tasks');
+    await wait(920);
+    await tap(page, back, record);
+    assert(await card(page, 'personal').evaluate(node => node === document.activeElement));
+    await wait(340);
+    await tap(page, back, record);
+    assert.equal(await number(page), '005');
+    assert(await page.locator('[data-open-modes]').evaluate(node => node === document.activeElement));
+    stage('Return to the same work');
+    await wait(430);
+    const drag = await swipe(page, client, -208, { pace: record ? 53 : 0 });
+    assert(Math.abs(drag+208) < 2);
+    await page.locator('[aria-current=true][data-level-id=gradient-006]').waitFor();
+    stage('Swipe to 006');
+    await wait(1010);
+    await tap(page, page.locator('[data-level-action]'), record);
+    await idleBoard(page);
+    assert.equal(await moves(page), 0);
+    stage('Start level 006');
+    await wait(655);
+    const [first] = rows.find(row => row.id === 'gradient-006').legalOptimalWitness;
+    await moveTile(page, client, ...first, record ? 55 : 0);
+    await idleBoard(page);
+    await settledBoard(page);
+    assert.equal(await moves(page), 1);
+    assert.equal((await snapshot(page)).attempts['gradient-006'].moves, 1);
+    stage('First exchange');
+    await wait(1100);
+    const end = Date.now();
+    const video = page.video();
+    await context.close();
+    if (video) {
+      await video.saveAs(`${output}/route-raw.webm`);
+      execFileSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y',
+        '-ss', ((take-started)/1000).toFixed(3), '-i', `${output}/route-raw.webm`,
+        '-t', ((end-take)/1000).toFixed(3), '-an', '-c:v', 'libx264', '-pix_fmt', 'yuv420p',
+        '-movflags', '+faststart', `${output}/Poluson-0.4.47-modes-to-006.mp4`]);
+    }
+    assert.deepEqual(errors, []);
+    await writeFile(`${output}/review.json`, JSON.stringify({
+      chromium: browser.version(), layouts, route, swap: first, moves: 1, record,
+      calendarSource: 'Dated test feed stored through the normal daily cache action',
+    }, null, 2)+'\n');
+  } finally { await context.close(); }
+}
+
 async function checkFirstWin(browser) {
   const cases = [
     { reducedMotion:'no-preference', sound:true,haptics:true },
@@ -423,7 +576,7 @@ async function checkFirstWin(browser) {
 }
 
 async function checkLevelScale(browser, record) {
-  const output = '.test-output/pr18-layout';
+  const output = '.test-output/level-picker';
   const game = JSON.parse(await readFile('package.json','utf8'));
   await mkdir(output,{recursive:true});
   const views = [{ width:390, height:844 }, { width:320, height:568 }];
@@ -472,7 +625,12 @@ async function checkLevelScale(browser, record) {
           const count = document.querySelector('.level-chapter-count');
           return { root:css(document.documentElement), count:css(count),
             art: { width:matrix.a*view.width, height:matrix.d*view.height, x:matrix.e, y:matrix.f },
-            gap:title.getBoundingClientRect().top-matrix.f-matrix.d*view.height,
+            titleGap:matrix.f-title.getBoundingClientRect().bottom,
+            actionGap:main.getBoundingClientRect().top-matrix.f-matrix.d*view.height,
+            neighbourWidth:Math.max(...[...document.querySelectorAll('.level-peek')].map(node => {
+              const rect = bounds(node);
+              return Math.max(0,Math.min(rect.right,innerWidth)-Math.max(rect.left,0));
+            })),
             selected:css(active), other:css(other), key:bounds(active), rail:bounds(active.parentElement),
             title:css(title.querySelector('span')), caption:css(links[1]), main:css(main),
             boxes:[bounds(title),bounds(main),bounds(count),...links.map(bounds)],
@@ -490,7 +648,9 @@ async function checkLevelScale(browser, record) {
         assert.equal(measure.main,16);
         assert(inView(measure.art,view) && measure.boxes.every(rect => inView(rect,view)) && !measure.overflow, JSON.stringify({ id, view, measure }));
         assert(Math.abs(measure.art.width / measure.art.height - (id === '001' ? 4 : 1)) < .01);
-        if (id === '001') assert(measure.gap >= 24 && measure.gap <= 48, JSON.stringify({id,view,measure}));
+        assert(measure.titleGap >= 8 && measure.titleGap <= 24 && measure.actionGap >= 8 && measure.actionGap <= 24,
+          JSON.stringify({id,view,measure}));
+        assert(measure.neighbourWidth >= 12, JSON.stringify({id,view,measure}));
         const filename = `level-${id}-${width}x${height}.png`;
         await page.screenshot({ path:`${output}/${filename}` });
         completed.push({id,width,height,filename,...measure});
@@ -535,6 +695,13 @@ async function checkLevelScale(browser, record) {
     assert(inView(caption,views[1]) && inView(label,views[1]));
     await chapterButton.tap();
     assert(await clean.locator('[data-chapter-menu=true]').isVisible());
+    await clean.keyboard.press('Escape');
+    await clean.locator(selector).press('End');
+    assert.equal(await number(clean), '015');
+    assert.equal(await clean.locator('.level-selection span').textContent(), 'Сборка знакомых приёмов');
+    for (const indicator of ['.level-selection', '[data-level-action]']) {
+      assert(inView(await clean.locator(indicator).boundingBox(), views[1]));
+    }
 
   } finally { await context.close(); await cleanContext.close(); }
 
@@ -589,6 +756,7 @@ try {
   const record = process.env.RECORD_EPISODE === '1';
   if (process.argv.includes('--board')) await boardEpisode(browser,record);
   else if (process.argv.includes('--routes')) await modeRoutes(browser,record);
+  else if (process.argv.includes('--gallery')) await modeGalleryEpisode(browser,record);
   else if (process.argv.includes('--first-win')) await checkFirstWin(browser);
   else if (process.argv.includes('--scale')) await checkLevelScale(browser,record);
   else {

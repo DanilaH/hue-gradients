@@ -372,7 +372,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (route.kind === 'daily') {
       if (!route.date && !route.month) void refreshDaily();
       else if (route.date) actions.querySelector<HTMLElement>(`[data-daily-date="${route.date}"]`)?.focus({ preventScroll: true });
-    } else if (route.kind === 'books') void refreshDaily();
+    } else if (route.kind === 'books' || route.kind === 'modes') void refreshDaily();
     if (route.kind === 'personal') {
       if (!route.key || session.state.personalProgress?.day !== localCalendarDay()) void issuePersonal();
       if (route.key) actions.querySelector<HTMLElement>(`[data-task-key="${route.key}"]`)?.focus({ preventScroll: true });
@@ -479,7 +479,10 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       dailyUnavailable = (session.state.dailyProgress?.through ?? '') > cutoff;
       if (alive && !dailyUnavailable) dailyUnavailable = !(await run({ kind: 'daily-cache', feed }));
     } catch { dailyUnavailable = true; /* The trusted archive remains available. */ }
-    finally { dailyLoading = false; if (alive && layer === 'meta' && (metaRoute.kind === 'daily' || metaRoute.kind === 'books')) render(); }
+    finally {
+      dailyLoading = false;
+      if (alive && layer === 'meta' && ['daily', 'books', 'modes'].includes(metaRoute.kind)) render();
+    }
   }
   function playDaily(date: string, replay: boolean, entry: 'books' | 'daily' = metaRoute.kind === 'books' ? 'books' : 'daily'): void {
     rememberPlayMenu();
@@ -597,6 +600,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   }
   function popMeta(): void {
     finishInsertion();
+    const fromModes = metaRoute.kind === 'modes';
     const draft = metaRoute.kind === 'draft' ? metaRoute.draftId : undefined;
     const previous = metaHistory.pop();
     const from = previous?.kind === 'album' ? actions.querySelector('.work-card-art')?.getBoundingClientRect() : undefined;
@@ -605,6 +609,9 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     render();
     if (previous?.kind === 'modes' && previousMode) {
       actions.querySelector<HTMLElement>(`[data-mode-entry="${previousMode}"]`)?.focus({ preventScroll: true });
+    }
+    if (previous?.kind === 'chapter' && fromModes) {
+      actions.querySelector<HTMLElement>('[data-open-modes]')?.focus({ preventScroll: true });
     }
     if (previous?.kind === 'editor-home' && draft) {
       actions.querySelector<HTMLElement>(`[data-editor-draft="${CSS.escape(draft)}"]`)?.focus({ preventScroll: true });
