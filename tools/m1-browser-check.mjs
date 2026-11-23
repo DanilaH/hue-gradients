@@ -121,10 +121,9 @@ try {
   await page.waitForSelector('#hue-app[data-layer=result]');
   let state = await readState(); assert.equal(state.completed.length, 1); assert.equal(state.attempts[state.activeLevelId].moves, 1);
   await page.setViewportSize({ width: 320, height: 568 });
-  const largerText = await page.addStyleTag({ content: 'html, body { font-size: 24px !important; }' });
+  await page.waitForSelector('#game-dialog[data-victory-phase=still]');
   assert.equal(await compactDialog(), true);
   assert.equal(await page.locator('#dialog-actions button').count(), 2);
-  await largerText.evaluate(element => element.remove());
   await page.setViewportSize({ width: 390, height: 844 });
   const completedRevision = state.revision;
   await page.reload(); await page.waitForSelector('#hue-app[data-layer=result]');
@@ -191,9 +190,10 @@ try {
   await page.mouse.move(stage.x + stage.width * .7, stage.y + stage.height / 2);
   await page.mouse.down(); await page.mouse.move(stage.x + stage.width * .3, stage.y + stage.height / 2, { steps: 6 });
   assert.equal(await selectedLevel.getAttribute('data-level-id'), saved.levelId);
-  assert.match(await page.locator('.level-stage').evaluate(node => node.style.getPropertyValue('--picker-drag')), /^-/);
+  assert(await page.locator('.level-track').evaluate(node =>
+    new DOMMatrixReadOnly(getComputedStyle(node).transform).m41 < 0));
   await page.mouse.up();
-  assert.equal(await selectedLevel.getAttribute('data-level-id'), 'gradient-003');
+  await page.locator('[aria-current=true][data-level-id=gradient-003]').waitFor();
   assert.equal(await page.locator('[data-level-action]').count(), 0);
   assert.equal(await page.locator('.level-preview rect').count(), 0);
   assert.equal(await page.locator('button.level-preview').count(), 0);
@@ -207,7 +207,6 @@ try {
   assert.equal(await page.locator('.composition-grid').count(), 0);
   await page.locator('[data-chapter="2"]').click();
   assert.match(await page.locator('.chapter-note').innerText(), /Соберите 10/);
-  const pickerText = await page.addStyleTag({ content: 'html, body { font-size: 24px !important; }' });
   assert.equal(await compactDialog(), true);
   await page.screenshot({ path: '.test-output/m1/chapter-locked.png' });
   await page.keyboard.press('Escape');
@@ -215,8 +214,8 @@ try {
   await page.locator('[data-level-id=gradient-002]').click();
   assert.equal(await page.locator('.level-preview rect').count(), level.width * level.height);
   const pickerFit = async () => page.locator('#game-dialog').evaluate(dialog => {
-    const anchors = [...dialog.querySelectorAll('.level-picker-nav button, [data-level-action], [data-open-chapters], .level-rail [aria-current=true]')];
-    return anchors.length === 6 && dialog.scrollHeight <= dialog.clientHeight + 1 && anchors.every(anchor => {
+    const anchors = [...dialog.querySelectorAll('.level-picker-nav button, [data-level-action], .level-picker-links button, .level-rail [aria-current=true]')];
+    return anchors.length === 7 && dialog.scrollHeight <= dialog.clientHeight + 1 && anchors.every(anchor => {
       const { x, y, width, height } = anchor.getBoundingClientRect();
       return x >= 0 && y >= 0 && x + width <= innerWidth + 1 && y + height <= innerHeight + 1 &&
         anchor.contains(document.elementFromPoint(x + width / 2, y + height / 2));
@@ -224,7 +223,6 @@ try {
   });
   assert.equal(await pickerFit(), true);
   await page.screenshot({ path: '.test-output/m1/picker-small.png' });
-  await pickerText.evaluate(element => element.remove());
   await page.setViewportSize({ width: 844, height: 390 });
   assert.equal(await pickerFit(), true);
   await page.getByRole('button', { name: '‹ Назад', exact: true }).click();

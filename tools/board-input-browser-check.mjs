@@ -111,7 +111,7 @@ try {
 
   async function measure(width, height, inset) {
     const style = inset ? await page.addStyleTag({
-      content: 'html,body { font-size: 24px !important; } #hue-app { padding: 24px !important; }',
+      content: '#hue-app { padding: 24px !important; }',
     }) : null;
     await page.waitForTimeout(150);
     const box = await board(page).boundingBox();

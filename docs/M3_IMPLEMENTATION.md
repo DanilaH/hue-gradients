@@ -16,7 +16,7 @@ Functional local implementation in 0.3.0/versionCode3. Production/editorial acce
 
 M4: complete creative editor, revision graph/author test, PNG export renderer and sharing. The draft-copy seed is deliberately small; evolve it with explicit validated migration when M4 adds editing/version history. Current copies are immutable draft snapshots with empty authorCompletions, not finished user works.
 
-M2: two licensed Cyrillic font comparison, 150% font acceptance, owner art decision and physical phone inspection. No automatic test proves these.
+M2: two licensed Cyrillic font comparison, fixed 100% in-game type acceptance, owner art decision and physical phone inspection. No automatic test proves these.
 
 M1/M0/M5–M8: native SQLite/haptic/process-death/real storage-pressure runtime, physical phone, actual hosted Yandex, identity/cloud/ads and production release remain open. Local receipt-backup facts are local recovery material; M5 must not mistake them for player completion facts during guest transfer.
 

@@ -153,7 +153,6 @@ try {
   assert.match(await card(page, 'past').innerText(), /Повторить рекорд/);
   // The reserved stage above a side figure must not be part of its button.
   await page.setViewportSize({ width: 320, height: 568 });
-  const largeText = await page.addStyleTag({ content: 'html { font-size: 150%; }' });
   const caption = kind => card(page, kind).locator('strong').innerText();
   assert.deepEqual(await Promise.all(['past', 'present', 'future'].map(caption)),
     ['Повторить рекорд', 'На время', 'Поле']);
@@ -177,7 +176,6 @@ try {
   assert.equal(await card(page, 'future').getAttribute('aria-pressed'), 'true');
   assert.equal((await state(page)).snapshot.personalProgress.active, null);
   await card(page, 'past').tap();
-  await largeText.evaluate(node => node.remove());
   await page.setViewportSize(viewport);
   await hold(720);
   const key = originalDay + ':past';
@@ -277,7 +275,7 @@ try {
     personalGoal: 'repeat-record', targetMoves: assignment.limit, unplayedFuture: future.levelId,
     correctedDay: [futureDay, originalDay], updatedWhileOpen: true, refreshedOnForeground: true, retainedHistory: true, awardsAfterReplay: 1,
     durationMs: { easy: ordinaryMs[0], ordinaryFinalField: ordinaryMs[1], finale: present.durationMs },
-    finaleId: present.levelId, finaleWonViaTouch: true, finaleExpiryVerified: true, sameDayRetry: true, staleRetryReturnedToToday: true, civilClockDidNotChangeTimer: true, compactMenuAt150Percent: true, backgroundTapPreservesSelection: true,
+    finaleId: present.levelId, finaleWonViaTouch: true, finaleExpiryVerified: true, sameDayRetry: true, staleRetryReturnedToToday: true, civilClockDidNotChangeTimer: true, compactMenuAtAuthoredTextSize: true, backgroundTapPreservesSelection: true,
     clipStartMillis, clipMillis, limits: 'Actual Chromium input. Campaign history made with domain actions and fixed civil/monotonic test clocks. Physical Android not run.' };
   await writeFile(`${output}/browser.json`, JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report));

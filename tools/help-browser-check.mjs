@@ -186,7 +186,6 @@ try {
 
   const compact = await newProfile({ viewport: { width: 320, height: 568 }, reducedMotion: 'reduce' });
   const small = compact.page;
-  await small.addStyleTag({ content: 'html,body{font-size:24px!important}' });
   const beforeBack = await state(small);
   await menu(small);
   assert(await small.locator('#dialog-actions button').evaluateAll(buttons => buttons.every(button => {
@@ -214,7 +213,7 @@ try {
   assert.equal(await small.locator('#dialog-copy').textContent(), '1 ход · С помощью');
   await cardDetails(small);
   assert.match(await small.locator('.work-card-records').innerText(), /Рекорд с помощью — 1/);
-  passed.push('320×568 at enlarged text, Back, static outlines, repeat pin feedback and dismissible tutorial');
+  passed.push('320×568 at the authored text size, Back, static outlines, repeat pin feedback and dismissible tutorial');
 
   const fault = await newProfile();
   const damaged = fault.page;

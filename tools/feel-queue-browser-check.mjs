@@ -110,7 +110,6 @@ try {
   assert.deepEqual((await capture()).loops, []);
   await button('Дальше').tap();
   await idle();
-  const larger = await page.addStyleTag({ content: 'html,body { font-size: 24px !important; }' });
   const settingsFit = [];
   for (const size of [{ width: 320, height: 568 }, { width: 568, height: 320 }]) {
     await page.setViewportSize(size);
@@ -128,7 +127,6 @@ try {
     settingsFit.push(size);
     await button('Продолжить').tap();
   }
-  await larger.evaluate(el => el.remove());
   assert.deepEqual(errors, []);
   const video = page.video();
   await context.close();

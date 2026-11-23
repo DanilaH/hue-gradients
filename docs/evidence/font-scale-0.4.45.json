@@ -1,0 +1,152 @@
+{
+  "commit": "2170d5c2c04fff7405650fefc2ca0b9246accfcd",
+  "build": "0.4.45 / 49",
+  "date": "2026-11-23",
+  "chromium": "141.0.7390.37",
+  "checks": [
+    "menu",
+    "--scale",
+    "--board",
+    "--first-win",
+    "--routes"
+  ],
+  "checksPassed": 5,
+  "recordedVideo": false,
+  "nativePhone": "NOT RUN",
+  "yandexHost": "NOT RUN",
+  "baselineNotes": "Independent follow-up probe used the default root at 100% and inspected chapter count and top settings. 150% was injected only in the diagnostics. The stock --scale suite sets the root explicitly for both cases.",
+  "views": [
+    {
+      "id": "001",
+      "width": 390,
+      "height": 844,
+      "scale": 100,
+      "other": 20,
+      "selected": 26,
+      "progressCount": 13.125,
+      "top": 14,
+      "title": 18,
+      "main": 16,
+      "caption": 15,
+      "gap": 30.375,
+      "art": {
+        "width": 312,
+        "height": 78,
+        "x": 39,
+        "y": 286.109375
+      },
+      "hitWidth": 56,
+      "hitHeight": 56
+    },
+    {
+      "id": "006",
+      "width": 390,
+      "height": 844,
+      "scale": 100,
+      "other": 20,
+      "selected": 26,
+      "progressCount": 13.125,
+      "top": 14,
+      "title": 18,
+      "main": 16,
+      "caption": 15,
+      "gap": 12,
+      "art": {
+        "width": 312,
+        "height": 312,
+        "x": 39,
+        "y": 178.296875
+      },
+      "hitWidth": 56,
+      "hitHeight": 56
+    },
+    {
+      "id": "001",
+      "width": 320,
+      "height": 568,
+      "scale": 100,
+      "other": 20,
+      "selected": 26,
+      "progressCount": 13.125,
+      "top": 14,
+      "title": 18,
+      "main": 16,
+      "caption": 15,
+      "gap": 26,
+      "art": {
+        "width": 256,
+        "height": 64,
+        "x": 32,
+        "y": 164.296875
+      },
+      "hitWidth": 56,
+      "hitHeight": 56
+    },
+    {
+      "id": "006",
+      "width": 320,
+      "height": 568,
+      "scale": 100,
+      "other": 20,
+      "selected": 26,
+      "progressCount": 13.125,
+      "top": 14,
+      "title": 18,
+      "main": 16,
+      "caption": 15,
+      "gap": 12,
+      "art": {
+        "width": 256,
+        "height": 256,
+        "x": 32,
+        "y": 75.296875
+      },
+      "hitWidth": 56,
+      "hitHeight": 56
+    },
+    {
+      "id": "001",
+      "width": 320,
+      "height": 568,
+      "scale": 150,
+      "other": 30,
+      "selected": 39,
+      "progressCount": 19.6875,
+      "top": 21,
+      "title": 27,
+      "main": 24,
+      "caption": 22.5,
+      "gap": 26,
+      "art": {
+        "width": 256,
+        "height": 64,
+        "x": 32,
+        "y": 140.28125
+      },
+      "hitWidth": 84,
+      "hitHeight": 72
+    },
+    {
+      "id": "006",
+      "width": 320,
+      "height": 568,
+      "scale": 150,
+      "other": 30,
+      "selected": 39,
+      "progressCount": 19.6875,
+      "top": 21,
+      "title": 27,
+      "main": 24,
+      "caption": 22.5,
+      "gap": 12,
+      "art": {
+        "width": 213,
+        "height": 213,
+        "x": 53.5,
+        "y": 62
+      },
+      "hitWidth": 84,
+      "hitHeight": 72
+    }
+  ]
+}

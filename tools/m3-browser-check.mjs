@@ -82,14 +82,14 @@ try{
  const albumButton=name=>page.getByRole('button',{name,exact:true});
  assert.deepEqual(await page.locator('.album-tabs button').allTextContents(),['Собранное','Мои работы']);
  for(const viewport of [{width:320,height:568},{width:844,height:390}]){
-  await page.setViewportSize(viewport);await page.evaluate(()=>document.documentElement.style.fontSize='150%');
+  await page.setViewportSize(viewport);
   assert((await page.locator('.album-nav button,.album-tabs button').evaluateAll(nodes=>nodes.map(node=>{
    const box=node.getBoundingClientRect();
    return box.height>=48&&box.x>=0&&box.y>=0&&box.right<=innerWidth&&box.bottom<=innerHeight
     &&document.elementFromPoint(box.x+box.width/2,box.y+box.height/2)===node;
   }))).every(Boolean));
  }
- await page.setViewportSize({width:390,height:844});await page.evaluate(()=>document.documentElement.style.fontSize='');
+ await page.setViewportSize({width:390,height:844});
  assert.equal(await page.locator('[data-album-level]').evaluateAll(nodes=>nodes.some(node=>node.scrollWidth>node.clientWidth+1)),false);
  const restored=page.locator('[data-album-level=gradient-014]');
  await restored.scrollIntoViewIfNeeded();

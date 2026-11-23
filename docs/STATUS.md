@@ -1,4 +1,6 @@
-# Status — 21 November 2026
+# Status — 23 November 2026
+
+**0.4.46 / 50, 23 November.** PR #18 fixes authored text sizing across both hosts. The paired Yandex build captures match at browser defaults 16 and 24 px. The chapter count is 15 px and the level rail remains 20/26 px. The signed preview APK and narrow-screen checks passed. [Evidence and device checks](evidence/pr18-font-scale-0.4.46.md).
 
 **0.4.45 / 49, 23 November.** The PR #17 follow-up enlarges level numbers and chapter signs and groups the striped 001 preview with its title and action. The 001 and 006 browser matrix includes 320×568 at 150% text. [Measurements and captures](evidence/pr17-level-scale-0.4.45.md).
 

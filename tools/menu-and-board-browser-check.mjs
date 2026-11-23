@@ -18,7 +18,7 @@ const number = page => page.locator('.level-selection strong').innerText();
 const press = (page, label) => page.getByRole('button', { name: label, exact: true }).tap();
 const tight = page => page.waitForFunction(() => !document.querySelector('.level-track')?.getAnimations().some(a => a.playState === 'running'));
 
-async function prepared(page) {
+async function prepared(page, completed = 5) {
   await page.goto(base);
   await ready(page);
   await page.evaluate(async witnesses => {
@@ -40,7 +40,7 @@ async function prepared(page) {
         if (!session.state.completed.includes(id)) throw Error(`Fixture failed to complete ${id}`);
       }
     } finally { store.close(); }
-  }, rows.slice(0, 5));
+  }, rows.slice(0, completed));
   await page.reload();
   await ready(page);
   if (await page.locator('#game-dialog[data-layer=result]').isVisible()) await page.keyboard.press('Escape');
@@ -423,13 +423,10 @@ async function checkFirstWin(browser) {
 }
 
 async function checkLevelScale(browser, record) {
-  const output = '.test-output/pr17-review';
+  const output = '.test-output/pr18-layout';
+  const game = JSON.parse(await readFile('package.json','utf8'));
   await mkdir(output,{recursive:true});
-  const views = [
-    { width:390, height:844, scale:100 },
-    { width:320, height:568, scale:100 },
-    { width:320, height:568, scale:150 },
-  ];
+  const views = [{ width:390, height:844 }, { width:320, height:568 }];
   const initial = views[0];
   const context = await browser.newContext({ viewport:{width:initial.width,height:initial.height}, hasTouch:true, isMobile:true });
   const cleanContext = await browser.newContext({ viewport:{width:initial.width,height:initial.height}, hasTouch:true, isMobile:true });
@@ -457,11 +454,10 @@ async function checkLevelScale(browser, record) {
     await select006(progress).tap();
     assert.equal(await number(progress),'006');
 
-    for (const { width,height,scale } of views) {
-      const view = { width,height };
+    for (const view of views) {
+      const { width,height } = view;
       for (const [page,id] of [[clean,'001'],[progress,'006']]) {
         await page.setViewportSize(view);
-        await page.evaluate(scale => { document.documentElement.style.fontSize = scale + '%'; },scale);
         if (id === '006') await centered(page);
         const measure = await page.evaluate(() => {
           const art = document.querySelector('.level-preview svg');
@@ -473,46 +469,48 @@ async function checkLevelScale(browser, record) {
           const other = document.querySelector('.level-rail button:not([aria-current])');
           const main = document.querySelector('[data-level-action]');
           const links = [...document.querySelectorAll('.level-picker-links button')];
-          return { art: { width:matrix.a*view.width, height:matrix.d*view.height, x:matrix.e, y:matrix.f },
+          const count = document.querySelector('.level-chapter-count');
+          return { root:css(document.documentElement), count:css(count),
+            art: { width:matrix.a*view.width, height:matrix.d*view.height, x:matrix.e, y:matrix.f },
             gap:title.getBoundingClientRect().top-matrix.f-matrix.d*view.height,
             selected:css(active), other:css(other), key:bounds(active), rail:bounds(active.parentElement),
             title:css(title.querySelector('span')), caption:css(links[1]), main:css(main),
-            boxes:[bounds(title),bounds(main),...links.map(bounds)],
+            boxes:[bounds(title),bounds(main),bounds(count),...links.map(bounds)],
             overflow:document.querySelector('#game-dialog').scrollWidth > innerWidth };
         });
-        const factor = scale/100;
-        assert.equal(measure.selected,26*factor);
-        assert.equal(measure.other,20*factor);
-        assert(measure.key.width>=56 && measure.key.height>=48);
+        assert.equal(measure.root,16);
+        assert.equal(measure.selected,26);
+        assert.equal(measure.other,20);
+        assert.equal(measure.key.width,56);
+        assert.equal(measure.key.height,56);
         assert(measure.key.left >= measure.rail.left - 1 && measure.key.right <= measure.rail.right + 1);
-        assert.equal(measure.title,18*factor);
-        assert.equal(measure.caption,15*factor);
-        assert.equal(measure.main,16*factor);
-        assert(inView(measure.art,view) && measure.boxes.every(rect => inView(rect,view)) && !measure.overflow, JSON.stringify({ id, view,scale,measure }));
+        assert.equal(measure.title,18);
+        assert.equal(measure.caption,15);
+        assert.equal(measure.count,15);
+        assert.equal(measure.main,16);
+        assert(inView(measure.art,view) && measure.boxes.every(rect => inView(rect,view)) && !measure.overflow, JSON.stringify({ id, view, measure }));
         assert(Math.abs(measure.art.width / measure.art.height - (id === '001' ? 4 : 1)) < .01);
-        if (id === '001') assert(measure.gap >= 24 && measure.gap <= 48, JSON.stringify({id,view,scale,measure}));
-        const filename = `level-${id}-${width}x${height}-${scale}.png`;
+        if (id === '001') assert(measure.gap >= 24 && measure.gap <= 48, JSON.stringify({id,view,measure}));
+        const filename = `level-${id}-${width}x${height}.png`;
         await page.screenshot({ path:`${output}/${filename}` });
-        completed.push({id,width,height,scale,filename,...measure});
+        completed.push({id,width,height,filename,...measure});
       }
 
-      if (width === 390 || scale === 150) {
-        await progress.locator('[data-open-chapters]').tap();
-        await progress.locator('[data-chapter="2"]').tap();
-        const note = progress.locator('.chapter-note');
-        assert.equal(await note.innerText(),'Соберите 10 работ главы 1');
-        const row = await progress.locator('[data-chapter="1"]').boundingBox();
-        const sign = await progress.locator('[data-chapter="1"] .chapter-symbol').boundingBox();
-        const finale = await progress.locator('[data-finale="1"]').boundingBox();
-        assert(row.height >= 84 && sign.width === 54 && finale.width >= 48);
-        const lockHint = await note.boundingBox();
-        assert(inView(lockHint,view));
-        await progress.screenshot({ path:`${output}/chapters-${width}x${height}-${scale}.png` });
-        await progress.keyboard.press('Escape');
-        assert.equal(await number(progress),'006');
-        assert(await menu(progress).isVisible());
-        assert(await progress.locator('[data-open-chapters]').evaluate(node => node === document.activeElement));
-      }
+      await progress.locator('[data-open-chapters]').tap();
+      await progress.locator('[data-chapter="2"]').tap();
+      const note = progress.locator('.chapter-note');
+      assert.equal(await note.innerText(),'Соберите 10 работ главы 1');
+      const row = await progress.locator('[data-chapter="1"]').boundingBox();
+      const sign = await progress.locator('[data-chapter="1"] .chapter-symbol').boundingBox();
+      const finale = await progress.locator('[data-finale="1"]').boundingBox();
+      assert(row.height >= 84 && sign.width === 54 && finale.width >= 48);
+      const lockHint = await note.boundingBox();
+      assert(inView(lockHint,view));
+      await progress.screenshot({ path:`${output}/chapters-${width}x${height}.png` });
+      await progress.keyboard.press('Escape');
+      assert.equal(await number(progress),'006');
+      assert(await menu(progress).isVisible());
+      assert(await progress.locator('[data-open-chapters]').evaluate(node => node === document.activeElement));
     }
 
     for (const [key,id] of [['Home','001'],['End','015']]) {
@@ -528,6 +526,16 @@ async function checkLevelScale(browser, record) {
     await centered(progress);
     const landscape = await progress.locator('[data-level-action]').boundingBox();
     assert(inView(landscape,{width:568,height:320}));
+
+    await prepared(clean,15);
+    const chapterButton = clean.locator('[data-open-chapters]');
+    assert.equal(await chapterButton.locator('.level-chapter-count').textContent(),'15/15');
+    const caption = await chapterButton.boundingBox();
+    const label = await chapterButton.locator('.level-chapter-count').boundingBox();
+    assert(inView(caption,views[1]) && inView(label,views[1]));
+    await chapterButton.tap();
+    assert(await clean.locator('[data-chapter-menu=true]').isVisible());
+
   } finally { await context.close(); await cleanContext.close(); }
 
   if (record) {
@@ -561,9 +569,8 @@ async function checkLevelScale(browser, record) {
     await video.saveAs(`${output}/route-raw.webm`);
     execFileSync('ffmpeg',['-hide_banner','-loglevel','error','-y','-ss',((take-start)/1000).toFixed(3),
       '-i',`${output}/route-raw.webm`,'-t',((end-take)/1000).toFixed(3),'-an','-c:v','libx264','-pix_fmt','yuv420p',
-      '-movflags','+faststart',`${output}/Poluson-0.4.45-levels-route.mp4`]);
+      '-movflags','+faststart',`${output}/Poluson-${game.version}-levels-route.mp4`]);
   }
-  const game = JSON.parse(await readFile('package.json','utf8'));
   await writeFile(`${output}/measurements.json`,JSON.stringify({
     version:game.version, browser:browser.version(), views:completed, edges:['001','015'], focusBack:'006', record,
   },null,2)+'\n');
@@ -648,7 +655,6 @@ try {
     const narrow = await browser.newContext({viewport:{width:320,height:568},hasTouch:true,isMobile:true,reducedMotion:'reduce'});
     const small = await narrow.newPage();
     await prepared(small);
-    await small.addStyleTag({ content:'html { font-size: 150%; }' });
     await small.locator('[data-level-id="gradient-006"]').tap();
     const action = await small.locator('[data-level-action]').boundingBox();
     const settingsButton = await small.locator('[data-menu-settings]').boundingBox();
@@ -660,7 +666,7 @@ try {
     assert.equal(await number(small),'006');
     assert.deepEqual(errors, []);
     await writeFile(`${out}/menu.json`,JSON.stringify({
-      chromium: browser.version(), viewport, narrow: {width:320,height:568,textScale:1.5,reducedMotion:true},
+      chromium: browser.version(), viewport, narrow: {width:320,height:568,textScale:1,reducedMotion:true},
       partial:'005', swipe:'006', settingsBack:'006', requirement, chaptersBack:'006', record,
     },null,2)+'\n');
   }

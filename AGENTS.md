@@ -1,4 +1,6 @@
 # hue-gradients — agent contract
+
+Owner decision, 23 Nov 2026: use exactly 100% in-game type on all hosts. For ART-03 and UX-02 apply the [current acceptance matrix](docs/design/menu-and-board-feel/README.md#type100) over the frozen spec 1.0 font-scale cases.
 **mini-games-kit pinned commit:** 469928d03f4bae5053e23db26e82187bedbc252e
 
 For ongoing development, follow [the delivery queue](docs/porting/DELIVERY_QUEUE.md). Resume the first available unfinished slice, record evidence and continue to the next without waiting for a new owner message. Carry external blockers separately and preserve owner-only decisions.

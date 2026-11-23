@@ -122,7 +122,6 @@ try {
   ...viewport,deviceScaleFactor:scale,mobile:false,screenWidth:screen.width,screenHeight:screen.height,
  });
  await emulateDisplay({width:320,height:568},phoneScreen);
- await page.evaluate(()=>document.documentElement.style.fontSize='150%');
  await ready();
  const buttonBounds=await direct.boundingBox();
  assert(buttonBounds.height>=48&&buttonBounds.y+buttonBounds.height<=568);
@@ -135,7 +134,6 @@ try {
  assert(landscapePreview.y+landscapePreview.height<=landscapeSave.y+1);
  await downloadWallpaper(levels[0],'wide-display.png','Poluson-001.png',[3120,1440]);
  await emulateDisplay(phoneViewport,phoneScreen);
- await page.evaluate(()=>document.documentElement.style.fontSize='');
  await ready();
  await button('‹ Назад').click();await page.locator('#hue-app[data-layer=result]').waitFor();
  passed.push('the display determines PNG size independently of viewport and a display change refreshes the open card');
