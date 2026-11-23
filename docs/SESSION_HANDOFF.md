@@ -1,5 +1,7 @@
 # Resume — 21 November 2026
 
+Текущая передача после 0.4.45 — единая шкала текста 100%, подпись счётчика главы и парная проверка на устройстве. [Задание](design/menu-and-board-feel/README.md#type100).
+
 **Owner scope update, 20 Nov.** All 89 audited rows have delivery packages in the [full porting roadmap](porting/FULL_ROADMAP.md). Package 01 was brought into `feat/m0-foundation` before package 02. Specific owner decisions on energy, single wallpaper and the M5 hold still govern.
 
 Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and M4_EXPORT_IMPLEMENTATION.md. Owner authorized roadmap continuation. Bound file reads/output; no blobs/base64 or whole-archive re-reads. Commit checkpoints and preserve newer remote work. Branch feat/m0-foundation, draft PR #1; main still contains the original README.

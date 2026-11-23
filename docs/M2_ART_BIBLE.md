@@ -28,7 +28,7 @@ Status: EXECUTABLE OWNER-REVIEW CANDIDATE for ART-01…09. Latest playable feel 
 
 ## Typography and acceptance still pending
 
-Current system-ui is PROVISIONAL. No bitmap/pseudo-pixel font was adopted. The required comparison of at most two bundled, licensed Cyrillic typefaces, final font decision and 150% font check are NOT RUN. Do not label the current platform-dependent face an approved typography system. No mass styling of campaign/meta/editor was undertaken.
+Current system-ui is PROVISIONAL. No bitmap/pseudo-pixel font was adopted. The required comparison of at most two bundled, licensed Cyrillic typefaces, final font decision and on-device fixed 100% typography check are NOT RUN. Do not label the current platform-dependent face an approved typography system. No mass styling of campaign/meta/editor was undertaken.
 
 Owner acceptance on an actual build and a physical phone is pending. Browser screenshots/video are an honest desktop-emulation review aid, not phone evidence. M1 native SQLite/process death/storage pressure remains pending because no Android device/emulator is attached. Hosted Yandex, identity/cloud/live ads remain separate external gates.
 
