@@ -1,0 +1,482 @@
+[
+  {
+    "sheet": "01-campaign",
+    "cell": 1,
+    "label": "Первый вход",
+    "trace": "scale/001",
+    "screenshotCssPx": [
+      390,
+      844
+    ]
+  },
+  {
+    "sheet": "01-campaign",
+    "cell": 2,
+    "label": "Выбор 001",
+    "trace": "scale/002",
+    "screenshotCssPx": [
+      390,
+      844
+    ]
+  },
+  {
+    "sheet": "01-campaign",
+    "cell": 3,
+    "label": "Выбор 006",
+    "trace": "scale/005",
+    "screenshotCssPx": [
+      390,
+      844
+    ]
+  },
+  {
+    "sheet": "01-campaign",
+    "cell": 4,
+    "label": "Закрытая работа",
+    "trace": "m1/017",
+    "screenshotCssPx": [
+      320,
+      568
+    ]
+  },
+  {
+    "sheet": "01-campaign",
+    "cell": 5,
+    "label": "Главы",
+    "trace": "scale/006",
+    "screenshotCssPx": [
+      390,
+      844
+    ]
+  },
+  {
+    "sheet": "01-campaign",
+    "cell": 6,
+    "label": "Условие главы",
+    "trace": "scale/007",
+    "screenshotCssPx": [
+      390,
+      844
+    ]
+  },
+  {
+    "sheet": "01-campaign",
+    "cell": 7,
+    "label": "Доска после хода",
+    "trace": "board/007",
+    "screenshotCssPx": [
+      390,
+      844
+    ]
+  },
+  {
+    "sheet": "01-campaign",
+    "cell": 8,
+    "label": "Первая победа",
+    "trace": "scale/003",
+    "screenshotCssPx": [
+      390,
+      844
+    ]
+  },
+  {
+    "sheet": "02-meta",
+    "cell": 1,
+    "label": "Режимы",
+    "trace": "routes/005",
+    "screenshotCssPx": [
+      390,
+      844
+    ]
+  },
+  {
+    "sheet": "02-meta",
+    "cell": 2,
+    "label": "Личные задания",
+    "trace": "routes/006",
+    "screenshotCssPx": [
+      390,
+      844
+    ]
+  },
+  {
+    "sheet": "02-meta",
+    "cell": 3,
+    "label": "Календарь",
+    "trace": "daily/005",
+    "screenshotCssPx": [
+      390,
+      740
+    ]
+  },
+  {
+    "sheet": "02-meta",
+    "cell": 4,
+    "label": "Календарь из кэша",
+    "trace": "daily/011",
+    "screenshotCssPx": [
+      390,
+      740
+    ]
+  },
+  {
+    "sheet": "02-meta",
+    "cell": 5,
+    "label": "Книги",
+    "trace": "books/008",
+    "screenshotCssPx": [
+      390,
+      740
+    ]
+  },
+  {
+    "sheet": "02-meta",
+    "cell": 6,
+    "label": "Гнездо 006",
+    "trace": "books/009",
+    "screenshotCssPx": [
+      390,
+      740
+    ]
+  },
+  {
+    "sheet": "02-meta",
+    "cell": 7,
+    "label": "Книга и событие",
+    "trace": "books/024",
+    "screenshotCssPx": [
+      390,
+      740
+    ]
+  },
+  {
+    "sheet": "02-meta",
+    "cell": 8,
+    "label": "Прогресс",
+    "trace": "m3/035",
+    "screenshotCssPx": [
+      320,
+      568
+    ]
+  },
+  {
+    "sheet": "03-challenges",
+    "cell": 1,
+    "label": "Список при 0 побед",
+    "trace": "challenge/004",
+    "screenshotCssPx": [
+      390,
+      740
+    ]
+  },
+  {
+    "sheet": "03-challenges",
+    "cell": 2,
+    "label": "Проба лимита",
+    "trace": "challenge-final/012",
+    "screenshotCssPx": [
+      390,
+      740
+    ]
+  },
+  {
+    "sheet": "03-challenges",
+    "cell": 3,
+    "label": "Финал и секрет",
+    "trace": "chapter-challenge/015",
+    "screenshotCssPx": [
+      390,
+      740
+    ]
+  },
+  {
+    "sheet": "03-challenges",
+    "cell": 4,
+    "label": "Скрытое поле",
+    "trace": "chapter-challenge/021",
+    "screenshotCssPx": [
+      390,
+      740
+    ]
+  },
+  {
+    "sheet": "03-challenges",
+    "cell": 5,
+    "label": "Треугольники",
+    "trace": "shape/013",
+    "screenshotCssPx": [
+      390,
+      740
+    ]
+  },
+  {
+    "sheet": "03-challenges",
+    "cell": 6,
+    "label": "Заезд завершён",
+    "trace": "timed-trial/008",
+    "screenshotCssPx": [
+      390,
+      740
+    ]
+  },
+  {
+    "sheet": "03-challenges",
+    "cell": 7,
+    "label": "Успех",
+    "trace": "challenge-final/018",
+    "screenshotCssPx": [
+      390,
+      740
+    ]
+  },
+  {
+    "sheet": "03-challenges",
+    "cell": 8,
+    "label": "Лимит исчерпан",
+    "trace": "challenge-final/021",
+    "screenshotCssPx": [
+      390,
+      740
+    ]
+  },
+  {
+    "sheet": "04-studio",
+    "cell": 1,
+    "label": "Пустой альбом",
+    "trace": "m4-export/003",
+    "screenshotCssPx": [
+      390,
+      790
+    ]
+  },
+  {
+    "sheet": "04-studio",
+    "cell": 2,
+    "label": "Собранные работы",
+    "trace": "m3/009",
+    "screenshotCssPx": [
+      390,
+      844
+    ]
+  },
+  {
+    "sheet": "04-studio",
+    "cell": 3,
+    "label": "Одна работа",
+    "trace": "m3/008",
+    "screenshotCssPx": [
+      390,
+      844
+    ]
+  },
+  {
+    "sheet": "04-studio",
+    "cell": 4,
+    "label": "Действия с PNG",
+    "trace": "m4-export/010",
+    "screenshotCssPx": [
+      390,
+      790
+    ]
+  },
+  {
+    "sheet": "04-studio",
+    "cell": 5,
+    "label": "Создание копии",
+    "trace": "m3/013",
+    "screenshotCssPx": [
+      390,
+      844
+    ]
+  },
+  {
+    "sheet": "04-studio",
+    "cell": 6,
+    "label": "Пустой редактор",
+    "trace": "routes/008",
+    "screenshotCssPx": [
+      390,
+      844
+    ]
+  },
+  {
+    "sheet": "04-studio",
+    "cell": 7,
+    "label": "Полотно",
+    "trace": "routes/009",
+    "screenshotCssPx": [
+      390,
+      844
+    ]
+  },
+  {
+    "sheet": "04-studio",
+    "cell": 8,
+    "label": "Выбор цвета",
+    "trace": "extra/color",
+    "screenshotCssPx": [
+      390,
+      844
+    ]
+  },
+  {
+    "sheet": "05-service",
+    "cell": 1,
+    "label": "Пауза",
+    "trace": "m3/037",
+    "screenshotCssPx": [
+      320,
+      568
+    ]
+  },
+  {
+    "sheet": "05-service",
+    "cell": 2,
+    "label": "Настройки из паузы",
+    "trace": "m3/038",
+    "screenshotCssPx": [
+      320,
+      568
+    ]
+  },
+  {
+    "sheet": "05-service",
+    "cell": 3,
+    "label": "Настройки из меню",
+    "trace": "extra/settings",
+    "screenshotCssPx": [
+      390,
+      844
+    ]
+  },
+  {
+    "sheet": "05-service",
+    "cell": 4,
+    "label": "Помощь",
+    "trace": "help/003",
+    "screenshotCssPx": [
+      390,
+      844
+    ]
+  },
+  {
+    "sheet": "05-service",
+    "cell": 5,
+    "label": "Готовое поле",
+    "trace": "help/013",
+    "screenshotCssPx": [
+      390,
+      844
+    ]
+  },
+  {
+    "sheet": "05-service",
+    "cell": 6,
+    "label": "Памятка об опорах",
+    "trace": "help/027",
+    "screenshotCssPx": [
+      320,
+      568
+    ]
+  },
+  {
+    "sheet": "05-service",
+    "cell": 7,
+    "label": "Перезапуск",
+    "trace": "m1/010",
+    "screenshotCssPx": [
+      390,
+      844
+    ]
+  },
+  {
+    "sheet": "05-service",
+    "cell": 8,
+    "label": "Восстановление",
+    "trace": "help/033",
+    "screenshotCssPx": [
+      390,
+      844
+    ]
+  },
+  {
+    "sheet": "06-states",
+    "cell": 1,
+    "label": "Размер полотна",
+    "trace": "m4/007",
+    "screenshotCssPx": [
+      390,
+      844
+    ]
+  },
+  {
+    "sheet": "06-states",
+    "cell": 2,
+    "label": "Закрепления",
+    "trace": "m4/012",
+    "screenshotCssPx": [
+      390,
+      844
+    ]
+  },
+  {
+    "sheet": "06-states",
+    "cell": 3,
+    "label": "Стартовая раскладка",
+    "trace": "extra/shuffle",
+    "screenshotCssPx": [
+      390,
+      844
+    ]
+  },
+  {
+    "sheet": "06-states",
+    "cell": 4,
+    "label": "История редактора",
+    "trace": "m4/015",
+    "screenshotCssPx": [
+      390,
+      844
+    ]
+  },
+  {
+    "sheet": "06-states",
+    "cell": 5,
+    "label": "Сбой календаря",
+    "trace": "daily/003",
+    "screenshotCssPx": [
+      390,
+      740
+    ]
+  },
+  {
+    "sheet": "06-states",
+    "cell": 6,
+    "label": "Ошибка экспорта",
+    "trace": "m4-export/007",
+    "screenshotCssPx": [
+      390,
+      790
+    ]
+  },
+  {
+    "sheet": "06-states",
+    "cell": 7,
+    "label": "Запрошена загрузка",
+    "trace": "m4-export/009",
+    "screenshotCssPx": [
+      390,
+      790
+    ]
+  },
+  {
+    "sheet": "06-states",
+    "cell": 8,
+    "label": "Ошибка запуска",
+    "trace": "extra/booterror",
+    "screenshotCssPx": [
+      390,
+      844
+    ]
+  }
+]
