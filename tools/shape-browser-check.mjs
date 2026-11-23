@@ -39,7 +39,7 @@ try {
   await page.goto(base);
   await page.waitForSelector('html[data-state=ready]');
   await page.locator('#levels').tap();
-  await button('Испытания').tap();
+  await button('Режимы').tap(); await button('Испытания').tap();
   await button('Фигуры').tap();
   const levels = await page.evaluate(async () => (await import('/src/domain/shapeLevels.ts')).geometryLevels);
   const results = [];

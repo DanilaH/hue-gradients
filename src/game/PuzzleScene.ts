@@ -6,8 +6,9 @@ import { airborneFraming, amount, ease, FRAME_END_MS, FRAME_START_MS, LANDING_MS
 import { clampCamera, edgeVelocity, moveCamera, REST_CAMERA, revealCell, viewBoard, type Camera, type Point } from './boardCamera';
 
 export const GAME_PRESENTABLE = 'hue:presentable';
-interface Hooks { swap(from: number, to: number): void; pin(position: number): void; paint(): void; interaction?(value: { x: number; y: number; color: string } | null): void }
+interface Hooks { motion(): boolean; swap(from: number, to: number): void; pin(position: number): void; paint(): void; interaction?(value: { x: number; y: number; color: string } | null): void }
 interface Gesture { id: number; from: number | null; x: number; y: number; latestX: number; latestY: number; drag: boolean; layout: string; camera: Camera }
+interface Lift { from: number; to: number | null; dx: number; dy: number }
 interface Navigation { anchor: Point; distance: number; camera: Camera }
 const liftHeight = (cell: Cell) => Math.min(32, Math.max(10, Math.min(cell.width, cell.height) * .48));
 
@@ -28,8 +29,9 @@ export class PuzzleScene extends Phaser.Scene {
   private readonly touches = new Map<number, Point>();
   private navigation: Navigation | null = null;
   private victory: { started: number; from: Camera; at: number; delays: number[]; elapsed: number; frame(elapsed: number, board: BoardGeometry): void } | null = null;
-  private released: { from: number; to: number; dx: number; dy: number } | null = null;
-  private settle: { from: number; to: number; dx: number; dy: number; started: number } | null = null;
+  private released: Lift | null = null;
+  private returning: (Lift & { started: number }) | null = null;
+  private settle: (Lift & { to: number; started: number; land?: () => void }) | null = null;
   constructor(level: LevelDefinition, attempt: Attempt, private readonly hooks: Hooks) { super('puzzle'); this.level = level; this.attempt = attempt; }
   create(): void {
     // A single Canvas renderer keeps clip paths and repeating tile ink in the same paint pass.
@@ -54,20 +56,26 @@ export class PuzzleScene extends Phaser.Scene {
     this.draw();
     this.game.events.once(Phaser.Core.Events.POST_RENDER, () => this.game.events.emit(GAME_PRESENTABLE));
   }
-  setView(level: LevelDefinition, attempt: Attempt, preview: boolean, enabled: boolean, concealed = false): void {
+  setView(level: LevelDefinition, attempt: Attempt, preview: boolean, enabled: boolean, concealed = false, preserveRelease = false): void {
     const switched = this.level !== level;
     if (switched) { this.focused = null; this.camera = REST_CAMERA; }
-    if (this.level !== level || this.attempt !== attempt || preview !== this.preview || concealed !== this.concealed || !enabled && !this.victory) this.cancel();
+    if (switched || this.attempt !== attempt || preview !== this.preview || concealed !== this.concealed || !enabled && !this.victory) {
+      const release = preserveRelease && !switched ? this.released : null;
+      this.cancel();
+      this.released = release;
+    }
     this.level = level; this.attempt = attempt; this.preview = preview; this.concealed = concealed;
     this.enabled = enabled && !attempt.completed && !preview && !concealed;
     if (this.drawable) { if (switched) this.labelBoard(); this.draw(); }
   }
-  presentSwap(previous: Attempt, next: Attempt, from: number, to: number, motion: boolean, cost = 1): void {
+  discardRelease(): void { this.released = null; }
+  presentSwap(previous: Attempt, next: Attempt, from: number, to: number, motion: boolean, cost = 1, land?: () => void): void {
     const release = this.released; this.released = null;
-    if (!motion || previous.attemptId !== next.attemptId || next.moves !== previous.moves + cost ||
+    if (previous.attemptId !== next.attemptId || next.moves !== previous.moves + cost ||
         previous.board[from] !== next.board[to] || previous.board[to] !== next.board[from]) return;
-    this.settle = { from, to, dx: release?.from === from && release.to === to ? release.dx : 0,
-      dy: release?.from === from && release.to === to ? release.dy : 0, started: performance.now() };
+    if (!motion) { this.draw(); land?.(); return; }
+    const offset = release?.from === from && release.to === to ? release : { dx: 0, dy: 0 };
+    this.settle = { from, to, dx: offset.dx, dy: offset.dy, started: performance.now(), ...(land ? { land } : {}) };
     this.game.canvas.dataset.settling = 'true'; this.draw();
   }
   presentVictory(at: number, frame: NonNullable<PuzzleScene['victory']>['frame']): void {
@@ -102,11 +110,11 @@ export class PuzzleScene extends Phaser.Scene {
   }
   isAnimating(): boolean {
     const edge = this.edge();
-    return this.victory !== null || this.settle !== null || edge.x !== 0 || edge.y !== 0;
+    return this.victory !== null || this.settle !== null || this.returning !== null || edge.x !== 0 || edge.y !== 0;
   }
   update(_time: number, delta: number): void {
     const edge = this.edge();
-    if (!this.victory && !this.settle && !edge.x && !edge.y) return;
+    if (!this.victory && !this.settle && !this.returning && !edge.x && !edge.y) return;
     if (this.victory) {
       const beat = this.victory, elapsed = performance.now() - beat.started;
       beat.elapsed = elapsed;
@@ -114,7 +122,9 @@ export class PuzzleScene extends Phaser.Scene {
       beat.frame(elapsed, this.geometry);
       return;
     }
-    if (this.settle && performance.now() - this.settle.started >= 150) this.finishSettle();
+    const now = performance.now();
+    if (this.settle && now - this.settle.started >= 150) this.finishSettle(true);
+    if (this.returning && now - this.returning.started >= 185) this.returning = null;
     if (edge.x || edge.y) {
       const seconds = Math.min(delta, 40) / 1000;
       this.camera = clampCamera(this.natural, { zoom: this.camera.zoom,
@@ -122,7 +132,12 @@ export class PuzzleScene extends Phaser.Scene {
     }
     this.draw();
   }
-  private finishSettle(): void { this.settle = null; if (this.game?.canvas) this.game.canvas.dataset.settling = 'false'; }
+  private finishSettle(land = false): void {
+    const finish = this.settle?.land;
+    this.settle = null;
+    if (this.game?.canvas) this.game.canvas.dataset.settling = 'false';
+    if (land) finish?.();
+  }
   private point(event: PointerEvent): { x: number; y: number } {
     const rect = this.game.canvas.getBoundingClientRect();
     return { x: event.clientX - rect.left, y: event.clientY - rect.top };
@@ -143,13 +158,18 @@ export class PuzzleScene extends Phaser.Scene {
       distance: Math.max(1, Math.hypot(a!.x - b.x, a!.y - b.y)) };
   }
   private startNavigation(): void {
-    this.finishSettle();
+    this.finishSettle(true);
+    this.returning = null;
     this.gesture = null; this.selected = null; this.hooks.interaction?.(null);
     this.navigation = { ...this.navPoints(), camera: this.camera };
   }
   private gestureOffset(gesture: Gesture): Point {
-    return { x: gesture.latestX - gesture.x + gesture.camera.x - this.camera.x,
-      y: gesture.latestY - gesture.y + gesture.camera.y - this.camera.y };
+    const center = cellCenter(this.boardCell(gesture.from!));
+    const x = center.x + gesture.latestX - gesture.x + gesture.camera.x - this.camera.x;
+    const y = center.y + gesture.latestY - gesture.y + gesture.camera.y - this.camera.y;
+    // Captured pointers may leave the canvas. Keep a visible portion at the edge until release.
+    return { x: Math.max(0, Math.min(this.natural.width, x)) - center.x,
+      y: Math.max(0, Math.min(this.natural.y + this.natural.height, y)) - center.y };
   }
   private down = (event: PointerEvent): void => {
     if (!this.enabled || event.button !== 0) return;
@@ -166,7 +186,8 @@ export class PuzzleScene extends Phaser.Scene {
       }
     }
     if (this.gesture) return;
-    this.finishSettle();
+    this.finishSettle(true);
+    this.returning = null;
     this.gesture = { id: event.pointerId, from: this.positionAt(x, y), x, y, latestX: x, latestY: y, drag: false,
       layout: this.layoutKey(), camera: this.camera };
     this.respond(this.gesture.from, x, y);
@@ -205,12 +226,15 @@ export class PuzzleScene extends Phaser.Scene {
     this.gesture = null;
     if (this.game.canvas.hasPointerCapture(event.pointerId)) this.game.canvas.releasePointerCapture(event.pointerId);
     if (!this.enabled) { this.cancel(); return; }
-    if (g.drag) {
+    if (g.drag && g.from !== null) {
       this.selected = null;
-      if (g.from !== null && target !== null && canSwap(this.level, g.from, target)) {
-        const offset = this.gestureOffset(g);
-        this.released = { from: g.from, to: target, dx: offset.x, dy: offset.y };
+      const { x: dx, y: dy } = this.gestureOffset(g);
+      const lift = { from: g.from, to: target, dx, dy };
+      if (target !== null && canSwap(this.level, g.from, target)) {
+        this.released = lift;
         this.hooks.swap(g.from, target);
+      } else if (this.hooks.motion()) {
+        this.returning = { ...lift, started: performance.now() };
       }
     } else if (g.from === target) this.tap(target);
     else this.selected = null;
@@ -224,13 +248,13 @@ export class PuzzleScene extends Phaser.Scene {
     if (this.selected === null) this.selected = position;
     else {
       const from = this.selected; this.selected = null;
-      if (canSwap(this.level, from, position)) { this.released = { from, to: position, dx: 0, dy: 0 }; this.hooks.swap(from, position); }
+      if (canSwap(this.level, from, position)) this.hooks.swap(from, position);
     }
   }
   cancel = (event?: PointerEvent): void => {
     // Releasing capture after a completed tap must not erase its tap–tap selection.
     if (event && event.pointerId !== this.gesture?.id && !this.touches.has(event.pointerId)) return;
-    this.finishSettle(); this.hooks.interaction?.(null);
+    this.finishSettle(); this.released = null; this.returning = null; this.hooks.interaction?.(null);
     const ids = new Set(this.touches.keys());
     if (this.gesture) ids.add(this.gesture.id);
     this.touches.clear(); this.navigation = null; this.gesture = null; this.selected = null;
@@ -241,7 +265,8 @@ export class PuzzleScene extends Phaser.Scene {
   };
   private key = (event: KeyboardEvent): void => {
     if (!this.enabled) return;
-    this.finishSettle();
+    this.finishSettle(event.key !== 'Escape');
+    this.returning = null;
     let position = this.focused ?? 0;
     if (this.large() && ['+', '=', '-'].includes(event.key)) {
       this.cancel();
@@ -369,7 +394,9 @@ export class PuzzleScene extends Phaser.Scene {
       ctx.restore();
     };
     const settle = elapsed >= 150 && beat ? null : this.settle, g = this.gesture;
-    const lifted = g?.drag ? g.from : null;
+    const activeDrag = g?.drag && g.from !== null ? g : null;
+    const returning = this.returning;
+    const lifted = activeDrag?.from ?? this.released?.from ?? returning?.from ?? null;
     const airborne: number[] = [];
     for (let i = 0; i < this.attempt.board.length; i++) {
       if (i === lifted) {
@@ -389,6 +416,7 @@ export class PuzzleScene extends Phaser.Scene {
     if (import.meta.env.DEV) {
       if (beat) ctx.canvas.dataset.victoryFrame = JSON.stringify({ elapsed, at: beat.at, airborne, delays: beat.delays });
       else delete ctx.canvas.dataset.victoryFrame;
+      ctx.canvas.dataset.lift = activeDrag ? 'held' : this.released ? 'pending' : returning ? 'returning' : 'none';
     }
     if (settle) {
       const from = cellAt(this.geometry, settle.from), to = cellAt(this.geometry, settle.to);
@@ -396,11 +424,13 @@ export class PuzzleScene extends Phaser.Scene {
       tile(settle.from, (to.x - from.x) * remaining, (to.y - from.y) * remaining);
       tile(settle.to, (from.x - to.x + settle.dx) * remaining, (from.y - to.y + settle.dy) * remaining);
     }
-    if (g && lifted !== null) {
-      const target = this.positionAt(g.latestX, g.latestY);
-      if (target !== null && canSwap(this.level, lifted, target)) this.brackets(ctx, cellAt(this.geometry, target));
-      const offset = this.gestureOffset(g);
-      tile(lifted, offset.x, offset.y, true);
+    if (lifted !== null) {
+      const target = activeDrag ? this.positionAt(activeDrag.latestX, activeDrag.latestY) : this.released?.to;
+      if (target != null && canSwap(this.level, lifted, target)) this.brackets(ctx, cellAt(this.geometry, target));
+      const offset = activeDrag ? this.gestureOffset(activeDrag) : null;
+      const retained = this.released ?? returning;
+      const remaining = returning ? (1 - amount((performance.now() - returning.started) / 185)) ** 3 : 1;
+      tile(lifted, (offset?.x ?? retained?.dx ?? 0) * remaining, (offset?.y ?? retained?.dy ?? 0) * remaining, true);
     }
     ctx.restore();
   }

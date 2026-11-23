@@ -34,7 +34,7 @@ try {
   await page.goto(base);
   await page.waitForSelector('html[data-state=ready]');
   await page.locator('#levels').tap();
-  await button('Испытания').tap();
+  await button('Режимы').tap(); await button('Испытания').tap();
   await button('Фигуры').tap();
   await page.locator('[data-challenge-id=geometry-v1-wide]').tap();
   await idle();

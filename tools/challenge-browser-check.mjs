@@ -44,7 +44,7 @@ try {
     return JSON.parse(saved.snapshotJson);
   });
   const active = data => data.challengeProgress.attempts[data.challengeProgress.active];
-  const list = async () => { await page.locator('#levels').tap(); await button('Испытания').tap(); };
+  const list = async () => { await page.locator('#levels').tap(); await button('Режимы').tap(); await button('Испытания').tap(); };
   const card = n => page.locator(`[data-challenge-id=challenge-v1-${n}]`);
   const board = page.locator('#board-region canvas');
   const tap = async (position, width, height) => {

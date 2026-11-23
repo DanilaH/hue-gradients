@@ -36,7 +36,7 @@ try {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   const button = name => page.getByRole('button', { name, exact: true });
-  const idle = () => page.waitForSelector('#hue-app[data-busy=false]');
+  const idle = () => page.waitForSelector('#hue-app[data-busy=false]:not([data-board-entry])');
   const ready = () => page.waitForSelector('html[data-state=ready]');
   const shelf = async () => { await page.locator('#levels').tap(); await button('Альбом').tap(); await button('Книги').tap(); };
   const books = async () => { await shelf(); await page.locator('[data-book-cover=book-v1-dawn]').tap(); };

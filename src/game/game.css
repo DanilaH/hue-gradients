@@ -289,12 +289,11 @@ html[data-host=browser] #game-dialog[data-picker=true] #dialog-actions {
   position: relative; width: min(100%,640px); justify-self: center; min-height: 145px;
   overflow: hidden; touch-action: pan-y pinch-zoom; user-select: none;
 }
-.level-preview, .level-peek { position: absolute; top: 12%; width: var(--field-width); height: 88%; display: grid; place-items: center; transform: translateX(var(--picker-drag,0px)); }
-.level-preview { left: 50%; transform: translateX(calc(-50% + var(--picker-drag,0px))); }
+.level-preview, .level-peek { position: absolute; top: 12%; width: var(--field-width); height: 88%; display: grid; place-items: center; }
+.level-preview { left: 50%; transform: translateX(-50%); }
 button.level-preview.quiet { padding: 0; border: 0; border-radius: 0; background: transparent; }
 .level-stage .composition { height: 100%; min-height: 0; pointer-events: none; }
 .level-preview .composition-grid { filter: drop-shadow(0 9px 24px #0b08175e); }
-.level-peek { opacity: .46; }
 .level-peek-prev { right: calc(50% + var(--field-width) / 2 + 12px); }
 .level-peek-next { left: calc(50% + var(--field-width) / 2 + 12px); }
 .level-locked::before {
@@ -796,7 +795,7 @@ html[data-host=browser] .editor-panel {
 .chapter-strip button[data-locked=true] { color: #c9adca; }
 .chapter-strip button[aria-current=true], .chapter-strip button:focus-visible { outline: 2px solid #ffdfa4; outline-offset: -2px; }
 .chapter-pieces { display: grid; grid-template-columns: repeat(15,minmax(0,1fr)); gap: 2px; width: 100%; }
-.chapter-pieces span { height: 13px; opacity: .26; border-bottom: 2px solid #25182e; }
+.chapter-pieces span { height: 13px; background: #8e8196; opacity: .26; border-bottom: 2px solid #25182e; }
 .chapter-pieces span[data-earned=true] { opacity: 1; border-bottom-color: #f6d7ab; }
 .challenge-demo { padding: 10px; background: #25182e; border: 1px solid #bb9ab644; }
 .challenge-demo h3, .challenge-demo p { margin: 0; font-size: .88rem; }
@@ -849,3 +848,69 @@ html[data-host=browser] .editor-panel {
   font-weight: 750; font-size: 1.35rem; color: white; text-shadow: 0 1px 5px #201229;
 }
 #game-dialog[data-layer=preferences] .setting small { margin-left: auto; margin-right: 10px; color: #e6c5de; }
+
+/* Campaign picker, chapter overview and its modal preferences. */
+.level-track { position: absolute; inset: 0; }
+.level-picker-nav button { min-height: 48px; border-radius: 0; color: #fff2de; background: #281e35; }
+.level-picker-nav button:active:not(:disabled) { background: #43334e; }
+.level-selection { align-items: center; flex-wrap: nowrap; width: min(94%,360px); margin: auto; }
+.level-selection span { flex: 1; min-width: 0; text-align: left; font-size: .9rem; }
+.level-actions > button { border-radius: 0; }
+.level-rail button[aria-current=true] { box-shadow: inset 0 -2px #ffe0b0; }
+.level-picker-links { width: min(100% - 16px,440px); margin-inline: auto; gap: 6px; }
+button.level-chapter-link { flex: 1; border: 0; border-radius: 0; padding-inline: 5px; background: #281e35; }
+.level-chapter-link::after { content: none; }
+#game-dialog[data-chapter-menu=true] #dialog-actions {
+  width: min(100%,560px); margin-inline: auto; grid-template-rows: auto auto auto; align-content: start;
+}
+#game-dialog[data-chapter-menu=true] :is(.chapter-strips,.chapter-progress) { margin: 6px 12px 0; }
+#game-dialog[data-chapter-menu=true] .chapter-note { grid-row: auto; min-height: 1.5em; }
+.chapter-strip button[data-chapter] {
+  grid-template-columns: 46px minmax(0,1fr); align-items: center; background: #2b2139; border-radius: 0;
+}
+.chapter-symbol {
+  --silhouette: polygon(6% 79%,46% 10%,55% 10%,94% 79%,74% 79%,50% 37%,27% 79%);
+  position: relative; grid-row: span 2; width: 43px; aspect-ratio: 1; background: #b29bb6;
+  clip-path: var(--silhouette);
+}
+[data-chapter="2"] .chapter-symbol {
+  --silhouette: polygon(4% 18%,94% 5%,94% 27%,21% 40%,21% 65%,94% 53%,94% 78%,4% 93%);
+}
+[data-chapter="3"] .chapter-symbol {
+  --silhouette: polygon(44% 1%,60% 19%,35% 47%,66% 28%,94% 49%,59% 91%,42% 71%,66% 53%,31% 70%,7% 50%);
+}
+[data-chapter="4"] .chapter-symbol {
+  --silhouette: polygon(7% 13%,92% 13%,92% 85%,7% 85%,7% 70%,74% 70%,74% 31%,25% 31%,25% 57%,59% 57%,59% 44%,38% 44%,38% 39%,68% 39%,68% 62%,7% 62%);
+}
+.chapter-symbol::after { content: ''; position: absolute; inset: 0; background: var(--chapter-palette); clip-path: inset(calc(100% - var(--chapter-coloured)) 0 0); }
+[data-locked=true] .chapter-symbol { background: #776a81; }
+.chapter-progress { border-radius: 0; }
+#menu-preferences {
+  inset: 0 0 0 auto; margin: 0; width: min(92vw,390px); height: 100%; max-height: none; padding: 14px 16px;
+  border: 0; overflow: auto; color: #fff2de; background: #292137; box-shadow: -6px 0 30px #0e091a6b;
+}
+#menu-preferences::backdrop { background: #160c254d; }
+#menu-preferences header { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+#menu-preferences h2 { font-size: 1.2rem; margin: 0; }
+#menu-preferences button { border-radius: 0; min-width: 48px; padding: 0; }
+.menu-preference-rows { display: grid; gap: 6px; margin-top: 16px; }
+.menu-preference-rows .setting {
+  display: grid; grid-template-columns: 1fr auto 26px; gap: 8px; padding: 8px 9px;
+  background: #392d48; font-size: .9rem;
+}
+.menu-preference-rows .setting small { color: #ded0e6; }
+.menu-preference-rows input { margin: 0; }
+@media (max-width: 360px) or (max-height: 620px) {
+  #game-dialog[data-picker=true] #dialog-actions { --picker-bottom: 10px; }
+  .level-picker-links { flex-wrap: nowrap; }
+  button.level-chapter-link { font-size: .72rem; }
+}
+.board-entry { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
+[data-board-entry=true] #board-region canvas { visibility: hidden; }
+#board-moves { font-size: .78rem; font-variant-numeric: tabular-nums; text-shadow: 0 1px 4px #160e27; }
+.book-slot .book-goal-preview {
+  position: absolute; inset: 0; min-height: 0; width: 100%; height: 100%;
+  padding: 0; opacity: .38; pointer-events: none;
+}
+.book-slot > :is(strong,small) { position: relative; text-shadow: 0 1px 4px #120d1e, 0 1px 3px #120d1e; }
+#dialog-actions[data-meta=editor-home] > button:not(.menu-row) { border-radius: 0; }

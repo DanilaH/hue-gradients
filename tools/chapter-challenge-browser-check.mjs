@@ -37,10 +37,14 @@ try {
   const card = id => page.locator(`[data-challenge-id=${id}]`);
   const chapterList = async () => {
     await page.locator('#levels').tap();
-    await button('Испытания').tap();
+    await button('Режимы').tap(); await button('Испытания').tap();
     await button('Финалы глав').tap();
   };
-  const levelsBack = async () => { await button('‹ Назад').tap(); await button('‹ Назад').tap(); };
+  const levelsBack = async () => {
+    await button('‹ Назад').tap();
+    await button('‹ Назад').tap();
+    await button('‹ Назад').tap();
+  };
   const canvas = () => page.locator('#board-region canvas').boundingBox();
   function point(box, level, position) {
     return { x: box.x + (position % level.width + .5) * box.width / level.width,
@@ -153,8 +157,10 @@ try {
   await idle();
   await levelsBack();
   await page.locator('#levels').tap();
+  await page.locator('[data-open-chapters]').tap();
   await button('Прогресс').tap();
-  assert.match(await page.getByLabel('Главы').innerText(), /Глава 1 · 15\/15 · Собрана · Финал пройден/);
+  assert.match(await page.locator('[data-meta=progress] [data-chapter="1"]').innerText(), /Глава 1 · 15\/15/);
+  assert.match((await page.locator('[data-meta=progress] [data-finale="1"]').getAttribute('aria-label')), /Финал главы 1, рекорд/);
   const { save } = await state(page);
   assert.deepEqual(save.completed, before.completed);
   assert.deepEqual(save.rights, before.rights);

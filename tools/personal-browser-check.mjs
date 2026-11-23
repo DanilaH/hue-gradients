@@ -49,7 +49,8 @@ try {
   const idle = page => page.waitForSelector('#hue-app[data-busy=false]');
   const tasks = async page => {
     await page.locator('#levels').tap();
-    await button(page, 'Задания').tap();
+    await button(page, 'Режимы').tap();
+    await button(page, 'Личные задания').tap();
     await card(page, 'present').waitFor();
   };
   const date = async (page, day) => {

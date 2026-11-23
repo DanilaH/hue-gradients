@@ -31,6 +31,8 @@ export class Atmosphere {
   private readonly ctx: CanvasRenderingContext2D;
   private readonly texture: CanvasPattern | null;
   private target: RGB[] = gels;
+  private base: RGB[] = gels;
+  private neighbour: { level: PaletteField; board: readonly number[] | null; palette: RGB[] } | null = null;
   private current: RGB[] = gels;
   private level: PaletteField | null = null;
   private board: readonly number[] | null = null;
@@ -70,14 +72,26 @@ export class Atmosphere {
     this.pointer = null; this.pointerPower = 0; this.pointerHeld = false; this.ripple = null;
   }
   setModel(level: PaletteField | null, board: readonly number[] | null, blendSolution = false): void {
-    if (this.level === level && this.board === board && this.blendSolution === blendSolution) return;
+    if (this.level === level && this.board === board && this.blendSolution === blendSolution) {
+      this.target = this.base;
+      return;
+    }
     this.level = level; this.board = board; this.blendSolution = blendSolution;
     this.target = level ? spatialPalette(level, board) : gels;
     if (level && board && blendSolution) {
       const solved = spatialPalette(level, null);
       this.target = this.target.map((color, i) => color.map((value, c) => value * .76 + solved[i]![c]! * .24) as unknown as RGB);
     }
+    this.base = this.target;
     if (!this.active || !this.motion) { this.current = this.target; this.draw(); }
+  }
+  previewPalette(level: PaletteField | null, board: readonly number[] | null, amount: number): void {
+    if (!this.motion || !amount) { this.target = this.base; return; }
+    if (level && (this.neighbour?.level !== level || this.neighbour.board !== board)) {
+      this.neighbour = { level, board, palette: spatialPalette(level, board) };
+    }
+    const destination = level ? this.neighbour!.palette : gels;
+    this.target = this.base.map((color, i) => color.map((v, c) => v + (destination[i]![c]! - v) * amount) as unknown as RGB);
   }
   configure(active: boolean, motion: boolean): void {
     this.motion = motion; this.active = active;

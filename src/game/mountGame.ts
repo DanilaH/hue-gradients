@@ -11,6 +11,7 @@ import { GUEST_VAULT, Session } from '../app/session';
 import { PuzzleScene, GAME_PRESENTABLE } from './PuzzleScene';
 import { Atmosphere, type ColourPointer } from './atmosphere';
 import { cellCenter } from './geometry';
+import { BoardEntry, readEntrySource } from './boardEntry';
 import { AmbientMusic } from './music';
 import { GameFeedback, type Haptic } from './feedback';
 import { calendarSelection, dailyLabel, isMenuList, levelPreview, personalObjects, renderMeta, type MetaRoute } from './metaView';
@@ -68,11 +69,16 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   parent.innerHTML = `<section id="hue-app" aria-label="Полусон">
     <header class="hud"><button id="levels" class="quiet">‹ Уровни</button><h1 id="title"></h1><button id="settings" class="quiet" aria-label="Пауза">⋯</button></header>
     <div id="board-region"></div>
-    <footer><p id="guidance" aria-live="polite" hidden></p><button id="help" class="quiet">Подсказка</button></footer>
+    <footer><p id="guidance" aria-live="polite" hidden></p><small id="board-moves" hidden></small><button id="help" class="quiet">Подсказка</button></footer>
     <dialog id="game-dialog" aria-labelledby="dialog-title">${victoryPrism}<h2 id="dialog-title"></h2><p id="dialog-copy"></p><p id="chapter-unlock" hidden></p><div id="dialog-actions"></div></dialog>
+    <dialog id="menu-preferences" aria-labelledby="menu-preferences-title">
+      <header><h2 id="menu-preferences-title">Настройки</h2><button type="button" aria-label="Закрыть настройки">×</button></header>
+      <div class="menu-preference-rows"></div>
+    </dialog>
   </section>`;
   const root = parent.querySelector<HTMLElement>('#hue-app')!;
   const region = root.querySelector<HTMLElement>('#board-region')!;
+  const boardEntry = new BoardEntry(root);
   const marker = document.createElement('span');
   marker.className = 'tile-mark';
   marker.hidden = true;
@@ -87,6 +93,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   const listeners = new AbortController();
   let alive = true, busy = false, ready = false, paintPending = false, notice = '';
   let markPosition: number | null = null, markTimer: ReturnType<typeof setTimeout> | undefined;
+  let keepRelease = false;
   let pendingHelp: (() => void) | null = null;
   let foregroundEpoch = 0;
   let queuedClock = false;
@@ -160,6 +167,62 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       else actions.querySelector('button')?.focus({ preventScroll: true });
     }
   }
+  const menuPreferences = byId<HTMLDialogElement>('menu-preferences');
+  const menuPreferenceRows = menuPreferences.querySelector<HTMLElement>('.menu-preference-rows')!;
+  let preferencesFlight: Animation | undefined;
+  function populatePreferences(container: HTMLElement): void {
+    for (const [key, label] of [['sound', 'Звуки'], ['music', 'Музыка'], ['haptics', 'Вибрация'], ['motion', 'Анимации'], ['statistics', 'Статистика уровня']] as const) {
+      const row = document.createElement('label'); row.className = 'setting';
+      const input = document.createElement('input'); input.type = 'checkbox'; input.checked = session.state.preferences[key];
+      input.dataset.preference = key;
+      input.setAttribute('aria-label', label);
+      input.onchange = () => {
+        if (key === 'music' && input.checked) music.unlock();
+        void run({ kind: 'preferences', key, value: input.checked });
+      };
+      const title = document.createElement('span'); title.textContent = label;
+      const status = document.createElement('small'); status.setAttribute('aria-hidden', 'true');
+      row.append(title, status, input); container.append(row);
+    }
+    syncPreferences(container);
+  }
+  function syncPreferences(container: HTMLElement): void {
+    for (const input of container.querySelectorAll<HTMLInputElement>('input[data-preference]')) {
+      const key = input.dataset.preference as keyof typeof session.state.preferences;
+      if (!busy) input.checked = session.state.preferences[key];
+      input.disabled = busy || activity.isBlocked();
+      input.previousElementSibling!.textContent = input.checked ? 'Вкл.' : 'Выкл.';
+    }
+  }
+  function showMenuPreferences(): void {
+    if (menuPreferences.open) return;
+    populatePreferences(menuPreferenceRows);
+    menuPreferences.showModal();
+    if (motionAllowed()) preferencesFlight = menuPreferences.animate(
+      [{ transform: 'translateX(100%)' }, { transform: 'translateX(0)' }],
+      { duration: 250, easing: 'cubic-bezier(.2,.68,.3,1)' },
+    );
+  }
+  function closeMenuPreferences(animate = true): void {
+    if (menuPreferences.dataset.closing === 'true' && animate) return;
+    const transform = getComputedStyle(menuPreferences).transform;
+    preferencesFlight?.cancel();
+    const close = () => {
+      delete menuPreferences.dataset.closing;
+      menuPreferences.close();
+      menuPreferenceRows.replaceChildren();
+    };
+    if (!animate || !motionAllowed()) { close(); return; }
+    menuPreferences.dataset.closing = 'true';
+    preferencesFlight = menuPreferences.animate(
+      [{ transform }, { transform: 'translateX(100%)' }],
+      { duration: 190, easing: 'ease-in', fill: 'forwards' },
+    );
+    preferencesFlight.onfinish = () => { close(); preferencesFlight?.cancel(); };
+  }
+  menuPreferences.querySelector('button')!.onclick = () => closeMenuPreferences();
+  menuPreferences.addEventListener('cancel', event => { event.preventDefault(); closeMenuPreferences(); }, { signal: listeners.signal });
+
   let lastFocus: HTMLElement | null = null;
   let metaRoute: MetaRoute = { kind: 'chapter', levelId: session.state.activeLevelId };
   const chosenLevels = new Map<number, string>();
@@ -167,6 +230,23 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     ?? (chapterIndexFor(session.state.activeLevelId) === index ? session.state.activeLevelId : recommendedLevel(session.state, index))
     ?? chapters[index]!.levelIds[0]!;
   let metaHistory: MetaRoute[] = [], metaReturn: Layer = 'none';
+  const campaignRoute = (): Extract<MetaRoute, { kind: 'chapter' }> => ({ kind: 'chapter', levelId: session.state.activeLevelId });
+  const modeTrail = (): MetaRoute[] => [campaignRoute(), { kind: 'modes' }];
+  let previousMode: MetaRoute['kind'] | undefined;
+  let playMenu: { kind: MetaRoute['kind']; history: MetaRoute[]; scroll: number } | null = null;
+  let returningScroll: number | undefined;
+  function rememberPlayMenu(): void {
+    if (layer === 'meta') playMenu = { kind: metaRoute.kind, history: [...metaHistory], scroll: dialog.scrollTop };
+  }
+  function restorePlayMenu(route: MetaRoute, fallback: MetaRoute[]): void {
+    const origin = playMenu?.kind === route.kind ? playMenu : null;
+    playMenu = null;
+    metaReturn = gameLayer();
+    metaHistory = origin?.history ?? fallback;
+    returningScroll = origin?.scroll;
+    metaRoute = route;
+    layer = 'meta';
+  }
   let restartLevelId: string | null = null, restartReturn: Layer = 'none';
   const initialLevel = current().level;
   // A quarantined attempt is never silently written as a fresh start. This value is only a display placeholder.
@@ -178,7 +258,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     return { ...value, x: (value.x + inner.x - outer.x) / outer.width, y: (value.y + inner.y - outer.y) / outer.height };
   }
   const scene = new PuzzleScene(initialLevel, initialAttempt, {
-    paint, swap: (from, to) => {
+    paint, motion: motionAllowed, swap: (from, to) => {
       const { own, attempt, challenge, timed, daily, personal } = current();
       if (!attempt) return;
       try { options.onIntent?.({ kind: 'swap-intent', mode: gameMode(session.state) }); }
@@ -225,6 +305,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (!alive || !game.isBooted) return;
     const s = size(); game.canvas.style.width = `${s.width}px`; game.canvas.style.height = `${s.height}px`;
     atmosphere.resize();
+    if (boardEntry.viewportChanged()) { boardEntry.stop(); render(); }
     const w = Math.round(s.width * s.dpr), h = Math.round(s.height * s.dpr);
     if (game.scale.width !== w || game.scale.height !== h) { scene.cancel(); game.scale.resize(w, h); }
     positionMark();
@@ -264,6 +345,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (layer === 'meta' && metaRoute.kind === 'book') finishInsertion();
     if (layer !== 'meta') { metaReturn = layer; metaHistory = []; }
     else {
+      if (metaRoute.kind === 'modes' && route.kind !== 'modes') previousMode = route.kind;
       const samePicker = route.kind === 'chapter' && metaRoute.kind === 'chapter'
         || route.kind === 'daily' && metaRoute.kind === 'daily'
         || route.kind === 'personal' && metaRoute.kind === 'personal'
@@ -288,13 +370,26 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   }
   function startLevel(id: string, book?: BookTarget, restart = false): void {
     if (current().own) { void run({ kind: 'author-exit' }, () => queueMicrotask(() => startLevel(id, book, restart))); return; }
-    const after = () => { metaHistory = []; notice = ''; layer = gameLayer(); };
+    if (book) rememberPlayMenu();
+    else playMenu = null;
+    const model = layer === 'meta' && (metaRoute.kind === 'chapter' || metaRoute.kind === 'book') ? levelPreview(session.state,id) : null;
+    const art = model && actions.querySelector<SVGSVGElement>(book
+      ? `[data-slot="${book.slot}"] .composition-grid` : `.level-preview[data-picker-work="${id}"] .composition-grid`);
+    const source = art && motionAllowed() ? readEntrySource(art, model?.board ?? null) : null;
+    const after = () => {
+      metaHistory = []; notice = ''; layer = gameLayer();
+      const { level, attempt } = current();
+      if (source && layer === 'none' && attempt && motionAllowed()) {
+        boardEntry.play(source, region.getBoundingClientRect(), level, attempt, render);
+      }
+    };
     const sameSource = book ? currentBook()?.bookId === book.bookId && currentBook()?.slot === book.slot : !session.state.bookOrigin;
     if (!restart && sameSource && session.state.activeLevelId === id && session.state.attempts[id]) { after(); render(); }
     else void run({ kind: restart ? 'restart' : 'open', levelId: id, attemptId: crypto.randomUUID(), ...(book ? { book } : {}) }, after);
   }
   function repeatLevel(id: string): void { startLevel(id, undefined, true); }
   function playChallenge(id: string, restart: boolean, book?: BookTarget, entry?: 'progress'): void {
+    rememberPlayMenu();
     const firstOpen = !session.state.challengeProgress?.attempts[id];
     if (!restart && current().challenge?.level.id === id && book?.bookId === currentBook()?.bookId &&
         book?.slot === currentBook()?.slot && session.state.challengeProgress?.entry === entry) {
@@ -331,10 +426,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     render();
   }
   function showBook(bookId: string, slot?: number): void {
-    metaReturn = gameLayer();
-    metaHistory = [{ kind: 'chapter', levelId: session.state.activeLevelId }, { kind: 'album', tab: 'campaign' }, { kind: 'books' }];
-    metaRoute = { kind: 'book', bookId, ...(slot !== undefined ? { slot } : {}) };
-    layer = 'meta';
+    restorePlayMenu({ kind: 'book', bookId, ...(slot !== undefined ? { slot } : {}) },
+      [campaignRoute(), { kind: 'album', tab: 'campaign' }, { kind: 'books' }]);
     if (newlyFilled?.bookId === bookId && newlyFilled.slot === slot) {
       if (motionAllowed()) {
         bookInsertion = newlyFilled;
@@ -350,11 +443,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     showBook(origin.bookId, origin.slot);
     render();
   }
-  function challengeLobby(group?: 'chapter' | 'geometry'): void {
-    metaReturn = gameLayer();
-    metaHistory = [{ kind: 'chapter', levelId: session.state.activeLevelId }];
-    metaRoute = { kind: 'challenges', ...(group ? { group } : {}) };
-    layer = 'meta';
+  function challengeLobby(group?: 'chapter' | 'geometry', selected?: string): void {
+    restorePlayMenu({ kind: 'challenges', ...(group ? { group } : {}), ...(selected ? { selected } : {}) }, modeTrail());
   }
   function leaveChallenge(): void {
     const challenge = current().challenge;
@@ -365,11 +455,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       if (origin) showBook(origin.bookId, origin.slot);
       else if (challenge?.book) showBook(challenge.book.id);
       else if (progress !== undefined) {
-        metaReturn = gameLayer();
-        metaHistory = [{ kind: 'chapter', levelId: session.state.activeLevelId }];
-        metaRoute = { kind: 'progress', chapter: progress };
-        layer = 'meta';
-      } else challengeLobby(group);
+        restorePlayMenu({ kind: 'progress', chapter: progress }, [{ ...campaignRoute(), chapterMenu: progress }]);
+      } else challengeLobby(group, challenge?.level.id);
     });
   }
   async function refreshDaily(): Promise<void> {
@@ -385,6 +472,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     finally { dailyLoading = false; if (alive && layer === 'meta' && (metaRoute.kind === 'daily' || metaRoute.kind === 'books')) render(); }
   }
   function playDaily(date: string, replay: boolean, entry: 'books' | 'daily' = metaRoute.kind === 'books' ? 'books' : 'daily'): void {
+    rememberPlayMenu();
     void run({ kind: 'daily-open', date, replay, entry, attemptId: crypto.randomUUID() }, () => {
       metaHistory = [];
       layer = gameLayer();
@@ -394,10 +482,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     const daily = current().daily;
     if (!daily) return;
     void run({ kind: 'daily-leave' }, () => {
-      metaReturn = gameLayer();
-      metaHistory = daily.entry === 'books' ? [{ kind: 'album', tab: 'campaign' }] : [{ kind: 'chapter', levelId: session.state.activeLevelId }];
-      metaRoute = daily.entry === 'books' ? { kind: 'books', eventDate: daily.date } : { kind: 'daily', date: daily.date };
-      layer = 'meta';
+      if (daily.entry === 'books') restorePlayMenu({ kind: 'books', eventDate: daily.date }, [campaignRoute(), { kind: 'album', tab: 'campaign' }]);
+      else restorePlayMenu({ kind: 'daily', date: daily.date, month: daily.date.slice(0,7) }, modeTrail());
       queueMicrotask(() => void refreshDaily());
     });
   }
@@ -411,6 +497,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       else void issuePersonal();
       return;
     }
+    rememberPlayMenu();
     void run({ kind: 'personal-open', key, restart, attemptId: crypto.randomUUID(), now: clockNow() }, () => {
       metaHistory = [];
       layer = gameLayer();
@@ -419,14 +506,12 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   function leavePersonal(): void {
     const key = current().personal?.key;
     void run({ kind: 'personal-leave', now: clockNow() }, () => {
-      metaReturn = gameLayer();
-      metaHistory = [{ kind: 'chapter', levelId: session.state.activeLevelId }];
-      metaRoute = { kind: 'personal', ...(key ? { key } : {}) };
-      layer = 'meta';
+      restorePlayMenu({ kind: 'personal', ...(key ? { key } : {}) }, modeTrail());
       queueMicrotask(() => void issuePersonal());
     });
   }
   function playTimed(): void {
+    rememberPlayMenu();
     const entry = layer === 'meta' && metaRoute.kind === 'challenges' ? metaRoute.group : current().timed?.entry;
     void run({ kind: 'timed-open', id: crypto.randomUUID(), now: clockNow(), ...(entry ? { entry } : {}) }, () => {
       metaHistory = [];
@@ -489,9 +574,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   function leaveAuthor(): void {
     const own = current().own; if (!own) return;
     void run({ kind: 'author-exit' }, () => {
-      metaHistory = [{ kind: 'album', tab: 'own' }];
-      metaRoute = { kind: 'draft', draftId: own.work.draftId, nodeId: own.node.nodeId };
-      layer = 'meta';
+      restorePlayMenu({ kind: 'draft', draftId: own.work.draftId, nodeId: own.node.nodeId }, [campaignRoute(), { kind: 'album', tab: 'own' }]);
     });
   }
   function selectedWork(): string | null {
@@ -504,11 +587,18 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   }
   function popMeta(): void {
     finishInsertion();
+    const draft = metaRoute.kind === 'draft' ? metaRoute.draftId : undefined;
     const previous = metaHistory.pop();
     const from = previous?.kind === 'album' ? actions.querySelector('.work-card-art')?.getBoundingClientRect() : undefined;
     if (previous) metaRoute = previous;
     else layer = metaReturn;
     render();
+    if (previous?.kind === 'modes' && previousMode) {
+      actions.querySelector<HTMLElement>(`[data-mode-entry="${previousMode}"]`)?.focus({ preventScroll: true });
+    }
+    if (previous?.kind === 'editor-home' && draft) {
+      actions.querySelector<HTMLElement>(`[data-editor-draft="${CSS.escape(draft)}"]`)?.focus({ preventScroll: true });
+    }
     if (from) {
       const cover = actions.querySelector<HTMLCanvasElement>('[data-album-selected] canvas');
       if (cover) movePrint(cover,from,cover.getBoundingClientRect());
@@ -549,12 +639,17 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     albumPositions.set(key, { scroll: scroller.scrollTop, ...(focus ? { focus } : {}) });
   }
   function renderDialog(): void {
+    if (menuPreferences.open) {
+      if (layer === 'meta') { syncPreferences(menuPreferenceRows); return; }
+      closeMenuPreferences(false);
+    }
     rememberAlbum();
     const switchLayer = dialog.dataset.layer !== layer;
     const menu = layer === 'meta' && isMenuList(metaRoute) ? metaRoute.kind : undefined;
     const switchMenu = dialog.dataset.menu !== menu;
     if (switchMenu) dailyFocus = menu === 'daily' && metaRoute.kind === 'daily' ? metaRoute.date : undefined;
-    const menuScroll = !switchMenu && menu ? dialog.scrollTop : 0;
+    const menuScroll = returningScroll ?? (!switchMenu && menu ? dialog.scrollTop : 0);
+    returningScroll = undefined;
     const openDisclosures = !switchMenu && menu
       ? [...actions.querySelectorAll<HTMLDetailsElement>('details[open][data-menu-disclosure]')].map(node => node.dataset.menuDisclosure)
       : [];
@@ -674,20 +769,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
         leaveBoard, true);
     } else if (layer === 'preferences') {
       byId('dialog-title').textContent = 'Настройки';
-      for (const [key, label] of [['sound', 'Звуки'], ['music', 'Музыка'], ['haptics', 'Вибрация'], ['motion', 'Анимации'], ['statistics', 'Статистика уровня']] as const) {
-        const row = document.createElement('label'); row.className = 'setting';
-        const input = document.createElement('input'); input.type = 'checkbox'; input.checked = session.state.preferences[key]; input.disabled = busy || activity.isBlocked();
-        input.setAttribute('aria-label', label);
-        input.onchange = () => {
-          if (key === 'music' && input.checked) music.unlock();
-          void run({ kind: 'preferences', key, value: input.checked });
-        };
-        const title = document.createElement('span'); title.textContent = label;
-        const status = document.createElement('small');
-        status.textContent = input.checked ? 'Вкл.' : 'Выкл.';
-        status.setAttribute('aria-hidden','true');
-        row.append(title, status, input); actions.append(row);
-      }
+      populatePreferences(actions);
       button('Продолжить', resumeBoard, true);
     } else if (layer === 'help-menu') {
       byId('dialog-title').textContent = 'Помощь';
@@ -768,13 +850,23 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
         const nodeId = metaRoute.kind === 'draft' ? metaRoute.nodeId : undefined;
         if (!editorView) editorView = new EditorView(actions, { work, ...(nodeId ? { nodeId } : {}), disabled: busy || activity.isBlocked(), pending: !!session.pending, commit: action => run(action), recover: recoverEditor,
           exportWork: (workId,nodeId) => showMeta({kind:'own-card',workId,nodeId}),
-          play: (workId, nodeId) => run({ kind: 'author-start', workId, nodeId, attemptId: crypto.randomUUID() }, () => { metaHistory = []; layer = current().attempt?.completed ? 'result' : 'none'; }),
+          play: (workId, nodeId) => {
+            rememberPlayMenu();
+            return run({ kind: 'author-start', workId, nodeId, attemptId: crypto.randomUUID() }, () => {
+              metaHistory = []; layer = current().attempt?.completed ? 'result' : 'none';
+            });
+          },
           back: popMeta });
         editorView.update(work, busy || activity.isBlocked(), !!session.pending);
       } else {
       renderMeta({ route: metaRoute, state: session.state, disabled: busy || activity.isBlocked() || !!session.pending,
         title: byId('dialog-title'), copy: byId('dialog-copy'), actions, navigate: showMeta, back: () => { back(); },
-        chosenLevel, play: startLevel, repeat: repeatLevel, playChallenge, playTimed, playDaily, playPersonal, playBook,
+        chosenLevel, settings: showMenuPreferences, createWork, motion: motionAllowed,
+        pickerLight: (id, amount) => {
+          const model = id ? levelPreview(session.state, id) : null;
+          atmosphere.previewPalette(model?.level ?? null, model?.board ?? null, amount);
+        },
+        play: startLevel, repeat: repeatLevel, playChallenge, playTimed, playDaily, playPersonal, playBook,
         ...(bookInsertion ? { bookInsertion } : {}),
         dailyLoading,
         ...(dailyUnavailable && options.dailySource ? { retryDaily: () => void refreshDaily() } : {}),
@@ -809,9 +901,12 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
         selected.focus({ preventScroll: true });
         if (switchMenu) selected.scrollIntoView({ block: 'nearest' });
       } else if (switchMenu) {
+        const resumedChallenge = metaRoute.kind === 'challenges' && metaRoute.selected
+          ? actions.querySelector<HTMLElement>('[data-challenge-id][aria-current=true]') : null;
         const progressChapter = metaRoute.kind === 'progress' ? metaRoute.chapter : undefined;
         const strip = progressChapter !== undefined ? actions.querySelector<HTMLElement>(`[data-finale="${progressChapter+1}"]`) : undefined;
-        if (strip) { strip.focus({ preventScroll: true }); strip.scrollIntoView({ block: 'nearest' }); }
+        if (resumedChallenge) resumedChallenge.focus({ preventScroll: true });
+        else if (strip) { strip.focus({ preventScroll: true }); strip.scrollIntoView({ block: 'nearest' }); }
         else dialogTitle.focus({ preventScroll: true });
       }
     }
@@ -832,6 +927,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     root.dataset.level = level.id; root.dataset.moves = String(attempt?.moves ?? 0); root.dataset.busy = String(busy); root.dataset.layer = layer;
     root.dataset.mode = personal ? 'personal' : daily ? 'daily' : timed ? 'timed' : challenge ? 'challenge' : own ? 'author' : 'campaign';
     root.dataset.motion = String(motionAllowed());
+    if (boardEntry.active && (layer !== 'none' || !motionAllowed())) boardEntry.stop();
     const pausedBoard = isPause(layer) || layer === 'restart' && isPause(restartReturn);
     const hiddenField = layer === 'secret' || pausedBoard && pauseOrigin === 'secret';
     const preview = layer === 'help' || pausedBoard && pauseOrigin === 'help';
@@ -844,11 +940,14 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     guidance.textContent = layer === 'secret' ? '' : personal?.limit !== undefined ? `Ходов осталось · ${personal.limit - personal.attempt.moves}` : challenge ? `Ходов осталось · ${challenge.moveLimit - challenge.attempt.moves}` : layer === 'help' ? 'Готовое поле' : notice || (!own && !session.state.onboarding.firstSwapDone ? 'Поменяй две плитки местами' : '');
     guidance.setAttribute('aria-live', timed || personal?.clock ? 'off' : 'polite');
     guidance.hidden = !timed && !personal?.clock && !guidance.textContent;
+    const count = byId('board-moves');
+    count.hidden = layer !== 'none' || !!(timed || challenge || personal || daily) || !session.state.preferences.statistics;
+    count.textContent = `Ходы · ${attempt?.moves ?? 0}`;
     const footerAction = byId<HTMLButtonElement>('help');
     footerAction.hidden = layer !== 'help' && layer !== 'secret' && (layer !== 'none' || !attempt?.completed);
     footerAction.textContent = layer === 'secret' ? 'Открыть поле' : layer === 'help' ? 'К игре' : 'Результат';
-    for (const node of root.querySelectorAll<HTMLButtonElement>('.hud button,footer button')) node.disabled = busy || activity.isBlocked() || !!session.pending;
-    if (attempt) scene.setView(level, attempt, preview, ready && !busy && !activity.isBlocked() && layer === 'none' && !session.pending, hiddenField);
+    for (const node of root.querySelectorAll<HTMLButtonElement>('.hud button,footer button')) node.disabled = busy || boardEntry.active || activity.isBlocked() || !!session.pending;
+    if (attempt) scene.setView(level, attempt, preview, ready && !busy && !boardEntry.active && !activity.isBlocked() && layer === 'none' && !session.pending, hiddenField, keepRelease);
     else scene.setView(level, initialAttempt, false, false);
     const picker = layer === 'meta' && metaRoute.kind === 'chapter' ? metaRoute : null;
     const cardId = selectedWork(), authorCard = selectedAuthorWork();
@@ -878,7 +977,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     atmosphere.configure(ready && !activity.isBlocked() && (picker !== null || cardId !== null || authorCard !== null || menuBackdrop || ['none', 'help', 'settings', 'preferences'].includes(layer) || layer === 'result' && victoryPhase === 'approach'), motionAllowed());
     feedback.configure(session.state.preferences, !ready || activity.isBlocked());
     music.configure(ready && !activity.isBlocked() && session.state.preferences.music);
-    activity.setGameplayDesired(ready && !busy && layer === 'none' && !attempt?.completed && !activity.isBlocked());
+    activity.setGameplayDesired(ready && !busy && !boardEntry.active && layer === 'none' && !attempt?.completed && !activity.isBlocked());
     renderDialog(); paint(); updateTimedClock(); finishImport();
   }
   function askHelp(assistance: Assistance): void {
@@ -913,6 +1012,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     const cost = autoSwap ? AUTO_HELP_COST : 1;
     const foreground = foregroundEpoch;
     let swapAccepted = false, succeeded = false, saved = false;
+    keepRelease = ordinarySwap;
     busy = true; render();
     try {
       const changed = await session.act(action);
@@ -937,17 +1037,25 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       const acceptedPair = eligible && pair && previous && next && previous.attemptId === next.attemptId &&
         next.moves === previous.moves + cost && next.board[pair.from] === previous.board[pair.to] &&
         next.board[pair.to] === previous.board[pair.from] ? pair : null;
+      if (!acceptedPair) scene.discardRelease();
       const won = !!(acceptedPair && next?.completed && !timed && challenge?.status !== 'lost' && personal?.status !== 'lost');
       if (won && motionAllowed()) {
         for (const key of heldActivation) blockedActivation.add(key);
         setVictoryPhase('approach');
       }
       render(); resize();
+      keepRelease = false;
       if (saved && action.kind === 'preferences' && action.value && foreground === foregroundEpoch
           && (action.key === 'sound' || action.key === 'haptics')) feedback.sample(action.key);
       if (eligible && timedBefore && timed?.run.cleared === timedBefore.run.cleared + 1) feedback.accepted('win');
       if (acceptedPair && previous && next) {
-        scene.presentSwap(previous, next, acceptedPair.from, acceptedPair.to, motionAllowed(), cost);
+        const land = won ? undefined : () => {
+          if (!alive || foreground !== foregroundEpoch) return;
+          const cell = scene.boardCell(acceptedPair.to);
+          atmosphere.accepted(atmospherePoint({ ...cellCenter(cell), color: level.solvedTileColors[next.board[acceptedPair.to]!]! }));
+          feedback.accepted('swap');
+        };
+        scene.presentSwap(previous, next, acceptedPair.from, acceptedPair.to, motionAllowed(), cost, land);
         if (won && victoryPhase === 'approach') {
           scene.presentVictory(acceptedPair.to, (elapsed, board) => {
             if (elapsed < LANDING_MS) {
@@ -970,11 +1078,6 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
             dialog.style.setProperty('--victory-opacity', String(ease(amount(reveal))));
           });
         } else if (won) feedback.accepted('win');
-        else {
-          const cell = scene.boardCell(acceptedPair.to);
-          atmosphere.accepted(atmospherePoint({ ...cellCenter(cell), color: level.solvedTileColors[next.board[acceptedPair.to]!]! }));
-          feedback.accepted('swap');
-        }
       }
     }
     return succeeded;
@@ -1004,6 +1107,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   }
   const back = (): boolean => {
     if (busy || layer === 'recovery') return true;
+    if (menuPreferences.open) { closeMenuPreferences(); return true; }
+    if (boardEntry.active) { boardEntry.stop(); render(); return true; }
     if (victoryWaiting()) { stopVictory(); return true; }
     scene.cancel();
     if (editorView && layer === 'meta') { void editorView.back(); return true; }
@@ -1011,7 +1116,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (layer === 'meta') {
       if (metaRoute.kind === 'chapter' && metaRoute.chapterMenu !== undefined) {
         metaRoute = { kind: 'chapter', levelId: metaRoute.levelId };
-        render(); actions.querySelector<HTMLElement>('[data-open-chapters]')?.focus({ preventScroll: true });
+        render(); dialog.scrollTop = 0; actions.querySelector<HTMLElement>('[data-open-chapters]')?.focus({ preventScroll: true });
         return true;
       }
       popMeta(); return true;
@@ -1133,5 +1238,5 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
         session.state.personalProgress?.day !== localCalendarDay()) void issuePersonal();
   }, 1000);
   await frame; ready = true; render(); resize();
-  return { back, destroy() { alive = false; printAnimation?.cancel(); clearTimeout(insertionTimer); clearInterval(clockTicker); clearInterval(personalTicker); clearMark(); editorView?.destroy(); workCard?.destroy(); stopVictory(); exportFiles.destroy?.(); listeners.abort(); observer.disconnect(); unblock(); atmosphere.destroy(); feedback.destroy(); music.destroy(); activity.setGameplayDesired(false); store.close(); destroyRenderer(game); } };
+  return { back, destroy() { alive = false; boardEntry.stop(); preferencesFlight?.cancel(); printAnimation?.cancel(); clearTimeout(insertionTimer); clearInterval(clockTicker); clearInterval(personalTicker); clearMark(); editorView?.destroy(); workCard?.destroy(); stopVictory(); exportFiles.destroy?.(); listeners.abort(); observer.disconnect(); unblock(); atmosphere.destroy(); feedback.destroy(); music.destroy(); activity.setGameplayDesired(false); store.close(); destroyRenderer(game); } };
 }

@@ -1,5 +1,7 @@
 # Status — 21 November 2026
 
+**0.4.44 / 48, 23 November.** PR #16 has a continuous picker, a settings panel that preserves its source, a preview-to-board transition and touch feedback that holds the tile through transaction confirmation. Chromium covers 006, archive return, book progression and author-trial return. The signed preview inspector passed. [Results and Android acceptance remaining](evidence/pr16-menu-board-0.4.44.md).
+
 All 16 available A1–G1 checkpoints were rerun against `431f06d`. This includes 192 unit tests, the signed 0.4.25 payload in Chromium 92 and 153, 30 offline daily boards and 8 independently checked wallpaper PNGs. Live services and physical device acceptance are recorded separately. [Results](evidence/queue-regression-a1-g1-2026-11-21.json)
 
 **0.4.35** addresses the audit in PR #12. Chromium restored the same time-trial and personal attempts across two restarts, including one before and one after a move. Both shipped web entrypoints passed a clean-profile Daily run with a staged source and a disconnected restart from local assets. A live endpoint and native SQLite/device acceptance remain open. Campaign loop initiation awaits the owner’s rules. [Audit follow-up](evidence/pr12-audit-followup-2026-11-22.json)

@@ -102,7 +102,8 @@ try {
     };
     let page = await openProfile();
     await page.locator('#levels').tap();
-    await button(page, mode === 'timed' ? 'Испытания' : 'Задания').tap();
+    await button(page, 'Режимы').tap();
+    await button(page, mode === 'timed' ? 'Испытания' : 'Личные задания').tap();
     await (mode === 'timed' ? page.getByRole('button', { name: /^Заезд на время/ }) : page.locator('[data-personal=present]')).tap();
     await running(page, mode);
     const started = await timer(page, mode);

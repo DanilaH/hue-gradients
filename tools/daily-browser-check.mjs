@@ -97,15 +97,18 @@ try {
   const one = await profile(recording), two = await profile(false);
   const opening = async (page) => {
     await page.locator('#levels').tap();
+    await page.getByRole('button', { name: 'Режимы', exact: true }).tap();
     await page.getByRole('button', { name: 'Задача дня', exact: true }).tap();
     await page.locator(`[data-daily-date="${first}"]`).waitFor();
   };
   const slot = (page, date) => page.locator(`[data-daily-date="${date}"]`);
   const empty = await profile(false, 'offline');
   await empty.page.locator('#levels').tap();
+  await empty.page.getByRole('button', { name: 'Режимы', exact: true }).tap();
   await empty.page.getByRole('button', { name: 'Задача дня', exact: true }).tap();
   await empty.page.getByRole('status').filter({ hasText: /Календарь (пока недоступен|не загрузился)/ }).waitFor();
   assert.equal(await empty.page.locator('[data-daily-date]').count(), 0);
+  await empty.page.getByRole('button', { name: '‹ Назад', exact: true }).tap();
   await empty.page.getByRole('button', { name: '‹ Назад', exact: true }).tap();
   await empty.page.locator('.level-stage').waitFor();
   await empty.context.close();
@@ -198,6 +201,10 @@ try {
   assert.deepEqual(offline.book.solved, [first]);
   assert.deepEqual(offline.completed, before.completed);
   assert.deepEqual(offline.rights, before.rights);
+  await one.page.getByRole('button', { name: 'К календарю', exact: true }).tap();
+  await idle(one.page);
+  assert.equal(await slot(one.page, first).getAttribute('aria-pressed'), 'true');
+  assert.equal(await slot(one.page, first).evaluate(node => node === document.activeElement), true);
   assert.deepEqual(errors, []);
   if (recording) await one.page.waitForTimeout(600);
   const clipMillis = Date.now() - one.captureBase - clipStartMillis;
@@ -209,6 +216,7 @@ try {
     const bank = await profile(false);
     await bank.page.evaluate(() => sessionStorage.setItem('fixture-daily', 'bank'));
     await bank.page.locator('#levels').tap();
+    await bank.page.getByRole('button', { name: 'Режимы', exact: true }).tap();
     await bank.page.getByRole('button', { name: 'Задача дня', exact: true }).tap();
     await slot(bank.page, staged.bank.through).waitFor();
     await bank.page.evaluate(() => sessionStorage.setItem('fixture-daily', 'offline'));

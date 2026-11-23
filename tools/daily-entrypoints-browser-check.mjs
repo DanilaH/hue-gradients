@@ -44,6 +44,7 @@ const ready = page => page.waitForSelector('html[data-state=ready]');
 const idle = page => page.waitForSelector('#hue-app[data-busy=false]');
 const selectCalendar = async page => {
   await page.locator('#levels').tap();
+  await button(page, 'Режимы').tap();
   await button(page, 'Задача дня').tap();
 };
 const state = page => page.evaluate(async () => {

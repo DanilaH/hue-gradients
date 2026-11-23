@@ -15,7 +15,7 @@ try{
  page.on('pageerror',e=>errors.push(e.message));await page.goto(base);await page.waitForSelector('html[data-state=ready]');
  const defs=JSON.parse(await readFile('docs/spec/candidates/levels-0.1.json','utf8')).campaign;
  const witnesses=JSON.parse(await readFile('docs/spec/candidates/validation-0.1.json','utf8')).rows;
- const idle=()=>page.waitForFunction(()=>document.querySelector('#hue-app')?.dataset.busy==='false');
+ const idle=()=>page.waitForFunction(()=>document.querySelector('#hue-app[data-busy=false]:not([data-board-entry])'));
  const state=()=>page.evaluate(async()=>{const{openIndexedDb}=await import('/src/local-store/indexed-db.ts');const s=await openIndexedDb(),r=await s.load('guest-local-v1');s.close();return{...JSON.parse(r.snapshotJson),revision:r.localRevision};});
  const solve=async ordinal=>{const level=defs[ordinal-1];assert.equal((await state()).activeLevelId,level.id);
   for(const[from,to]of witnesses.find(r=>r.id===level.id).legalOptimalWitness){for(const index of[from,to]){const r=await page.locator('#board-region canvas').boundingBox();await page.mouse.click(r.x+(index%level.width+.5)*r.width/level.width,r.y+4+(Math.floor(index/level.width)+.5)*(r.height-8)/level.height);}await idle();}
@@ -60,7 +60,7 @@ try{
  await picker();assert.equal(await page.locator('[data-level-action]').innerText(),'Продолжить');await playSelected();assert.deepEqual(await state(),replayed);
  passed.push('finished board previews its result and starts a fresh replay; zero-move replay resumes with the same receipt');
  await picker();await selectLevel(15);assert.equal(await page.locator('[data-level-action]').innerText(),'Играть');
- assert.deepEqual(await page.locator('.level-preview rect').evaluateAll(rects=>rects.map(rect=>rect.getAttribute('fill'))),defs[14].startTileAtPosition.map(id=>defs[14].solvedTileColors[id]));
+ assert.deepEqual(await page.locator('.level-preview rect').evaluateAll(rects=>rects.map(rect=>rect.getAttribute('fill'))),defs[14].solvedTileColors);
  await playSelected();await solve(15);
  await page.getByRole('button',{name:'Дальше',exact:true}).click();await idle();assert.equal((await state()).activeLevelId,'gradient-006');passed.push('free choice after fifth and next-lowest recommendation');
  for(let n=6;n<=8;n++){await solve(n);await page.getByRole('button',{name:'Дальше',exact:true}).click();await idle();}
@@ -123,7 +123,7 @@ try{
  await page.setViewportSize({width:320,height:568});
  await picker();
  await context.setOffline(true);
- await albumButton('Прогресс').click();
+ await chapterMenu();await albumButton('Прогресс').click();
  const progress=page.locator('[data-meta=progress]');
  assert.match(await progress.innerText(),/Собрано 15 из 60 · 15 XP/);
  assert.match(await progress.locator('[data-chapter="1"]').innerText(),/Глава 1 · 15\/15/);
@@ -137,6 +137,7 @@ try{
  await page.screenshot({path:'.test-output/m3/progress.png'});
  await context.setOffline(false);
  await progress.getByRole('button',{name:'‹ Назад',exact:true}).click();
+ await page.getByRole('button',{name:'‹ Назад',exact:true}).click();
  assert.equal(await page.locator('.level-stage').count(),1);
  passed.push('offline progress shows real XP, chapter completion, victory history and pending world comparison');
  await page.keyboard.press('Escape');
@@ -147,7 +148,7 @@ try{
  await page.reload();await page.waitForSelector('html[data-state=ready]');
  assert.equal((await state()).preferences.statistics,false);
  await picker();
- await albumButton('Прогресс').click();
+ await chapterMenu();await albumButton('Прогресс').click();
  assert.equal(await progress.getByText('Ступени мастерства',{exact:true}).count(),0);
  assert.match(await progress.innerText(),/История побед/);
  assert.deepEqual((await state()).victories,current.victories);

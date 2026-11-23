@@ -52,6 +52,7 @@ try {
   });
   async function open(page) {
     await page.locator('#levels').tap();
+    await button(page, /^Режимы$/).tap();
     await button(page, /^Испытания$/).tap();
     await button(page, /^Заезд на время/).tap();
     await idle(page);

@@ -10,6 +10,8 @@ Read AGENTS.md, PROJECT_DECISIONS.md, STATUS.md, M4_EDITOR_IMPLEMENTATION.md and
 
 ## Current slice
 
+PR #16 is implemented on `feat/menu-and-board-feel` from `feat/m0-foundation` at `92e581a`. Start the next review with the 20-second picker and the 006 contact recording. Android touch, OS Back, sound and haptics remain open for the signed `preview3` APK 0.4.44 / 48. [Evidence](evidence/pr16-menu-board-0.4.44.md).
+
 PR #14 follow-up in 0.4.43 covers the three-object Personal Tasks screen at 320×568 with browser text set to 150%. Empty-stage touch preserves the selection. The figure and its caption select the task. Side captions are compact and the selected task keeps its full name and visible launch control. [Browser evidence](evidence/pr14-personal-follow-up-0.4.43.json).
 
 PR #14 is implemented in 0.4.42. Browser checks cover result reveal on 001 and 006, shape and orientation in the challenge preview, both Daily restart sources, same-day and stale personal retries, and opaque controls. Personal Tasks captures show two and three objects on real profiles. Owner typography, physical Android, signed APK and the production Daily endpoint are pending. [Acceptance](evidence/pr14-menu-0.4.42.json).

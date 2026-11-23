@@ -14,12 +14,16 @@ import { personalArt } from './personalArt';
 type PickerRoute = { kind: 'chapter'; levelId: string; chapterMenu?: number };
 export type MetaRoute = PickerRoute | AlbumRoute | { kind: 'card' | 'copy'; levelId: string } |
   { kind: 'own-card'; workId: string; nodeId: string } | { kind: 'draft'; draftId: string; nodeId?: string } |
-  { kind: 'progress'; chapter?: number } | { kind: 'books'; eventDate?: string } | { kind: 'personal'; key?: string } | { kind: 'book'; bookId: string; slot?: number } | { kind: 'daily'; date?: string; month?: string } | { kind: 'challenges'; group?: 'chapter' | 'geometry' };
+  { kind: 'modes' | 'editor-home' } | { kind: 'progress'; chapter?: number } | { kind: 'books'; eventDate?: string } | { kind: 'personal'; key?: string } | { kind: 'book'; bookId: string; slot?: number } | { kind: 'daily'; date?: string; month?: string } | { kind: 'challenges'; group?: 'chapter' | 'geometry'; selected?: string };
 interface MetaView {
   route: MetaRoute; state: Workspace; disabled: boolean;
   title: HTMLElement; copy: HTMLElement; actions: HTMLElement;
   navigate(route: MetaRoute): void; back(): void;
   chosenLevel(index: number): string;
+  settings(): void;
+  createWork(): void;
+  motion(): boolean;
+  pickerLight(id: string | undefined, amount: number): void;
   play(id: string): void; saveCopy(id: string, name: string): void;
   repeat(id: string): void;
   playChallenge(id: string, restart: boolean, book?: BookTarget, entry?: 'progress'): void;
@@ -55,7 +59,7 @@ export function calendarSelection(state: Workspace, date?: string, month?: strin
 }
 
 export function isMenuList(route: MetaRoute): boolean {
-  return ['personal', 'daily', 'books', 'book', 'progress', 'challenges'].includes(route.kind);
+  return ['modes', 'editor-home', 'personal', 'daily', 'books', 'book', 'progress', 'challenges'].includes(route.kind);
 }
 
 function actionButton(parent: HTMLElement, text: string, invoke: () => void, disabled: boolean): HTMLButtonElement {
@@ -63,7 +67,7 @@ function actionButton(parent: HTMLElement, text: string, invoke: () => void, dis
   button.type = 'button'; button.textContent = text; button.disabled = disabled;
   button.onclick = invoke; parent.append(button); return button;
 }
-function preview(level: Pick<LevelDefinition, 'width' | 'height' | 'solvedTileColors'>, large = false,
+function preview(level: Pick<LevelDefinition, 'width' | 'height' | 'solvedTileColors' | 'positions'>, large = false,
   board?: readonly number[], pins: readonly number[] = []): HTMLElement {
   const frame = document.createElement('div'); frame.className = large ? 'composition composition-large' : 'composition'; frame.setAttribute('aria-hidden', 'true');
   const ns = 'http://www.w3.org/2000/svg', cells = document.createElementNS(ns, 'svg');
@@ -71,14 +75,22 @@ function preview(level: Pick<LevelDefinition, 'width' | 'height' | 'solvedTileCo
   cells.setAttribute('preserveAspectRatio', 'xMidYMid meet'); cells.setAttribute('shape-rendering', 'crispEdges');
   level.solvedTileColors.forEach((_, position) => {
     const color = level.solvedTileColors[board?.[position] ?? position]!;
-    const cell = document.createElementNS(ns, 'rect'); cell.setAttribute('x', String(position % level.width));
-    cell.setAttribute('y', String(Math.floor(position / level.width))); cell.setAttribute('width', '1'); cell.setAttribute('height', '1');
+    const shape = level.positions?.[position];
+    const cell = document.createElementNS(ns, shape ? 'polygon' : 'rect');
+    if (shape) cell.setAttribute('points', shape.vertices.map(([x, y]) => `${x * level.width},${y * level.height}`).join(' '));
+    else {
+      cell.setAttribute('x', String(position % level.width));
+      cell.setAttribute('y', String(Math.floor(position / level.width)));
+      cell.setAttribute('width', '1'); cell.setAttribute('height', '1');
+    }
     cell.setAttribute('fill', color); cells.append(cell);
   });
   for (const position of pins) {
     const pin = document.createElementNS(ns, 'circle');
-    pin.setAttribute('cx', String(position % level.width + .5));
-    pin.setAttribute('cy', String(Math.floor(position / level.width) + .5));
+    const grid = boardGeometry(level.width, level.height, level.width, level.height, level.positions);
+    const center = cellCenter(cellAt({ ...grid, y: 0, height: level.height, gap: 0 }, position));
+    pin.setAttribute('cx', String(center.x));
+    pin.setAttribute('cy', String(center.y));
     pin.setAttribute('r', '.045'); pin.setAttribute('fill', '#181322');
     pin.setAttribute('stroke', '#fff2de'); pin.setAttribute('stroke-width', '.019');
     cells.append(pin);
@@ -97,7 +109,7 @@ export function levelPreview(state: Workspace, id: string) {
   const status = pickerState(state, id);
   if (status === 'Закрыт') return null;
   const level = getLevel(id);
-  return { level, board: status === 'Собран' ? null : state.attempts[id]?.board ?? level.startTileAtPosition };
+  return { level, board: status === 'Начат' ? state.attempts[id]!.board : null };
 }
 
 const pickChapter = (state: Workspace, index: number) => `Глава ${index+1} · ${chapterCount(state,index)}/${chapters[index]!.levelIds.length}`;
@@ -124,10 +136,17 @@ function chapterStrips(v: MetaView, selected: number | undefined, choose: (index
     const fragments = document.createElement('span'); fragments.className = 'chapter-pieces'; fragments.setAttribute('aria-hidden','true');
     for (const levelId of chapter.levelIds) {
       const piece = document.createElement('span'), level = getLevel(levelId);
-      piece.style.background = `linear-gradient(152deg,${level.solvedTileColors[0]},${level.solvedTileColors.at(-1)})`;
-      piece.dataset.earned = String(v.state.completed.includes(levelId));
+      const earned = v.state.completed.includes(levelId);
+      if (earned) piece.style.background = `linear-gradient(152deg,${level.solvedTileColors[0]},${level.solvedTileColors.at(-1)})`;
+      piece.dataset.earned = String(earned);
       fragments.append(piece);
     }
+    const symbol = document.createElement('span');
+    symbol.className = 'chapter-symbol';
+    symbol.setAttribute('aria-hidden','true');
+    symbol.style.setProperty('--chapter-coloured', `${100 * chapterCount(v.state,index) / chapter.levelIds.length}%`);
+    symbol.style.setProperty('--chapter-palette', `linear-gradient(135deg,${getLevel(chapter.levelIds[0]!).solvedTileColors[0]},${getLevel(chapter.levelIds.at(-1)!).solvedTileColors.at(-1)})`);
+    select.prepend(symbol);
     select.append(fragments);
     const finale = chapterChallenges[index*2]!;
     const finaleOpen = challengeAvailable(finale,v.state);
@@ -216,18 +235,18 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
   };
   const nav = document.createElement('nav'); nav.className = 'level-picker-nav'; actions.append(nav);
   button('‹ Назад', v.back, nav).className = 'quiet';
+  button('Настройки', v.settings, nav).dataset.menuSettings = '';
   if (route.chapterMenu !== undefined) {
     v.title.textContent = 'Главы';
     actions.append(chapterStrips(v, route.chapterMenu, chapterIndex => {
       const levelId = chapterIndex === index ? route.levelId : v.chosenLevel(chapterIndex);
       moveTo({ kind:'chapter',levelId }, '[data-open-chapters]');
     }));
+    button('Прогресс', () => v.navigate({ kind: 'progress' }), actions).className = 'chapter-progress';
     return;
   }
 
   v.title.textContent = 'Уровни';
-  button('Прогресс', () => v.navigate({ kind: 'progress' }), nav).className = 'quiet';
-  button('Альбом', () => v.navigate({ kind: 'album', tab: 'campaign' }), nav).className = 'quiet';
   const position = chapter.levelIds.indexOf(route.levelId);
   const selectedState = pickerState(state, route.levelId);
   const rail = document.createElement('div'); rail.className = 'level-rail';
@@ -237,6 +256,7 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
     if (levelId && next !== position && !v.disabled) moveTo({ kind: 'chapter', levelId }, '[aria-current=true][data-level-id]');
   };
   const stage = document.createElement('div'); stage.className = 'level-stage'; actions.append(stage);
+  const track = document.createElement('div'); track.className = 'level-track'; stage.append(track);
   const label = selectedState === 'Собран' ? 'Повторить' : selectedState === 'Начат' ? 'Продолжить' : 'Играть';
   const activate = () => (selectedState === 'Собран' ? v.repeat : v.play)(route.levelId);
   let center: HTMLButtonElement | undefined;
@@ -244,6 +264,7 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
     const model = levelPreview(state, id);
     const slot = document.createElement(selected && model ? 'button' : 'div');
     slot.className = style;
+    slot.dataset.pickerWork = id;
     if (slot instanceof HTMLButtonElement) {
       center = slot;
       slot.classList.add('quiet');
@@ -253,7 +274,7 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
       // Pointer taps are resolved on release by the stage. Keyboard and assistive clicks use the button.
       slot.onclick = event => { if (event.detail === 0) activate(); };
     } else slot.setAttribute('aria-hidden', 'true');
-    stage.append(slot);
+    track.append(slot);
     if (!model) { slot.classList.add('level-locked'); return; }
     const { level, board } = model;
     slot.append(preview(level, false, board ?? undefined, selected && board ? level.pinnedPositions : []));
@@ -262,37 +283,66 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
   if (previous) boardAt(previous, 'level-peek level-peek-prev');
   boardAt(route.levelId, 'level-preview', true);
   if (next) boardAt(next, 'level-peek level-peek-next');
-  let drag: { id: number; x: number; y: number; moved: boolean; fromCenter: boolean } | undefined;
+  let drag: { id: number; x: number; y: number; base: number; moved: boolean; fromCenter: boolean } | undefined;
+  let settling: Animation | undefined;
+  const step = () => (track.querySelector('.level-preview')?.getBoundingClientRect().width ?? 0) + 12;
+  const offset = () => new DOMMatrixReadOnly(getComputedStyle(track).transform).m41;
+  const move = (x: number) => {
+    track.style.transform = `translateX(${x}px)`;
+    v.pickerLight(x < 0 ? next : previous, Math.min(1, Math.abs(x) / step()));
+  };
+  const settle = (direction: number) => {
+    const end = direction * step();
+    const finish = () => {
+      settling?.cancel(); settling = undefined;
+      if (!stage.isConnected) return;
+      if (direction) select(position - direction);
+      else move(0);
+    };
+    if (!v.motion() || Math.abs(end - offset()) < 1) { finish(); return; }
+    settling = track.animate([
+      { transform: `translateX(${offset()}px)` }, { transform: `translateX(${end}px)` },
+    ], { duration: direction ? 305 : 245, easing: 'cubic-bezier(.18,.72,.25,1)', fill: 'forwards' });
+    v.pickerLight(direction < 0 ? next : direction > 0 ? previous : undefined, direction ? 1 : 0);
+    settling.onfinish = finish;
+  };
   stage.onpointerdown = event => {
-    if (!v.disabled && !drag && event.isPrimary && event.button === 0) {
-      drag = { id: event.pointerId, x: event.clientX, y: event.clientY, moved: false,
-        fromCenter: !!center?.contains(event.target as Node) };
-      stage.setPointerCapture(event.pointerId);
-    }
+    if (v.disabled || drag || !event.isPrimary || event.button !== 0) return;
+    const base = offset();
+    settling?.cancel(); settling = undefined;
+    move(base);
+    drag = { id: event.pointerId, x: event.clientX, y: event.clientY, base, moved: Math.abs(base) > 2,
+      fromCenter: !!center?.contains(event.target as Node) };
+    stage.setPointerCapture(event.pointerId);
   };
   const cancelDrag = (event: PointerEvent) => {
     if (drag?.id !== event.pointerId) return;
     drag = undefined;
-    stage.style.removeProperty('--picker-drag');
+    settle(0);
   };
   stage.onpointermove = event => {
     if (drag?.id !== event.pointerId) return;
     const dx = event.clientX - drag.x, dy = event.clientY - drag.y;
     if (Math.hypot(dx, dy) > 10) drag.moved = true;
-    if (Math.abs(dx) > Math.abs(dy)) {
-      stage.style.setProperty('--picker-drag', `${Math.max(-96, Math.min(96, dx))}px`);
-    }
+    if (Math.abs(dx) <= Math.abs(dy)) return;
+    const total = drag.base + dx;
+    const hasNeighbour = total < 0 ? !!next : !!previous;
+    move(hasNeighbour ? Math.max(-step(), Math.min(step(), total)) : Math.sign(total) * 47 * (1 - Math.exp(-Math.abs(total) / 100)));
   };
   stage.onpointercancel = cancelDrag;
   stage.onlostpointercapture = event => { if (event.target === stage) cancelDrag(event); };
   stage.onpointerup = event => {
     const gesture = drag;
     if (gesture?.id !== event.pointerId) return;
+    drag = undefined;
     const dx = event.clientX - gesture.x, dy = event.clientY - gesture.y;
-    cancelDrag(event);
-    if (Math.abs(dx) >= 34 && Math.abs(dx) > Math.abs(dy)) select(position + (dx < 0 ? 1 : -1));
-    else if (gesture.fromCenter && !gesture.moved && Math.hypot(dx, dy) <= 10 &&
-      center?.contains(document.elementFromPoint(event.clientX, event.clientY))) activate();
+    const x = offset(), threshold = Math.max(42, Math.min(66, step() * .19));
+    if (Math.abs(x) >= threshold && (x < 0 ? next : previous)) settle(Math.sign(x));
+    else {
+      settle(0);
+      if (gesture.fromCenter && !gesture.moved && Math.hypot(dx, dy) <= 10 &&
+        center?.contains(document.elementFromPoint(event.clientX, event.clientY))) activate();
+    }
   };
   const details = document.createElement('div'); details.className = 'level-actions'; actions.append(details);
   const selection = document.createElement('p');
@@ -300,7 +350,7 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
   const number = document.createElement('strong');
   number.textContent = String(getLevel(route.levelId).ordinal).padStart(3, '0');
   const status = document.createElement('span');
-  status.textContent = selectedState;
+  status.textContent = getLevel(route.levelId).title;
   selection.append(number, status);
   details.append(selection);
   if (selectedState === 'Закрыт') {
@@ -334,15 +384,8 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
   const chapterLink = button(pickChapter(state,index), () => moveTo({ ...route, chapterMenu: index }, '[aria-current=true][data-chapter]'), links);
   chapterLink.className = 'quiet level-chapter-link';
   chapterLink.dataset.openChapters = '';
-  const challengesLink = button('Испытания', () => v.navigate({ kind: 'challenges' }), links);
-  challengesLink.className = 'quiet level-chapter-link';
-  challengesLink.setAttribute('aria-label', 'Испытания');
-  const personalLink = button('Задания', () => v.navigate({ kind: 'personal' }), links);
-  personalLink.className = 'quiet level-chapter-link';
-  personalLink.setAttribute('aria-label', 'Задания');
-  const dailyLink = button('Задача дня', () => v.navigate({ kind: 'daily' }), links);
-  dailyLink.className = 'quiet level-chapter-link';
-  dailyLink.setAttribute('aria-label', 'Задача дня');
+  button('Режимы', () => v.navigate({ kind: 'modes' }), links).className = 'quiet level-chapter-link';
+  button('Альбом', () => v.navigate({ kind: 'album', tab: 'campaign' }), links).className = 'quiet level-chapter-link';
 }
 
 const russianDate = new Intl.DateTimeFormat('ru', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
@@ -393,6 +436,34 @@ export function renderMeta(v: MetaView): void {
   const menuBack = () => button('‹ Назад', v.back).className = 'quiet menu-back';
   if (route.kind === 'chapter') {
     renderPicker(v, route);
+  } else if (route.kind === 'modes') {
+    v.title.textContent = 'Режимы';
+    menuBack();
+    const day = calendarSelection(state).selected;
+    const daily = day ? state.dailyProgress?.slots[day] : undefined;
+    const draft = Object.values(state.creative?.works ?? {}).at(-1);
+    const draftColours = draft?.nodes[draft.headNodeId]?.field.solvedTileColors;
+    const modeEntry = (kind: 'daily' | 'personal' | 'challenges' | 'editor-home', title: string,
+      caption: string, colours?: readonly string[]) => {
+      const row = button('', () => v.navigate({ kind }));
+      row.dataset.modeEntry = kind;
+      row.setAttribute('aria-label', title);
+      menuRow(row, title, caption, undefined, colours);
+    };
+    modeEntry('daily', 'Задача дня', daily ? dailyLabel(daily.date) : 'Календарь и архив', daily?.level.solvedTileColors);
+    modeEntry('personal', 'Личные задания', '');
+    modeEntry('challenges', 'Испытания', 'Лимит ходов, фигуры и заезд', geometryChallenges[0]?.level.solvedTileColors);
+    modeEntry('editor-home', 'Редактор', draft?.name ?? 'Создать работу', draftColours);
+  } else if (route.kind === 'editor-home') {
+    v.title.textContent = 'Редактор';
+    menuBack();
+    button('Создать', v.createWork);
+    for (const work of Object.values(state.creative?.works ?? {}).reverse()) {
+      const node = work.nodes[work.headNodeId]!;
+      const item = button('', () => v.navigate({ kind: 'draft', draftId: work.draftId }));
+      item.dataset.editorDraft = work.draftId;
+      menuRow(item, work.name, '', undefined, node.field.solvedTileColors);
+    }
   } else if (route.kind === 'progress') {
     v.title.textContent = 'Прогресс';
     renderProgress(actions, state, v.disabled, v.back, chapterStrips(v, route.chapter, index => {
@@ -459,6 +530,14 @@ export function renderMeta(v: MetaView): void {
         tile.title = 'Выполнено';
         slots.append(tile);
       } else {
+        if (open && !challenge) {
+          const model = levelPreview(state,level.id);
+          if (model) {
+            const goalArt = preview(level, false, model.board ?? undefined);
+            goalArt.classList.add('book-goal-preview');
+            tile.append(goalArt);
+          }
+        }
         const text = document.createElement('strong'); text.textContent = number;
         const detail = document.createElement('small');
         detail.textContent = open ? caption : challenge ? `Соберите ${challenge.requiredWorks} работ` : levelRequirement(state,level);
@@ -674,6 +753,7 @@ export function renderMeta(v: MetaView): void {
       const restart = !!attempt && challengeStatus(definition, attempt) !== 'playing';
       const card = button('', () => v.playChallenge(level.id, restart), list, locked);
       card.dataset.challengeId = level.id;
+      if (route.selected === level.id) card.setAttribute('aria-current','true');
       menuRow(card, level.title, locked ? definition.afterFinaleId ? 'Пройди финал главы'
         : definition.chapterIndex !== undefined ? 'Собери все работы главы'
         : `Откроется за ${requiredWorks} работ` : [
