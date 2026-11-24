@@ -1,0 +1,700 @@
+{
+  "version": "0.4.47 / 51",
+  "revision": "2767344a7c360c4dcc72d0b36145d046f3ed5442",
+  "entry": "root Vite entry on Chromium; fresh IndexedDB in each case",
+  "browser": "153.0.8010.0",
+  "cases": [
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "reducedMotion": "no-preference",
+      "gesture": "drag 1→2",
+      "timestamps": "performance.now() ms of the navigation; 002-reload starts a new navigation",
+      "finalActionStartMs": 7671,
+      "states": [
+        {
+          "event": "ready",
+          "ms": 1977,
+          "id": "gradient-001",
+          "board": [
+            0,
+            2,
+            1,
+            3
+          ],
+          "moves": 0,
+          "completed": [],
+          "onboarding": {
+            "version": 1,
+            "firstSwapDone": false,
+            "pinExplained": false
+          },
+          "guidance": "Поменяй две плитки местами",
+          "layer": "none"
+        },
+        {
+          "event": "idle",
+          "ms": 6672,
+          "id": "gradient-001",
+          "board": [
+            0,
+            2,
+            1,
+            3
+          ],
+          "moves": 0,
+          "completed": [],
+          "onboarding": {
+            "version": 1,
+            "firstSwapDone": false,
+            "pinExplained": false
+          },
+          "guidance": "Поменяй две плитки местами",
+          "layer": "none"
+        },
+        {
+          "event": "tap-pin",
+          "ms": 6771,
+          "id": "gradient-001",
+          "board": [
+            0,
+            2,
+            1,
+            3
+          ],
+          "moves": 0,
+          "completed": [],
+          "onboarding": {
+            "version": 1,
+            "firstSwapDone": false,
+            "pinExplained": true,
+            "earlyPinTaps": 1
+          },
+          "guidance": "Плитки с точкой закреплены",
+          "layer": "none"
+        },
+        {
+          "event": "drop-on-pin",
+          "ms": 7400,
+          "id": "gradient-001",
+          "board": [
+            0,
+            2,
+            1,
+            3
+          ],
+          "moves": 0,
+          "completed": [],
+          "onboarding": {
+            "version": 1,
+            "firstSwapDone": false,
+            "pinExplained": true,
+            "earlyPinTaps": 1
+          },
+          "guidance": "Плитки с точкой закреплены",
+          "layer": "none"
+        },
+        {
+          "event": "result",
+          "ms": 9978,
+          "id": "gradient-001",
+          "board": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "moves": 1,
+          "completed": [
+            "gradient-001"
+          ],
+          "onboarding": {
+            "version": 1,
+            "firstSwapDone": true,
+            "pinExplained": true,
+            "earlyPinTaps": 1
+          },
+          "guidance": "",
+          "layer": "result"
+        },
+        {
+          "event": "next",
+          "ms": 10167,
+          "id": "gradient-002",
+          "board": [
+            0,
+            3,
+            1,
+            2,
+            4
+          ],
+          "moves": 0,
+          "completed": [
+            "gradient-001"
+          ],
+          "onboarding": {
+            "version": 1,
+            "firstSwapDone": true,
+            "pinExplained": true,
+            "earlyPinTaps": 1
+          },
+          "guidance": "",
+          "layer": "none"
+        },
+        {
+          "event": "002-first-exchange",
+          "ms": 10308,
+          "id": "gradient-002",
+          "board": [
+            0,
+            1,
+            3,
+            2,
+            4
+          ],
+          "moves": 1,
+          "completed": [
+            "gradient-001"
+          ],
+          "onboarding": {
+            "version": 1,
+            "firstSwapDone": true,
+            "pinExplained": true,
+            "earlyPinTaps": 1
+          },
+          "guidance": "",
+          "layer": "none"
+        },
+        {
+          "event": "002-reload",
+          "ms": 1153,
+          "id": "gradient-002",
+          "board": [
+            0,
+            1,
+            3,
+            2,
+            4
+          ],
+          "moves": 1,
+          "completed": [
+            "gradient-001"
+          ],
+          "onboarding": {
+            "version": 1,
+            "firstSwapDone": true,
+            "pinExplained": true,
+            "earlyPinTaps": 1
+          },
+          "guidance": "",
+          "layer": "none"
+        }
+      ],
+      "trace": {
+        "states": [
+          {
+            "ms": 1872,
+            "level": "gradient-001",
+            "moves": "0",
+            "layer": "none",
+            "phase": "still",
+            "next": "absent",
+            "nextVisible": false,
+            "inert": false
+          },
+          {
+            "ms": 7735,
+            "level": "gradient-001",
+            "moves": "1",
+            "layer": "result",
+            "phase": "approach",
+            "next": "disabled",
+            "nextVisible": false,
+            "inert": true
+          },
+          {
+            "ms": 8582,
+            "level": "gradient-001",
+            "moves": "1",
+            "layer": "result",
+            "phase": "landed",
+            "next": "disabled",
+            "nextVisible": false,
+            "inert": true
+          },
+          {
+            "ms": 9105,
+            "level": "gradient-001",
+            "moves": "1",
+            "layer": "result",
+            "phase": "reveal",
+            "next": "disabled",
+            "nextVisible": true,
+            "inert": true
+          },
+          {
+            "ms": 9505,
+            "level": "gradient-001",
+            "moves": "1",
+            "layer": "result",
+            "phase": "still",
+            "next": "enabled",
+            "nextVisible": true,
+            "inert": false
+          }
+        ],
+        "sound": [
+          {
+            "ms": 8580,
+            "durationMs": 240
+          }
+        ],
+        "haptic": [
+          {
+            "ms": 8580,
+            "pattern": 22
+          }
+        ]
+      },
+      "pageErrors": []
+    },
+    {
+      "viewport": {
+        "width": 320,
+        "height": 568
+      },
+      "reducedMotion": "no-preference",
+      "gesture": "tap 2, tap 1",
+      "timestamps": "performance.now() ms of the navigation; 002-reload starts a new navigation",
+      "finalActionStartMs": 1045,
+      "states": [
+        {
+          "event": "ready",
+          "ms": 802,
+          "id": "gradient-001",
+          "board": [
+            0,
+            2,
+            1,
+            3
+          ],
+          "moves": 0,
+          "completed": [],
+          "onboarding": {
+            "version": 1,
+            "firstSwapDone": false,
+            "pinExplained": false
+          },
+          "guidance": "Поменяй две плитки местами",
+          "layer": "none"
+        },
+        {
+          "event": "third-pin-dialog",
+          "ms": 977,
+          "id": "gradient-001",
+          "board": [
+            0,
+            2,
+            1,
+            3
+          ],
+          "moves": 0,
+          "completed": [],
+          "onboarding": {
+            "version": 1,
+            "firstSwapDone": false,
+            "pinExplained": true,
+            "earlyPinTaps": 3
+          },
+          "guidance": "Поменяй две плитки местами",
+          "layer": "pin-guide"
+        },
+        {
+          "event": "selected",
+          "ms": 1030,
+          "id": "gradient-001",
+          "board": [
+            0,
+            2,
+            1,
+            3
+          ],
+          "moves": 0,
+          "completed": [],
+          "onboarding": {
+            "version": 1,
+            "firstSwapDone": false,
+            "pinExplained": true,
+            "earlyPinTaps": 3
+          },
+          "guidance": "Поменяй две плитки местами",
+          "layer": "none"
+        },
+        {
+          "event": "result",
+          "ms": 2887,
+          "id": "gradient-001",
+          "board": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "moves": 1,
+          "completed": [
+            "gradient-001"
+          ],
+          "onboarding": {
+            "version": 1,
+            "firstSwapDone": true,
+            "pinExplained": true,
+            "earlyPinTaps": 3
+          },
+          "guidance": "",
+          "layer": "result"
+        },
+        {
+          "event": "next",
+          "ms": 2987,
+          "id": "gradient-002",
+          "board": [
+            0,
+            3,
+            1,
+            2,
+            4
+          ],
+          "moves": 0,
+          "completed": [
+            "gradient-001"
+          ],
+          "onboarding": {
+            "version": 1,
+            "firstSwapDone": true,
+            "pinExplained": true,
+            "earlyPinTaps": 3
+          },
+          "guidance": "",
+          "layer": "none"
+        },
+        {
+          "event": "002-first-exchange",
+          "ms": 3060,
+          "id": "gradient-002",
+          "board": [
+            0,
+            1,
+            3,
+            2,
+            4
+          ],
+          "moves": 1,
+          "completed": [
+            "gradient-001"
+          ],
+          "onboarding": {
+            "version": 1,
+            "firstSwapDone": true,
+            "pinExplained": true,
+            "earlyPinTaps": 3
+          },
+          "guidance": "",
+          "layer": "none"
+        },
+        {
+          "event": "002-reload",
+          "ms": 952,
+          "id": "gradient-002",
+          "board": [
+            0,
+            1,
+            3,
+            2,
+            4
+          ],
+          "moves": 1,
+          "completed": [
+            "gradient-001"
+          ],
+          "onboarding": {
+            "version": 1,
+            "firstSwapDone": true,
+            "pinExplained": true,
+            "earlyPinTaps": 3
+          },
+          "guidance": "",
+          "layer": "none"
+        }
+      ],
+      "trace": {
+        "states": [
+          {
+            "ms": 683,
+            "level": "gradient-001",
+            "moves": "0",
+            "layer": "none",
+            "phase": "still",
+            "next": "absent",
+            "nextVisible": false,
+            "inert": false
+          },
+          {
+            "ms": 954,
+            "level": "gradient-001",
+            "moves": "0",
+            "layer": "pin-guide",
+            "phase": "still",
+            "next": "absent",
+            "nextVisible": false,
+            "inert": false
+          },
+          {
+            "ms": 1013,
+            "level": "gradient-001",
+            "moves": "0",
+            "layer": "none",
+            "phase": "still",
+            "next": "absent",
+            "nextVisible": false,
+            "inert": false
+          },
+          {
+            "ms": 1102,
+            "level": "gradient-001",
+            "moves": "1",
+            "layer": "result",
+            "phase": "approach",
+            "next": "disabled",
+            "nextVisible": false,
+            "inert": true
+          },
+          {
+            "ms": 1934,
+            "level": "gradient-001",
+            "moves": "1",
+            "layer": "result",
+            "phase": "landed",
+            "next": "disabled",
+            "nextVisible": false,
+            "inert": true
+          },
+          {
+            "ms": 2476,
+            "level": "gradient-001",
+            "moves": "1",
+            "layer": "result",
+            "phase": "reveal",
+            "next": "disabled",
+            "nextVisible": true,
+            "inert": true
+          },
+          {
+            "ms": 2878,
+            "level": "gradient-001",
+            "moves": "1",
+            "layer": "result",
+            "phase": "still",
+            "next": "enabled",
+            "nextVisible": true,
+            "inert": false
+          }
+        ],
+        "sound": [
+          {
+            "ms": 1932,
+            "durationMs": 240
+          }
+        ],
+        "haptic": [
+          {
+            "ms": 1932,
+            "pattern": 22
+          }
+        ]
+      },
+      "pageErrors": []
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "reducedMotion": "reduce",
+      "gesture": "drag 2→1",
+      "timestamps": "performance.now() ms of the navigation; 002-reload starts a new navigation",
+      "finalActionStartMs": 1236,
+      "states": [
+        {
+          "event": "ready",
+          "ms": 963,
+          "id": "gradient-001",
+          "board": [
+            0,
+            2,
+            1,
+            3
+          ],
+          "moves": 0,
+          "completed": [],
+          "onboarding": {
+            "version": 1,
+            "firstSwapDone": false,
+            "pinExplained": false
+          },
+          "guidance": "Поменяй две плитки местами",
+          "layer": "none"
+        },
+        {
+          "event": "cancel",
+          "ms": 1232,
+          "id": "gradient-001",
+          "board": [
+            0,
+            2,
+            1,
+            3
+          ],
+          "moves": 0,
+          "completed": [],
+          "onboarding": {
+            "version": 1,
+            "firstSwapDone": false,
+            "pinExplained": false
+          },
+          "guidance": "Поменяй две плитки местами",
+          "layer": "none"
+        },
+        {
+          "event": "result",
+          "ms": 1553,
+          "id": "gradient-001",
+          "board": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "moves": 1,
+          "completed": [
+            "gradient-001"
+          ],
+          "onboarding": {
+            "version": 1,
+            "firstSwapDone": true,
+            "pinExplained": false
+          },
+          "guidance": "",
+          "layer": "result"
+        },
+        {
+          "event": "next",
+          "ms": 1645,
+          "id": "gradient-002",
+          "board": [
+            0,
+            3,
+            1,
+            2,
+            4
+          ],
+          "moves": 0,
+          "completed": [
+            "gradient-001"
+          ],
+          "onboarding": {
+            "version": 1,
+            "firstSwapDone": true,
+            "pinExplained": false
+          },
+          "guidance": "",
+          "layer": "none"
+        },
+        {
+          "event": "002-first-exchange",
+          "ms": 1703,
+          "id": "gradient-002",
+          "board": [
+            0,
+            1,
+            3,
+            2,
+            4
+          ],
+          "moves": 1,
+          "completed": [
+            "gradient-001"
+          ],
+          "onboarding": {
+            "version": 1,
+            "firstSwapDone": true,
+            "pinExplained": false
+          },
+          "guidance": "",
+          "layer": "none"
+        },
+        {
+          "event": "002-reload",
+          "ms": 896,
+          "id": "gradient-002",
+          "board": [
+            0,
+            1,
+            3,
+            2,
+            4
+          ],
+          "moves": 1,
+          "completed": [
+            "gradient-001"
+          ],
+          "onboarding": {
+            "version": 1,
+            "firstSwapDone": true,
+            "pinExplained": false
+          },
+          "guidance": "",
+          "layer": "none"
+        }
+      ],
+      "trace": {
+        "states": [
+          {
+            "ms": 873,
+            "level": "gradient-001",
+            "moves": "0",
+            "layer": "none",
+            "phase": "still",
+            "next": "absent",
+            "nextVisible": false,
+            "inert": false
+          },
+          {
+            "ms": 1539,
+            "level": "gradient-001",
+            "moves": "1",
+            "layer": "result",
+            "phase": "still",
+            "next": "enabled",
+            "nextVisible": true,
+            "inert": false
+          }
+        ],
+        "sound": [
+          {
+            "ms": 1539,
+            "durationMs": 240
+          }
+        ],
+        "haptic": [
+          {
+            "ms": 1539,
+            "pattern": 22
+          }
+        ]
+      },
+      "pageErrors": []
+    }
+  ]
+}
