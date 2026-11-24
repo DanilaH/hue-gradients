@@ -2,6 +2,8 @@
 
 **Действует:** 18.11.2026. **Принцип:** проект получает доказанный технический baseline своей платформы, короткие инструкции агента, локальную карту выбора исследований и **точный guidance SHA** (а runtime bootstrap отдельно закрепляет ту же версию зависимости). Он НЕ получает все игровые механики, директора, рекламную политику или контент только потому, что они существуют в kit.
 
+**Отдельный сценарий:** создание **исследовательского чата в ChatGPT**, а не репозитория игры, описано в [Researcher Chat Bootstrap](../porting/RESEARCH_METHOD.md). По запросу «ты исследователь X; сверься с mini-games-kit и дай инструкции проекта» агент должен выдать paste-ready ChatGPT Project Instructions и первое исследовательское задание. Утилита `npm run researcher:chat:init` создаёт только два текстовых файла. `guidance:init/adopt` не управляет ChatGPT Project Settings.
+
 ## 1. Выбрать тип проекта, не смешивая разные хосты
 
 **Yandex Games + Phaser:** использовать существующий проверенный mandatory bootstrap:
@@ -10,11 +12,11 @@
 
 Это копирует реализацию Yandex SDK, real/mock, lifecycle, startup, sound activity, viewport, TS/Vite/Phaser и CI; генерирует AGENTS, PROJECT_DECISIONS и локальную kit task routing. В новом репозитории выполнить install/build/tests, затем заменить BootstrapScene реальным gameplay. Арт и правила ещё не выбраны.
 
-**RuStore/Android + Phaser/Capacitor:** использовать отдельный [Android host bootstrap](https://github.com/DanilaH/mini-games-kit/blob/469928d03f4bae5053e23db26e82187bedbc252e/docs/android/BOOTSTRAP.md):
+**RuStore/Android + Phaser/Capacitor:** использовать отдельный [Android host bootstrap](https://github.com/DanilaH/mini-games-kit/blob/5cac32b0851c80bdff1d61069b8524b9e42170e1/docs/android/BOOTSTRAP.md):
 
     npm run bootstrap:android:create -- ../my-game --app-id com.example.mygame --orientation portrait --name my-game
 
-Он создаёт запускаемый versioned native host: lifecycle/Back, атомарный KV, один владелец safe-area, изолированные preview/releaseCheck/production и инструменты подписи/проверки APK. Runtime и guidance закрепляются на exact SHA. Выбрать orientation явно; не копировать идентичность, награды/схемы/баланс или SDK-политику игры-донора. Native Mobile Ads/AppMetrica/notifications подключаются осознанно по [Android contracts](https://github.com/DanilaH/mini-games-kit/blob/469928d03f4bae5053e23db26e82187bedbc252e/docs/android/ADS_AND_LIFECYCLE.md) и [release acceptance](https://github.com/DanilaH/mini-games-kit/blob/469928d03f4bae5053e23db26e82187bedbc252e/docs/ANDROID_RELEASE_ACCEPTANCE.md), они не считаются установленными только по наличию env/Markdown.
+Он создаёт запускаемый versioned native host: lifecycle/Back, атомарный KV, один владелец safe-area, изолированные preview/releaseCheck/production и инструменты подписи/проверки APK. Runtime и guidance закрепляются на exact SHA. Выбрать orientation явно; не копировать идентичность, награды/схемы/баланс или SDK-политику игры-донора. Native Mobile Ads/AppMetrica/notifications подключаются осознанно по [Android contracts](https://github.com/DanilaH/mini-games-kit/blob/5cac32b0851c80bdff1d61069b8524b9e42170e1/docs/android/ADS_AND_LIFECYCLE.md) и [release acceptance](https://github.com/DanilaH/mini-games-kit/blob/5cac32b0851c80bdff1d61069b8524b9e42170e1/docs/ANDROID_RELEASE_ACCEPTANCE.md), они не считаются установленными только по наличию env/Markdown.
 
 Для другого или существующего native scaffold доступен прежний **guidance-only** режим:
 
@@ -40,13 +42,13 @@
 
 Не создаются: код и ассеты из чужой игры, release keys, production ad IDs, store assets, gameplay policy, общий analytics/backend, исторические копии всех научных файлов, обязательные тысячи строк test harness. Полные research docs доступны на GitHub под **проверенным pinned SHA** по ссылкам в маршрутизаторе.
 
-**UI с первой задачи:** локальный Task Router содержит прямые pinned-ссылки на [UX & Art System](https://github.com/DanilaH/mini-games-kit/blob/469928d03f4bae5053e23db26e82187bedbc252e/docs/visual-preproduction/UX_AND_ART_SYSTEM.md), [Stable Progress UI](https://github.com/DanilaH/mini-games-kit/blob/469928d03f4bae5053e23db26e82187bedbc252e/docs/layout/STABLE_PROGRESS_UI.md) и [UI Motion Recipes](https://github.com/DanilaH/mini-games-kit/blob/469928d03f4bae5053e23db26e82187bedbc252e/docs/feel/UI_MOTION_RECIPES.md). AGENTS требует выбирать подходящий маршрут до реализации UI и проверять затронутые состояния. PROJECT_DECISIONS содержит место для профиля конкретной игры: компоненты/токены, основные действия, движение, отмена/reduced motion и осознанные исключения. Заполнять только принятые решения; существующая Art Bible может оставаться их источником. Эти документы не устанавливают новый UI runtime или общую тему.
+**UI с первой задачи:** локальный Task Router содержит прямые pinned-ссылки на [UX & Art System](https://github.com/DanilaH/mini-games-kit/blob/5cac32b0851c80bdff1d61069b8524b9e42170e1/docs/visual-preproduction/UX_AND_ART_SYSTEM.md), [Stable Progress UI](https://github.com/DanilaH/mini-games-kit/blob/5cac32b0851c80bdff1d61069b8524b9e42170e1/docs/layout/STABLE_PROGRESS_UI.md) и [UI Motion Recipes](https://github.com/DanilaH/mini-games-kit/blob/5cac32b0851c80bdff1d61069b8524b9e42170e1/docs/feel/UI_MOTION_RECIPES.md). AGENTS требует выбирать подходящий маршрут до реализации UI и проверять затронутые состояния. PROJECT_DECISIONS содержит место для профиля конкретной игры: компоненты/токены, основные действия, движение, отмена/reduced motion и осознанные исключения. Заполнять только принятые решения; существующая Art Bible может оставаться их источником. Эти документы не устанавливают новый UI runtime или общую тему.
 
 ## 3. Перед первым gameplay implementation
 
 1. Проверить, что origin boilerplate соответствует платформе и поддерживает реальные game start/stop/save/SDK ошибки. Завести CI, минимум unit/build и хотя бы один реальный gesture/viewport smoke до релиза.
 2. Из local Task Router выбрать реальную задачу: core prototype, input/UX, reference reproduction, asset production, release и т.д. Не читать каждый архивный research paper на каждый баг.
-3. Открыть [Kit public API](https://github.com/DanilaH/mini-games-kit/blob/469928d03f4bae5053e23db26e82187bedbc252e/docs/API.md) закреплённого SHA и сделать явный **adoption matrix**: REUSE (импорт и тест), NOT APPLICABLE, LOCAL POLICY (почему не в kit), MISSING (доказанный недостающий контракт). Для часто нужных ресурсов смотреть storage, durable receipts, activity coordinator, audio, layout, haptics, loading/asset formatting.
+3. Открыть [Kit public API](https://github.com/DanilaH/mini-games-kit/blob/5cac32b0851c80bdff1d61069b8524b9e42170e1/docs/API.md) закреплённого SHA и сделать явный **adoption matrix**: REUSE (импорт и тест), NOT APPLICABLE, LOCAL POLICY (почему не в kit), MISSING (доказанный недостающий контракт). Для часто нужных ресурсов смотреть storage, durable receipts, activity coordinator, audio, layout, haptics, loading/asset formatting.
 4. Не копировать готовый экспорт в исходники ради удобства: использовать dependency/совместимый path, pin/upgrade review. На React/DOM/Phaser/Android распространять только подходящий runtime contract; Yandex SDK web отличается от Yandex Mobile Ads Android.
 5. Зафиксировать game-specific source of truth: правила/состояния, RNG, версии сохранения, ориентации, основное действие, onboarding, платформу, эстетический выбор и ограничения.
 6. Для конкретного референса открыть Reference Protocol, снять наблюдаемые transition/gestures и составить gap matrix. Для нового арт направления до массового производства — отдельный Visual Preproduction/owner approval.
