@@ -2,8 +2,10 @@
   "schemaVersion": 1,
   "repository": "DanilaH/mini-games-kit",
   "runtimeCommit": "469928d03f4bae5053e23db26e82187bedbc252e",
-  "guidanceCommit": "469928d03f4bae5053e23db26e82187bedbc252e",
+  "guidanceCommit": "5cac32b0851c80bdff1d61069b8524b9e42170e1",
   "specCommit": "812b926ebfc82c6b0e5f3c6506145de2331028a0",
   "sourceAccess": "GitHub connector; every materialized source checked against pinned Git blob SHA",
-  "localRuntimeArchiveSha256": "ba9088a0b937b3e86084666c36361ba47627ce833f4594aaf94e10eac62f1cc9"
+  "localRuntimeArchiveSha256": "ba9088a0b937b3e86084666c36361ba47627ce833f4594aaf94e10eac62f1cc9",
+  "researchMethodCommit": "06a01d5c1f7af3cdf8013c9ce0f6a691d086af78",
+  "hueInventoryCommit": "cf7cffc48b4925a897c6613949c771d3325713bb"
 }

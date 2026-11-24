@@ -1,5 +1,7 @@
 # Project decisions — 18 November 2026
 
+**24 ноября · методика и доказательства.** Основные инструкции синхронизированы с принятым kit main. Для работы с оригинальным кодом отдельно принят исследовательский протокол из открытого kit PR №139 на точном коммите. Собственная реализация опирается на алгоритмы и архитектуру оригинала. Приватные исходные фрагменты остаются в исследовательском архиве. [Ревизии, матрица доказательств и приёмка](porting/RESEARCH_METHOD.md).
+
 **23 ноября 2026 · решение владельца.** Все игровые экраны Android и Яндекс Игр используют только 100% авторской шкалы текста. Это правило действует для ART-03 и UX-02 поверх импортированного ТЗ 1.0 и заменяет прежние требования о кадрах при 150%. [Точные размеры и приёмка](design/menu-and-board-feel/README.md#type100).
 
 **22 ноября · очередь аудита 0.4.34.** Сначала исправляем возврат времени в обоих таймерах. Daily проверяем с нового профиля и после офлайн-входа. Правила нового цикла согласуются отдельно. Кнопку запуска в книгах до этого не показываем. [Приёмка](evidence/pr12-audit-followup-2026-11-22.json).
@@ -17,7 +19,7 @@
 **21 ноября · художественное направление.** Владелец выбрал прямоугольную композицию меню, видимый дизеринг на плитках, полноэкранный итоговый градиент и победу с отъездом камеры, подъёмом плиток, последовательными локальными посадками, волной фактуры и брызгами от краёв. Серии V1/V2, источники и исключения для игровых режимов — в [ТЗ](design/dreamy-psx/README.md). Прежнее требование точного цвета отдельного пикселя заменяется проверкой базового sRGB, среднего цвета и различимости соседних плиток в игровом рендере. Чистые обои проверяются попиксельно. Приёмка эпизода и конкретной гарнитуры ещё предстоит.
 
 **20 November, after the transfer audit.** Owner directs delivery of the complete audited feature program. [Packages and dependencies](porting/FULL_ROADMAP.md) and [ledger](porting/ADOPTION_LEDGER.json) govern new implementation briefs. Earlier baseline exclusions of modes, zoom, social and commercial systems are superseded for the corresponding new packages. Preserve the existing fixed-start campaign and core rules for its saved attempts. No energy or paid entry, one device-sized wallpaper per chosen work, cloud/account M5 on hold.
-Guidance snapshot SHA: 469928d03f4bae5053e23db26e82187bedbc252e
+Guidance snapshot SHA: 5cac32b0851c80bdff1d61069b8524b9e42170e1
 Runtime snapshot SHA: 469928d03f4bae5053e23db26e82187bedbc252e
 
 ## Source of truth

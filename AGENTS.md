@@ -1,13 +1,15 @@
 # hue-gradients — agent contract
 
 Owner decision, 23 Nov 2026: use exactly 100% in-game type on all hosts. For ART-03 and UX-02 apply the [current acceptance matrix](docs/design/menu-and-board-feel/README.md#type100) over the frozen spec 1.0 font-scale cases.
-**mini-games-kit pinned commit:** 469928d03f4bae5053e23db26e82187bedbc252e
+**Guidance snapshot pin:** 5cac32b0851c80bdff1d61069b8524b9e42170e1
+
+Runtime kit commit: 469928d03f4bae5053e23db26e82187bedbc252e.
 
 For ongoing development, follow [the delivery queue](docs/porting/DELIVERY_QUEUE.md). Resume the first available unfinished slice, record evidence and continue to the next without waiting for a new owner message. Carry external blockers separately and preserve owner-only decisions.
 
 Use docs/porting/FULL_ROADMAP.md for the owner-ordered full transfer and the latest package status. Package 01 acceptance is in docs/porting/FIRST_PACKAGE.md. For audit wording about optional systems, apply the 20 November decision in docs/PROJECT_DECISIONS.md.
 
-Read docs/PROJECT_DECISIONS.md, docs/STATUS.md and docs/SESSION_HANDOFF.md, then relevant requirements in docs/spec/PRODUCT_SPEC_1_0.md and ROADMAP_1_0.md. Select 1–2 routes in docs/kit-guidance/TASK_ROUTER.md before material work. Reference work follows docs/kit-guidance/REFERENCE_PROTOCOL.md. Reusable work follows docs/kit-guidance/KIT_FEEDBACK_LOOP.md; report KIT IMPACT. Inspect the pinned kit docs/API.md before adding infrastructure. Runtime and guidance pins are separate; no silent upgrades.
+Read docs/PROJECT_DECISIONS.md, docs/STATUS.md and docs/SESSION_HANDOFF.md, then relevant requirements in docs/spec/PRODUCT_SPEC_1_0.md and ROADMAP_1_0.md. Select 1–2 routes in docs/kit-guidance/TASK_ROUTER.md before material work. Reference work follows docs/kit-guidance/REFERENCE_PROTOCOL.md and [the Hue research handoff](docs/porting/RESEARCH_METHOD.md). Link each sourceFeatureId to inspected code or footage, the architectural conclusion, actual consumer code and an acceptance episode. Keep exact vendor excerpts in the private research annex. Use the game’s own implementation and assets in this public repository. Reusable work follows docs/kit-guidance/KIT_FEEDBACK_LOOP.md; report KIT IMPACT. Inspect the pinned kit docs/API.md before adding infrastructure. Runtime and guidance pins are separate; no silent upgrades.
 
 Full first release includes campaign, meta, daily/archive, editor, export and cloud. No energy. First15 definitions are immutable. Visual direction is the owner's dreamy/PSX reference in docs/spec/reference; font pending M2. Accept one actual gameplay/win episode before broad styling. Do not restart the A/B/C visual contest. UI changes use routed UX/motion/layout guidance and the game's accepted tokens.
 
