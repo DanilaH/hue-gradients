@@ -11,6 +11,7 @@ interface Gesture { id: number; from: number | null; x: number; y: number; lates
 interface Lift { from: number; to: number | null; dx: number; dy: number }
 interface Navigation { anchor: Point; distance: number; camera: Camera }
 const liftHeight = (cell: Cell) => Math.min(32, Math.max(10, Math.min(cell.width, cell.height) * .48));
+const CUE_OUT_MS = 140, CUE_BACK_MS = 220, CUE_POSITION = 1, CUE_DISTANCE = 3;
 
 export class PuzzleScene extends Phaser.Scene {
   private drawable = false;
@@ -32,6 +33,7 @@ export class PuzzleScene extends Phaser.Scene {
   private released: Lift | null = null;
   private returning: (Lift & { started: number }) | null = null;
   private settle: (Lift & { to: number; started: number; land?: () => void }) | null = null;
+  private firstSwapCueStarted: number | null = null;
   constructor(level: LevelDefinition, attempt: Attempt, private readonly hooks: Hooks) { super('puzzle'); this.level = level; this.attempt = attempt; }
   create(): void {
     // A single Canvas renderer keeps clip paths and repeating tile ink in the same paint pass.
@@ -108,13 +110,24 @@ export class PuzzleScene extends Phaser.Scene {
     return gesture?.drag && this.camera.zoom > 1
       ? edgeVelocity(this.natural, this.camera, { x: gesture.latestX, y: gesture.latestY }) : { x: 0, y: 0 };
   }
+  playFirstSwapCue(): void {
+    if (!this.drawable || !this.enabled) return;
+    this.firstSwapCueStarted = performance.now();
+    this.draw();
+  }
+  stopFirstSwapCue(): void {
+    if (this.firstSwapCueStarted === null) return;
+    this.firstSwapCueStarted = null;
+    if (this.drawable) this.draw();
+  }
   isAnimating(): boolean {
     const edge = this.edge();
-    return this.victory !== null || this.settle !== null || this.returning !== null || edge.x !== 0 || edge.y !== 0;
+    return this.victory !== null || this.settle !== null || this.returning !== null ||
+      this.firstSwapCueStarted !== null || edge.x !== 0 || edge.y !== 0;
   }
   update(_time: number, delta: number): void {
     const edge = this.edge();
-    if (!this.victory && !this.settle && !this.returning && !edge.x && !edge.y) return;
+    if (!this.victory && !this.settle && !this.returning && this.firstSwapCueStarted === null && !edge.x && !edge.y) return;
     if (this.victory) {
       const beat = this.victory, elapsed = performance.now() - beat.started;
       beat.elapsed = elapsed;
@@ -123,6 +136,9 @@ export class PuzzleScene extends Phaser.Scene {
       return;
     }
     const now = performance.now();
+    if (this.firstSwapCueStarted !== null && now - this.firstSwapCueStarted >= CUE_OUT_MS + CUE_BACK_MS) {
+      this.firstSwapCueStarted = null;
+    }
     if (this.settle && now - this.settle.started >= 150) this.finishSettle(true);
     if (this.returning && now - this.returning.started >= 185) this.returning = null;
     if (edge.x || edge.y) {
@@ -254,6 +270,7 @@ export class PuzzleScene extends Phaser.Scene {
   cancel = (event?: PointerEvent): void => {
     // Releasing capture after a completed tap must not erase its tap–tap selection.
     if (event && event.pointerId !== this.gesture?.id && !this.touches.has(event.pointerId)) return;
+    this.firstSwapCueStarted = null;
     this.finishSettle(); this.released = null; this.returning = null; this.hooks.interaction?.(null);
     const ids = new Set(this.touches.keys());
     if (this.gesture) ids.add(this.gesture.id);
@@ -356,6 +373,11 @@ export class PuzzleScene extends Phaser.Scene {
       ctx.fillStyle = colour;
       ctx.fill();
     };
+    const recess = (cell: Cell) => {
+      paintShape(cell, 'rgba(40,32,49,.83)');
+      this.cellPath(ctx, cell, 2);
+      ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(217,197,226,.42)'; ctx.stroke();
+    };
     const tile = (position: number, dx = 0, dy = 0, held = false): void => {
       const cell = cellAt(this.geometry, position), tileId = this.preview ? position : this.attempt.board[position]!;
       const center = cellCenter(cell);
@@ -397,13 +419,14 @@ export class PuzzleScene extends Phaser.Scene {
     const activeDrag = g?.drag && g.from !== null ? g : null;
     const returning = this.returning;
     const lifted = activeDrag?.from ?? this.released?.from ?? returning?.from ?? null;
+    const cueTime = this.firstSwapCueStarted === null ? 0 : performance.now() - this.firstSwapCueStarted;
+    const cueOffset = CUE_DISTANCE * (cueTime <= CUE_OUT_MS
+      ? ease(amount(cueTime / CUE_OUT_MS))
+      : 1 - ease(amount((cueTime - CUE_OUT_MS) / CUE_BACK_MS)));
     const airborne: number[] = [];
     for (let i = 0; i < this.attempt.board.length; i++) {
-      if (i === lifted) {
-        const cell = cellAt(this.geometry, i);
-        paintShape(cell, 'rgba(40,32,49,.83)');
-        this.cellPath(ctx, cell, 2);
-        ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(217,197,226,.42)'; ctx.stroke();
+      if (i === lifted || i === CUE_POSITION && cueOffset > 0) {
+        recess(cellAt(this.geometry, i));
       } else if (flights?.[i]) {
         const cell = cellAt(this.geometry, i);
         paintShape(cell, 'rgba(16,14,28,.72)');
@@ -413,7 +436,10 @@ export class PuzzleScene extends Phaser.Scene {
       } else if (!settle || (i !== settle.from && i !== settle.to)) tile(i);
     }
     for (const position of airborne) tile(position);
+    if (cueOffset > 0) tile(CUE_POSITION, cueOffset);
     if (import.meta.env.DEV) {
+      if (this.firstSwapCueStarted !== null) ctx.canvas.dataset.firstSwapOffset = String(cueOffset);
+      else delete ctx.canvas.dataset.firstSwapOffset;
       if (beat) ctx.canvas.dataset.victoryFrame = JSON.stringify({ elapsed, at: beat.at, airborne, delays: beat.delays });
       else delete ctx.canvas.dataset.victoryFrame;
       ctx.canvas.dataset.lift = activeDrag ? 'held' : this.released ? 'pending' : returning ? 'returning' : 'none';

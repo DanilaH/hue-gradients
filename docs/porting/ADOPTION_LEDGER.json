@@ -8,7 +8,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "MATCH",
       "stage": "Пакет 01",
-      "currentImplementation": "Обмен, перетаскивание и отказ на опорах подтверждены тестом ядра. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/PuzzleScene.ts В A1 на 001 Chromium подтвердил тап и сброс на (200,398), плюс отказ на опоре и за пределами поля. | https://github.com/DanilaH/hue-gradients/blob/2e7c0b8546403b640167f11b691f143e164b5553/tools/board-input-browser-check.mjs",
+      "currentImplementation": "Обмен, перетаскивание и отказ на опорах подтверждены тестом ядра. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/PuzzleScene.ts В A1 на 001 Chromium подтвердил тап и сброс на (200,398), плюс отказ на опоре и за пределами поля. | https://github.com/DanilaH/hue-gradients/blob/2e7c0b8546403b640167f11b691f143e164b5553/tools/board-input-browser-check.mjs В 0.4.48 два тапа и drag на 001 привели к одному ходу на 002, который восстановился после reload. См. docs/evidence/pr21-first-30-seconds-0.4.48.md.",
       "nextAction": "Повторить контрольный эпизод на физическом телефоне (G1).",
       "deliveryPackage": "01",
       "sourceNextCheck": "Проверить tap и drag одного обмена на Android."
@@ -18,7 +18,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "MATCH",
       "stage": "Пакет 01",
-      "currentImplementation": "Опоры защищены перестановкой и доменными правилами. В Chromium тап по опоре не меняет ходы. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/domain/puzzle.ts В A1 на 001 Chromium подтвердил тап и сброс на (200,398), плюс отказ на опоре и за пределами поля. | https://github.com/DanilaH/hue-gradients/blob/2e7c0b8546403b640167f11b691f143e164b5553/tools/board-input-browser-check.mjs",
+      "currentImplementation": "Опоры защищены перестановкой и доменными правилами. В Chromium тап по опоре не меняет ходы. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/domain/puzzle.ts В A1 на 001 Chromium подтвердил тап и сброс на (200,398), плюс отказ на опоре и за пределами поля. | https://github.com/DanilaH/hue-gradients/blob/2e7c0b8546403b640167f11b691f143e164b5553/tools/board-input-browser-check.mjs В 0.4.48 промах над опорой на 001 оставил ноль ходов и подсказок. См. docs/evidence/pr21-first-30-seconds-0.4.48.md.",
       "nextAction": "Повторить контрольный эпизод на физическом телефоне (G1).",
       "deliveryPackage": "01",
       "sourceNextCheck": "Попытаться уронить плитку на опору."
@@ -260,7 +260,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 01",
-      "currentImplementation": "Первое обращение даёт короткий текст. На третьем тапе по опоре в первых десяти уровнях открывается закрываемое объяснение. Проверено в Chromium. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/mountGame.ts",
+      "currentImplementation": "Первое обращение даёт короткий текст. На третьем тапе по опоре в первых десяти уровнях открывается закрываемое объяснение. Проверено в Chromium. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/mountGame.ts В 0.4.48 первое сообщение на 001 уступает основной строке через 2 с. Штатный диалог третьего касания проверен на 320×568. См. docs/evidence/pr21-first-30-seconds-0.4.48.md.",
       "nextAction": "Сверить с физическим оригиналом и принять нашу подсказку на телефоне.",
       "deliveryPackage": "01",
       "sourceNextCheck": "Сравнить первый и третий тап в игре на новом профиле. Проверить, доступно ли объяснение игроку после перезапуска."

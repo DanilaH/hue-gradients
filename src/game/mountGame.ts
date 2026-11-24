@@ -36,6 +36,8 @@ import { browserExportFiles, type ExportFiles } from '../app/exportFiles';
 import './game.css';
 
 const clockNow = () => Math.floor(performance.timeOrigin + performance.now());
+const FIRST_SWAP_LINE = 'Поменяй местами две полосы без точек';
+const PIN_LINE = 'Плитки с точкой закреплены';
 
 type Layer = 'none' | 'secret' | 'help' | 'help-menu' | 'pin-guide' | 'result' | 'meta' | 'restart' | 'recovery' | 'settings' | 'preferences';
 interface Activity extends Pick<GameplayActivityCoordinator, 'isBlocked' | 'onBlockedChange' | 'setGameplayDesired'> {}
@@ -102,6 +104,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   const byId = <T extends HTMLElement>(id: string) => root.querySelector<T>(`#${id}`)!;
   const listeners = new AbortController();
   let alive = true, busy = false, ready = false, paintPending = false, notice = '';
+  let firstSwapTimer: number | undefined, firstSwapCueDismissed = false;
+  let firstPinTimer: number | undefined;
   let markPosition: number | null = null, markTimer: ReturnType<typeof setTimeout> | undefined;
   let keepRelease = false;
   let pendingHelp: (() => void) | null = null;
@@ -267,6 +271,28 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     const outer = root.getBoundingClientRect(), inner = region.getBoundingClientRect();
     return { ...value, x: (value.x + inner.x - outer.x) / outer.width, y: (value.y + inner.y - outer.y) / outer.height };
   }
+  const firstCampaignBoard = ({ level, attempt, own, challenge, timed, daily, personal }: ReturnType<typeof current>) =>
+    level.id === 'gradient-001' && !!attempt && !attempt.completed && !session.state.completed.includes(level.id) &&
+    !session.state.onboarding.firstSwapDone && !own && !challenge && !timed && !daily && !personal && !currentBook();
+  function dismissFirstSwapCue(): void {
+    firstSwapCueDismissed = true;
+    clearTimeout(firstSwapTimer); firstSwapTimer = undefined;
+    scene.stopFirstSwapCue();
+  }
+  function syncFirstSwapCue(available: boolean): void {
+    if (!available) {
+      if (firstSwapTimer !== undefined || firstSwapCueDismissed) dismissFirstSwapCue();
+    } else if (!firstSwapCueDismissed && firstSwapTimer === undefined) {
+      firstSwapTimer = window.setTimeout(() => {
+        firstSwapTimer = undefined;
+        firstSwapCueDismissed = true;
+        scene.playFirstSwapCue();
+      }, 4000);
+    }
+  }
+  function clearFirstPinLine(): void {
+    clearTimeout(firstPinTimer); firstPinTimer = undefined;
+  }
   const scene = new PuzzleScene(initialLevel, initialAttempt, {
     paint, motion: motionAllowed, swap: (from, to) => {
       const { own, attempt, challenge, timed, daily, personal } = current();
@@ -279,13 +305,18 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     },
     pin: position => {
       showMark(position, 'pin');
-      const { own, level, challenge, timed, daily, personal } = current();
+      const board = current();
+      const { own, level, challenge, timed, daily, personal } = board;
       if (challenge || timed || daily || personal) return;
       const onboarding = session.state.onboarding;
-      if (own) { notice = 'Плитки с точкой закреплены'; render(); }
+      if (own) { notice = PIN_LINE; render(); }
       else if (!onboarding.pinExplained || level.ordinal <= 10 && (onboarding.earlyPinTaps ?? 1) < 3) {
         void run({ kind: 'pin' }, () => {
-          if (!onboarding.pinExplained) notice = 'Плитки с точкой закреплены';
+          if (!onboarding.pinExplained) {
+            if (firstCampaignBoard(board)) {
+              firstPinTimer = window.setTimeout(() => { firstPinTimer = undefined; render(); }, 2000);
+            } else notice = PIN_LINE;
+          }
           if (session.state.onboarding.earlyPinTaps === 3 && !activity.isBlocked()) layer = 'pin-guide';
         });
       }
@@ -305,10 +336,13 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (!alive || !region.querySelector('canvas')) return;
     if (markPosition !== null) positionMark();
     queueMicrotask(() => {
-      if (!alive || !game.isBooted || paintPending || activity.isBlocked()) return;
-      paintPending = true;
-      game.events.once(Phaser.Core.Events.POST_RENDER, () => { paintPending = false; if (!scene.isAnimating()) game.loop.sleep(); });
-      game.loop.wake();
+      if (!alive || !game.isBooted || activity.isBlocked()) return;
+      if (!paintPending) {
+        paintPending = true;
+        game.events.once(Phaser.Core.Events.POST_RENDER, () => { paintPending = false; if (!scene.isAnimating()) game.loop.sleep(); });
+      }
+      // Backgrounding may put the loop to sleep with an outstanding post-render callback.
+      if (!game.loop.running) game.loop.wake();
     });
   }
   function resize(): void {
@@ -941,7 +975,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   }
   function render(): void {
     if (!alive) return;
-    const { level, attempt, own, challenge, timed, daily, personal } = current();
+    const board = current();
+    const { level, attempt, own, challenge, timed, daily, personal } = board;
     if (!attempt && !session.pending) layer = 'recovery';
     if (layer === 'none' && (challenge && challenge.status !== 'playing' || timed?.run.remainingMs === 0 || personal && personal.status !== 'playing')) layer = 'result';
     const victory = layer === 'result' && attempt?.completed && !timed && challenge?.status !== 'lost' && personal?.status !== 'lost';
@@ -962,7 +997,10 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       : daily ? '‹ Календарь' : timed || challenge ? '‹ Испытания' : own ? '‹ Редактор' : '‹ Уровни';
     byId('title').textContent = personal ? personalTaskName(personal) : daily ? dailyLabel(daily.date) : own || challenge || timed ? level.title : `Уровень ${level.ordinal}`;
     const guidance = byId('guidance');
-    guidance.textContent = layer === 'secret' ? '' : personal?.limit !== undefined ? `Ходов осталось · ${personal.limit - personal.attempt.moves}` : challenge ? `Ходов осталось · ${challenge.moveLimit - challenge.attempt.moves}` : layer === 'help' ? 'Готовое поле' : notice || (!own && !session.state.onboarding.firstSwapDone ? 'Поменяй две плитки местами' : '');
+    const firstBoard = firstCampaignBoard(board);
+    if (!firstBoard || layer !== 'none' || activity.isBlocked()) clearFirstPinLine();
+    guidance.textContent = layer === 'secret' ? '' : personal?.limit !== undefined ? `Ходов осталось · ${personal.limit - personal.attempt.moves}` : challenge ? `Ходов осталось · ${challenge.moveLimit - challenge.attempt.moves}` : layer === 'help' ? 'Готовое поле' : notice || (firstBoard ? (firstPinTimer === undefined ? FIRST_SWAP_LINE : PIN_LINE)
+      : !own && !session.state.onboarding.firstSwapDone ? 'Поменяй две плитки местами' : '');
     guidance.setAttribute('aria-live', timed || personal?.clock ? 'off' : 'polite');
     guidance.hidden = !timed && !personal?.clock && !guidance.textContent;
     const count = byId('board-moves');
@@ -972,8 +1010,10 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     footerAction.hidden = layer !== 'help' && layer !== 'secret' && (layer !== 'none' || !attempt?.completed);
     footerAction.textContent = layer === 'secret' ? 'Открыть поле' : layer === 'help' ? 'К игре' : 'Результат';
     for (const node of root.querySelectorAll<HTMLButtonElement>('.hud button,footer button')) node.disabled = busy || boardEntry.active || activity.isBlocked() || !!session.pending;
-    if (attempt) scene.setView(level, attempt, preview, ready && !busy && !boardEntry.active && !activity.isBlocked() && layer === 'none' && !session.pending, hiddenField, keepRelease);
+    const canPlay = ready && !busy && !boardEntry.active && !activity.isBlocked() && layer === 'none' && !session.pending;
+    if (attempt) scene.setView(level, attempt, preview, canPlay, hiddenField, keepRelease);
     else scene.setView(level, initialAttempt, false, false);
+    syncFirstSwapCue(firstBoard && canPlay && motionAllowed());
     const picker = layer === 'meta' && metaRoute.kind === 'chapter' ? metaRoute : null;
     const cardId = selectedWork(), authorCard = selectedAuthorWork();
     const menuBackdrop = layer === 'meta' && (metaRoute.kind === 'album' || isMenuList(metaRoute));
@@ -1131,6 +1171,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     return success;
   }
   const back = (): boolean => {
+    dismissFirstSwapCue();
     if (busy || layer === 'recovery') return true;
     if (menuPreferences.open) { closeMenuPreferences(); return true; }
     if (boardEntry.active) { boardEntry.stop(); render(); return true; }
@@ -1159,6 +1200,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     return false;
   };
   const unlockMusic = () => { if (session.state.preferences.music && !activity.isBlocked()) music.unlock(); };
+  root.addEventListener('pointerdown', dismissFirstSwapCue, { signal: listeners.signal, capture: true });
   root.addEventListener('pointerdown', unlockMusic, { signal: listeners.signal, capture: true });
   root.addEventListener('keydown', unlockMusic, { signal: listeners.signal, capture: true });
   byId('help').addEventListener('click', () => {
@@ -1205,6 +1247,9 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   }, { signal: listeners.signal, capture: true });
   const activationKey = (event: KeyboardEvent) => ['Enter', ' '].includes(event.key);
   window.addEventListener('keydown', event => {
+    if (activationKey(event) || ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Escape', 'Tab'].includes(event.key)) {
+      dismissFirstSwapCue();
+    }
     if (activationKey(event)) {
       const key = event.code || event.key;
       heldActivation.add(key);
@@ -1233,6 +1278,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   const observer = new ResizeObserver(resize); observer.observe(region);
   window.addEventListener('resize', resize, { signal: listeners.signal });
   window.addEventListener('pagehide', () => {
+    dismissFirstSwapCue(); clearFirstPinLine();
     const timer = activeClock();
     if (timer?.startedAt != null && timer.remainingMs > 0) {
       checkpointClock(timer.remainingMs - timedRemaining(timer, pauseRequestedAt ?? clockNow()), true);
@@ -1269,5 +1315,5 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
         session.state.personalProgress?.day !== localCalendarDay()) void issuePersonal();
   }, 1000);
   await frame; ready = true; render(); resize();
-  return { back, destroy() { alive = false; boardEntry.stop(); preferencesFlight?.cancel(); printAnimation?.cancel(); clearTimeout(insertionTimer); clearInterval(clockTicker); clearInterval(personalTicker); clearMark(); editorView?.destroy(); workCard?.destroy(); stopVictory(); exportFiles.destroy?.(); listeners.abort(); observer.disconnect(); pickerRailSize.disconnect(); unblock(); atmosphere.destroy(); feedback.destroy(); music.destroy(); activity.setGameplayDesired(false); store.close(); destroyRenderer(game); } };
+  return { back, destroy() { alive = false; dismissFirstSwapCue(); clearFirstPinLine(); boardEntry.stop(); preferencesFlight?.cancel(); printAnimation?.cancel(); clearTimeout(insertionTimer); clearInterval(clockTicker); clearInterval(personalTicker); clearMark(); editorView?.destroy(); workCard?.destroy(); stopVictory(); exportFiles.destroy?.(); listeners.abort(); observer.disconnect(); pickerRailSize.disconnect(); unblock(); atmosphere.destroy(); feedback.destroy(); music.destroy(); activity.setGameplayDesired(false); store.close(); destroyRenderer(game); } };
 }
