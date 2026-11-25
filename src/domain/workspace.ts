@@ -1,3 +1,4 @@
+import { geometryWorkPayload } from './geometryRecipe';
 import { CAMPAIGN_CONTENT_VERSION, CONTENT_VERSION, createAttempt, proposeAssistance, proposeSwap, RULES_VERSION, validateAttempt, validateLevel, type Assistance, type Attempt, type ContentVersion, type LevelDefinition } from './puzzle';
 import { getLevel, levels } from './levels';
 import { earnedRights, isKnownRight, levelIsOpen, META_POLICY } from './progression';
@@ -75,6 +76,11 @@ export function canonicalJson(value: unknown): string {
   return JSON.stringify(value);
 }
 export function fingerprintPayload(level: LevelDefinition): string {
+  if (level.geometry) return canonicalJson({
+    geometry: geometryWorkPayload(level.geometry, level.width, level.height, level.positions!, level.pinnedPositions),
+    contentVersion: level.contentVersion, rulesVersion: RULES_VERSION,
+    solvedTileColors: level.solvedTileColors,
+  });
   return canonicalJson({ width: level.width, height: level.height, solvedTileColors: level.solvedTileColors.map(c => c.toUpperCase()),
     pinnedPositions: [...level.pinnedPositions].sort((a, b) => a - b), startTileAtPosition: level.startTileAtPosition });
 }

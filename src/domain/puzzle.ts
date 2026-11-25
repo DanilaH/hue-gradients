@@ -1,12 +1,15 @@
-import { RECTANGLE, validPosition, type StartRecipe, type TilePosition } from './tileShapes';
+import { RECTANGLE, validOrientedPosition, validPosition, type StartRecipe, type TilePosition } from './tileShapes';
+import { GEOMETRY_START_VERSION, geometryColors, geometrySeed, geometryStart, geometryWorkPayload,
+  validGeometryIdentity, type GeometryIdentity } from './geometryRecipe';
 
 /** Game-owned rules. This module has no renderer, SDK, clock or storage imports. */
 export const RULES_VERSION = 'gradient-rules-1';
 export const CONTENT_VERSION = 'gradient-prototype-0.1';
 export const CAMPAIGN_CONTENT_VERSION = 'gradient-campaign-candidates-0.1';
 export const CHALLENGE_CONTENT_VERSION = 'gradient-challenges-1';
+export const PILOT_CONTENT_VERSION = 'gradient-pilot-1';
 export const DAILY_CONTENT_VERSION = 'gradient-daily-1';
-export type ContentVersion = typeof CONTENT_VERSION | typeof CAMPAIGN_CONTENT_VERSION | typeof CHALLENGE_CONTENT_VERSION | typeof DAILY_CONTENT_VERSION;
+export type ContentVersion = typeof CONTENT_VERSION | typeof CAMPAIGN_CONTENT_VERSION | typeof CHALLENGE_CONTENT_VERSION | typeof DAILY_CONTENT_VERSION | typeof PILOT_CONTENT_VERSION;
 
 export interface LevelDefinition {
   readonly contentVersion?: ContentVersion;
@@ -21,6 +24,7 @@ export interface LevelDefinition {
   readonly minimumSwaps: number;
   readonly positions?: readonly TilePosition[];
   readonly startRecipe?: StartRecipe;
+  readonly geometry?: GeometryIdentity;
 }
 
 export interface Attempt {
@@ -34,7 +38,12 @@ export interface Attempt {
   readonly assisted: boolean;
   readonly assistsUsed: number;
   readonly completed: boolean;
-  readonly generatedStart?: StartRecipe & { readonly board: readonly number[] };
+  readonly generatedStart?: (StartRecipe | {
+    readonly version: typeof GEOMETRY_START_VERSION;
+    readonly mode: 'group-cycle';
+    readonly seed: number;
+    readonly work: string;
+  }) & { readonly board: readonly number[] };
 }
 
 export const AUTO_HELP_COST = 3;
@@ -69,25 +78,39 @@ export function minimumSwaps(board: readonly number[], pins: readonly number[]):
   return board.length - pins.length - cycles;
 }
 
+function compatibleShape(level: LevelDefinition, index: number) {
+  const position = level.positions?.[index];
+  return level.geometry ? position?.family : position?.shape ?? RECTANGLE;
+}
+
 function respectsShapes(level: LevelDefinition, order: readonly number[]): boolean {
-  return !level.positions || order.every((tile, position) => level.positions![tile]!.shape === level.positions![position]!.shape);
+  return !level.positions || order.every((tile, position) => compatibleShape(level, tile) === compatibleShape(level, position));
 }
 
 export function canSwap(level: LevelDefinition, from: number, to: number): boolean {
-  const size = level.width * level.height;
+  const size = level.geometry ? level.solvedTileColors.length : level.width * level.height;
   return from !== to && integer(from, 0, size - 1) && integer(to, 0, size - 1) &&
     !level.pinnedPositions.includes(from) && !level.pinnedPositions.includes(to) &&
-    (level.positions?.[from]?.shape ?? RECTANGLE) === (level.positions?.[to]?.shape ?? RECTANGLE);
+    compatibleShape(level, from) === compatibleShape(level, to);
 }
 
 export function validateLevel(level: LevelDefinition): void {
   if (!integer(level.width, 1, 13) || !integer(level.height, 1, 13)) throw new Error('Invalid board dimensions');
-  const size = level.width * level.height;
-  if (level.startTileAtPosition.length !== size || level.solvedTileColors.length !== size) throw new Error('Invalid board size');
+  const size = level.geometry ? level.solvedTileColors.length : level.width * level.height;
+  if (!integer(size, 2, 169) || level.startTileAtPosition.length !== size || level.solvedTileColors.length !== size) throw new Error('Invalid board size');
+  if ((level.contentVersion === PILOT_CONTENT_VERSION) !== !!level.geometry) throw new Error('Invalid geometry version');
   if (level.solvedTileColors.some(color => !/^#[0-9A-Fa-f]{6}$/.test(color))) throw new Error('Invalid RGB');
   validatePermutation(level.startTileAtPosition, level.pinnedPositions);
   if (level.positions && (level.positions.length !== size || !level.positions.every(validPosition) ||
       !respectsShapes(level, level.startTileAtPosition))) throw new Error('Invalid tile positions');
+  if (level.geometry) {
+    const positions = level.positions;
+    if (level.startRecipe || !validGeometryIdentity(level.geometry) || !positions?.every(validOrientedPosition) ||
+        new Set(positions.map(position => position.center!.join(','))).size !== size ||
+        geometryColors(positions, level.geometry.corners).some((colour, index) => colour !== level.solvedTileColors[index])) {
+      throw new Error('Invalid versioned geometry');
+    }
+  }
   const movableColors = level.solvedTileColors.filter((_, position) => !level.pinnedPositions.includes(position));
   if (movableColors.length < 2 || new Set(movableColors.map(color => color.toUpperCase())).size !== movableColors.length) {
     throw new Error('Invalid movable colors');
@@ -100,18 +123,24 @@ export function validateLevel(level: LevelDefinition): void {
 export function createAttempt(level: LevelDefinition, attemptId: string): Attempt {
   validateLevel(level);
   if (!attemptId) throw new Error('Missing attempt ID');
+  const generated = level.geometry ? {
+    version: GEOMETRY_START_VERSION, mode: 'group-cycle' as const,
+    seed: geometrySeed(attemptId), work: geometryWorkPayload(level.geometry, level.width, level.height, level.positions!, level.pinnedPositions),
+  } as const : level.startRecipe;
+  const board = level.geometry
+    ? geometryStart(level.positions!, level.pinnedPositions, generated!.seed) : [...level.startTileAtPosition];
   return {
     schemaVersion: 1, rulesVersion: RULES_VERSION, contentVersion: level.contentVersion ?? CONTENT_VERSION,
-    levelId: level.id, attemptId, board: [...level.startTileAtPosition],
+    levelId: level.id, attemptId, board,
     moves: 0, assisted: false, assistsUsed: 0, completed: false,
-    ...(level.startRecipe ? { generatedStart: { ...level.startRecipe, board: [...level.startTileAtPosition] } } : {}),
+    ...(generated ? { generatedStart: { ...generated, board: [...board] } } : {}),
   };
 }
 
 export function validateAttempt(level: LevelDefinition, attempt: Attempt): void {
   if (attempt.schemaVersion !== 1 || attempt.rulesVersion !== RULES_VERSION || attempt.contentVersion !== (level.contentVersion ?? CONTENT_VERSION) ||
       attempt.levelId !== level.id || typeof attempt.attemptId !== 'string' || !attempt.attemptId ||
-      attempt.board.length !== level.width * level.height ||
+      attempt.board.length !== level.solvedTileColors.length ||
       !integer(attempt.moves, 0, Number.MAX_SAFE_INTEGER) || !integer(attempt.assistsUsed, 0, Number.MAX_SAFE_INTEGER) ||
       typeof attempt.assisted !== 'boolean' || typeof attempt.completed !== 'boolean' ||
       attempt.assisted !== (attempt.assistsUsed > 0) ||
@@ -122,6 +151,17 @@ export function validateAttempt(level: LevelDefinition, attempt: Attempt): void 
   validatePermutation(attempt.board, level.pinnedPositions);
   if (!respectsShapes(level, attempt.board)) throw new Error('Incompatible tiles in saved field');
   const generated = attempt.generatedStart, recipe = level.startRecipe;
+  if (level.geometry) {
+    const seed = geometrySeed(attempt.attemptId);
+    if (generated?.version !== GEOMETRY_START_VERSION || generated.seed !== seed ||
+        generated.work !== geometryWorkPayload(level.geometry, level.width, level.height, level.positions!, level.pinnedPositions) || generated.mode !== 'group-cycle' || !Array.isArray(generated.board) ||
+        generated.board.length !== attempt.board.length ||
+        geometryStart(level.positions!, level.pinnedPositions, seed).some((tile, position) =>
+          tile !== generated.board[position] || attempt.moves === 0 && tile !== attempt.board[position])) {
+      throw new Error('Invalid saved geometry start');
+    }
+    return;
+  }
   if (recipe ? !generated || recipe.version !== generated.version || recipe.seed !== generated.seed ||
       recipe.mode !== generated.mode || !Array.isArray(generated.board) ||
       generated.board.length !== level.startTileAtPosition.length ||

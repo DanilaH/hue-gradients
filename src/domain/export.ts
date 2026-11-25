@@ -1,14 +1,18 @@
 import { hasAuthorProof } from './creative';
 import { getLevel } from './levels';
+import { pilotLevel } from './geometryPilot';
 import type { LevelDefinition } from './puzzle';
 import type { Workspace } from './workspace';
 
-export type ExportField = Pick<LevelDefinition, 'width' | 'height' | 'solvedTileColors'>;
+export type ExportField = Pick<LevelDefinition, 'width' | 'height' | 'solvedTileColors' | 'geometry'>;
 export interface WallpaperSize { width: number; height: number }
 
 export function wallpaperField(state: Workspace, key: string): ExportField {
   const completed = state.completed.find(id => key === `campaign:${id}`);
   let field: ExportField | undefined = completed ? getLevel(completed) : undefined;
+  const pilotId = key.startsWith('pilot:') ? key.slice('pilot:'.length) : '';
+  if (pilotId && state.challengeProgress?.best[pilotId] !== undefined) field = pilotLevel(pilotId);
+  if (field?.geometry) return field;
   if (!field) {
     for (const work of Object.values(state.creative?.works ?? {})) {
       const node = Object.values(work.nodes).find(node => key === `own:${work.workId}:${node.nodeId}`);

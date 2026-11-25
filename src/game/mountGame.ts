@@ -25,6 +25,7 @@ import { activeDaily, validateDailyFeed, type DailyFeed } from '../domain/daily'
 import { activeTimed, timedRemaining } from '../domain/timeTrial';
 import { books, bookProgress } from '../domain/books';
 import { activeChallenge, challenges } from '../domain/challenges';
+import { pilotLevel } from '../domain/geometryPilot';
 import { publishedBenchmark } from '../domain/playerProgress';
 import { EditorView } from './editorView';
 import { renderAlbum, type AlbumPosition, type AlbumRoute } from './albumView';
@@ -487,14 +488,15 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     showBook(origin.bookId, origin.slot);
     render();
   }
-  function challengeLobby(group?: 'chapter' | 'geometry', selected?: string): void {
+  function challengeLobby(group?: 'chapter' | 'geometry' | 'pilot', selected?: string): void {
     restorePlayMenu({ kind: 'challenges', ...(group ? { group } : {}), ...(selected ? { selected } : {}) }, modeTrail());
   }
   function leaveChallenge(): void {
     const challenge = current().challenge;
     const origin = currentBook();
     const progress = session.state.challengeProgress?.entry === 'progress' ? challenge?.chapterIndex : undefined;
-    const group = challenge?.chapterIndex !== undefined ? 'chapter' : challenge?.level.id.startsWith('geometry-v1-') ? 'geometry' : undefined;
+    const group = challenge?.chapterIndex !== undefined ? 'chapter' : challenge?.level.geometry ? 'pilot'
+      : challenge?.level.id.startsWith('geometry-v1-') ? 'geometry' : undefined;
     void run({ kind: 'challenge-leave' }, () => {
       if (origin) showBook(origin.bookId, origin.slot);
       else if (challenge?.book) showBook(challenge.book.id);
@@ -559,7 +561,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   }
   function playTimed(): void {
     rememberPlayMenu();
-    const entry = layer === 'meta' && metaRoute.kind === 'challenges' ? metaRoute.group : current().timed?.entry;
+    const entry = layer === 'meta' && metaRoute.kind === 'challenges' && metaRoute.group !== 'pilot'
+      ? metaRoute.group : current().timed?.entry;
     void run({ kind: 'timed-open', id: crypto.randomUUID(), now: clockNow(), ...(entry ? { entry } : {}) }, () => {
       metaHistory = [];
       layer = gameLayer();
@@ -721,7 +724,10 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     else delete dialog.dataset.cover;
     if (editorView && !(layer === 'meta' && metaRoute.kind === 'draft')) { editorView.destroy(); editorView = null; editorDraftId = null; }
     const cardId = selectedWork(), authorCard = selectedAuthorWork();
-    const cardKey = cardId ? `campaign:${cardId}` : authorCard ? `own:${authorCard.work.workId}:${authorCard.nodeId}` : null;
+    const pilot = layer === 'meta' && metaRoute.kind === 'pilot-card' ? pilotLevel(metaRoute.levelId) : undefined;
+    const pilotBest = pilot ? session.state.challengeProgress?.best[pilot.id] : undefined;
+    const cardKey = cardId ? `campaign:${cardId}` : authorCard ? `own:${authorCard.work.workId}:${authorCard.nodeId}`
+      : pilot && pilotBest !== undefined ? `pilot:${pilot.id}` : null;
     if (cardKey !== workCardId) { workCard?.destroy(); workCard = null; workCardId = cardKey; }
     dialog.dataset.workCard = String(cardKey !== null);
     dialog.dataset.picker = String(layer === 'meta' && metaRoute.kind === 'chapter');
@@ -759,7 +765,10 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       byId('dialog-title').textContent = won ? 'Испытание пройдено' : 'Ходы закончились';
       byId('dialog-copy').textContent = `Ходы · ${challenge.attempt.moves} из ${challenge.moveLimit}`;
       const challengeBack = challenge.book || currentBook() ? 'К книге' : session.state.challengeProgress?.entry === 'progress' ? 'К прогрессу' : 'К испытаниям';
-      if (won) button(challengeBack, leaveChallenge);
+      if (won) {
+        button(challengeBack, leaveChallenge);
+        if (level.geometry) button('Обои', () => showMeta({ kind: 'pilot-card', levelId: level.id }), true);
+      }
       else {
         button('Повторить', () => playChallenge(level.id, true, currentBook(), session.state.challengeProgress?.entry));
         button(challengeBack, leaveChallenge, true);
@@ -803,6 +812,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     } else if (layer === 'restart') {
       byId('dialog-title').textContent = 'Начать заново?';
       byId('dialog-copy').textContent = `«${own || challenge || timed || daily || personal ? level.title : getLevel(restartLevelId ?? level.id).title}» начнётся с исходного поля.`;
+      if (level.geometry) byId('dialog-copy').textContent = 'Плитки перемешаются, ходы начнут считаться заново.';
       button('Начать заново', () => {
         if (challenge) { playChallenge(level.id, true, currentBook(), session.state.challengeProgress?.entry); return; }
         if (personal) { playPersonal(personal.key, true); return; }
@@ -857,7 +867,14 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
       button('К игре', () => { layer = 'none'; render(); });
     } else if (layer === 'meta') {
       const work = draftId && session.state.creative ? findDraft(session.state.creative, draftId) : null;
-      if (cardKey) {
+      if (cardKey && pilot && pilotBest !== undefined) {
+        byId('dialog-title').textContent = pilot.title;
+        if (!workCard) workCard = new WorkCardView(actions, session.state, {
+          key: cardKey, title: pilot.title, minimum: pilot.minimumSwaps, filename: `Poluson-${pilot.id}.png`,
+          best: { clean: pilotBest, assisted: null }, perfect: pilotBest === pilot.minimumSwaps,
+        }, exportFiles, { back: popMeta });
+        workCard.update(busy || activity.isBlocked() || !!session.pending);
+      } else if (cardKey) {
         const finished = cardId ? getLevel(cardId) : null;
         const title = finished?.title ?? authorCard!.work.name;
         const record = finished ? session.state.bests[finished.id]! : authorBests(authorCard!.work, authorCard!.nodeId);

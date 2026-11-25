@@ -4,7 +4,8 @@ import { CHALLENGE_CONTENT_VERSION, minimumSwaps, validateLevel, type LevelDefin
 import type { StartRecipe, TilePosition, TileShape, Vertex } from './tileShapes';
 
 const hexagon: readonly Vertex[] = [[.5, 0], [1, .25], [1, .75], [.5, 1], [0, .75], [0, .25]];
-const vertices: Record<TileShape, readonly Vertex[]> = {
+type LegacyShape = Extract<TileShape, 'triangle-nw' | 'triangle-se' | 'rect' | 'hex'>;
+const vertices: Record<LegacyShape, readonly Vertex[]> = {
   'triangle-nw': [[0, 0], [1, 0], [0, 1]],
   'triangle-se': [[1, 0], [1, 1], [0, 1]],
   rect: [[0, 0], [1, 0], [1, 1], [0, 1]],
@@ -14,7 +15,7 @@ const vertices: Record<TileShape, readonly Vertex[]> = {
 function positions(level: LevelDefinition, layout: 'triangles' | 'hexagons' | 'mixed'): readonly TilePosition[] {
   return Object.freeze(level.solvedTileColors.map((_, index) => {
     const column = index % level.width, row = Math.floor(index / level.width);
-    let shape: TileShape, sx: number, sy: number, spanX: number, spanY: number;
+    let shape: LegacyShape, sx: number, sy: number, spanX: number, spanY: number;
     if (layout === 'hexagons') {
       shape = 'hex';
       sx = column + (row % 2) * .5;

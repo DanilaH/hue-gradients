@@ -12,6 +12,10 @@ export const victoryPrism = `<div id="victory-prism" aria-hidden="true" hidden><
 </svg></div>`;
 
 export function colourPrism(prism: HTMLElement, level: LevelDefinition): void {
+  if (level.geometry) {
+    level.geometry.corners.forEach((colour, i) => prism.style.setProperty(`--facet-${i}`, colour));
+    return;
+  }
   const { width, height, solvedTileColors: colors } = level;
   const last = colors.length - 1;
   const positions = width === 1 || height === 1

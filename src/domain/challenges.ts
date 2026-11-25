@@ -2,6 +2,7 @@ import type { BookTarget } from './workspace';
 import { chapters, getLevel } from './levels';
 import { bookProgress, books, type Book, type BookProof } from './books';
 import { geometryLevels } from './shapeLevels';
+import { pilotLevels } from './geometryPilot';
 import { CHALLENGE_CONTENT_VERSION, createAttempt, minimumSwaps, proposeSwap, validateAttempt, validateLevel,
   type Attempt, type LevelDefinition } from './puzzle';
 
@@ -76,9 +77,11 @@ export type ChallengeAction =
 
 export const geometryChallenges: readonly ChallengeDefinition[] = Object.freeze(geometryLevels.map(level =>
   Object.freeze({ level, requiredWorks: 0, moveLimit: level.minimumSwaps + 3 })));
+export const pilotChallenges: readonly ChallengeDefinition[] = pilotLevels.map(level =>
+  Object.freeze({ level, requiredWorks: 0, moveLimit: level.minimumSwaps + 3 }));
 const bookChallenges = books.map(book => Object.freeze({ level: book.level, requiredWorks: 0,
   moveLimit: book.level.minimumSwaps + 3, book }));
-const allChallenges = [...challenges, ...chapterChallenges, ...geometryChallenges, ...bookChallenges];
+const allChallenges = [...challenges, ...chapterChallenges, ...geometryChallenges, ...pilotChallenges, ...bookChallenges];
 const entry = (id: string | null): ChallengeDefinition | undefined => allChallenges.find(item => item.level.id === id);
 
 export function challengeAvailable(definition: ChallengeDefinition, proof: BookProof): boolean {

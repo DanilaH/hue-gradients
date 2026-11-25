@@ -491,6 +491,7 @@ html[data-host=browser] #game-dialog[data-menu] {
   border-radius: 0; background: #23172f85; color: #fff2de;
 }
 .menu-row.quiet:disabled { opacity: 1; color: #d5c5db; }
+.menu-row[data-palette-tier] .composition { flex: 0 0 58px; height: 43px; }
 .menu-row-copy { display: grid; gap: 3px; flex: 1; min-width: 0; overflow-wrap: anywhere; font-weight: 600; }
 .menu-row-copy small { color: var(--menu-secondary); font-size: .8rem; font-weight: 400; }
 .menu-row-swatch {

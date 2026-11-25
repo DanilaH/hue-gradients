@@ -4,7 +4,7 @@ import { canSwap, type LevelDefinition } from '../domain/puzzle';
 import { makeField } from '../domain/editor';
 import type { BookTarget, Workspace } from '../domain/workspace';
 import type { AlbumRoute } from './albumView';
-import { chapterChallenges, challengeAvailable, challenges, challengeStatus, geometryChallenges } from '../domain/challenges';
+import { chapterChallenges, challengeAvailable, challenges, challengeStatus, geometryChallenges, pilotChallenges } from '../domain/challenges';
 import { bookProgress, books } from '../domain/books';
 import { gradientThumbnail } from './exportRenderer';
 import { personalAssignments, personalLevel, personalTaskName, TASK_KINDS, taskKey, taskStatus } from '../domain/personal';
@@ -14,8 +14,8 @@ import { personalArt } from './personalArt';
 
 type PickerRoute = { kind: 'chapter'; levelId: string; chapterMenu?: number };
 export type MetaRoute = PickerRoute | AlbumRoute | { kind: 'card' | 'copy'; levelId: string } |
-  { kind: 'own-card'; workId: string; nodeId: string } | { kind: 'draft'; draftId: string; nodeId?: string } |
-  { kind: 'modes' | 'editor-home' } | { kind: 'progress'; chapter?: number } | { kind: 'books'; eventDate?: string } | { kind: 'personal'; key?: string } | { kind: 'book'; bookId: string; slot?: number } | { kind: 'daily'; date?: string; month?: string } | { kind: 'challenges'; group?: 'chapter' | 'geometry'; selected?: string };
+  { kind: 'pilot-card'; levelId: string } | { kind: 'own-card'; workId: string; nodeId: string } | { kind: 'draft'; draftId: string; nodeId?: string } |
+  { kind: 'modes' | 'editor-home' } | { kind: 'progress'; chapter?: number } | { kind: 'books'; eventDate?: string } | { kind: 'personal'; key?: string } | { kind: 'book'; bookId: string; slot?: number } | { kind: 'daily'; date?: string; month?: string } | { kind: 'challenges'; group?: 'chapter' | 'geometry' | 'pilot'; selected?: string };
 interface MetaView {
   route: MetaRoute; state: Workspace; disabled: boolean;
   title: HTMLElement; copy: HTMLElement; actions: HTMLElement;
@@ -799,7 +799,7 @@ export function renderMeta(v: MetaView): void {
     menuBack();
     const tabs = document.createElement('div');
     tabs.className = 'challenge-tabs';
-    for (const [group, name] of [[undefined, 'Лимит ходов'], ['chapter', 'Финалы глав'], ['geometry', 'Фигуры']] as const) {
+    for (const [group, name] of [[undefined, 'Лимит ходов'], ['chapter', 'Финалы глав'], ['geometry', 'Фигуры'], ['pilot', 'Проба']] as const) {
       const tab = button(name, () => v.navigate({ kind: 'challenges', ...(group ? { group } : {}) }), tabs);
       tab.className = 'quiet';
       tab.setAttribute('aria-pressed', String(route.group === group));
@@ -807,15 +807,16 @@ export function renderMeta(v: MetaView): void {
     const list = document.createElement('div');
     list.className = 'menu-list';
     const timed = state.timedProgress;
-    const timedButton = button('', v.playTimed);
+    const timedButton = route.group === 'pilot' ? null : button('', v.playTimed);
     const remainingSeconds = Math.ceil((timed?.run.remainingMs ?? 0) / 1000);
     const continuing = remainingSeconds > 0;
     const duration = continuing ? `${Math.floor(remainingSeconds / 60)}:${String(remainingSeconds % 60).padStart(2, '0')} осталось` : '10 минут';
-    menuRow(timedButton, continuing ? 'Продолжить заезд' : 'Заезд на время',
+    if (timedButton) menuRow(timedButton, continuing ? 'Продолжить заезд' : 'Заезд на время',
       timed?.finished ? `${duration} · Рекорд · ${timed.best}` : duration);
     actions.append(tabs, list);
-    const definitions = route.group === 'chapter' ? chapterChallenges : route.group === 'geometry' ? geometryChallenges : challenges;
-    if (route.group !== 'chapter') {
+    const definitions = route.group === 'chapter' ? chapterChallenges : route.group === 'geometry' ? geometryChallenges
+      : route.group === 'pilot' ? pilotChallenges : challenges;
+    if (route.group !== 'chapter' && route.group !== 'pilot') {
       const demonstration = route.group === 'geometry' ? definitions.find(item => item.level.id === 'geometry-v1-mixed')
         : definitions.find(item => challengeAvailable(item,state));
       if (demonstration) renderChallengeDemo(list, demonstration.level, demonstration.moveLimit, route.group === 'geometry');
@@ -834,9 +835,14 @@ export function renderMeta(v: MetaView): void {
       menuRow(card, level.title, locked ? definition.afterFinaleId ? 'Пройди финал главы'
         : definition.chapterIndex !== undefined ? 'Собери все работы главы'
         : `Откроется за ${requiredWorks} работ` : [
-        `Лимит · ${moveLimit}`,
+        level.geometry ? level.geometry.paletteTier === 'Lo' ? 'Разные оттенки' : 'Близкие оттенки' : `Лимит · ${moveLimit}`,
         best === undefined ? '' : `Рекорд · ${best}`,
       ].filter(Boolean).join(' · '), locked ? 'Закрыто' : restart ? 'Повторить' : attempt ? 'Продолжить' : undefined);
+      if (level.geometry) {
+        card.prepend(preview(level));
+        card.dataset.paletteTier = level.geometry.paletteTier;
+        if (best !== undefined) button('Обои', () => v.navigate({ kind: 'pilot-card', levelId: level.id }), list).className = 'quiet';
+      }
     }
   } else if (route.kind === 'card' || route.kind === 'copy') {
     const level = getLevel(route.levelId);

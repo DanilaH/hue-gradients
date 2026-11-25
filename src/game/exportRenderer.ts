@@ -36,6 +36,7 @@ function samplesOnAxis(pixels: number, nodes: number) {
 }
 
 function drawGradient(ctx: CanvasRenderingContext2D, field: ExportField, { width, height }: WallpaperSize): void {
+  if (field.geometry) field = { width: 2, height: 2, solvedTileColors: field.geometry.corners };
   const image = ctx.createImageData(width, height);
   const { data } = image;
   const colours = field.solvedTileColors.map(colour => {

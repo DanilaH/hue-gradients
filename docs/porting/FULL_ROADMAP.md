@@ -1,5 +1,7 @@
 # Полная программа переноса для «Полусна»
 
+**Поставка 25 ноября.** D2 selection и входы в «Режимах» реализованы в 0.4.49, C1-next с 16 полями в отдельной «Пробе» — в 0.4.50. [D2](../evidence/pr22-23-modes-personal-0.4.49.md) · [C1-next](../evidence/pr24-25-geometry-pilot-0.4.50.md).
+
 **25 ноября · итоговая исследовательская ревизия.** [Результат и порядок работ](FINAL_RESEARCH_REVIEW.md), [94 строки](RESEARCH_DISPOSITION.json). Оригинальный Voronoi collider path доказан, gap MISSING; 3 UNKNOWN ограничены точечными проверками/решением владельца. Общий реверс завершён в рамках текущего реестра: не повторять исследованные темы без конкретного пробела. Приоритет — реализация и приёмка существующих требований; внешние зависимости и owner-only отдельно. Полные source листинги: [kit PR149](https://github.com/DanilaH/mini-games-kit/blob/b46de8366d766311d686b5225d230d4ebcd3db95/research/games/hue/porting/VORONOI_CLOSURE_2026-11-25.md).
 
 

@@ -1,7 +1,7 @@
 import type { LevelDefinition } from '../domain/puzzle';
 import type { Point } from './boardCamera';
 import { paintGradientThumbnail } from './exportRenderer';
-import { cellAt, type BoardGeometry } from './geometry';
+import { cellAt, nearestTile, type BoardGeometry } from './geometry';
 import { orderedGrain, TileDither } from './tileDither';
 import { amount, CAMERA_SETTLE_MS, landingCamera, landingTileOpacity, WAVE_MS } from './victoryMotion';
 
@@ -91,7 +91,9 @@ export class VictoryArtwork {
       // Keep the sprays just inside the screen so they cross the visible edges.
       const x = (nx ? .08 + .84 * u : u) * this.effects.width;
       const y = (ny ? .08 + .84 * v : v) * this.effects.height;
-      const colour = level.solvedTileColors[Math.round(v * (level.height - 1)) * level.width + Math.round(u * (level.width - 1))]!;
+      const position = level.geometry ? nearestTile(level.positions!, level.width, level.height, u, v)
+        : Math.round(v * (level.height - 1)) * level.width + Math.round(u * (level.width - 1));
+      const colour = level.solvedTileColors[position]!;
       const starts = WAVE_MS * Math.hypot(x - origin.x, y - origin.y) / Math.max(1, this.waveEnd);
       for (let i = 0; i < 3; i++) {
         const speed = 54 + ((from.length * 37) % 90);

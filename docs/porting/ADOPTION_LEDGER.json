@@ -270,8 +270,8 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 04",
-      "currentImplementation": "Треугольники разной ориентации и разные формы не обмениваются; совместимые обмены проверены. | https://github.com/DanilaH/hue-gradients/blob/493b2415967e77f7c61bdb471e8db06677f63eb8/tools/shape-browser-check.mjs В 0.4.39 в пробе форм проверены допустимая и недопустимая пары без записи в профиль. 1275/1440 обычных полей Hue Too используют несколько групп совместимости. У нас это пока отдельные испытания. | https://github.com/DanilaH/mini-games-kit/blob/534e488862195836982f6ac47c991541ce11b850/research/games/hue/porting/GENERATION_NATIVE_2026-11-25.md У оригинала TileType отдельно от Rot, isValidSwapCandidate сравнивает TileType и lock; SwapTiles подгоняет поворот. 1785/1920 с отличающимися поворотами одной группы; Triangle 735. У нас triangle-nw/se разные строки, несовместимы. 368 исходных уровней имеют shape-def с числом вершин вне 3/4/6, 232 — mixed-turn shape. Наши validPosition и convex-only polygonContains пока это не поддерживают. | https://github.com/DanilaH/mini-games-kit/blob/a483e41e054cbd2ad3cfb42d3127ff0d2760d37c/research/games/hue/porting/AUTHORING_2026-11-25.md Дополнение: у оригинала FindSwapCandidateUnderDrag пробует midpoint world-touch/центр → touch → центр, проверяя совместимость после каждой пробы; при неуспехе helper может вернуть невалидный первый кандидат, ход отдельно валидируется. https://github.com/DanilaH/mini-games-kit/blob/b46de8366d766311d686b5225d230d4ebcd3db95/research/games/hue/porting/VORONOI_CLOSURE_2026-11-25.md",
-      "nextAction": "В новой версии: groupId отдельно от ориентации, обмен двух одинаковых форм с разным Rot, автоматический поворот при посадке; несовместимая форма/опора отказ. Собственный пятиугольник и невыпуклая L-форма: корректный hit-test, выемка не активна. Старые geometry-v1 правила неизменны. Принять отдельные hit regions и fallback цели, без разрешения нелегального хода.",
+      "currentImplementation": "В 0.4.50 пилот проверил совместимость независимо от угла, отказ над опорой и чужим семейством, видимый авторский поворот. [Приёмка](../evidence/pr24-25-geometry-pilot-0.4.50.md)",
+      "nextAction": "Физический Android: поворот, попадание, продолжение, обои и читаемость палитр. По итогам отдельно решить выпуск этого банка в кампанию.",
       "deliveryPackage": "04",
       "sourceNextCheck": "На прототипе проверить, как игрок видит допустимые пары разных форм."
     },
@@ -280,8 +280,8 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 04",
-      "currentImplementation": "Для треугольного и смешанного поля у каждой совместимой группы один цикл. | https://github.com/DanilaH/hue-gradients/blob/493b2415967e77f7c61bdb471e8db06677f63eb8/tools/shape-browser-check.mjs В 0.4.48 генератор group-cycle есть в фигурах; обычная кампания использует фиксированные старты. В оригинале reset вновь строит один цикл на каждую совместимую группу; 1950/1950 формул perfect совпали. | https://github.com/DanilaH/mini-games-kit/blob/534e488862195836982f6ac47c991541ce11b850/research/games/hue/porting/GENERATION_NATIVE_2026-11-25.md 1950 формул заново проверены на сырых объектах; ориентация не делит группы. Для двух пар треугольников разных поворотов один общий цикл даёт 3 вместо двух отдельных циклов с минимумом 2. | https://github.com/DanilaH/mini-games-kit/blob/a483e41e054cbd2ad3cfb42d3127ff0d2760d37c/research/games/hue/porting/AUTHORING_2026-11-25.md",
-      "nextAction": "Проверить математический минимум на собственном четырёхплиточном поле одной формы двух ориентаций, 100 seed и неизменные закрепления.",
+      "currentImplementation": "В 0.4.50 100 seed на каждом поле, один цикл по семейству, опоры и singleton проверены. [Приёмка](../evidence/pr24-25-geometry-pilot-0.4.50.md)",
+      "nextAction": "Физический Android: поворот, попадание, продолжение, обои и читаемость палитр. По итогам отдельно решить выпуск этого банка в кампанию.",
       "deliveryPackage": "04",
       "sourceNextCheck": "Сверить минимумы однотипного и смешанного полей отдельно."
     },
@@ -290,8 +290,8 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "MATCH",
       "stage": "Пакет 01",
-      "currentImplementation": "Карточка показывает математический минимум, два личных рекорда и отметку идеальной чистой победы. Метка переживает перезапуск и новую победу с помощью. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/workCardView.ts Новый подсчёт 1950 записей Hue Too подтвердил сумму n−1 для каждой группы. В нашем ядре minimumSwaps считает фактические циклы, корректно для фиксированного старта. | https://github.com/DanilaH/mini-games-kit/blob/534e488862195836982f6ac47c991541ce11b850/research/games/hue/porting/GENERATION_NATIVE_2026-11-25.md",
-      "nextAction": "Проверить сохранение математического минимума на 100 новых group-cycle стартах нескольких форм; человеческая трудность отдельно.",
+      "currentImplementation": "В 0.4.50 минимум одного цикла на семейство проверен на 1600 стартах. [Приёмка](../evidence/pr24-25-geometry-pilot-0.4.50.md)",
+      "nextAction": "Физический Android: поворот, попадание, продолжение, обои и читаемость палитр. По итогам отдельно решить выпуск этого банка в кампанию.",
       "deliveryPackage": "01",
       "sourceNextCheck": "Довести знак и минимум до карточки и проверить после replay."
     },
@@ -901,8 +901,8 @@
       "gap": "PARTIAL",
       "stage": "Пакет 04",
       "deliveryPackage": "04",
-      "currentImplementation": "0.4.48. createAttempt копирует level.startTileAtPosition, включая replay; есть сохранение generatedStart в специальных полях. Нового seed на каждую новую обычную попытку нет. https://github.com/DanilaH/hue-gradients/blob/4d205b238ec9e04c9cf7a4fe33c04a6f4b9a52a8/src/domain/puzzle.ts#L100 | https://github.com/DanilaH/mini-games-kit/blob/534e488862195836982f6ac47c991541ce11b850/research/games/hue/porting/GENERATION_NATIVE_2026-11-25.md Перед новыми геометриями нужно устранить проектное ограничение: fingerprintPayload не включает positions, снимок копии тоже. Схема dailyCatalog отвергает positions/startRecipe. Старые хеши остаются каноническими; новая версия обязана различать геометрию, совместимость и start. | https://github.com/DanilaH/mini-games-kit/blob/a483e41e054cbd2ad3cfb42d3127ff0d2760d37c/research/games/hue/porting/AUTHORING_2026-11-25.md",
-      "nextAction": "Миграция и попытка новой версии; geometry/work/attempt identity не смешивать; immutable старые контракты, ежедневная публикация и экспорт.",
+      "currentImplementation": "В 0.4.50 сохранённый старт восстанавливается, новая попытка пилота получает новый seed; кампания, личные задачи и календарь сохраняют прежние контракты. [Приёмка](../evidence/pr24-25-geometry-pilot-0.4.50.md)",
+      "nextAction": "Физический Android: поворот, попадание, продолжение, обои и читаемость палитр. По итогам отдельно решить выпуск этого банка в кампанию.",
       "sourceNextCheck": "На оригинальном Android сравнить старты обычного уровня/restart и daily; установить сохранение/возврат после смерти процесса."
     },
     {
@@ -911,18 +911,18 @@
       "gap": "PARTIAL",
       "stage": "Пакет 04",
       "deliveryPackage": "04",
-      "currentImplementation": "0.4.48. 60 собственных обычных уровней, все прямоугольные, 30 daily из десяти повторяющихся шаблонов. Оригинал: 232 BoardDef на 1440 обычных, 558/720 совпадений в парах i↔i+8, 0/240 в boss; 90/90 пакетов имеют спад математического минимума. https://github.com/DanilaH/hue-gradients/blob/4d205b238ec9e04c9cf7a4fe33c04a6f4b9a52a8/docs/spec/tools/build_release_candidates.py | https://github.com/DanilaH/mini-games-kit/blob/534e488862195836982f6ac47c991541ce11b850/research/games/hue/porting/GENERATION_NATIVE_2026-11-25.md 1920 внешних палитр оригинала содержат 190 точных RGBA-четвёрок; 332 базовых ID, 32 семейства. 720/720 пар i↔i+8 одного BaseBoardId, 22 из 62 многовариантных баз имеют одинаковую подпись центров/поворотов, разные опоры. Это не основание копировать оригинальные координаты/цвета. | https://github.com/DanilaH/mini-games-kit/blob/a483e41e054cbd2ad3cfb42d3127ff0d2760d37c/research/games/hue/porting/AUTHORING_2026-11-25.md",
-      "nextAction": "Авторская библиотека с независимыми family/size/anchorTier/variant/paletteId; пилот 8 баз ×2 цветовых варианта, волна нагрузки; отдельные финалы и собственные ресурсы.",
+      "currentImplementation": "В 0.4.50 восемь самостоятельных шаблонов и по две независимые палитры, в отдельной пробе без замены кампании. [Приёмка](../evidence/pr24-25-geometry-pilot-0.4.50.md)",
+      "nextAction": "Физический Android: поворот, попадание, продолжение, обои и читаемость палитр. По итогам отдельно решить выпуск этого банка в кампанию.",
       "sourceNextCheck": "Сопоставить пары одинаковой геометрии в игре и запись босса; отделить нагрузку от визуальной сложности."
     },
     {
       "id": "h2-palette-complexity",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
       "stage": "Пакет 04",
       "deliveryPackage": "04",
-      "currentImplementation": "0.4.48. Четыре угла и редакционное предупреждение .025 есть, самостоятельного класса сложности палитры в LevelDefinition/кандидатах нет. В Hue Too Lo=0 (1760), Hi=1 (160, только boss). На 135/137 одинаковых определениях в номинальной модели Hi снижает minimum-compatible-distance; медианное отношение .495260. https://github.com/DanilaH/hue-gradients/blob/4d205b238ec9e04c9cf7a4fe33c04a6f4b9a52a8/src/domain/editor.ts | https://github.com/DanilaH/mini-games-kit/blob/a483e41e054cbd2ad3cfb42d3127ff0d2760d37c/research/games/hue/porting/AUTHORING_2026-11-25.md",
-      "nextAction": "Собственные обычные/сложные палитры одной геометрии и опор; в редакционном пилоте выделить Hi-финалы. Проверить выбранную метку/палитру, уникальность RGB в совместимой группе, расстояния и игру на телефоне; долю и границы не считать установленными для Полусна.",
+      "currentImplementation": "В 0.4.50 независимые Lo/Hi применены к восьми парам. Числовая дистанция и точные пиксели проверены отдельно от оценки игрока. [Приёмка](../evidence/pr24-25-geometry-pilot-0.4.50.md)",
+      "nextAction": "Физический Android: поворот, попадание, продолжение, обои и читаемость палитр. По итогам отдельно решить выпуск этого банка в кампанию.",
       "sourceNextCheck": "Плейтест одной BoardDef с Lo и Hi на оригинале, раздельно реальная ошибка и время; не заявлять адаптивность."
     },
     {
@@ -931,18 +931,18 @@
       "gap": "PARTIAL",
       "stage": "Пакет 04",
       "deliveryPackage": "04",
-      "currentImplementation": "0.4.48. Editor fieldColors применяет прямоугольную RGB-интерполяцию; shapeLevels переносит solvedTileColors с прямоугольного source, новые вершины не меняют цвета; wallpaper строится из width×height узлов. Оригинал ApplyPalette пересчитывает ColorRect по центрам не скрытых плиток, затем sample в координате фигуры. https://github.com/DanilaH/hue-gradients/blob/4d205b238ec9e04c9cf7a4fe33c04a6f4b9a52a8/src/domain/shapeLevels.ts | https://github.com/DanilaH/hue-gradients/blob/4d205b238ec9e04c9cf7a4fe33c04a6f4b9a52a8/src/game/exportRenderer.ts | https://github.com/DanilaH/mini-games-kit/blob/a483e41e054cbd2ad3cfb42d3127ff0d2760d37c/research/games/hue/porting/AUTHORING_2026-11-25.md",
-      "nextAction": "Новая версия собственной геометрии: явный центр и extent, y-ориентация, четыре собственных цвета, sample независимо от индекса. Проверить асимметричную схему/точные углы, после swap цвет принадлежит плитке; итоговое одно полноэкранное полотно из той же палитры, корректная обложка/копия/экспорт, не изменять старые PNG.",
+      "currentImplementation": "В 0.4.50 значения пилота семплируются по нормированным центрам; градиент выбранной палитры проверен по пикселям в двух размерах. [Приёмка](../evidence/pr24-25-geometry-pilot-0.4.50.md)",
+      "nextAction": "Физический Android: поворот, попадание, продолжение, обои и читаемость палитр. По итогам отдельно решить выпуск этого банка в кампанию.",
       "sourceNextCheck": "Снять на оригинале цвета выбранных фигур до и после exchange; проверить реальную роль Offset/grade/hidden."
     },
     {
       "id": "h2-voronoi-branch",
-      "status": "ROADMAPPED",
-      "gap": "MISSING",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
       "stage": "Пакет 04",
       "deliveryPackage": "04",
-      "currentImplementation": "0.4.48: hitTest по прямоугольнику/видимому выпуклому полигону; отдельные Voronoi regions отсутствуют. Оригинал 2.1.1/1013: обычный BoardCache→Factory→Deserialize(w2=1)→BoardVoronoiBuilder.Apply→PolygonCollider2D.SetPath/LinkCollider. Ненулевой noise только у 16 BoardDef/60 уровней не ограничивает вызов Apply. https://github.com/DanilaH/hue-gradients/blob/4d205b238ec9e04c9cf7a4fe33c04a6f4b9a52a8/src/game/geometry.ts | https://github.com/DanilaH/mini-games-kit/blob/b46de8366d766311d686b5225d230d4ebcd3db95/research/games/hue/porting/VORONOI_CLOSURE_2026-11-25.md",
-      "nextAction": "C1-next: отделить визуальную форму от hit-region. Проверить свой mixed/concave пример и границы, точки палец/центр/середина, несовместимость и pin, zoom/pan, быстрый drop, неизменный state. Не добавлять видимую деформацию/noise без отдельного решения.",
+      "currentImplementation": "В 0.4.50 отдельные области ближайшего центра и исходный перебор кандидатов применены к пилоту. Sites без шума. [Приёмка](../evidence/pr24-25-geometry-pilot-0.4.50.md)",
+      "nextAction": "Физический Android: поворот, попадание, продолжение, обои и читаемость палитр. По итогам отдельно решить выпуск этого банка в кампанию.",
       "sourceNextCheck": "Оригинальный Android: сравнить точку на границе видимой фигуры и целевой collider, два открытия одной доски; кодовая активация уже подтверждена."
     }
   ],

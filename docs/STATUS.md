@@ -1,5 +1,7 @@
 # Status — 23 November 2026
 
+**0.4.49–0.4.50 / 53–54, 25 November.** The menu and personal task selection now agree. Future survives 60/60. The separate pilot contains 16 boards with orientation fit, Voronoi selection, center colors, fresh starts and full-screen PNG. Signed previews and browser episodes passed. [Menus and tasks](evidence/pr22-23-modes-personal-0.4.49.md) · [Geometry and phone acceptance](evidence/pr24-25-geometry-pilot-0.4.50.md).
+
 **0.4.48 / 52, 24 November.** PR #21 adds the first-move line and one idle cue on 001. Both filmed paths reach and restore the first saved exchange on 002. The signed preview APK passed payload inspection. [Evidence and device acceptance](evidence/pr21-first-30-seconds-0.4.48.md).
 
 **0.4.46 / 50, 23 November.** PR #18 fixes authored text sizing across both hosts. The paired Yandex build captures match at browser defaults 16 and 24 px. The chapter count is 15 px and the level rail remains 20/26 px. The signed preview APK and narrow-screen checks passed. [Evidence and device checks](evidence/pr18-font-scale-0.4.46.md).
