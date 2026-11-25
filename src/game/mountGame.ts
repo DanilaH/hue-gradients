@@ -268,8 +268,8 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
   const initialAttempt = current().attempt ?? { schemaVersion: 1 as const, rulesVersion: 'gradient-rules-1' as const,
     contentVersion: 'gradient-prototype-0.1' as const, levelId: initialLevel.id, attemptId: 'quarantined-display', board: initialLevel.startTileAtPosition,
     moves: 0, assisted: false, assistsUsed: 0, completed: false };
-  function atmospherePoint(value: ColourPointer): ColourPointer {
-    const outer = root.getBoundingClientRect(), inner = region.getBoundingClientRect();
+  function atmospherePoint(value: ColourPointer, inner: DOMRectReadOnly = region.getBoundingClientRect()): ColourPointer {
+    const outer = root.getBoundingClientRect();
     return { ...value, x: (value.x + inner.x - outer.x) / outer.width, y: (value.y + inner.y - outer.y) / outer.height };
   }
   const firstCampaignBoard = ({ level, attempt, own, challenge, timed, daily, personal }: ReturnType<typeof current>) =>
@@ -322,7 +322,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
         });
       }
     },
-    interaction: value => atmosphere.interaction(value ? atmospherePoint(value) : null),
+    interaction: (value, bounds) => atmosphere.interaction(value ? atmospherePoint(value, bounds) : null),
   });
   let resolveFrame!: () => void;
   const frame = new Promise<void>(resolve => { resolveFrame = resolve; });

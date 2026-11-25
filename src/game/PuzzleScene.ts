@@ -7,7 +7,7 @@ import { airborneFraming, amount, ease, FRAME_END_MS, FRAME_START_MS, LANDING_MS
 import { clampCamera, edgeVelocity, moveCamera, REST_CAMERA, revealCell, viewBoard, type Camera, type Point } from './boardCamera';
 
 export const GAME_PRESENTABLE = 'hue:presentable';
-interface Hooks { motion(): boolean; swap(from: number, to: number): void; pin(position: number): void; paint(): void; interaction?(value: { x: number; y: number; color: string } | null): void }
+interface Hooks { motion(): boolean; swap(from: number, to: number): void; pin(position: number): void; paint(): void; interaction?(value: { x: number; y: number; color: string } | null, bounds?: DOMRectReadOnly): void }
 interface Gesture { id: number; from: number | null; x: number; y: number; latestX: number; latestY: number; drag: boolean; layout: string; camera: Camera }
 interface Lift { from: number; to: number | null; dx: number; dy: number }
 interface Navigation { anchor: Point; distance: number; camera: Camera }
@@ -26,7 +26,9 @@ export class PuzzleScene extends Phaser.Scene {
   private focused: number | null = null;
   private gesture: Gesture | null = null;
   private geometry!: BoardGeometry;
+  private cells: Cell[] = [];
   private natural!: BoardGeometry;
+  private surface = { width: 1, height: 1 };
   private camera: Camera = REST_CAMERA;
   private readonly touches = new Map<number, Point>();
   private navigation: Navigation | null = null;
@@ -105,7 +107,7 @@ export class PuzzleScene extends Phaser.Scene {
       ? basic + ' Масштаб и перемещение двумя пальцами. На клавиатуре плюс и минус.'
       : basic);
   }
-  boardCell(position: number): Cell { return cellAt(this.geometry, position); }
+  boardCell(position: number): Cell { return this.cells[position]!; }
   private edge(): Point {
     const gesture = this.gesture;
     return gesture?.drag && this.camera.zoom > 1
@@ -155,13 +157,8 @@ export class PuzzleScene extends Phaser.Scene {
     if (this.game?.canvas) this.game.canvas.dataset.settling = 'false';
     if (land) finish?.();
   }
-  private point(event: PointerEvent): { x: number; y: number } {
-    const rect = this.game.canvas.getBoundingClientRect();
-    return { x: event.clientX - rect.left, y: event.clientY - rect.top };
-  }
-  private layoutKey(): string {
-    const r = this.game.canvas.getBoundingClientRect(), parent = this.game.canvas.parentElement!.getBoundingClientRect();
-    return [r.x, r.y, r.width, r.height, parent.width, parent.height, window.innerWidth, window.innerHeight].join(':');
+  private layoutKey(rect: DOMRectReadOnly): string {
+    return [rect.x, rect.y, rect.width, rect.height, window.innerWidth, window.innerHeight].join(':');
   }
   private positionAt(x: number, y: number): number | null {
     const view = this.natural;
@@ -199,15 +196,15 @@ export class PuzzleScene extends Phaser.Scene {
   }
   private down = (event: PointerEvent): void => {
     if (!this.enabled || event.button !== 0) return;
-    const { x, y } = this.point(event);
     const canvas = this.game.canvas;
+    const rect = canvas.getBoundingClientRect(), x = event.clientX - rect.left, y = event.clientY - rect.top;
     if (this.large() && event.pointerType === 'touch') {
       if (this.touches.size >= 2) return;
       this.touches.set(event.pointerId, { x, y });
       if (this.touches.size === 2) {
         this.startNavigation();
         canvas.setPointerCapture(event.pointerId);
-        this.draw(); event.preventDefault();
+        this.draw(false, rect); event.preventDefault();
         return;
       }
     }
@@ -215,27 +212,34 @@ export class PuzzleScene extends Phaser.Scene {
     this.finishSettle(true);
     this.returning = null;
     this.gesture = { id: event.pointerId, from: this.positionAt(x, y), x, y, latestX: x, latestY: y, drag: false,
-      layout: this.layoutKey(), camera: this.camera };
-    this.respond(this.gesture.from, x, y);
-    this.game.canvas.setPointerCapture(event.pointerId); this.draw(); event.preventDefault();
+      layout: this.layoutKey(rect), camera: this.camera };
+    this.respond(this.gesture.from, x, y, rect);
+    canvas.setPointerCapture(event.pointerId); this.draw(false, rect); event.preventDefault();
   };
+  private followPointer(gesture: Gesture, x: number, y: number): void {
+    gesture.latestX = x;
+    gesture.latestY = y;
+    if (Math.hypot(x - gesture.x, y - gesture.y) >= 8 && gesture.from !== null &&
+        !this.level.pinnedPositions.includes(gesture.from)) gesture.drag = true;
+  }
   private move = (event: PointerEvent): void => {
-    if (this.touches.has(event.pointerId)) this.touches.set(event.pointerId, this.point(event));
-    if (this.navigation && this.touches.has(event.pointerId)) {
+    const g = this.gesture, touch = this.touches.has(event.pointerId);
+    if (!touch && g?.id !== event.pointerId) return;
+    const rect = this.game.canvas.getBoundingClientRect(), x = event.clientX - rect.left, y = event.clientY - rect.top;
+    if (touch) this.touches.set(event.pointerId, { x, y });
+    if (this.navigation && touch) {
       const next = this.navPoints();
       const initial = this.navigation;
       this.camera = moveCamera(this.natural, initial.camera, initial.anchor, next.anchor,
         initial.camera.zoom * next.distance / initial.distance);
-      this.draw();
+      this.draw(false, rect);
       return;
     }
-    const g = this.gesture;
     if (!g || g.id !== event.pointerId) return;
-    if (g.layout !== this.layoutKey()) { this.cancel(); return; }
-    const { x, y } = this.point(event); g.latestX = x; g.latestY = y;
-    if (Math.hypot(x - g.x, y - g.y) >= 8 && g.from !== null && !this.level.pinnedPositions.includes(g.from)) g.drag = true;
-    if (g.drag) this.respond(g.from, x, y);
-    this.draw();
+    if (g.layout !== this.layoutKey(rect)) { this.cancel(); return; }
+    this.followPointer(g, x, y);
+    if (g.drag) this.respond(g.from, x, y, rect);
+    this.draw(false, rect);
   };
   private up = (event: PointerEvent): void => {
     if (this.touches.delete(event.pointerId) && this.navigation) {
@@ -246,9 +250,10 @@ export class PuzzleScene extends Phaser.Scene {
     }
     const g = this.gesture;
     if (!g || g.id !== event.pointerId) return;
-    if (g.layout !== this.layoutKey()) { this.cancel(); return; }
-    this.move(event); // Final coordinates, independent of pointermove/render delivery.
-    const { x, y } = this.point(event), target = g.drag ? this.swapTarget(g, x, y) : this.positionAt(x, y);
+    const rect = this.game.canvas.getBoundingClientRect(), x = event.clientX - rect.left, y = event.clientY - rect.top;
+    if (g.layout !== this.layoutKey(rect)) { this.cancel(); return; }
+    this.followPointer(g, x, y); // The final coordinates need not have arrived in a pointermove.
+    const target = g.drag ? this.swapTarget(g, x, y) : this.positionAt(x, y);
     this.gesture = null;
     if (this.game.canvas.hasPointerCapture(event.pointerId)) this.game.canvas.releasePointerCapture(event.pointerId);
     if (!this.enabled) { this.cancel(); return; }
@@ -265,7 +270,7 @@ export class PuzzleScene extends Phaser.Scene {
     } else if (g.from === target) this.tap(target);
     else this.selected = null;
     this.hooks.interaction?.(null);
-    this.draw();
+    this.draw(false, rect);
   };
   private tap(position: number | null): void {
     if (position === null || this.level.pinnedPositions.includes(position)) {
@@ -314,15 +319,15 @@ export class PuzzleScene extends Phaser.Scene {
     event.preventDefault(); this.focused = position; this.draw(event.key !== 'Escape');
   };
   private resized(): void { this.cancel(); this.draw(); }
-  private respond(position: number | null, x: number, y: number): void {
+  private respond(position: number | null, x: number, y: number, bounds: DOMRectReadOnly): void {
     if (position === null || this.level.pinnedPositions.includes(position)) { this.hooks.interaction?.(null); return; }
-    this.hooks.interaction?.({ x, y, color: this.level.solvedTileColors[this.attempt.board[position]!]! });
+    this.hooks.interaction?.({ x, y, color: this.level.solvedTileColors[this.attempt.board[position]!]! }, bounds);
   }
-  private cellPath(ctx: CanvasRenderingContext2D, cell: Cell, inset = 0): void {
+  private cellPath(ctx: CanvasRenderingContext2D, cell: Cell, inset = 0, seat = false): void {
     ctx.beginPath();
     if (cell.points) {
       const cx = cell.width / 2, cy = cell.height / 2;
-      const scale = inset ? .86 : .99;
+      const scale = inset ? .86 : seat ? 1 : .99;
       cell.points.forEach(([x, y], i) => {
         const px = cell.x + cx + (x - cx) * scale, py = cell.y + cy + (y - cy) * scale;
         if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
@@ -346,8 +351,8 @@ export class PuzzleScene extends Phaser.Scene {
     ctx.lineWidth = 4; ctx.strokeStyle = '#151020'; ctx.stroke();
     ctx.lineWidth = 2; ctx.strokeStyle = '#fff3df'; ctx.stroke();
   }
-  private draw(followFocus = false): void {
-    const rect = this.game.canvas.getBoundingClientRect();
+  private draw(followFocus = false, rect = this.game.canvas.getBoundingClientRect()): void {
+    this.surface = rect;
     this.natural = boardGeometry(rect.width, rect.height, this.level.width, this.level.height, this.level.positions, !!this.level.geometry);
     this.camera = clampCamera(this.natural, this.camera);
     if (followFocus && this.camera.zoom > 1 && this.focused !== null) {
@@ -363,16 +368,21 @@ export class PuzzleScene extends Phaser.Scene {
         x: from.x * (1 - zoom) + this.natural.width * (1 - fit) / 2 * zoom,
         y: from.y * (1 - zoom) + this.natural.height * (1 - fit) / 2 * zoom };
     }
-    this.geometry = viewBoard(this.natural, this.camera);
+    const view = viewBoard(this.natural, this.camera), last = this.geometry;
+    if (!last || last.x !== view.x || last.y !== view.y || last.width !== view.width || last.height !== view.height ||
+        last.columns !== view.columns || last.rows !== view.rows || last.positions !== view.positions || last.voronoi !== view.voronoi) {
+      this.geometry = view;
+      this.cells = this.attempt.board.map((_, position) => cellAt(view, position));
+    }
     if (import.meta.env.DEV) this.game.canvas.dataset.camera = JSON.stringify(this.camera);
     this.hooks.paint();
   }
   private paintBoard(ctx: CanvasRenderingContext2D): void {
-    const rect = this.game.canvas.getBoundingClientRect(), beat = this.victory;
-    const elapsed = beat?.elapsed ?? 0;
+    const beat = this.victory, elapsed = beat?.elapsed ?? 0;
     if (beat && elapsed >= LANDING_MS) return;
+    const sx = ctx.canvas.width / Math.max(1, this.surface.width), sy = ctx.canvas.height / Math.max(1, this.surface.height);
     ctx.save();
-    ctx.setTransform(ctx.canvas.width / Math.max(1, rect.width), 0, 0, ctx.canvas.height / Math.max(1, rect.height), 0, 0);
+    ctx.setTransform(sx, 0, 0, sy, 0, 0);
     ctx.imageSmoothingEnabled = false;
     const ink = this.dither ??= new TileDither(ctx);
     const flights = beat?.delays.map(delay => tileJump(elapsed, delay));
@@ -389,7 +399,7 @@ export class PuzzleScene extends Phaser.Scene {
       ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(217,197,226,.42)'; ctx.stroke();
     };
     const tile = (position: number, dx = 0, dy = 0, held = false, turn = 0): void => {
-      const cell = cellAt(this.geometry, position), tileId = this.preview ? position : this.attempt.board[position]!;
+      const cell = this.boardCell(position), tileId = this.preview ? position : this.attempt.board[position]!;
       const center = cellCenter(cell);
       const jump = flights?.[position] ?? 0;
       const lift = jump * liftHeight(cell);
@@ -409,9 +419,17 @@ export class PuzzleScene extends Phaser.Scene {
           return [(.5 + cos * u - sin * v) * face.width, (.5 + sin * u + cos * v) * face.height] as const;
         });
       }
-      this.cellPath(ctx, face);
+      const seated = !!(this.level.geometry && face.points && !held && !jump && !dx && !dy && !turn);
+      this.cellPath(ctx, face, 0, seated);
       ctx.fillStyle = ink.colour(colour);
       ctx.fill();
+      if (seated) {
+        // Cover the antialias fringe at shared edges without shrinking the authored faces.
+        ctx.strokeStyle = ctx.fillStyle;
+        ctx.lineWidth = 1.25 / Math.max(1, Math.min(sx, sy));
+        ctx.lineJoin = 'round';
+        ctx.stroke();
+      }
       if (held) {
         ctx.save();
         ctx.clip();
@@ -444,9 +462,9 @@ export class PuzzleScene extends Phaser.Scene {
     const airborne: number[] = [];
     for (let i = 0; i < this.attempt.board.length; i++) {
       if (i === lifted || i === CUE_POSITION && cueOffset > 0) {
-        recess(cellAt(this.geometry, i));
+        recess(this.boardCell(i));
       } else if (flights?.[i]) {
-        const cell = cellAt(this.geometry, i);
+        const cell = this.boardCell(i);
         paintShape(cell, 'rgba(16,14,28,.72)');
         this.cellPath(ctx, cell, 1);
         ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,238,216,.34)'; ctx.stroke();
@@ -464,7 +482,7 @@ export class PuzzleScene extends Phaser.Scene {
       ctx.canvas.dataset.lift = activeDrag ? 'held' : this.released ? 'pending' : returning ? 'returning' : 'none';
     }
     if (settle) {
-      const from = cellAt(this.geometry, settle.from), to = cellAt(this.geometry, settle.to);
+      const from = this.boardCell(settle.from), to = this.boardCell(settle.to);
       const remaining = (1 - amount((performance.now() - settle.started) / 150)) ** 3;
       const positions = this.level.geometry ? this.level.positions : undefined;
       const turn = quarterTurnBetween(positions?.[settle.from], positions?.[settle.to]);
@@ -474,7 +492,7 @@ export class PuzzleScene extends Phaser.Scene {
     }
     if (lifted !== null) {
       const target = activeDrag ? this.swapTarget(activeDrag, activeDrag.latestX, activeDrag.latestY) : this.released?.to;
-      if (target != null && canSwap(this.level, lifted, target)) this.brackets(ctx, cellAt(this.geometry, target));
+      if (target != null && canSwap(this.level, lifted, target)) this.brackets(ctx, this.boardCell(target));
       const offset = activeDrag ? this.gestureOffset(activeDrag) : null;
       const retained = this.released ?? returning;
       const remaining = returning ? (1 - amount((performance.now() - returning.started) / 185)) ** 3 : 1;

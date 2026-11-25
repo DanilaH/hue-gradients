@@ -263,7 +263,6 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
     if (levelId && next !== position && !v.disabled) moveTo({ kind: 'chapter', levelId }, '[aria-current=true][data-level-id]');
   };
   const hero = document.createElement('div'); hero.className = 'level-hero'; actions.append(hero);
-  hero.dataset.strip = String(selectedLevel.width >= 2 * selectedLevel.height);
   const selection = document.createElement('p');
   selection.className = 'level-selection';
   const number = document.createElement('strong');
@@ -273,10 +272,11 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
   selection.append(number, title);
   hero.append(selection);
   const stage = document.createElement('div'); stage.className = 'level-stage'; hero.append(stage);
-  stage.style.setProperty('--work-aspect', `${selectedLevel.width} / ${selectedLevel.height}`);
   const track = document.createElement('div'); track.className = 'level-track'; stage.append(track);
   const label = selectedState === 'Собран' ? 'Повторить' : selectedState === 'Начат' ? 'Продолжить' : 'Играть';
   const activate = () => (selectedState === 'Собран' ? v.repeat : v.play)(route.levelId);
+  const details = document.createElement('div'); details.className = 'level-actions';
+  let action: HTMLButtonElement | undefined;
   let center: HTMLButtonElement | undefined;
   function boardAt(id: string, style: string, selected = false): void {
     const model = levelPreview(state, id);
@@ -295,80 +295,89 @@ function renderPicker(v: MetaView, route: PickerRoute): void {
       slot.onclick = event => { if (event.detail === 0) activate(); };
     } else slot.setAttribute('aria-hidden', 'true');
     track.append(slot);
-    if (!model) { slot.classList.add('level-locked'); return; }
-    const { board } = model;
+    if (!model) slot.classList.add('level-locked');
+    const board = model?.board;
     slot.append(preview(level, false, board ?? undefined, selected && board ? level.pinnedPositions : []));
   }
   const previous = chapter.levelIds[position - 1], next = chapter.levelIds[position + 1];
   if (previous) boardAt(previous, 'level-peek level-peek-prev');
   boardAt(route.levelId, 'level-preview', true);
   if (next) boardAt(next, 'level-peek level-peek-next');
-  let drag: { id: number; x: number; y: number; base: number; moved: boolean; fromCenter: boolean } | undefined;
+  hero.append(details);
+  if (selectedState === 'Закрыт') {
+    const requirement = document.createElement('p'); requirement.className = 'chapter-note';
+    requirement.textContent = levelRequirement(state,selectedLevel); details.append(requirement);
+  } else {
+    action = button(label, activate, details);
+    action.dataset.levelAction = '';
+    action.onclick = event => { if (event.detail === 0) activate(); };
+  }
+
+  let drag: { id: number; x: number; y: number; base: number; moved: boolean; activation?: HTMLButtonElement } | undefined;
   let settling: Animation | undefined;
-  const step = () => (track.querySelector('.level-preview')?.getBoundingClientRect().width ?? 0) + 12;
-  const offset = () => new DOMMatrixReadOnly(getComputedStyle(track).transform).m41;
+  let distance = 1, applied = 0;
   const move = (x: number) => {
+    if (x === applied) return;
+    applied = x;
     track.style.transform = `translateX(${x}px)`;
-    v.pickerLight(x < 0 ? next : previous, Math.min(1, Math.abs(x) / step()));
+    v.pickerLight(x < 0 ? next : previous, Math.min(1, Math.abs(x) / distance));
   };
   const settle = (direction: number) => {
-    const end = direction * step();
+    const end = direction * distance;
     const finish = () => {
       settling?.cancel(); settling = undefined;
-      if (!stage.isConnected) return;
+      if (!hero.isConnected) return;
       if (direction) select(position - direction);
       else move(0);
     };
-    if (!v.motion() || Math.abs(end - offset()) < 1) { finish(); return; }
+    if (!v.motion() || Math.abs(end - applied) < 1) { finish(); return; }
     settling = track.animate([
-      { transform: `translateX(${offset()}px)` }, { transform: `translateX(${end}px)` },
+      { transform: `translateX(${applied}px)` }, { transform: `translateX(${end}px)` },
     ], { duration: direction ? 305 : 245, easing: 'cubic-bezier(.18,.72,.25,1)', fill: 'forwards' });
     v.pickerLight(direction < 0 ? next : direction > 0 ? previous : undefined, direction ? 1 : 0);
     settling.onfinish = finish;
   };
-  stage.onpointerdown = event => {
+  hero.onpointerdown = event => {
     if (v.disabled || drag || !event.isPrimary || event.button !== 0) return;
-    const base = offset();
+    distance = (track.querySelector<HTMLElement>('.level-preview')?.offsetWidth ?? 0) + 12;
+    const base = settling ? new DOMMatrixReadOnly(getComputedStyle(track).transform).m41 : applied;
     settling?.cancel(); settling = undefined;
     move(base);
+    const hit = event.target as Node;
+    const activation = center?.contains(hit) ? center : action?.contains(hit) ? action : undefined;
     drag = { id: event.pointerId, x: event.clientX, y: event.clientY, base, moved: Math.abs(base) > 2,
-      fromCenter: !!center?.contains(event.target as Node) };
-    stage.setPointerCapture(event.pointerId);
+      ...(activation ? { activation } : {}) };
+    hero.setPointerCapture(event.pointerId);
   };
   const cancelDrag = (event: PointerEvent) => {
     if (drag?.id !== event.pointerId) return;
     drag = undefined;
     settle(0);
   };
-  stage.onpointermove = event => {
+  hero.onpointermove = event => {
     if (drag?.id !== event.pointerId) return;
     const dx = event.clientX - drag.x, dy = event.clientY - drag.y;
     if (Math.hypot(dx, dy) > 10) drag.moved = true;
     if (Math.abs(dx) <= Math.abs(dy)) return;
     const total = drag.base + dx;
     const hasNeighbour = total < 0 ? !!next : !!previous;
-    move(hasNeighbour ? Math.max(-step(), Math.min(step(), total)) : Math.sign(total) * 47 * (1 - Math.exp(-Math.abs(total) / 100)));
+    move(hasNeighbour ? Math.max(-distance, Math.min(distance, total)) : Math.sign(total) * 47 * (1 - Math.exp(-Math.abs(total) / 100)));
   };
-  stage.onpointercancel = cancelDrag;
-  stage.onlostpointercapture = event => { if (event.target === stage) cancelDrag(event); };
-  stage.onpointerup = event => {
+  hero.onpointercancel = cancelDrag;
+  hero.onlostpointercapture = event => { if (event.target === hero) cancelDrag(event); };
+  hero.onpointerup = event => {
     const gesture = drag;
     if (gesture?.id !== event.pointerId) return;
     drag = undefined;
     const dx = event.clientX - gesture.x, dy = event.clientY - gesture.y;
-    const x = offset(), threshold = Math.max(42, Math.min(66, step() * .19));
-    if (Math.abs(x) >= threshold && (x < 0 ? next : previous)) settle(Math.sign(x));
+    const threshold = Math.max(42, Math.min(66, distance * .19));
+    if (Math.abs(applied) >= threshold && (applied < 0 ? next : previous)) settle(Math.sign(applied));
     else {
       settle(0);
-      if (gesture.fromCenter && !gesture.moved && Math.hypot(dx, dy) <= 10 &&
-        center?.contains(document.elementFromPoint(event.clientX, event.clientY))) activate();
+      if (gesture.activation && !gesture.moved && Math.hypot(dx, dy) <= 10 &&
+        gesture.activation.contains(document.elementFromPoint(event.clientX, event.clientY))) activate();
     }
   };
-  const details = document.createElement('div'); details.className = 'level-actions'; hero.append(details);
-  if (selectedState === 'Закрыт') {
-    const requirement = document.createElement('p'); requirement.className = 'chapter-note';
-    requirement.textContent = levelRequirement(state,selectedLevel); details.append(requirement);
-  } else button(label, activate, details).dataset.levelAction = '';
   actions.append(rail);
   chapter.levelIds.forEach((id, number) => {
     const ordinal = getLevel(id).ordinal;

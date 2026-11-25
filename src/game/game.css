@@ -287,25 +287,24 @@ html[data-host=browser] #game-dialog[data-picker=true] #dialog-actions {
   color: #fff2de; background: transparent; font-size: .875rem; text-shadow: 0 1px 4px #160e27;
 }
 .level-picker-nav button:active:not(:disabled) { background: #43334e; }
+#game-dialog[data-picker=true][data-chapter-menu=false] #dialog-actions {
+  height: 100%; grid-template-rows: 48px minmax(180px,1fr) 56px 49px;
+}
 .level-hero {
-  --art-height-limit: max(96px,min(58vh,calc(100vh - 314px)));
-  --field-width: min(84%,410px,var(--strip-width-limit,var(--art-height-limit)));
-  display: grid; align-self: center; justify-self: center; gap: clamp(12px,2.4vh,22px);
-  width: min(100%,640px); min-width: 0; padding-block: 4px;
+  --field-width: min(80%,410px);
+  display: grid; grid-template-rows: clamp(64px,12vh,98px) minmax(0,1fr) 56px;
+  align-self: stretch; justify-self: center; gap: 10px;
+  width: min(100%,640px); min-width: 0; min-height: 0;
+  touch-action: pan-y pinch-zoom; user-select: none;
 }
-.level-hero[data-strip=true] { --strip-width-limit: 56vh; }
 .level-stage {
-  position: relative; width: 100%; justify-self: center; min-height: 48px;
-  overflow-x: clip; overflow-y: visible; touch-action: pan-y pinch-zoom; user-select: none;
-}
-/* Use the active SVG's aspect ratio to reserve the coloured height. Each neighbour has its own ratio. */
-.level-stage::before {
-  content: ''; display: block; width: var(--field-width); aspect-ratio: var(--work-aspect); max-height: var(--art-height-limit);
+  position: relative; width: 100%; min-height: 0;
+  overflow-x: clip; touch-action: pan-y pinch-zoom;
 }
 .level-track { position: absolute; inset: 0; }
 .level-preview, .level-peek {
   position: absolute; top: 50%; width: var(--field-width); aspect-ratio: var(--card-aspect);
-  max-height: var(--art-height-limit); display: grid; place-items: center; transform: translateY(-50%);
+  max-height: 100%; display: grid; place-items: center; transform: translateY(-50%); min-height: 0;
 }
 .level-preview { left: 50%; transform: translate(-50%,-50%); }
 button.level-preview.quiet { min-height: 0; padding: 0; border: 0; border-radius: 0; background: transparent; }
@@ -313,21 +312,22 @@ button.level-preview.quiet { min-height: 0; padding: 0; border: 0; border-radius
 .level-preview .composition-grid { filter: drop-shadow(0 9px 24px #0b08175e); }
 .level-peek-prev { right: calc(50% + var(--field-width) / 2 + 12px); }
 .level-peek-next { left: calc(50% + var(--field-width) / 2 + 12px); }
-.level-peek.level-locked { max-height: 100%; }
-.level-locked::before {
-  content: ''; width: 100%; height: 100%; border: 1px solid var(--menu-line);
-  background: linear-gradient(135deg,#d0a9da13,#1e213b52), #262139;
-}
-.level-actions { display: grid; width: var(--field-width); justify-self: center; }
+.level-locked { filter: grayscale(1) brightness(.68); }
+.level-actions { display: grid; width: var(--field-width); justify-self: center; align-items: center; min-width: 0; }
+.level-actions .chapter-note { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; padding-inline: 6px; }
 .level-selection {
-  display: grid; justify-self: center; gap: 5px; width: var(--field-width); margin: 0;
+  display: grid; justify-self: center; width: var(--field-width); margin: 0;
+  grid-template-rows: 1fr minmax(2.32em,auto); align-items: start; align-content: center; gap: 4px;
   text-shadow: 0 1px 7px #20142d;
 }
 .level-selection strong {
   font-size: clamp(2.125rem,7.4vh,4rem); font-weight: 550; line-height: .98;
   letter-spacing: -.055em; font-variant-numeric: tabular-nums slashed-zero;
 }
-.level-selection span { min-width: 0; color: var(--menu-secondary); font-size: 1.125rem; line-height: 1.16; overflow-wrap: break-word; }
+.level-selection span {
+  min-width: 0; color: var(--menu-secondary); font-size: 1.125rem; line-height: 1.16; height: 2.32em; overflow-wrap: break-word;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+}
 .level-actions > button {
   position: relative; padding-inline: 14px 42px; border-radius: 0; font-size: 1rem; font-weight: 650; text-align: left;
 }
@@ -542,20 +542,21 @@ html[data-host=browser] #game-dialog[data-menu] {
 .chapter-note { font-size: .875rem; margin: 0; text-align: center; }
 #game-dialog[data-chapter-menu=true] .chapter-note { grid-row: 4; padding: 0 12px; text-shadow: 0 1px 4px #160e27, 0 1px 2px #160e27; }
 @media (orientation:portrait) and (max-height:650px) {
-  .level-selection { grid-template-columns: auto minmax(0,1fr); align-items: center; gap: 10px; }
+  .level-selection { grid-template: 1fr / 4.1rem minmax(0,1fr); align-items: center; gap: 5px; }
 }
 @media (orientation:landscape) and (max-height:450px) {
   #game-dialog[data-menu] { --menu-top: 4px; --menu-bottom: 12px; gap: 6px; }
   #game-dialog[data-menu] #dialog-title { margin-top: 0; font-size: clamp(1.25rem,4vw,1.8rem); }
-  #game-dialog[data-picker=true]:not([data-chapter-menu=true]) #dialog-actions {
-    grid-template-columns: repeat(2,minmax(0,1fr)); grid-template-rows: auto minmax(min-content,1fr) auto auto auto;
+  #game-dialog[data-picker=true][data-chapter-menu=false] #dialog-actions {
+    grid-template-columns: repeat(2,minmax(0,1fr)); grid-template-rows: 48px minmax(64px,1fr) 56px 56px 49px;
     grid-template-areas: 'nav stage' 'title stage' 'action stage' 'rail stage' 'chapters stage';
     --picker-bottom: 10px;
   }
   .level-picker-nav { grid-area: nav; }
-  .level-hero { display: contents; --field-width: min(76%,82vh); --art-height-limit: 82vh; }
-  .level-stage { grid-area: stage; align-self: center; }
-  .level-selection { grid-area: title; align-self: center; }
+  .level-hero { display: contents; --field-width: min(76%,410px); }
+  .level-stage { grid-area: stage; align-self: stretch; }
+  .level-selection { grid-area: title; align-self: stretch; grid-template-rows: 1fr 2.32em; touch-action: pan-y pinch-zoom; }
+  .level-actions { touch-action: pan-y pinch-zoom; }
   .level-actions { grid-area: action; }
   .level-rail { grid-area: rail; }
   .level-picker-links { grid-area: chapters; }
