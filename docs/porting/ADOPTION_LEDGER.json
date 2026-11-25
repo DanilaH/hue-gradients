@@ -146,11 +146,11 @@
     },
     {
       "id": "h1-local-resume",
-      "status": "ROADMAPPED",
+      "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 09",
-      "currentImplementation": "Веб-путь восстанавливает подтверждённое поле; физический Android открыт. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/workspace.ts A2: ресурсы 0.4.14 из APK открывают ту же попытку на Chromium 92/158. Обновление и несовместимость сохраняют байты локальной партии Chromium 0.4.12. | https://github.com/DanilaH/hue-gradients/blob/356c9576436d7b0f5378aee432add400fffcdeec/tools/first-launch-apk-check.mjs F2: добавлены атомарные локальные факты «принято», проверка replay, разделение сопоставимых результатов и тест дедупликации.",
-      "nextAction": "Сетевой провайдер соревнования, доверенное время и аналитика ждут конфигурации. Реальные Android-записи и прерывание проверить в G1.",
+      "currentImplementation": "Веб-путь восстанавливает подтверждённое поле; физический Android открыт. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/workspace.ts A2: ресурсы 0.4.14 из APK открывают ту же попытку на Chromium 92/158. Обновление и несовместимость сохраняют байты локальной партии Chromium 0.4.12. | https://github.com/DanilaH/hue-gradients/blob/356c9576436d7b0f5378aee432add400fffcdeec/tools/first-launch-apk-check.mjs F2: добавлены атомарные локальные факты «принято», проверка replay, разделение сопоставимых результатов и тест дедупликации. 0.4.48 Session.load/prepareCommit/readOperation сохраняет и восстанавливает локальное состояние; PR12 записал Chromium 0.4.35, №21 — первый ход на 002. https://github.com/DanilaH/hue-gradients/blob/4d205b238ec9e04c9cf7a4fe33c04a6f4b9a52a8/src/app/session.ts",
+      "nextAction": "G1 на физическом Android: 001→002, сохранённый ход, HOME→kill/force-stop→launcher, обновление поверх сохранения и тот же board/attemptId/moves/best. Не ждать облака или соревнования.",
       "deliveryPackage": "09",
       "sourceNextCheck": "Убить процесс после хода на тестовом устройстве."
     },
@@ -160,7 +160,7 @@
       "gap": "PARTIAL",
       "stage": "Пакет 09",
       "currentImplementation": "Есть локальное сохранение и контракт, нет подтверждённого переноса между устройствами. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/spec/TECHNICAL_SPEC_0_1.md F2: добавлены атомарные локальные факты «принято», проверка replay, разделение сопоставимых результатов и тест дедупликации.",
-      "nextAction": "Сетевой провайдер соревнования, доверенное время и аналитика ждут конфигурации. Реальные Android-записи и прерывание проверить в G1.",
+      "nextAction": "Пауза M5 по владельцу; не начинать backend/auth/hosting. Локальную приёмку вести отдельно.",
       "reason": "Пауза владельца 19 ноября, см. AGENTS.md.",
       "deliveryPackage": "09",
       "sourceNextCheck": "После снятия паузы проверить два расходящихся профиля."
@@ -211,7 +211,7 @@
       "gap": "MATCH",
       "stage": "Пакет 02",
       "currentImplementation": "Переключатель в паузе убирает статистику уровня и сравнение. Настройка сохраняется после перезапуска. Локальная история открывается отдельно. | https://github.com/DanilaH/hue-gradients/blob/08a2162544b1eeb1cca403893078368d9e2c04ab/src/game/mountGame.ts",
-      "nextAction": "Проверить переключатель на Android и в увеличенном тексте.",
+      "nextAction": "G1: переключатель скрывает/показывает счёт; внутриигровая шкала всегда 100% при разных системных размерах.",
       "deliveryPackage": "02",
       "sourceNextCheck": "Проверить спрос на спокойный режим без счётчика."
     },
@@ -270,8 +270,8 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 04",
-      "currentImplementation": "Треугольники разной ориентации и разные формы не обмениваются; совместимые обмены проверены. | https://github.com/DanilaH/hue-gradients/blob/493b2415967e77f7c61bdb471e8db06677f63eb8/tools/shape-browser-check.mjs В 0.4.39 в пробе форм проверены допустимая и недопустимая пары без записи в профиль. 1275/1440 обычных полей Hue Too используют несколько групп совместимости. У нас это пока отдельные испытания. | https://github.com/DanilaH/mini-games-kit/blob/534e488862195836982f6ac47c991541ce11b850/research/games/hue/porting/GENERATION_NATIVE_2026-11-25.md У оригинала TileType отдельно от Rot, isValidSwapCandidate сравнивает TileType и lock; SwapTiles подгоняет поворот. 1785/1920 с отличающимися поворотами одной группы; Triangle 735. У нас triangle-nw/se разные строки, несовместимы. 368 исходных уровней имеют shape-def с числом вершин вне 3/4/6, 232 — mixed-turn shape. Наши validPosition и convex-only polygonContains пока это не поддерживают. | https://github.com/DanilaH/mini-games-kit/blob/a483e41e054cbd2ad3cfb42d3127ff0d2760d37c/research/games/hue/porting/AUTHORING_2026-11-25.md",
-      "nextAction": "В новой версии: groupId отдельно от ориентации, обмен двух одинаковых форм с разным Rot, автоматический поворот при посадке; несовместимая форма/опора отказ. Собственный пятиугольник и невыпуклая L-форма: корректный hit-test, выемка не активна. Старые geometry-v1 правила неизменны.",
+      "currentImplementation": "Треугольники разной ориентации и разные формы не обмениваются; совместимые обмены проверены. | https://github.com/DanilaH/hue-gradients/blob/493b2415967e77f7c61bdb471e8db06677f63eb8/tools/shape-browser-check.mjs В 0.4.39 в пробе форм проверены допустимая и недопустимая пары без записи в профиль. 1275/1440 обычных полей Hue Too используют несколько групп совместимости. У нас это пока отдельные испытания. | https://github.com/DanilaH/mini-games-kit/blob/534e488862195836982f6ac47c991541ce11b850/research/games/hue/porting/GENERATION_NATIVE_2026-11-25.md У оригинала TileType отдельно от Rot, isValidSwapCandidate сравнивает TileType и lock; SwapTiles подгоняет поворот. 1785/1920 с отличающимися поворотами одной группы; Triangle 735. У нас triangle-nw/se разные строки, несовместимы. 368 исходных уровней имеют shape-def с числом вершин вне 3/4/6, 232 — mixed-turn shape. Наши validPosition и convex-only polygonContains пока это не поддерживают. | https://github.com/DanilaH/mini-games-kit/blob/a483e41e054cbd2ad3cfb42d3127ff0d2760d37c/research/games/hue/porting/AUTHORING_2026-11-25.md Дополнение: у оригинала FindSwapCandidateUnderDrag пробует midpoint world-touch/центр → touch → центр, проверяя совместимость после каждой пробы; при неуспехе helper может вернуть невалидный первый кандидат, ход отдельно валидируется. https://github.com/DanilaH/mini-games-kit/blob/b46de8366d766311d686b5225d230d4ebcd3db95/research/games/hue/porting/VORONOI_CLOSURE_2026-11-25.md",
+      "nextAction": "В новой версии: groupId отдельно от ориентации, обмен двух одинаковых форм с разным Rot, автоматический поворот при посадке; несовместимая форма/опора отказ. Собственный пятиугольник и невыпуклая L-форма: корректный hit-test, выемка не активна. Старые geometry-v1 правила неизменны. Принять отдельные hit regions и fallback цели, без разрешения нелегального хода.",
       "deliveryPackage": "04",
       "sourceNextCheck": "На прототипе проверить, как игрок видит допустимые пары разных форм."
     },
@@ -487,11 +487,11 @@
     },
     {
       "id": "cp-four-corners",
-      "status": "ROADMAPPED",
+      "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 04",
-      "currentImplementation": "Та же основа, Полусон использует своё half-up округление и одномерные поля. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/editor.ts",
-      "nextAction": "Реализовать соответствующий пункт пакета 04 и проверить приёмку из FULL_ROADMAP.md. ",
+      "currentImplementation": "Та же основа, Полусон использует своё half-up округление и одномерные поля. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/editor.ts 0.4.48 fieldColors и wallpaper renderer используют encoded-sRGB bilinear с half-up; прямоугольный путь работает, отличия округления сохранены. https://github.com/DanilaH/hue-gradients/blob/4d205b238ec9e04c9cf7a4fe33c04a6f4b9a52a8/src/domain/editor.ts | https://github.com/DanilaH/hue-gradients/blob/4d205b238ec9e04c9cf7a4fe33c04a6f4b9a52a8/src/game/exportRenderer.ts",
+      "nextAction": "Сохранить legacy и пиксельные тесты; для фигур принять sample по центру отдельно.",
       "deliveryPackage": "04",
       "sourceNextCheck": "Сверить промежуточные оттенки и вырожденную ось."
     },
@@ -621,7 +621,7 @@
       "gap": "PARTIAL",
       "stage": "Пакет 07",
       "currentImplementation": "E3: проверены фиксированная отправляемая версия, квота 15 по подтверждённой UTC-дате, повтор, отзыв и жалоба на фикстуре.",
-      "nextAction": "Подключить реальный сервис модерации и проверить публикацию и выдачу на релизной площадке.",
+      "nextAction": "Подключить реальный сервис модерации и проверить публикацию и выдачу на релизной площадке. Реальная сеть/модерация/аккаунт требуют снятия соответствующего внешнего ограничения и конфигурации; до этого локальные фикстуры, без подготовки нового backend.",
       "deliveryPackage": "07",
       "sourceNextCheck": "Сначала проверить исходный UI submit, затем отдельный контракт валидации и жалоб."
     },
@@ -631,7 +631,7 @@
       "gap": "PARTIAL",
       "stage": "Пакет 07",
       "currentImplementation": "E3: проверены фиксированная отправляемая версия, квота 15 по подтверждённой UTC-дате, повтор, отзыв и жалоба на фикстуре.",
-      "nextAction": "Подключить реальный сервис модерации и проверить публикацию и выдачу на релизной площадке.",
+      "nextAction": "Подключить реальный сервис модерации и проверить публикацию и выдачу на релизной площадке. Реальная сеть/модерация/аккаунт требуют снятия соответствующего внешнего ограничения и конфигурации; до этого локальные фикстуры, без подготовки нового backend.",
       "deliveryPackage": "07",
       "sourceNextCheck": "В оригинале проверить смену дня после 15; риск не считать доказанным багом."
     },
@@ -641,7 +641,7 @@
       "gap": "PARTIAL",
       "stage": "Пакет 07",
       "currentImplementation": "E3: проверены фиксированная отправляемая версия, квота 15 по подтверждённой UTC-дате, повтор, отзыв и жалоба на фикстуре.",
-      "nextAction": "Подключить реальный сервис модерации и проверить публикацию и выдачу на релизной площадке.",
+      "nextAction": "Подключить реальный сервис модерации и проверить публикацию и выдачу на релизной площадке. Реальная сеть/модерация/аккаунт требуют снятия соответствующего внешнего ограничения и конфигурации; до этого локальные фикстуры, без подготовки нового backend.",
       "deliveryPackage": "07",
       "sourceNextCheck": "Проверить отдельно выдачу, кеш и отзыв контента."
     },
@@ -697,11 +697,11 @@
     },
     {
       "id": "cp-save",
-      "status": "ROADMAPPED",
+      "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 09",
-      "currentImplementation": "У нас контракт сильнее: фиксируем каждый ход; device kill ещё открыт. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/workspace.ts A2: ресурсы 0.4.14 из APK открывают ту же попытку на Chromium 92/158. Обновление и несовместимость сохраняют байты локальной партии Chromium 0.4.12. | https://github.com/DanilaH/hue-gradients/blob/356c9576436d7b0f5378aee432add400fffcdeec/tools/first-launch-apk-check.mjs F2: добавлены атомарные локальные факты «принято», проверка replay, разделение сопоставимых результатов и тест дедупликации.",
-      "nextAction": "Сетевой провайдер соревнования, доверенное время и аналитика ждут конфигурации. Реальные Android-записи и прерывание проверить в G1.",
+      "currentImplementation": "У нас контракт сильнее: фиксируем каждый ход; device kill ещё открыт. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/workspace.ts A2: ресурсы 0.4.14 из APK открывают ту же попытку на Chromium 92/158. Обновление и несовместимость сохраняют байты локальной партии Chromium 0.4.12. | https://github.com/DanilaH/hue-gradients/blob/356c9576436d7b0f5378aee432add400fffcdeec/tools/first-launch-apk-check.mjs F2: добавлены атомарные локальные факты «принято», проверка replay, разделение сопоставимых результатов и тест дедупликации. 0.4.48 Session.load/prepareCommit/readOperation сохраняет и восстанавливает локальное состояние; PR12 записал Chromium 0.4.35, №21 — первый ход на 002. https://github.com/DanilaH/hue-gradients/blob/4d205b238ec9e04c9cf7a4fe33c04a6f4b9a52a8/src/app/session.ts",
+      "nextAction": "G1 на физическом Android: 001→002, сохранённый ход, HOME→kill/force-stop→launcher, обновление поверх сохранения и тот же board/attemptId/moves/best. Не ждать облака или соревнования.",
       "deliveryPackage": "09",
       "sourceNextCheck": "Проверить HOME→kill, force-stop→launcher и сохранение последнего хода."
     },
@@ -791,7 +791,7 @@
       "gap": "PARTIAL",
       "stage": "Пакет 09",
       "currentImplementation": "Нет сетевого сравнения результатов. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md F2: добавлены атомарные локальные факты «принято», проверка replay, разделение сопоставимых результатов и тест дедупликации.",
-      "nextAction": "Сетевой провайдер соревнования, доверенное время и аналитика ждут конфигурации. Реальные Android-записи и прерывание проверить в G1.",
+      "nextAction": "Сетевой провайдер соревнования, доверенное время и аналитика ждут конфигурации. Реальные Android-записи и прерывание проверить в G1. Реальная сеть/модерация/аккаунт требуют снятия соответствующего внешнего ограничения и конфигурации; до этого локальные фикстуры, без подготовки нового backend.",
       "deliveryPackage": "09",
       "sourceNextCheck": "Выработать сравнимый старт и правила помощи перед счётом."
     },
@@ -801,7 +801,7 @@
       "gap": "MISSING",
       "stage": "Пакет 07",
       "currentImplementation": "Опубликованного каталога и отбора у нас нет. Серверная модерация оригинала неизвестна. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/src/domain/creative.ts E2: принята передача точной проверенной ревизии, безопасный отказ импорта и повторное решение без кампанийного кредита. | https://github.com/DanilaH/hue-gradients/blob/2540d4f2e448e1727bd3a3b389fbc88acd07000e/tools/transfer-browser-check.mjs",
-      "nextAction": "Проверить Android отправку, системный выбор JSON и обои на телефоне (G1).",
+      "nextAction": "Проверить Android отправку, системный выбор JSON и обои на телефоне (G1). Реальная сеть/модерация/аккаунт требуют снятия соответствующего внешнего ограничения и конфигурации; до этого локальные фикстуры, без подготовки нового backend.",
       "deliveryPackage": "07",
       "sourceNextCheck": "Проверить выход в каталог независимо от успешной отправки."
     },
@@ -821,7 +821,7 @@
       "gap": "UNKNOWN",
       "stage": "Пакет 06",
       "currentImplementation": "Кнопка запуска нового цикла скрыта в 0.4.35. На профиле 60/60 сохранены коллекция, черновик и старое право.",
-      "nextAction": "Согласовать правила нового цикла с владельцем отдельно.",
+      "nextAction": "Ожидать согласования правил нового цикла. До него кнопка скрыта; исходный внешний ролик/release notes нужны только при возобновлении.",
       "deliveryPackage": "06",
       "sourceNextCheck": "Получить полные release notes либо оригинальную запись того, что сбрасывается."
     },
@@ -841,7 +841,7 @@
       "gap": "UNKNOWN",
       "stage": "Пакет 05",
       "currentImplementation": "Обои кампании реализованы. Доказательств аналогичного обычного экспорта в оригинале недостаточно. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md | docs/audits/daily-native-20261125.md",
-      "nextAction": "На исходном телефоне полный маршрут тройки и итоговый файл; экспорт одной работы остаётся решением владельца.",
+      "nextAction": "Один целевой маршрут оригинального share трёх Daily до фактического файла/chooser, если будет нужен перенос. Не блокирует экспорт выбранной работы; не смешивать с D1.",
       "deliveryPackage": "05",
       "sourceNextCheck": "Записать в исходной игре отдельно share обычной победы и всех трёх daily, сохранить выходные файлы."
     },
@@ -881,7 +881,7 @@
       "gap": "UNKNOWN",
       "stage": "Пакет 04",
       "currentImplementation": "Редактор рассчитывает минимум OKLab между подвижными плитками и выдаёт CLOSE_COLORS_REVIEW при d < 0,025. В оригинале найден минимум после применения палитры. Влияние на выдачу не установлено. | https://github.com/DanilaH/hue-gradients/blob/92e581a641f7969b7f869a7db49a08bbbecf1d72/src/domain/editor.ts#L113 Скан 88 сборок / 59322 ненулевых регистраций: из 36 LDR S +112 шесть в игровых модулях, только один читает поле минимума внутри UpdateColors. Из 208 LDR W +112 нет кандидатов в игровых модулях. Внешний читатель не установлен; косвенные обращения UNKNOWN. В архивных измерениях порог 0,025 сработал бы на 732/955 Hue 1 и 702/740 Color Puzzle. | https://github.com/DanilaH/mini-games-kit/blob/534e488862195836982f6ac47c991541ce11b850/research/games/hue/porting/GENERATION_NATIVE_2026-11-25.md Уточнение исходного MinAppliedColorDistance: UpdateColors пропускает IsHidden, не IsLocked, и сравнивает все видимые цвета, включая опоры и несовместимые формы. Наша метрика всех подвижных и предложенная метрика совместимых — самостоятельные диагностики. Hi/Lo показывает авторскую, не адаптивную сложность. | https://github.com/DanilaH/mini-games-kit/blob/a483e41e054cbd2ad3cfb42d3127ff0d2760d37c/research/games/hue/porting/AUTHORING_2026-11-25.md",
-      "nextAction": "Развести три метрики (visible/all movable/compatible). Не блокировать по .025; для адаптивности отдельно доказать внешний читатель. Плейтест собственного близкого градиента.",
+      "nextAction": "Оставить авторскую диагностику близости цветов, не внедрять adaptive. Открыть только если найден внешний читатель +112/имеется инструментированная сессия; плейтест цвета относится к C1/G1.",
       "deliveryPackage": "04",
       "sourceNextCheck": "Динамический доступ к BoardPalette +112 или доказанная косвенная загрузка; не заключать об отсутствии потребителя только из scalar scan."
     },
@@ -938,15 +938,15 @@
     {
       "id": "h2-voronoi-branch",
       "status": "ROADMAPPED",
-      "gap": "UNKNOWN",
+      "gap": "MISSING",
       "stage": "Пакет 04",
       "deliveryPackage": "04",
-      "currentImplementation": "В 0.4.48 нет отдельного Voronoi-пути построения фигур. В оригинале DefToBoard альтернативная ветка принимает bool, 16 BoardDef/60 ссылок имеют noise .01; caller с true не подтверждён. https://github.com/DanilaH/mini-games-kit/blob/a483e41e054cbd2ad3cfb42d3127ff0d2760d37c/research/games/hue/porting/AUTHORING_2026-11-25.md",
-      "nextAction": "Оставить исследовательский пункт; не выдавать за обязательный runtime. Найти caller/значение аргумента, два рестарта одного исходного уровня, сравнить фактические контуры. При подтверждении — отдельная версия собственного генератора и проверка gesture/save/visual.",
-      "sourceNextCheck": "Проследить аргумент w2 при реальном построении оригинала и изменение геометрии на двух новых попытках."
+      "currentImplementation": "0.4.48: hitTest по прямоугольнику/видимому выпуклому полигону; отдельные Voronoi regions отсутствуют. Оригинал 2.1.1/1013: обычный BoardCache→Factory→Deserialize(w2=1)→BoardVoronoiBuilder.Apply→PolygonCollider2D.SetPath/LinkCollider. Ненулевой noise только у 16 BoardDef/60 уровней не ограничивает вызов Apply. https://github.com/DanilaH/hue-gradients/blob/4d205b238ec9e04c9cf7a4fe33c04a6f4b9a52a8/src/game/geometry.ts | https://github.com/DanilaH/mini-games-kit/blob/b46de8366d766311d686b5225d230d4ebcd3db95/research/games/hue/porting/VORONOI_CLOSURE_2026-11-25.md",
+      "nextAction": "C1-next: отделить визуальную форму от hit-region. Проверить свой mixed/concave пример и границы, точки палец/центр/середина, несовместимость и pin, zoom/pan, быстрый drop, неизменный state. Не добавлять видимую деформацию/noise без отдельного решения.",
+      "sourceNextCheck": "Оригинальный Android: сравнить точку на границе видимой фигуры и целевой collider, два открытия одной доски; кодовая активация уже подтверждена."
     }
   ],
-  "sourceInventory": "https://github.com/DanilaH/mini-games-kit/blob/1ddde0853174d6fcb46da963a719438d8d3a897c/research/games/hue/porting/SOURCE_FEATURES.json",
-  "method": "Пакет 01 проверен на 0.4.11 и перенесён в feat/m0-foundation. Пакет 02 обновлён по 0.4.12. Остальные расхождения отражают срез 0.4.10. IMPLEMENTED_UNVERIFIED оставляет приёмку на телефоне открытой. 23 ноября четыре строки (h2-perceptual, h1-rate-grace, h1-reward-grace, h2-remove-prompt) отдельно сверены по коду 0.4.43 на 92e581a641f7969b7f869a7db49a08bbbecf1d72. Остальные строки сохраняют прежние срезы. 25 ноября дополнены результаты проверки текущего кода 0.4.48 (4d205b2) и два новых ID: свежий reset и редакционные серии. Нативные доказательства и каталог в kit PR #148; потребительская приёмка новых требований NOT RUN. 25.11: исходные BoardDef/Palette прочитаны целиком независимым декодером; уточнена геометрия, цветовая метрика, добавлены три ID. Новая потребительская приёмка NOT RUN. 25.11: закрытый архив полных выбранных оригинальных тел методов (422) связан с каждым sourceFeatureId через SOURCE_FEATURES/INDEX. https://github.com/DanilaH/mini-games-kit/blob/1ddde0853174d6fcb46da963a719438d8d3a897c/research/games/hue/porting/source-evidence-20261125/INDEX.md. Артефактная полнота не повышает статусы соответствия/приёмки.",
+  "sourceInventory": "https://github.com/DanilaH/mini-games-kit/blob/b46de8366d766311d686b5225d230d4ebcd3db95/research/games/hue/porting/SOURCE_FEATURES.json",
+  "method": "Пакет 01 проверен на 0.4.11 и перенесён в feat/m0-foundation. Пакет 02 обновлён по 0.4.12. Остальные расхождения отражают срез 0.4.10. IMPLEMENTED_UNVERIFIED оставляет приёмку на телефоне открытой. 23 ноября четыре строки (h2-perceptual, h1-rate-grace, h1-reward-grace, h2-remove-prompt) отдельно сверены по коду 0.4.43 на 92e581a641f7969b7f869a7db49a08bbbecf1d72. Остальные строки сохраняют прежние срезы. 25 ноября дополнены результаты проверки текущего кода 0.4.48 (4d205b2) и два новых ID: свежий reset и редакционные серии. Нативные доказательства и каталог в kit PR #148; потребительская приёмка новых требований NOT RUN. 25.11: исходные BoardDef/Palette прочитаны целиком независимым декодером; уточнена геометрия, цветовая метрика, добавлены три ID. Новая потребительская приёмка NOT RUN. 25.11: закрытый архив полных выбранных оригинальных тел методов (422) связан с каждым sourceFeatureId через SOURCE_FEATURES/INDEX. https://github.com/DanilaH/mini-games-kit/blob/1ddde0853174d6fcb46da963a719438d8d3a897c/research/games/hue/porting/source-evidence-20261125/INDEX.md. Артефактная полнота не повышает статусы соответствия/приёмки. 25.11 итоговая ревизия 94/94: статический caller Voronoi закрыт (UNKNOWN→MISSING), h1-local-resume/cp-save/cp-four-corners уточнены как implemented-unverified по уже существующему коду/браузерным доказательствам. Остальные исторические gap/status не повышались автоматически. Отдельная классификация source и дальнейшего действия — RESEARCH_DISPOSITION.json; полная исследовательская сверка — FINAL_RESEARCH_REVIEW.md. Никаких новых тестов потребителя/телефона.",
   "ownerScope": "20.11.2026, после аудита 0.4.10: «это всё делать надо». Весь реестр включён в программу разработки. Более конкретные решения: бесплатные попытки, одни плавные обои на работу, cloud M5 на паузе. Формулировки прежнего аудита «кандидат» отражают предыдущий статус."
 }

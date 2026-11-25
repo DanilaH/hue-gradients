@@ -7,5 +7,5 @@
   "sourceAccess": "GitHub connector; every materialized source checked against pinned Git blob SHA",
   "localRuntimeArchiveSha256": "ba9088a0b937b3e86084666c36361ba47627ce833f4594aaf94e10eac62f1cc9",
   "researchMethodCommit": "06a01d5c1f7af3cdf8013c9ce0f6a691d086af78",
-  "hueInventoryCommit": "1ddde0853174d6fcb46da963a719438d8d3a897c"
+  "hueInventoryCommit": "b46de8366d766311d686b5225d230d4ebcd3db95"
 }
