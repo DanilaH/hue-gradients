@@ -1,7 +1,7 @@
 {
   "schema": "consumer-adoption-ledger-v1",
   "consumerCommit": "7b8200062ab6398980827fd27d884506ca3eb786",
-  "asOf": "2026-11-24",
+  "asOf": "2026-11-25",
   "features": [
     {
       "id": "h1-swap",
@@ -380,8 +380,8 @@
       "status": "ROADMAPPED",
       "gap": "MISSING",
       "stage": "Пакет 05",
-      "currentImplementation": "0.4.48, личные задания. На чистом профиле при 0 XP доступны два задания. В I Love Hue Too Daily Divination открывается с 40 XP. Публичный UTC-календарь «Полусна» — отдельная продуктовая механика. | https://github.com/DanilaH/hue-gradients/blob/4d205b238ec9e04c9cf7a4fe33c04a6f4b9a52a8/src/game/mountGame.ts#L537",
-      "nextAction": "Проверить профили с 0, 39 и 40 XP, сравнить время до открытия и решить с владельцем порог именно личных заданий.",
+      "currentImplementation": "0.4.48, личные задания. На чистом профиле при 0 XP доступны два задания. В I Love Hue Too Daily Divination открывается с 40 XP. Публичный UTC-календарь «Полусна» — отдельная продуктовая механика. | https://github.com/DanilaH/hue-gradients/blob/4d205b238ec9e04c9cf7a4fe33c04a6f4b9a52a8/src/game/mountGame.ts#L537 | docs/audits/daily-native-20261125.md",
+      "nextAction": "Сравнить ранний доступ и порог 40/60 (после открытия всех глав); решение владельца до изменения.",
       "deliveryPackage": "05",
       "sourceNextCheck": "Определить момент знакомства с daily при запуске сервиса."
     },
@@ -390,8 +390,8 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "MATCH",
       "stage": "Пакет 05",
-      "currentImplementation": "0.4.48, личные задания используют локальный календарный день, как StartSession оригинала. В Chromium при 2026-11-24 01:15 UTC личный экран показал 24 ноября в Екатеринбурге и 23 ноября в Лос-Анджелесе. Общий календарь использует отдельный доверенный UTC. | https://github.com/DanilaH/hue-gradients/blob/4d205b238ec9e04c9cf7a4fe33c04a6f4b9a52a8/src/game/mountGame.ts#L537",
-      "nextAction": "На физическом устройстве пройти локальную полночь с открытой личной попыткой и проверить историю и повтор.",
+      "currentImplementation": "0.4.48, личные задания используют локальный календарный день, как StartSession оригинала. В Chromium при 2026-11-24 01:15 UTC личный экран показал 24 ноября в Екатеринбурге и 23 ноября в Лос-Анджелесе. Общий календарь использует отдельный доверенный UTC. | https://github.com/DanilaH/hue-gradients/blob/4d205b238ec9e04c9cf7a4fe33c04a6f4b9a52a8/src/game/mountGame.ts#L537 Граница: оригинал не перевыдаёт сессию при откате даты; наша история привязана к дате/типу. | docs/audits/daily-native-20261125.md",
+      "nextAction": "Полночь посреди попытки, откат даты и смена часового пояса на Android; отдельный UTC-календарь не смешивать.",
       "deliveryPackage": "05",
       "sourceNextCheck": "Проверить две зоны и перевод часов на опубликованном слоте."
     },
@@ -400,8 +400,8 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 05",
-      "currentImplementation": "Отдельная задача предлагает прежний уровень с достижимой целью на ход лучше. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs PR №8/D2: Для идеального результата добавлена цель «Повторить рекорд» с удержанием математического минимума. В 0.4.37 кристалл открывает реальную цель и повтор рекорда.",
-      "nextAction": "Проверить смысл трёх целей и время на физическом телефоне (G1).",
+      "currentImplementation": "Отдельная задача предлагает прежний уровень с достижимой целью на ход лучше. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs PR №8/D2: Для идеального результата добавлена цель «Повторить рекорд» с удержанием математического минимума. В 0.4.37 кристалл открывает реальную цель и повтор рекорда. Оригинал: max(best,perfect) и штрафы −20 за perfect, −10 за историю. Наше best−1 — адаптация. | docs/audits/daily-native-20261125.md",
+      "nextAction": "Тест best 20/min 15, best=min и последний допустимый ход; решение владельца о мягком лимите.",
       "deliveryPackage": "05",
       "sourceNextCheck": "Прототип из уже решённой работы, последний допустимый ход засчитывается."
     },
@@ -410,8 +410,8 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 05",
-      "currentImplementation": "Поле без помощи с локальным лимитом времени. Истечение проверено в Chromium. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs PR №8/D2: Лимит зависит от минимума, числа подвижных плиток и отдельного коэффициента для финала главы. В 0.4.35 тот же таймер пережил два перезапуска до и после обмена. В 0.4.37 песочные часы показывают остаток сохранённой попытки.",
-      "nextAction": "Проверить смысл трёх целей и время на физическом телефоне (G1).",
+      "currentImplementation": "Поле без помощи с локальным лимитом времени. Истечение проверено в Chromium. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs PR №8/D2: Лимит зависит от минимума, числа подвижных плиток и отдельного коэффициента для финала главы. В 0.4.35 тот же таймер пережил два перезапуска до и после обмена. В 0.4.37 песочные часы показывают остаток сохранённой попытки. Оригинал: текущий кластер по ≥5 победам, completed +10/history −20; perfect×3, boss×6. Наш запас 15–94 с на 60 полях. | docs/audits/daily-native-20261125.md",
+      "nextAction": "Проверить выдачу по прогрессу, обычное поле и финал, таймер на устройстве; запас не менять до плейтеста.",
       "deliveryPackage": "05",
       "sourceNextCheck": "Проверить границу таймера и возобновление после паузы."
     },
@@ -420,8 +420,8 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 05",
-      "currentImplementation": "0.4.48. Для личной пробы берётся пул непройденных из первой закрытой главы, при отсутствии закрытых — из оставшейся кампании. Сортируется по локальной оценке, затем применяется отбор по истории и весам. В Hue Too источники из C+1…C+3. | https://github.com/DanilaH/hue-gradients/blob/4d205b238ec9e04c9cf7a4fe33c04a6f4b9a52a8/src/domain/personal.ts#L84",
-      "nextAction": "На заранее заданном прогрессе сравнить доступность и повторы для одного и трёх будущих кластеров; проверить финал кампании и сохранить выданные задачи.",
+      "currentImplementation": "0.4.48. Для личной пробы берётся пул непройденных из первой закрытой главы, при отсутствии закрытых — из оставшейся кампании. Сортируется по локальной оценке, затем применяется отбор по истории и весам. В Hue Too источники из C+1…C+3. | https://github.com/DanilaH/hue-gradients/blob/4d205b238ec9e04c9cf7a4fe33c04a6f4b9a52a8/src/domain/personal.ts#L84 Уточнение: оригинал допускает C и все последующие кластеры; в первых 28 из 30 максимум у 21 поля C+2 (модель), в конце остаётся непустым. Наш тест 60/60 требует отсутствия Future. | docs/audits/daily-native-20261125.md",
+      "nextAction": "P1: предложить устойчивую выдачу Future на 60/60 и по реальному прогрессу, в 30-дневном цикле; сохранить старые задания.",
       "deliveryPackage": "05",
       "sourceNextCheck": "Проверить выдачу на профилях с разным прогрессом."
     },
@@ -430,8 +430,8 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 05",
-      "currentImplementation": "История личных заданий сохраняет одну отметку на задание и дату, повтор не дублирует. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs PR №8/D2: После коррекции даты сохраняются история, выданные поля и одна отметка за повтор. В 0.4.37 проверены четыре даты, откат календаря и повтор без дубля.",
-      "nextAction": "Проверить смысл трёх целей и время на физическом телефоне (G1).",
+      "currentImplementation": "История личных заданий сохраняет одну отметку на задание и дату, повтор не дублирует. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs PR №8/D2: После коррекции даты сохраняются история, выданные поля и одна отметка за повтор. В 0.4.37 проверены четыре даты, откат календаря и повтор без дубля. Оригинал выбирает три слота независимо до записи глобальной истории, совпадение поля между слотами допустимо по коду. Future не учитывает историю. Наше различие полей и ротация — полезная адаптация. | docs/audits/daily-native-20261125.md",
+      "nextAction": "30 дат, истощение пула, уникальные три ID при достаточном пуле, неизменность назначенных контрактов.",
       "deliveryPackage": "05",
       "sourceNextCheck": "Проверить на двух разных профилях, если вводится личная подборка."
     },
@@ -440,8 +440,8 @@
       "status": "ROADMAPPED",
       "gap": "MISSING",
       "stage": "Пакет 05",
-      "currentImplementation": "В оригинале +1 XP за победу Daily Divination. В 0.4.48 успешное личное задание даёт отдельный флаг personalAward и запись earned, отображаемый XP кампании равен state.completed.length. Бонус личного XP отсутствует. UTC-календарь к этой строке не относится. | https://github.com/DanilaH/hue-gradients/blob/4d205b238ec9e04c9cf7a4fe33c04a6f4b9a52a8/src/app/session.ts#L61",
-      "nextAction": "Проверить победу и повтор одного личного задания, курсор XP и дедупликацию на профиле. Учесть отдельно от подписанных дат общего календаря.",
+      "currentImplementation": "В оригинале +1 XP за победу Daily Divination. В 0.4.48 успешное личное задание даёт отдельный флаг personalAward и запись earned, отображаемый XP кампании равен state.completed.length. Бонус личного XP отсутствует. UTC-календарь к этой строке не относится. | https://github.com/DanilaH/hue-gradients/blob/4d205b238ec9e04c9cf7a4fe33c04a6f4b9a52a8/src/app/session.ts#L61 В оригинале подтверждён успешный путь +1 XP, но не повторная UI-идемпотентность. | docs/audits/daily-native-20261125.md",
+      "nextAction": "Согласовать отдельный/общий XP, не подменять завершения кампании; один award на дату/тип.",
       "deliveryPackage": "05",
       "sourceNextCheck": "Повторная победа по одному слоту, отдельность от кампании."
     },
@@ -840,8 +840,8 @@
       "status": "ROADMAPPED",
       "gap": "UNKNOWN",
       "stage": "Пакет 05",
-      "currentImplementation": "Обои кампании реализованы. Доказательств аналогичного обычного экспорта в оригинале недостаточно. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md",
-      "nextAction": "Реализовать соответствующий пункт пакета 05 и проверить приёмку из FULL_ROADMAP.md. Подтвердить границу источника: Записать в исходной игре отдельно share обычной победы и всех трёх daily, сохранить выходные файлы.",
+      "currentImplementation": "Обои кампании реализованы. Доказательств аналогичного обычного экспорта в оригинале недостаточно. | https://github.com/DanilaH/hue-gradients/blob/7e18212668d613cafbb1ff24be8a9e6ae779caa7/docs/STATUS.md | docs/audits/daily-native-20261125.md",
+      "nextAction": "На исходном телефоне полный маршрут тройки и итоговый файл; экспорт одной работы остаётся решением владельца.",
       "deliveryPackage": "05",
       "sourceNextCheck": "Записать в исходной игре отдельно share обычной победы и всех трёх daily, сохранить выходные файлы."
     },
