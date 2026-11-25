@@ -7,7 +7,7 @@ import type { AlbumRoute } from './albumView';
 import { chapterChallenges, challengeAvailable, challenges, challengeStatus, geometryChallenges } from '../domain/challenges';
 import { bookProgress, books } from '../domain/books';
 import { gradientThumbnail } from './exportRenderer';
-import { personalLevel, personalTaskName, TASK_KINDS, taskKey, taskStatus } from '../domain/personal';
+import { personalAssignments, personalLevel, personalTaskName, TASK_KINDS, taskKey, taskStatus } from '../domain/personal';
 import { renderProgress } from './progressView';
 import { boardGeometry, cellAt, cellCenter } from './geometry';
 import { personalArt } from './personalArt';
@@ -32,6 +32,7 @@ interface MetaView {
   playBook(target: BookTarget): void;
   bookInsertion?: BookTarget;
   dailyLoading: boolean;
+  personalDay: string;
   retryDaily?: () => void;
   playDaily(date: string, replay: boolean): void;
   playPersonal(key: string, restart: boolean): void;
@@ -39,8 +40,8 @@ interface MetaView {
 
 const personalShortLabels = { past: 'Рекорд', present: 'На время', future: 'Поле' };
 
-export function personalObjects(state: Workspace, key?: string) {
-  const progress = state.personalProgress;
+export function personalObjects(state: Workspace, key?: string, day?: string) {
+  const progress = day ? personalAssignments(state, day) : state.personalProgress;
   const tasks = progress ? TASK_KINDS.flatMap(kind => {
     const id = taskKey(progress.day, kind);
     const task = progress.tasks[id];
@@ -458,11 +459,13 @@ function renderModes(v: MetaView): void {
   }
   const dayCaption = daily
     ? `${daily.date === state.dailyProgress!.through ? '' : 'Архив · '}${shortDate.format(new Date(`${daily.date}T00:00:00Z`))}`
-    : v.dailyLoading ? 'Загрузка календаря…' : 'Календарь и архив';
+    : v.dailyLoading ? 'Загрузка календаря…' : 'Календарь пока недоступен';
 
   const objects = document.createElement('span');
   objects.className = 'mode-objects';
-  for (const kind of TASK_KINDS) objects.append(personalArt(kind));
+  const { tasks } = personalObjects(state, undefined, v.personalDay);
+  for (const { task } of tasks) objects.append(personalArt(task.kind));
+  const personalCaption = tasks.map(({ task }) => personalShortLabels[task.kind]).join(' · ');
 
   // The public Shapes set is available from the outset. Chapter secrets stay in their own route.
   const figure = geometryChallenges.find(item => item.level.id === 'geometry-v1-mixed')!;
@@ -482,13 +485,16 @@ function renderModes(v: MetaView): void {
   }
 
   const entries = [
-    ['daily', 'Задача дня', dayCaption, calendar],
-    ['personal', 'Личные задания', 'Рекорд · время · поле', objects],
-    ['challenges', 'Испытания', 'Фигуры, лимит и заезд', shape],
-    ['editor-home', 'Редактор', work?.name ?? 'Создать работу', canvas],
+    ['daily', daily && daily.date < state.dailyProgress!.through ? 'Архив' : 'Задача дня', dayCaption, calendar,
+      () => v.navigate({ kind: 'daily' })],
+    ['personal', 'Личные задания', personalCaption, objects, () => v.navigate({ kind: 'personal' })],
+    ['challenges', 'Испытания', 'Фигуры · ' + figure.level.title, shape,
+      () => v.navigate({ kind: 'challenges', group: 'geometry', selected: figure.level.id })],
+    ['editor-home', 'Редактор', work ? 'Продолжить · ' + work.name : 'Создать работу', canvas,
+      () => work ? v.navigate({ kind: 'draft', draftId: work.draftId }) : v.createWork()],
   ] as const;
-  for (const [kind, title, caption, art] of entries) {
-    const card = actionButton(gallery, '', () => v.navigate({ kind }), v.disabled);
+  for (const [kind, title, caption, art, open] of entries) {
+    const card = actionButton(gallery, '', open, v.disabled);
     card.className = 'quiet mode-card';
     card.dataset.modeEntry = kind;
     card.setAttribute('aria-label', title);
@@ -814,7 +820,9 @@ export function renderMeta(v: MetaView): void {
         : definitions.find(item => challengeAvailable(item,state));
       if (demonstration) renderChallengeDemo(list, demonstration.level, demonstration.moveLimit, route.group === 'geometry');
     }
+    const nextLocked = definitions.find(item => !challengeAvailable(item, state));
     for (const definition of definitions) {
+      if (!challengeAvailable(definition, state) && definition !== nextLocked) continue;
       const { level, requiredWorks, moveLimit } = definition;
       const locked = !challengeAvailable(definition, state);
       const attempt = state.challengeProgress?.attempts[level.id];

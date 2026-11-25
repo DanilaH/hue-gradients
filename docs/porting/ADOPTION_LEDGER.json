@@ -390,7 +390,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "MATCH",
       "stage": "Пакет 05",
-      "currentImplementation": "0.4.48, личные задания используют локальный календарный день, как StartSession оригинала. В Chromium при 2026-11-24 01:15 UTC личный экран показал 24 ноября в Екатеринбурге и 23 ноября в Лос-Анджелесе. Общий календарь использует отдельный доверенный UTC. | https://github.com/DanilaH/hue-gradients/blob/4d205b238ec9e04c9cf7a4fe33c04a6f4b9a52a8/src/game/mountGame.ts#L537 Граница: оригинал не перевыдаёт сессию при откате даты; наша история привязана к дате/типу. | docs/audits/daily-native-20261125.md",
+      "currentImplementation": "Локальная смена и откат даты восстанавливают выданные задачи. Chromium 0.4.49, 1 декабря → 25 ноября, ранее полученная награда сохранена. [Приёмка](../evidence/pr22-23-modes-personal-0.4.49.md)",
       "nextAction": "Полночь посреди попытки, откат даты и смена часового пояса на Android; отдельный UTC-календарь не смешивать.",
       "deliveryPackage": "05",
       "sourceNextCheck": "Проверить две зоны и перевод часов на опубликованном слоте."
@@ -400,7 +400,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 05",
-      "currentImplementation": "Отдельная задача предлагает прежний уровень с достижимой целью на ход лучше. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs PR №8/D2: Для идеального результата добавлена цель «Повторить рекорд» с удержанием математического минимума. В 0.4.37 кристалл открывает реальную цель и повтор рекорда. Оригинал: max(best,perfect) и штрафы −20 за perfect, −10 за историю. Наше best−1 — адаптация. | docs/audits/daily-native-20261125.md",
+      "currentImplementation": "Вес рекорда и общей истории по Pick; сохраняются улучшение на ход и повтор идеального минимума. [Приёмка](../evidence/pr22-23-modes-personal-0.4.49.md)",
       "nextAction": "Тест best 20/min 15, best=min и последний допустимый ход; решение владельца о мягком лимите.",
       "deliveryPackage": "05",
       "sourceNextCheck": "Прототип из уже решённой работы, последний допустимый ход засчитывается."
@@ -410,7 +410,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 05",
-      "currentImplementation": "Поле без помощи с локальным лимитом времени. Истечение проверено в Chromium. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs PR №8/D2: Лимит зависит от минимума, числа подвижных плиток и отдельного коэффициента для финала главы. В 0.4.35 тот же таймер пережил два перезапуска до и после обмена. В 0.4.37 песочные часы показывают остаток сохранённой попытки. Оригинал: текущий кластер по ≥5 победам, completed +10/history −20; perfect×3, boss×6. Наш запас 15–94 с на 60 полях. | docs/audits/daily-native-20261125.md",
+      "currentImplementation": "Последняя глава с пятью победами, веса прохождения/истории, приоритет первого финала и прежний таймер Полусна. [Приёмка](../evidence/pr22-23-modes-personal-0.4.49.md)",
       "nextAction": "Проверить выдачу по прогрессу, обычное поле и финал, таймер на устройстве; запас не менять до плейтеста.",
       "deliveryPackage": "05",
       "sourceNextCheck": "Проверить границу таймера и возобновление после паузы."
@@ -420,7 +420,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 05",
-      "currentImplementation": "0.4.48. Для личной пробы берётся пул непройденных из первой закрытой главы, при отсутствии закрытых — из оставшейся кампании. Сортируется по локальной оценке, затем применяется отбор по истории и весам. В Hue Too источники из C+1…C+3. | https://github.com/DanilaH/hue-gradients/blob/4d205b238ec9e04c9cf7a4fe33c04a6f4b9a52a8/src/domain/personal.ts#L84 Уточнение: оригинал допускает C и все последующие кластеры; в первых 28 из 30 максимум у 21 поля C+2 (модель), в конце остаётся непустым. Наш тест 60/60 требует отсутствия Future. | docs/audits/daily-native-20261125.md",
+      "currentImplementation": "Три слота при 60/60. Приоритет следующей главы, невыполненные перед выполненными, ротация равных кандидатов. [Приёмка](../evidence/pr22-23-modes-personal-0.4.49.md)",
       "nextAction": "P1: предложить устойчивую выдачу Future на 60/60 и по реальному прогрессу, в 30-дневном цикле; сохранить старые задания.",
       "deliveryPackage": "05",
       "sourceNextCheck": "Проверить выдачу на профилях с разным прогрессом."
@@ -430,7 +430,7 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 05",
-      "currentImplementation": "История личных заданий сохраняет одну отметку на задание и дату, повтор не дублирует. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs PR №8/D2: После коррекции даты сохраняются история, выданные поля и одна отметка за повтор. В 0.4.37 проверены четыре даты, откат календаря и повтор без дубля. Оригинал выбирает три слота независимо до записи глобальной истории, совпадение поля между слотами допустимо по коду. Future не учитывает историю. Наше различие полей и ротация — полезная адаптация. | docs/audits/daily-native-20261125.md В оригинале меню daily читает и проверяет кампанийный state, но helper передаёт null в PrepareGame; daily SaveLevelState пуст. Мы не переносим возможное удаление невалидного кампанийного state. | https://github.com/DanilaH/mini-games-kit/blob/534e488862195836982f6ac47c991541ce11b850/research/games/hue/porting/GENERATION_NATIVE_2026-11-25.md",
+      "currentImplementation": "Контракты по дате и типу, общая история в весах Past/Present, разные поля в один день и отдельные попытки. [Приёмка](../evidence/pr22-23-modes-personal-0.4.49.md)",
       "nextAction": "Проверить один ID в незавершённой кампании и в личном задании: ходы, state и best независимы, reset не затрагивает другой режим.",
       "deliveryPackage": "05",
       "sourceNextCheck": "Проверить на двух разных профилях, если вводится личная подборка."
@@ -440,7 +440,7 @@
       "status": "ROADMAPPED",
       "gap": "MISSING",
       "stage": "Пакет 05",
-      "currentImplementation": "В оригинале +1 XP за победу Daily Divination. В 0.4.48 успешное личное задание даёт отдельный флаг personalAward и запись earned, отображаемый XP кампании равен state.completed.length. Бонус личного XP отсутствует. UTC-календарь к этой строке не относится. | https://github.com/DanilaH/hue-gradients/blob/4d205b238ec9e04c9cf7a4fe33c04a6f4b9a52a8/src/app/session.ts#L61 В оригинале подтверждён успешный путь +1 XP, но не повторная UI-идемпотентность. | docs/audits/daily-native-20261125.md",
+      "currentImplementation": "Одна существующая локальная отметка за дату и тип. При повторе кампания и её права сохраняются; новый XP не начисляется. [Приёмка](../evidence/pr22-23-modes-personal-0.4.49.md)",
       "nextAction": "Согласовать отдельный/общий XP, не подменять завершения кампании; один award на дату/тип.",
       "deliveryPackage": "05",
       "sourceNextCheck": "Повторная победа по одному слоту, отдельность от кампании."

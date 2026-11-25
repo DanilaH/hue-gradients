@@ -1,6 +1,6 @@
-import { calendarDayIndex, isCalendarDay, pickWeighted } from '@danilah/mini-games-kit/core';
+import { calendarDayIndex, isCalendarDay } from '@danilah/mini-games-kit/core';
 import { chapters, getLevel, levels } from './levels';
-import { chapterIndexFor, chapterIsOpen, levelIsOpen } from './progression';
+import { chapterCount, chapterIndexFor, levelIsOpen } from './progression';
 import { chapterChallenges, challengeAvailable } from './challenges';
 import { createAttempt, proposeSwap, validateAttempt, type Attempt, type LevelDefinition } from './puzzle';
 import { timedRemaining } from './timeTrial';
@@ -23,7 +23,7 @@ interface Task {
   readonly clock?: { readonly remainingMs: number; readonly startedAt: number | null };
 }
 export interface PersonalProgress {
-  readonly policy: 'personal-v1' | 'personal-v2';
+  readonly policy: 'personal-v1' | 'personal-v2' | 'personal-v3';
   readonly day: string;
   readonly tasks: Readonly<Record<string, Task>>;
   readonly active: string | null;
@@ -57,49 +57,59 @@ export function personalDuration(level: LevelDefinition): number {
   return Math.max(15, 10 + level.minimumSwaps * secondsPerSwap + Math.ceil(movable / 3)) * 1_000;
 }
 
-function issue(state: Workspace, day: string): PersonalProgress | undefined {
+// Hue Too weights come from DailyPuzzlePicker.Pick (0x160f43c).
+// The four-chapter campaign favors C+1 in Future; same-day uniqueness and
+// equal-weight rotation are local rules. Existing contracts take precedence.
+export function personalAssignments(state: Workspace, day: string): PersonalProgress | undefined {
   const previous = state.personalProgress;
   if (!isCalendarDay(day)) return previous;
   const tasks = { ...previous?.tasks };
   const used = new Set(TASK_KINDS.flatMap(kind => tasks[taskKey(day, kind)]?.levelId ?? []));
-  const recent = Object.values(tasks).filter(task => task.date < day).sort((a, b) => b.date.localeCompare(a.date));
-  const pick = (kind: TaskKind, candidates: readonly string[]): string | undefined => {
-    const available = candidates.filter(id => !used.has(id));
-    if (!available.length) return undefined;
+  const recent = Object.values(tasks).filter(task => task.date < day);
+  const history = new Set(recent.map(task => task.levelId));
+  const completed = new Set(state.completed);
+  const current = chapters.reduce((last, _, index) => chapterCount(state, index) >= 5 ? index : last, 0);
+  const present = chapters[current]!.levelIds;
+  const future = chapters.slice(current).flatMap(chapter => chapter.levelIds);
+  const firstFinales = finales.filter(challenge => challengeAvailable(challenge, state) && !history.has(challenge.level.id));
+  const byKind: Record<TaskKind, readonly string[]> = {
+    past: state.completed.filter(id => best(state, id) != null),
+    present: [...firstFinales.map(challenge => challenge.level.id), ...present,
+      ...levels.filter(level => !present.includes(level.id) && levelIsOpen(state, level.id)).map(level => level.id)],
+    future: [...future, ...levels.filter(level => !future.includes(level.id)).map(level => level.id)],
+  };
+  const priority = (kind: TaskKind, id: string): number => {
+    if (kind === 'past') return (best(state, id)! <= getLevel(id).minimumSwaps ? -20 : 0) - (history.has(id) ? 10 : 0);
+    if (kind === 'present') {
+      if (firstFinales.some(challenge => challenge.level.id === id)) return 100;
+      return (present.includes(id) ? 40 : 0) + (completed.has(id) ? 10 : 0) - (history.has(id) ? 20 : 0);
+    }
+    const offset = chapterIndexFor(id) - current;
+    const latterHalf = chapters[chapterIndexFor(id)]!.levelIds.indexOf(id) > Math.floor(chapters[0]!.levelIds.length / 2);
+    return (completed.has(id) ? 0 : 100) + (offset === 1 ? 30 : offset > 1 ? 10 : offset === 0 ? 0 : -20)
+      + (levelIsOpen(state, id) ? 10 : 0) + (latterHalf ? 10 : 0);
+  };
+  const pick = (kind: TaskKind): string | undefined => {
+    const options = byKind[kind].filter(id => !used.has(id));
+    if (!options.length) return undefined;
+    const score = Math.max(...options.map(id => priority(kind, id)));
     const lastUse = new Map<string, string>();
     for (const task of recent) {
-      if (task.kind === kind && !lastUse.has(task.levelId)) lastUse.set(task.levelId, task.date);
+      if (task.kind === kind && task.date > (lastUse.get(task.levelId) ?? '')) lastUse.set(task.levelId, task.date);
     }
-    const earliestUse = available.reduce((earliest, id) => {
-      const last = lastUse.get(id) ?? '';
-      return last < earliest ? last : earliest;
-    }, day);
-    const pool = available.filter(id => (lastUse.get(id) ?? '') === earliestUse).slice(0, 4);
+    const tied = options.filter(id => priority(kind, id) === score);
+    const earliest = tied.reduce((date, id) => (lastUse.get(id) ?? '') < date ? lastUse.get(id) ?? '' : date, day);
+    const pool = tied.filter(id => (lastUse.get(id) ?? '') === earliest);
+    if (kind === 'future') pool.sort((a, b) => difficulty(getLevel(b)) - difficulty(getLevel(a)) || a.localeCompare(b));
+    else pool.sort();
     const seed = Math.imul(calendarDayIndex(day) + TASK_KINDS.indexOf(kind) * 103, 0x9e3779b9) >>> 0;
-    return pickWeighted(pool.map((value, index) => ({ value, weight: pool.length - index })), {
-      next: () => seed / 0x100000000,
-    });
-  };
-  const completed = new Set(state.completed);
-  const currentChapter = chapterIndexFor(state.activeLevelId);
-  const upcoming = chapters.find((_, index) => !chapterIsOpen(state, index));
-  const future = (upcoming ? upcoming.levelIds.map(getLevel) : levels)
-    .filter(level => !completed.has(level.id)).sort((a, b) => difficulty(b) - difficulty(a));
-  const firstFinales = finales.filter(challenge => challengeAvailable(challenge, state) &&
-    !recent.some(task => task.kind === 'present' && task.levelId === challenge.level.id));
-  // A personal preview can use nearby campaign fields without unlocking their campaign entries.
-  const present = levels.filter(level => levelIsOpen(state, level.id) || chapters[currentChapter]!.levelIds.slice(0, 6).includes(level.id))
-    .sort((a, b) => Number(completed.has(a.id)) - Number(completed.has(b.id)));
-  const options: Record<TaskKind, readonly string[]> = {
-    past: [...state.completed].reverse().filter(id => best(state, id) != null),
-    present: firstFinales.length ? firstFinales.map(challenge => challenge.level.id) : present.map(level => level.id),
-    future: future.map(level => level.id),
+    return pool[Math.floor(seed / 0x100000000 * Math.min(pool.length, kind === 'future' ? 4 : pool.length))];
   };
   let changed = previous?.day !== day;
   for (const kind of ['past', 'future', 'present'] as const) {
     const key = taskKey(day, kind);
     if (tasks[key]) continue;
-    const levelId = pick(kind, options[kind]);
+    const levelId = pick(kind);
     if (!levelId) continue;
     const base = { kind, date: day, levelId };
     const level = personalLevel(levelId);
@@ -111,7 +121,7 @@ function issue(state: Workspace, day: string): PersonalProgress | undefined {
     used.add(levelId);
     changed = true;
   }
-  return changed ? { policy: 'personal-v2', tasks, day, active: previous?.active ?? null, earned: previous?.earned ?? [] } : previous;
+  return changed ? { policy: 'personal-v3', tasks, day, active: previous?.active ?? null, earned: previous?.earned ?? [] } : previous;
 }
 export function taskStatus(task: Task): 'playing' | 'won' | 'lost' {
   if (task.attempt?.completed) return 'won';
@@ -125,7 +135,7 @@ export function activePersonal(progress?: PersonalProgress) {
 }
 
 export function applyPersonal(state: Workspace, action: PersonalAction): PersonalProgress | undefined {
-  if (action.kind === 'personal-issue') return issue(state, action.day);
+  if (action.kind === 'personal-issue') return personalAssignments(state, action.day);
   const progress = state.personalProgress;
   if (!progress || !count(action.now)) return progress;
   if (action.kind === 'personal-open') {
@@ -165,7 +175,7 @@ export function applyPersonal(state: Workspace, action: PersonalAction): Persona
     key, attempt.completed && !progress.earned.includes(key) ? [...progress.earned, key] : progress.earned);
 }
 export function validatePersonal(progress: PersonalProgress): void {
-  if (!progress || (progress.policy !== 'personal-v1' && progress.policy !== 'personal-v2') || !isCalendarDay(progress.day) || !progress.tasks || typeof progress.tasks !== 'object' ||
+  if (!progress || (progress.policy !== 'personal-v1' && progress.policy !== 'personal-v2' && progress.policy !== 'personal-v3') || !isCalendarDay(progress.day) || !progress.tasks || typeof progress.tasks !== 'object' ||
       Array.isArray(progress.tasks) || !Array.isArray(progress.earned) || new Set(progress.earned).size !== progress.earned.length ||
       (progress.active !== null && !progress.tasks[progress.active]?.attempt)) throw new Error('Invalid personal assignments');
   for (const [key, task] of Object.entries(progress.tasks)) {

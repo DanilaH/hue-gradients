@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { activePersonal, personalDuration, personalLevel, personalTaskName, taskKey, validatePersonal } from '../src/domain/personal';
+import { activePersonal, personalAssignments, personalDuration, personalLevel, personalTaskName, taskKey, validatePersonal } from '../src/domain/personal';
 import { chapters, levels } from '../src/domain/levels';
 import { chapterIsOpen } from '../src/domain/progression';
 import { applyAction, newWorkspace, type Workspace } from '../src/domain/workspace';
@@ -48,7 +48,7 @@ test('30 ideal victories offer a repeat and an unsolved goal after every chapter
   expect(campaign.completed).not.toContain(tasks[taskKey(day, 'future')]?.levelId);
   expect(new Set(Object.values(tasks).map(task => task.levelId)).size).toBe(3);
   const completed = clear(levels.map(level => level.id));
-  expect(Object.values(issue(completed, day).personalProgress!.tasks).map(task => task.kind)).toEqual(['past', 'present']);
+  expect(Object.values(issue(completed, day).personalProgress!.tasks).map(task => task.kind)).toEqual(['past', 'future', 'present']);
 });
 
 test('a corrected civil date returns to its issued contracts and does not award the same task twice', () => {
@@ -87,6 +87,47 @@ test('legacy task contracts survive policy change without losing the old active 
     tasks: { ...modern.personalProgress!.tasks, [present]: original } } };
   validatePersonal(old.personalProgress);
   const advanced = issue(old, '2026-12-01');
-  expect(advanced.personalProgress?.policy).toBe('personal-v2');
+  expect(advanced.personalProgress?.policy).toBe('personal-v3');
   expect(issue(advanced, day).personalProgress?.tasks[present]).toEqual(original);
+});
+
+test.each([0, 1, 5, 10, 30, 59, 60])('issues distinct slots with %i campaign wins', count => {
+  const campaign = clear(levels.slice(0, count).map(level => level.id));
+  const plan = personalAssignments(campaign, day)!;
+  const assigned = Object.values(plan.tasks);
+  expect(assigned).toHaveLength(count ? 3 : 2);
+  expect(new Set(assigned.map(task => task.levelId)).size).toBe(assigned.length);
+  expect(issue(campaign, day).personalProgress).toEqual(plan);
+  expect(campaign.personalProgress).toBeUndefined();
+  if (count < 60) expect(campaign.completed).not.toContain(plan.tasks[taskKey(day, 'future')]!.levelId);
+});
+
+test('all three slots survive 30 days at 60/60 and rotate without rewriting old contracts', () => {
+  const campaign = clear(levels.map(level => level.id));
+  const dates = Array.from({ length: 30 }, (_, day) => '2026-11-' + String(day + 1).padStart(2, '0'));
+  const snapshot = dates.reduce(issue, campaign);
+  for (const date of dates) {
+    const assigned = Object.values(snapshot.personalProgress!.tasks).filter(task => task.date === date);
+    expect(assigned).toHaveLength(3);
+    expect(new Set(assigned.map(task => task.levelId)).size).toBe(3);
+  }
+  for (let week = 0; week < 28; week += 7) {
+    expect(new Set(dates.slice(week, week + 7).map(date => snapshot.personalProgress!.tasks[taskKey(date, 'future')]!.levelId)).size).toBeGreaterThan(1);
+  }
+  const restored = issue(snapshot, dates[0]!);
+  expect(restored.personalProgress!.tasks).toEqual(snapshot.personalProgress!.tasks);
+  expect(restored.attempts).toEqual(campaign.attempts);
+  expect(restored.rights).toEqual(campaign.rights);
+});
+
+test('fills a missing legacy Future without modifying issued attempts or awarded slots', () => {
+  const campaign = clear(levels.map(level => level.id));
+  const old = issue(campaign, day);
+  const key = taskKey(day, 'future');
+  const { [key]: _, ...oldTasks } = old.personalProgress!.tasks;
+  const legacy = { ...old, personalProgress: { ...old.personalProgress!, policy: 'personal-v2' as const, tasks: oldTasks } };
+  const fixed = issue(legacy, day);
+  expect(fixed.personalProgress!.tasks[key]).toBeDefined();
+  for (const [id, task] of Object.entries(oldTasks)) expect(fixed.personalProgress!.tasks[id]).toBe(task);
+  expect(fixed.attempts).toBe(legacy.attempts);
 });

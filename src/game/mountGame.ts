@@ -389,7 +389,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     if (layer === 'meta' && metaRoute.kind === 'book') finishInsertion();
     if (layer !== 'meta') { metaReturn = layer; metaHistory = []; }
     else {
-      if (metaRoute.kind === 'modes' && route.kind !== 'modes') previousMode = route.kind;
+      if (metaRoute.kind === 'modes' && route.kind !== 'modes') previousMode = route.kind === 'draft' ? 'editor-home' : route.kind;
       const samePicker = route.kind === 'chapter' && metaRoute.kind === 'chapter'
         || route.kind === 'daily' && metaRoute.kind === 'daily'
         || route.kind === 'personal' && metaRoute.kind === 'personal'
@@ -792,7 +792,12 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
           onward.classList.add('result-next');
           onward.setAttribute('aria-label', 'Дальше');
         }
-        else byId('dialog-copy').textContent += '\nКампания собрана';
+        else {
+          byId('dialog-copy').textContent += '\nКампания собрана';
+          const levelsButton = button('К уровням', () => showMeta(campaignRoute()));
+          levelsButton.classList.add('result-next');
+          levelsButton.setAttribute('aria-label', 'К уровням');
+        }
         button('В альбом', () => showMeta({ kind: 'card', levelId: level.id }), !!next);
       }
     } else if (layer === 'restart') {
@@ -920,7 +925,7 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
         },
         play: startLevel, repeat: repeatLevel, playChallenge, playTimed, playDaily, playPersonal, playBook,
         ...(bookInsertion ? { bookInsertion } : {}),
-        dailyLoading,
+        dailyLoading, personalDay: localCalendarDay(),
         ...(dailyUnavailable && options.dailySource ? { retryDaily: () => void refreshDaily() } : {}),
         saveCopy: (levelId, name) => {
           const draftId = crypto.randomUUID();
@@ -1310,7 +1315,11 @@ export async function mountGame(parent: HTMLElement, store: TransactionalLocalSt
     render();
   });
   const clockTicker = setInterval(updateTimedClock, 200);
+  let lastMenuDay = localCalendarDay();
   const personalTicker = setInterval(() => {
+    const day = localCalendarDay();
+    if (ready && layer === 'meta' && metaRoute.kind === 'modes' && day !== lastMenuDay) render();
+    lastMenuDay = day;
     if (ready && !busy && !activity.isBlocked() && !session.pending && layer === 'meta' && metaRoute.kind === 'personal' &&
         session.state.personalProgress?.day !== localCalendarDay()) void issuePersonal();
   }, 1000);

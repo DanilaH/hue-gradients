@@ -48,10 +48,15 @@ try {
   const ready = page => page.waitForSelector('html[data-state=ready]');
   const idle = page => page.waitForSelector('#hue-app[data-busy=false]');
   const tasks = async page => {
-    await page.locator('#levels').tap();
+    if (await button(page, 'К уровням').isVisible()) await button(page, 'К уровням').tap();
+    else await page.locator('#levels').tap();
     await button(page, 'Режимы').tap();
-    await button(page, 'Личные задания').tap();
+    const entrance = button(page, 'Личные задания');
+    const advertised = await entrance.locator('.mode-objects canvas').count();
+    await entrance.tap();
     await card(page, 'present').waitFor();
+    assert.equal(await page.locator('[data-personal]').count(), advertised);
+
   };
   const date = async (page, day) => {
     await page.evaluate(day => sessionStorage.setItem('personal-date', String(Date.parse(day + 'T12:00:00Z'))), day);
@@ -270,13 +275,72 @@ try {
   assert.equal(afterMidnight.snapshot.personalProgress.tasks[sameDayKey].attempt.attemptId, replay.tasks[sameDayKey].attempt.attemptId);
   assert.deepEqual(afterMidnight.awards, [sameDayKey]);
   await finale.context.close();
+
+  const complete = await profile(originalDay);
+  await seedCampaign(complete.page, [15, 15, 15, 15]);
+  const beforeFullTask = (await state(complete.page)).snapshot;
+  assert.equal(beforeFullTask.completed.length, 60);
+  await tasks(complete.page);
+  const fullStart = (await state(complete.page)).snapshot;
+  assert.equal(await complete.page.locator('[data-personal]').count(), 3);
+  await card(complete.page, 'future').locator('strong').tap();
+  await complete.page.locator('[data-personal-play]').tap();
+  await idle(complete.page);
+  const fullKey = originalDay + ':future';
+  const fullTask = (await state(complete.page)).snapshot.personalProgress.tasks[fullKey];
+  await solve(complete.page, await levelFor(complete.page, fullTask.levelId));
+  await button(complete.page, 'К заданиям').tap();
+  const fullEnd = await state(complete.page);
+  assert.deepEqual(fullEnd.awards, [fullKey]);
+  assert.deepEqual(fullEnd.snapshot.attempts, beforeFullTask.attempts);
+  assert.deepEqual(fullEnd.snapshot.rights, beforeFullTask.rights);
+  assert.equal(fullStart.personalProgress.tasks[fullKey].levelId, fullTask.levelId);
+  await complete.context.close();
+
+  const menu = await profile(originalDay, recording);
+  const menuStart = Date.now() - menu.captureBase;
+  const menuPage = menu.page;
+  const mode = name => button(menuPage, name);
+  const menuHold = ms => recording ? menuPage.waitForTimeout(ms) : Promise.resolve();
+  await menuPage.locator('#levels').tap();
+  await mode('Режимы').tap();
+  assert.equal(await mode('Личные задания').locator('canvas').count(), 2);
+  assert.match(await mode('Задача дня').innerText(), /Календарь пока недоступен/);
+  await menuHold(650);
+  await mode('Испытания').tap();
+  assert.equal(await mode('Фигуры').getAttribute('aria-pressed'), 'true');
+  const figure = menuPage.locator('[data-challenge-id="geometry-v1-mixed"]');
+  assert.equal(await figure.getAttribute('aria-current'), 'true');
+  await menuHold(450);
+  await figure.tap();
+  await idle(menuPage);
+  await menuPage.waitForSelector('#hue-app[data-mode=challenge][data-layer=none]');
+  await menuHold(400);
+  await menuPage.locator('#levels').tap();
+  await figure.waitFor();
+  await mode('‹ Назад').tap();
+  const editor = mode('Редактор');
+  await editor.tap();
+  const editorName = menuPage.getByRole('textbox', { name: 'Название работы' });
+  await editorName.waitFor();
+  await menuHold(400);
+  await mode('Назад').tap();
+  assert.match(await editor.innerText(), /Продолжить/);
+  await editor.tap();
+  await editorName.waitFor();
+  assert.equal(Object.keys((await state(menuPage)).snapshot.creative.works).length, 1);
+  await menuHold(550);
+  const menuDuration = Date.now() - menu.captureBase - menuStart;
+  const menuVideo = menuPage.video();
+  await menu.context.close();
+  if (menuVideo) await menuVideo.saveAs(output + '/modes.webm');
   assert.deepEqual(errors, []);
   const report = { browser: browser.version(), starterDays, perfectCampaignWins: perfectCount,
     personalGoal: 'repeat-record', targetMoves: assignment.limit, unplayedFuture: future.levelId,
     correctedDay: [futureDay, originalDay], updatedWhileOpen: true, refreshedOnForeground: true, retainedHistory: true, awardsAfterReplay: 1,
     durationMs: { easy: ordinaryMs[0], ordinaryFinalField: ordinaryMs[1], finale: present.durationMs },
     finaleId: present.levelId, finaleWonViaTouch: true, finaleExpiryVerified: true, sameDayRetry: true, staleRetryReturnedToToday: true, civilClockDidNotChangeTimer: true, compactMenuAtAuthoredTextSize: true, backgroundTapPreservesSelection: true,
-    clipStartMillis, clipMillis, limits: 'Actual Chromium input. Campaign history made with domain actions and fixed civil/monotonic test clocks. Physical Android not run.' };
+    fullCampaignFuture: fullTask.levelId, fullCampaignFutureWon: true, menuStart, menuDuration, clipStartMillis, clipMillis, limits: 'Actual Chromium input. Campaign history made with domain actions and fixed civil/monotonic test clocks. Physical Android not run.' };
   await writeFile(`${output}/browser.json`, JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report));
 } finally {
