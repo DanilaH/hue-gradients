@@ -28,8 +28,8 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 04",
-      "currentImplementation": "Четыре тестовых собственных поля, включая треугольники и шестиугольники. | https://github.com/DanilaH/hue-gradients/blob/493b2415967e77f7c61bdb471e8db06677f63eb8/tools/shape-browser-check.mjs",
-      "nextAction": "Перепроверить взаимодействие, форму, отклик и различимость RGB на физическом телефоне (G1).",
+      "currentImplementation": "Четыре тестовых собственных поля, включая треугольники и шестиугольники. | https://github.com/DanilaH/hue-gradients/blob/493b2415967e77f7c61bdb471e8db06677f63eb8/tools/shape-browser-check.mjs Все 60 обычных полей текущей кампании прямоугольные. Hue Too имеет несколько групп форм у 1275/1440 обычных полей. | https://github.com/DanilaH/mini-games-kit/blob/534e488862195836982f6ac47c991541ce11b850/research/games/hue/porting/GENERATION_NATIVE_2026-11-25.md",
+      "nextAction": "Расширять собственную кампанию геометрическими семействами после первых 15; сначала редакционный пилот, проверить касание, читаемость и экспорт.",
       "deliveryPackage": "04",
       "sourceNextCheck": "Сравнить по одной собственной задаче одинаковой длины с разной геометрией."
     },
@@ -270,8 +270,8 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 04",
-      "currentImplementation": "Треугольники разной ориентации и разные формы не обмениваются; совместимые обмены проверены. | https://github.com/DanilaH/hue-gradients/blob/493b2415967e77f7c61bdb471e8db06677f63eb8/tools/shape-browser-check.mjs В 0.4.39 в пробе форм проверены допустимая и недопустимая пары без записи в профиль.",
-      "nextAction": "Перепроверить взаимодействие, форму, отклик и различимость RGB на физическом телефоне (G1).",
+      "currentImplementation": "Треугольники разной ориентации и разные формы не обмениваются; совместимые обмены проверены. | https://github.com/DanilaH/hue-gradients/blob/493b2415967e77f7c61bdb471e8db06677f63eb8/tools/shape-browser-check.mjs В 0.4.39 в пробе форм проверены допустимая и недопустимая пары без записи в профиль. 1275/1440 обычных полей Hue Too используют несколько групп совместимости. У нас это пока отдельные испытания. | https://github.com/DanilaH/mini-games-kit/blob/534e488862195836982f6ac47c991541ce11b850/research/games/hue/porting/GENERATION_NATIVE_2026-11-25.md",
+      "nextAction": "Проверить группы совместимости в новой кампании, включая ориентации; не переносить новые формы в старые fingerprint.",
       "deliveryPackage": "04",
       "sourceNextCheck": "На прототипе проверить, как игрок видит допустимые пары разных форм."
     },
@@ -280,8 +280,8 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 04",
-      "currentImplementation": "Для треугольного и смешанного поля у каждой совместимой группы один цикл. | https://github.com/DanilaH/hue-gradients/blob/493b2415967e77f7c61bdb471e8db06677f63eb8/tools/shape-browser-check.mjs",
-      "nextAction": "Перепроверить взаимодействие, форму, отклик и различимость RGB на физическом телефоне (G1).",
+      "currentImplementation": "Для треугольного и смешанного поля у каждой совместимой группы один цикл. | https://github.com/DanilaH/hue-gradients/blob/493b2415967e77f7c61bdb471e8db06677f63eb8/tools/shape-browser-check.mjs В 0.4.48 генератор group-cycle есть в фигурах; обычная кампания использует фиксированные старты. В оригинале reset вновь строит один цикл на каждую совместимую группу; 1950/1950 формул perfect совпали. | https://github.com/DanilaH/mini-games-kit/blob/534e488862195836982f6ac47c991541ce11b850/research/games/hue/porting/GENERATION_NATIVE_2026-11-25.md",
+      "nextAction": "Для новой версии — проверить 2/3/8 плиток в группе, singleton, несколько групп, опоры, минимум и сохранение seed/start. Не изменять legacy.",
       "deliveryPackage": "04",
       "sourceNextCheck": "Сверить минимумы однотипного и смешанного полей отдельно."
     },
@@ -290,8 +290,8 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "MATCH",
       "stage": "Пакет 01",
-      "currentImplementation": "Карточка показывает математический минимум, два личных рекорда и отметку идеальной чистой победы. Метка переживает перезапуск и новую победу с помощью. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/workCardView.ts",
-      "nextAction": "Проверить читаемость карточки на Android.",
+      "currentImplementation": "Карточка показывает математический минимум, два личных рекорда и отметку идеальной чистой победы. Метка переживает перезапуск и новую победу с помощью. | https://github.com/DanilaH/hue-gradients/blob/19e0410be30b80b50ced1168cd4aa4ef8b71ecc3/src/game/workCardView.ts Новый подсчёт 1950 записей Hue Too подтвердил сумму n−1 для каждой группы. В нашем ядре minimumSwaps считает фактические циклы, корректно для фиксированного старта. | https://github.com/DanilaH/mini-games-kit/blob/534e488862195836982f6ac47c991541ce11b850/research/games/hue/porting/GENERATION_NATIVE_2026-11-25.md",
+      "nextAction": "Проверить сохранение математического минимума на 100 новых group-cycle стартах нескольких форм; человеческая трудность отдельно.",
       "deliveryPackage": "01",
       "sourceNextCheck": "Довести знак и минимум до карточки и проверить после replay."
     },
@@ -430,8 +430,8 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "PARTIAL",
       "stage": "Пакет 05",
-      "currentImplementation": "История личных заданий сохраняет одну отметку на задание и дату, повтор не дублирует. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs PR №8/D2: После коррекции даты сохраняются история, выданные поля и одна отметка за повтор. В 0.4.37 проверены четыре даты, откат календаря и повтор без дубля. Оригинал выбирает три слота независимо до записи глобальной истории, совпадение поля между слотами допустимо по коду. Future не учитывает историю. Наше различие полей и ротация — полезная адаптация. | docs/audits/daily-native-20261125.md",
-      "nextAction": "30 дат, истощение пула, уникальные три ID при достаточном пуле, неизменность назначенных контрактов.",
+      "currentImplementation": "История личных заданий сохраняет одну отметку на задание и дату, повтор не дублирует. | https://github.com/DanilaH/hue-gradients/blob/1f206af56b9cde90fe571d30faab0e868352b207/tools/personal-browser-check.mjs PR №8/D2: После коррекции даты сохраняются история, выданные поля и одна отметка за повтор. В 0.4.37 проверены четыре даты, откат календаря и повтор без дубля. Оригинал выбирает три слота независимо до записи глобальной истории, совпадение поля между слотами допустимо по коду. Future не учитывает историю. Наше различие полей и ротация — полезная адаптация. | docs/audits/daily-native-20261125.md В оригинале меню daily читает и проверяет кампанийный state, но helper передаёт null в PrepareGame; daily SaveLevelState пуст. Мы не переносим возможное удаление невалидного кампанийного state. | https://github.com/DanilaH/mini-games-kit/blob/534e488862195836982f6ac47c991541ce11b850/research/games/hue/porting/GENERATION_NATIVE_2026-11-25.md",
+      "nextAction": "Проверить один ID в незавершённой кампании и в личном задании: ходы, state и best независимы, reset не затрагивает другой режим.",
       "deliveryPackage": "05",
       "sourceNextCheck": "Проверить на двух разных профилях, если вводится личная подборка."
     },
@@ -870,8 +870,8 @@
       "status": "IMPLEMENTED_UNVERIFIED",
       "gap": "MATCH",
       "stage": "Пакет 03",
-      "currentImplementation": "Перезапуск до раскрытия сохраняет тот же старт и сразу показывает RGB всех плиток; подтверждено снимками и байтами попытки. | https://github.com/DanilaH/hue-gradients/blob/a976384455eeb503df89fb45898727d6f35e9808/tools/chapter-challenge-browser-check.mjs",
-      "nextAction": "Повторить первое открытие, reload, Back и отображение цветов на телефоне (G1).",
+      "currentImplementation": "Перезапуск до раскрытия сохраняет тот же старт и сразу показывает RGB всех плиток; подтверждено снимками и байтами попытки. | https://github.com/DanilaH/hue-gradients/blob/a976384455eeb503df89fb45898727d6f35e9808/tools/chapter-challenge-browser-check.mjs В оригинале PrepareGame сохраняет ненулевой state; GetResetBoardState только при новом старте/рестарте. Daily helper передаёт null. | https://github.com/DanilaH/mini-games-kit/blob/534e488862195836982f6ac47c991541ce11b850/research/games/hue/porting/GENERATION_NATIVE_2026-11-25.md",
+      "nextAction": "Развести resume существующего state и новый restart в следующей ревизии; проверить secret, паузу, reload и смерть процесса.",
       "deliveryPackage": "03",
       "sourceNextCheck": "Если добавлять скрытие, проверить resume без повторного спойлера."
     },
@@ -880,10 +880,10 @@
       "status": "ROADMAPPED",
       "gap": "UNKNOWN",
       "stage": "Пакет 04",
-      "currentImplementation": "Редактор рассчитывает минимум OKLab между подвижными плитками и выдаёт CLOSE_COLORS_REVIEW при d < 0,025. В оригинале найден минимум после применения палитры. Влияние на выдачу не установлено. | https://github.com/DanilaH/hue-gradients/blob/92e581a641f7969b7f869a7db49a08bbbecf1d72/src/domain/editor.ts#L113",
-      "nextAction": "Пакет 04. Сохранить проверку редактора и её тесты. Для постановки адаптивной выдачи требуется обнаружить чтение метрики, меняющее поле или палитру.",
+      "currentImplementation": "Редактор рассчитывает минимум OKLab между подвижными плитками и выдаёт CLOSE_COLORS_REVIEW при d < 0,025. В оригинале найден минимум после применения палитры. Влияние на выдачу не установлено. | https://github.com/DanilaH/hue-gradients/blob/92e581a641f7969b7f869a7db49a08bbbecf1d72/src/domain/editor.ts#L113 Скан 88 сборок / 59322 ненулевых регистраций: из 36 LDR S +112 шесть в игровых модулях, только один читает поле минимума внутри UpdateColors. Из 208 LDR W +112 нет кандидатов в игровых модулях. Внешний читатель не установлен; косвенные обращения UNKNOWN. В архивных измерениях порог 0,025 сработал бы на 732/955 Hue 1 и 702/740 Color Puzzle. | https://github.com/DanilaH/mini-games-kit/blob/534e488862195836982f6ac47c991541ce11b850/research/games/hue/porting/GENERATION_NATIVE_2026-11-25.md",
+      "nextAction": "Оставить предупреждением, не использовать как универсальный запрет. Для адаптивной выдачи нужен подтверждённый потребитель поля. Следующее исследование — динамический watchpoint, сравнение UI/выдачи при низком и высоком значении.",
       "deliveryPackage": "04",
-      "sourceNextCheck": "Записать обращения к полю BoardPalette +112 при открытии фиксированных campaign и daily. При чтении проследить решение, индекс уровня и ключ палитры. | https://github.com/DanilaH/mini-games-kit/blob/cf7cffc48b4925a897c6613949c771d3325713bb/research/games/hue/porting/COLOR_AND_AD_TRIGGERS_2026-11-23.md#h2-perceptual"
+      "sourceNextCheck": "Динамический доступ к BoardPalette +112 или доказанная косвенная загрузка; не заключать об отсутствии потребителя только из scalar scan."
     },
     {
       "id": "h1-share-scores",
@@ -894,9 +894,29 @@
       "nextAction": "Включить сравнение после публикации выборки.",
       "deliveryPackage": "02",
       "sourceNextCheck": "На выборе своей механики определить допустимые попытки и отдельно проверить равенство ориентиру."
+    },
+    {
+      "id": "h2-shuffle-reset",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 04",
+      "deliveryPackage": "04",
+      "currentImplementation": "0.4.48. createAttempt копирует level.startTileAtPosition, включая replay; есть сохранение generatedStart в специальных полях. Нового seed на каждую новую обычную попытку нет. https://github.com/DanilaH/hue-gradients/blob/4d205b238ec9e04c9cf7a4fe33c04a6f4b9a52a8/src/domain/puzzle.ts#L100 | https://github.com/DanilaH/mini-games-kit/blob/534e488862195836982f6ac47c991541ce11b850/research/games/hue/porting/GENERATION_NATIVE_2026-11-25.md",
+      "nextAction": "Проектировать отдельную версию обычной попытки: новая перестановка на новый старт/restart, одна и та же при resume. Legacy и первые 15 сохраняются. Независимые replay/XP/best/PNG и миграция; два seed, нулевые и частичные ходы, аварийное завершение.",
+      "sourceNextCheck": "На оригинальном Android сравнить старты обычного уровня/restart и daily; установить сохранение/возврат после смерти процесса."
+    },
+    {
+      "id": "h2-content-series",
+      "status": "IMPLEMENTED_UNVERIFIED",
+      "gap": "PARTIAL",
+      "stage": "Пакет 04",
+      "deliveryPackage": "04",
+      "currentImplementation": "0.4.48. 60 собственных обычных уровней, все прямоугольные, 30 daily из десяти повторяющихся шаблонов. Оригинал: 232 BoardDef на 1440 обычных, 558/720 совпадений в парах i↔i+8, 0/240 в boss; 90/90 пакетов имеют спад математического минимума. https://github.com/DanilaH/hue-gradients/blob/4d205b238ec9e04c9cf7a4fe33c04a6f4b9a52a8/docs/spec/tools/build_release_candidates.py | https://github.com/DanilaH/mini-games-kit/blob/534e488862195836982f6ac47c991541ce11b850/research/games/hue/porting/GENERATION_NATIVE_2026-11-25.md",
+      "nextAction": "Собственный контентный пилот после 015: набор шаблонов rect/hex/tri/mixed, независимые палитры и опоры, волны минимума и новый seed; повтор шаблона не является браком. Согласовать диапазон нагрузки и точку расширения; сохранить legacy и опубликованные daily.",
+      "sourceNextCheck": "Сопоставить пары одинаковой геометрии в игре и запись босса; отделить нагрузку от визуальной сложности."
     }
   ],
-  "sourceInventory": "https://github.com/DanilaH/mini-games-kit/blob/cf7cffc48b4925a897c6613949c771d3325713bb/research/games/hue/porting/SOURCE_FEATURES.json",
-  "method": "Пакет 01 проверен на 0.4.11 и перенесён в feat/m0-foundation. Пакет 02 обновлён по 0.4.12. Остальные расхождения отражают срез 0.4.10. IMPLEMENTED_UNVERIFIED оставляет приёмку на телефоне открытой. 23 ноября четыре строки (h2-perceptual, h1-rate-grace, h1-reward-grace, h2-remove-prompt) отдельно сверены по коду 0.4.43 на 92e581a641f7969b7f869a7db49a08bbbecf1d72. Остальные строки сохраняют прежние срезы.",
+  "sourceInventory": "https://github.com/DanilaH/mini-games-kit/blob/534e488862195836982f6ac47c991541ce11b850/research/games/hue/porting/SOURCE_FEATURES.json",
+  "method": "Пакет 01 проверен на 0.4.11 и перенесён в feat/m0-foundation. Пакет 02 обновлён по 0.4.12. Остальные расхождения отражают срез 0.4.10. IMPLEMENTED_UNVERIFIED оставляет приёмку на телефоне открытой. 23 ноября четыре строки (h2-perceptual, h1-rate-grace, h1-reward-grace, h2-remove-prompt) отдельно сверены по коду 0.4.43 на 92e581a641f7969b7f869a7db49a08bbbecf1d72. Остальные строки сохраняют прежние срезы. 25 ноября дополнены результаты проверки текущего кода 0.4.48 (4d205b2) и два новых ID: свежий reset и редакционные серии. Нативные доказательства и каталог в kit PR #148; потребительская приёмка новых требований NOT RUN.",
   "ownerScope": "20.11.2026, после аудита 0.4.10: «это всё делать надо». Весь реестр включён в программу разработки. Более конкретные решения: бесплатные попытки, одни плавные обои на работу, cloud M5 на паузе. Формулировки прежнего аудита «кандидат» отражают предыдущий статус."
 }
